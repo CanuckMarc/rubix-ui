@@ -10,7 +10,7 @@ import {
   NodeSchema,
   NodeValue,
   NodeValues,
-  UpdateWiresConnection,
+  UpdateWiresConnection, WiresHelp,
 } from "../../../wailsjs/go/backend/App";
 import { db, node } from "../../../wailsjs/go/models";
 
@@ -19,6 +19,11 @@ export class FlowFactory {
   // arg2 is hostUUID
   // arg3 is used when user is programming on flow localhost (as in running rubix-edge-wires backend on their PC)
   // set arg3 to true if its a remote connection
+
+
+  async WiresHelp():Promise<string> {
+    return await WiresHelp();
+  }
 
   async BulkDeleteWiresConnection(
     connUUID: string,
