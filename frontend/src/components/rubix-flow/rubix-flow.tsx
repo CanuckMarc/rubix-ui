@@ -180,14 +180,14 @@ const Flow = (props: any) => {
   };
   
   const handleClickNode = (e: ReactMouseEvent, node: NodeInterface) => {
-    if (e.ctrlKey || e.metaKey) {
+    if (e.ctrlKey) {
       handleNodeContextMenu(e, node);
     }
   }
 
   const handleOnClick = (e: ReactMouseEvent) => {
     const element = e.target as HTMLElement;
-    if ((e.ctrlKey || e.metaKey) && element.classList.contains("react-flow__pane")) {
+    if (e.ctrlKey && element.classList.contains("react-flow__pane")) {
       handlePaneContextMenu(e);
     }
   };
@@ -374,7 +374,7 @@ const Flow = (props: any) => {
         fitViewOptions={{ maxZoom: 1 }}
         deleteKeyCode={["Delete"]}
         onNodeDragStop={handleNodeDragStop}
-        multiSelectionKeyCode={["AltLeft", "AltRight"]}
+        multiSelectionKeyCode={["Alt", "Meta"]}
       >
         <ControlUndoable
           canUndo={canUndo && past && past.length !== 0}
