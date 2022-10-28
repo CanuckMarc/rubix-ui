@@ -17,7 +17,7 @@ export const HelpModal: FC<HelpModalProps> = ({ open = false, onClose }) => {
     "Hold shift and drag for multi-selection.",
     "Drag a connection into empty space to add a new node and connect it to the source.",
     "SHORTCUTS...",
-    "Hold Control and Left click to select nodes or connections.",
+    "Hold Alt and Left click to select nodes or connections.",
     "Hold Control and A to select all node.",
     "Hold Control and E for export to nodes .",
     "Hold Control and I for import to nodes.",
