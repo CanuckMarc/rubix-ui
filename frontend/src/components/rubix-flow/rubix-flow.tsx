@@ -180,9 +180,8 @@ const Flow = (props: any) => {
   };
   
   const handleClickNode = (e: ReactMouseEvent, node: NodeInterface) => {
-    if (e.ctrlKey) {
-      handleNodeContextMenu(e, node);
-    }
+    e.preventDefault();
+    if (e.ctrlKey && !e.shiftKey) handleNodeContextMenu(e, node);
   }
 
   const handleOnClick = (e: ReactMouseEvent) => {
@@ -374,7 +373,7 @@ const Flow = (props: any) => {
         fitViewOptions={{ maxZoom: 1 }}
         deleteKeyCode={["Delete"]}
         onNodeDragStop={handleNodeDragStop}
-        multiSelectionKeyCode={["Alt", "Meta"]}
+        multiSelectionKeyCode={["Ctrl+Shift"]}
       >
         <ControlUndoable
           canUndo={canUndo && past && past.length !== 0}

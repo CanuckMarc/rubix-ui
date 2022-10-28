@@ -66,7 +66,7 @@ export const AutoSizeInput: FC<AutoSizeInputProps> = ({
 
   return (
     <>
-      <input ref={setRef} {...props} />
+      <input ref={setRef} {...props} value={props.value || ""} />
       <span ref={measureRef} style={{ ...baseStyles, ...styles }}>
         {props.value || ""}
       </span>
