@@ -43,4 +43,6 @@ export const ROUTES: ROUTE = {
     "/wires-connections/connections/:connUUID/hosts/:hostUUID",
   USER_GUIDE: "/user-guide",
   USER_GUIDE_REMOTE: "/user-guide/connections/:connUUID/hosts/:hostUUID",
+  SCHEDULES: "/schedules",
+  SCHEDULES_REMOTE: "/schedules/connections/:connUUID/hosts/:hostUUID",
 };

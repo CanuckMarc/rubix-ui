@@ -21,6 +21,7 @@ import AppStore from "./components/release/appStore";
 import RubixFlow from "./components/rubix-flow/rubix-flow";
 import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
+import Schedules from "./components/schedules/schedules";
 
 function AppRoutes() {
   return (
@@ -109,6 +110,11 @@ function AppRoutes() {
         key={routes.WIRES_CONNECTIONS}
         path={routes.WIRES_CONNECTIONS_REMOTE}
         element={<WiresConnections />}
+      />
+      <Route
+        key={routes.SCHEDULES}
+        path={routes.SCHEDULES_REMOTE}
+        element={<Schedules />}
       />
       <Route
         key={routes.USER_GUIDE}

@@ -9,6 +9,7 @@ let ObjectType = {
   HOSTS: "hosts",
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
+  SCHEDULES_REMOTE: "schedules",
 };
 
 interface ObjectTypeRoute {
@@ -62,6 +63,14 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
       ":hostUUID",
       hostUUID
     ),
+  [ObjectType.SCHEDULES_REMOTE]: (
+    connUUID: string = "",
+    hostUUID: string = ""
+  ) =>
+    ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(
+      ":hostUUID",
+      hostUUID
+    ),
 };
 
 function getItemValue(item: any, type: string) {
@@ -77,6 +86,7 @@ function getItemValue(item: any, type: string) {
     case ObjectType.HOSTS:
     case ObjectType.RUBIX_FLOW_REMOTE:
     case ObjectType.WIRES_CONNECTIONS_REMOTE:
+    case ObjectType.SCHEDULES_REMOTE:
     default:
       deleteProp = "";
       break;
@@ -219,6 +229,26 @@ export function getTreeDataIterative(connections: any) {
                       value: getItemValue(
                         host,
                         ObjectType.WIRES_CONNECTIONS_REMOTE
+                      ),
+                      children: null,
+                    },
+                    {
+                      ...getTreeObject(
+                        {
+                          name: "schedules",
+                          uuid: "schedules_" + host.uuid,
+                        },
+                        ObjectTypesToRoutes[
+                          ObjectType.SCHEDULES_REMOTE
+                        ](connection.uuid, host.uuid),
+                        ""
+                      ),
+                      next: ObjectTypesToRoutes[
+                        ObjectType.SCHEDULES_REMOTE
+                      ](connection.uuid, host.uuid),
+                      value: getItemValue(
+                        host,
+                        ObjectType.SCHEDULES_REMOTE
                       ),
                       children: null,
                     },
