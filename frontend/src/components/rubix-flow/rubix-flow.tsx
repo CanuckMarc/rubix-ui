@@ -34,7 +34,11 @@ import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
 import { ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
-import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
+import {
+  convertDataSpec,
+  getNodeSpecDetail,
+  useNodesSpec,
+} from "./use-nodes-spec";
 import { Spin } from "antd";
 import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
@@ -57,16 +61,19 @@ import { categoryColorMap } from "./util/colors";
 import { NodeCategory } from "./lib/Nodes/NodeCategory";
 import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
-import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
+import {
+  isValidConnection,
+  isInputExistConnection,
+} from "./util/isCanConnection";
 
 const edgeTypes = {
   default: CustomEdge,
 };
 
 type SelectableBoxType = {
-  edgeId: string,
-  rect: DOMRect | null,
-}
+  edgeId: string;
+  rect: DOMRect | null;
+};
 
 const Flow = (props: any) => {
   const { customNodeTypes } = props;
@@ -88,6 +95,7 @@ const Flow = (props: any) => {
   const [rubixFlowInstance, setRubixFlowInstance] = useState<
     ReactFlowInstance | any
   >(null);
+  const [isAddSub, setIsAddSub] = useState(false);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
 
   const { connUUID = "", hostUUID = "" } = useParams();
@@ -139,8 +147,13 @@ const Flow = (props: any) => {
       if (connection.target === null) return;
       if (
         connection.targetHandle &&
-        isInputExistConnection(edges, connection.target, connection.targetHandle)
-      ) return;
+        isInputExistConnection(
+          edges,
+          connection.target,
+          connection.targetHandle
+        )
+      )
+        return;
 
       const newEdge = {
         id: generateUuid(),
@@ -206,12 +219,13 @@ const Flow = (props: any) => {
         nodeType,
         newNode.id,
         lastConnectStart
-      )
+      );
 
       if (
         newEdge.targetHandle &&
         isInputExistConnection(edges, newEdge.target, newEdge.targetHandle)
-      ) return;
+      )
+        return;
 
       onEdgesChange([
         {
@@ -344,6 +358,7 @@ const Flow = (props: any) => {
     setNodePickerVisibility(undefined);
     setNodeMenuVisibility(undefined);
     setIsDoubleClick(false);
+    setIsAddSub(false);
   };
 
   const handlePaneClick = () => closeNodePicker();
@@ -557,6 +572,23 @@ const Flow = (props: any) => {
     }
   };
 
+  const hdlOpenNodePicker = (node: NodeInterface) => {
+    const elemNode = document.querySelectorAll(`[data-id='${node.id}']`)
+    if (elemNode && elemNode.length > 0) {
+      const widthSider = document.getElementById('rubix-sider')?.offsetWidth || 0
+      const widthAddNode = 194
+      const subPosition = 10
+      
+      const rect = elemNode[0]?.getBoundingClientRect()
+      const x = rect.x + rect.width - (widthSider + widthAddNode) - subPosition
+      const y = rect.y + rect.height - subPosition
+
+      setNodeMenuVisibility({ x, y });
+      setSelectedNode(node);
+      setIsAddSub(true);
+    }
+  };
+
   useEffect(() => {
     closeNodePicker();
     factory
@@ -691,6 +723,7 @@ const Flow = (props: any) => {
               onRefreshValues={handleRefreshValues}
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
+              onOpenNodePicker={hdlOpenNodePicker}
             />
             {nodePickerVisibility && (
               <NodePicker
@@ -706,6 +739,7 @@ const Flow = (props: any) => {
                 node={selectedNode}
                 onClose={closeNodePicker}
                 isDoubleClick={isDoubleClick}
+                isAddSub={isAddSub}
               />
             )}
           </ReactFlow>

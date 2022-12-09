@@ -328,6 +328,7 @@ export const MenuSidebar = () => {
 
   return (
     <Sider
+      id="rubix-sider"
       width={250}
       style={{ minHeight: "100vh" }}
       collapsed={collapsed}

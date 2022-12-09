@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ClearModal } from "./ClearModal";
 import { HelpModal } from "./HelpModal";
 import { LoadModal } from "./LoadModal";
@@ -12,12 +12,15 @@ import {
   UploadOutlined,
   PlayCircleOutlined,
   SettingOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { FlowFactory } from "../factory";
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { useParams } from "react-router-dom";
 import { handleNodesEmptySettings } from "../util/handleSettings";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
+import { ChangeParentNodeModal } from "./Modals";
+import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type ControlProps = {
   onDeleteEdges: (nodes: any, edges: any) => void;
@@ -27,6 +30,7 @@ type ControlProps = {
   onRefreshValues: () => void;
   settings: FlowSettings;
   onSaveSettings: (settings: FlowSettings) => void;
+  onOpenNodePicker: (node: NodeInterface) => void;
 };
 
 const Controls = ({
@@ -37,12 +41,16 @@ const Controls = ({
   onRefreshValues,
   settings,
   onSaveSettings,
+  onOpenNodePicker,
 }: ControlProps) => {
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
   const [settingRefreshModalOpen, setSettingRefreshModalOpen] = useState(false);
+  const [isWarningAddSubModal, setWarningAddSubModal] = useState(false);
+  const [nodeSelected, setNodeSelected] = useState<NodeInterface[]>([]);
+
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = connUUID && hostUUID ? true : false;
   const instance = useReactFlow();
@@ -63,6 +71,21 @@ const Controls = ({
     );
     instance.setNodes(newNodes);
   };
+
+  const getNodeSelected = () => {
+    const nodes = instance.getNodes() as NodeInterface[];
+    return nodes.filter((item) => item.selected && item.isParent);
+  };
+
+  const hdlOpenAddSub = () => {
+    const newNodeSelected = getNodeSelected();
+    if (newNodeSelected.length === 1) {
+      onOpenNodePicker(newNodeSelected[0]);
+    } else {
+      setWarningAddSubModal(true);
+    }
+  };
+  const hdlCloseAddSub = () => setWarningAddSubModal(false);
 
   /* Ctrl + e (key): Save Graph */
   useCtrlPressKey("KeyE", () => {
@@ -163,9 +186,25 @@ const Controls = ({
     onRefreshValues();
   });
 
+  useEffect(() => {
+    const newNodeSelected = getNodeSelected();
+    if (newNodeSelected.length !== nodeSelected.length) {
+      setNodeSelected(newNodeSelected);
+    }
+  }, [instance.getNodes()]);
+
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {nodeSelected.length > 0 && (
+          <div
+            className="cursor-pointer border-r bg-white hover:bg-gray-100"
+            title="Add sub node"
+            onClick={hdlOpenAddSub}
+          >
+            <PlusOutlined className="p-2 text-gray-700 align-middle" />
+          </div>
+        )}
         <div
           className="cursor-pointer border-r bg-white hover:bg-gray-100"
           title="Settings refresh value"
@@ -221,6 +260,10 @@ const Controls = ({
         open={settingRefreshModalOpen}
         onClose={() => setSettingRefreshModalOpen(false)}
         onSaveSettings={onSaveSettings}
+      />
+      <ChangeParentNodeModal
+        open={isWarningAddSubModal}
+        onClose={hdlCloseAddSub}
       />
     </>
   );

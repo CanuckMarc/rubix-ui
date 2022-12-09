@@ -20,6 +20,7 @@ type NodeMenuProps = {
   node: NodeInterface;
   isDoubleClick: boolean;
   onClose: () => void;
+  isAddSub: boolean;
 };
 
 const AddNodeComponent = ({
@@ -27,6 +28,7 @@ const AddNodeComponent = ({
   onClose,
   instance,
   isAddSubNode = false,
+  isAddSub,
 }: any) => {
   if (!node.isParent) return null;
 
@@ -101,6 +103,13 @@ const AddNodeComponent = ({
     setNodeList(nodeList);
   };
 
+  useEffect(() => {
+    if (isAddSub) {
+      setNodePickerVisibility(true);
+      fetchNodeList();
+    }
+  }, [isAddSub]);
+
   return (
     <>
       <div
@@ -161,6 +170,7 @@ const NodeMenu = ({
   node,
   isDoubleClick,
   onClose,
+  isAddSub,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
   const [isShowSetting, setIsShowSetting] = useState(false);
@@ -227,6 +237,7 @@ const NodeMenu = ({
             onClose={onClose}
             instance={instance}
             isAddSubNode={true}
+            isAddSub={isAddSub}
           />
           <AddNodeComponent node={node} onClose={onClose} instance={instance} />
           {nodeType.allowPayload && (

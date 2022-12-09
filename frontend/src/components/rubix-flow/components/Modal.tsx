@@ -9,7 +9,7 @@ export type ModalAction = {
 export type ModalProps = {
   open?: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   actions: ModalAction[];
 };
 
@@ -39,11 +39,13 @@ export const Modal: FC<PropsWithChildren<ModalProps>> = ({
         className="z-20 relative top-20 mx-auto border shadow-lg bg-white rounded-md"
         style={{ minWidth: "400px", width: "fit-content" }}
       >
-        <div className="p-3 border-b">
-          <h2 className="text-3xl text-center font-bold title black--text">
-            {title}
-          </h2>
-        </div>
+        {title && (
+          <div className="p-3 border-b">
+            <h2 className="text-3xl text-center font-bold title black--text">
+              {title}
+            </h2>
+          </div>
+        )}
         <div
           className="p-3 text-start black--text"
           style={{
