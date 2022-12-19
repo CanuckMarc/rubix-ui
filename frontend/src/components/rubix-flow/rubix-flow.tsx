@@ -1,10 +1,4 @@
-import {
-  MouseEvent as ReactMouseEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -18,11 +12,7 @@ import ReactFlow, {
 } from "react-flow-renderer/nocss";
 import useUndoable from "use-undoable";
 import cx from "classnames";
-import {
-  Box,
-  boxesIntersect,
-  useSelectionContainer,
-} from "@air/react-drag-to-select";
+import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
 
 import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
@@ -41,16 +31,9 @@ import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
 import ControlUndoable from "./components/ControlUndoable";
 import { NodeInterface } from "./lib/Nodes/NodeInterface";
-import {
-  handleGetSettingType,
-  handleNodesEmptySettings,
-} from "./util/handleSettings";
+import { handleGetSettingType, handleNodesEmptySettings } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
-import {
-  getFlowSettings,
-  FLOW_SETTINGS,
-  FlowSettings,
-} from "./components/FlowSettingsModal";
+import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
 import { NodeSideBar } from "./components/NodeSidebar";
 import "./rubix-flow.css";
 import { categoryColorMap } from "./util/colors";
@@ -64,9 +47,9 @@ const edgeTypes = {
 };
 
 type SelectableBoxType = {
-  edgeId: string,
-  rect: DOMRect | null,
-}
+  edgeId: string;
+  rect: DOMRect | null;
+};
 
 const Flow = (props: any) => {
   const { customNodeTypes } = props;
@@ -74,20 +57,15 @@ const Flow = (props: any) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
-  const [nodePickerVisibility, setNodePickerVisibility] =
-    useState<XYPosition>();
+  const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
-  const [lastConnectStart, setLastConnectStart] =
-    useState<OnConnectStartParams>();
-  const refreshInterval = useRef<null | number>(null);
-  const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] =
-    useUndoable({ nodes: nodes, edges: edges });
+  const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
+  const refreshInterval = useRef<null | any>(null);
+  const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] = useUndoable({ nodes: nodes, edges: edges });
   const [isDoubleClick, setIsDoubleClick] = useState(false);
   const [flowSettings, setFlowSettings] = useState(getFlowSettings());
   const rubixFlowWrapper = useRef<null | any>(null);
-  const [rubixFlowInstance, setRubixFlowInstance] = useState<
-    ReactFlowInstance | any
-  >(null);
+  const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
 
   const { connUUID = "", hostUUID = "" } = useParams();
@@ -133,21 +111,10 @@ const Flow = (props: any) => {
 
   const onMove = () => setShouldUpdateMiniMap((s) => !s);
 
-
   const handleAddNode = useCallback(
-    async (
-      isParent: boolean,
-      style: any,
-      nodeType: string,
-      position: XYPosition
-    ) => {
+    async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
       closeNodePicker();
-      const nodeSettings = await handleGetSettingType(
-        connUUID,
-        hostUUID,
-        isRemote,
-        nodeType
-      );
+      const nodeSettings = await handleGetSettingType(connUUID, hostUUID, isRemote, nodeType);
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
       const newNode = {
         id: generateUuid(),
@@ -166,22 +133,12 @@ const Flow = (props: any) => {
       if (lastConnectStart === undefined) return;
 
       // add an edge if we started on a socket
-      const originNode = nodes.find(
-        (node) => node.id === lastConnectStart.nodeId
-      );
+      const originNode = nodes.find((node) => node.id === lastConnectStart.nodeId);
       if (originNode === undefined) return;
 
-      const newEdge = calculateNewEdge(
-        originNode,
-        nodeType,
-        newNode.id,
-        lastConnectStart
-      );
+      const newEdge = calculateNewEdge(originNode, nodeType, newNode.id, lastConnectStart);
 
-      if (
-        newEdge.targetHandle &&
-        isInputExistConnection(edges, newEdge.target, newEdge.targetHandle)
-      ) {
+      if (newEdge.targetHandle && isInputExistConnection(edges, newEdge.target, newEdge.targetHandle)) {
         return;
       }
 
@@ -190,40 +147,28 @@ const Flow = (props: any) => {
     [lastConnectStart, nodes, onEdgesChange, onNodesChange]
   );
 
-  const handleStartConnect = (
-    e: ReactMouseEvent,
-    params: OnConnectStartParams
-  ) => {
+  const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
     setLastConnectStart(params);
   };
 
   const onEdgeContextMenu = useCallback(
     (evt: ReactMouseEvent, edge: any) => {
       evt.preventDefault();
-      const newEdges = edges.map((item) =>
-        item.id === edge.id ? { ...edge, selected: !item.selected } : item
-      );
+      const newEdges = edges.map((item) => (item.id === edge.id ? { ...edge, selected: !item.selected } : item));
       setEdges(newEdges);
     },
     [edges, setEdges]
   );
 
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
-    const {
-      nodeid: nodeId,
-      handleid: handleId,
-      handlepos: position,
-    } = (evt.target as HTMLDivElement).dataset;
+    const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
     const isTarget = position === "left";
 
     if (lastConnectStart) {
       const isDragSelected = edges.some((item) => {
         const isChangeTarget =
-          lastConnectStart.handleType === "target" &&
-          item.targetHandle === lastConnectStart.handleId;
-        const isChangeSource =
-          lastConnectStart.handleId === "out" &&
-          item.source === lastConnectStart.nodeId;
+          lastConnectStart.handleType === "target" && item.targetHandle === lastConnectStart.handleId;
+        const isChangeSource = lastConnectStart.handleId === "out" && item.source === lastConnectStart.nodeId;
 
         return item.selected && (isChangeTarget || isChangeSource);
       });
@@ -240,10 +185,7 @@ const Flow = (props: any) => {
         if (nodeId) {
           // update selected lines to new node if start and end are same type
           newEdges = edges.map((item) => {
-            if (
-              item.selected &&
-              lastConnectStart.nodeId === item[lastConnectStart.handleType!!]
-            ) {
+            if (item.selected && lastConnectStart.nodeId === item[lastConnectStart.handleType!!]) {
               const updateKey = isTarget ? "target" : "source";
               item[`${updateKey}Handle`] = handleId;
               item[updateKey] = nodeId;
@@ -320,10 +262,7 @@ const Flow = (props: any) => {
     setNodePickerVisibility({ x, y });
   };
 
-  const handleNodeContextMenu = (
-    event: React.MouseEvent,
-    node: NodeInterface
-  ) => {
+  const handleNodeContextMenu = (event: React.MouseEvent, node: NodeInterface) => {
     const { x, y } = setMousePosition(event);
     setNodeMenuVisibility({ x, y });
     setSelectedNode(node);
@@ -417,10 +356,7 @@ const Flow = (props: any) => {
     });
   };
 
-  const handleCopyNodes = async (_copied: {
-    nodes: NodeInterface[];
-    edges: any;
-  }) => {
+  const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
     /* Unselected nodes, edges */
     nodes.forEach((item) => (item.selected = false));
     edges.forEach((item) => (item.selected = false));
@@ -431,12 +367,7 @@ const Flow = (props: any) => {
      */
     const newFlow = handleCopyNodesAndEdges(_copied);
 
-    newFlow.nodes = await handleNodesEmptySettings(
-      connUUID,
-      hostUUID,
-      isRemote,
-      newFlow.nodes
-    );
+    newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
 
     const _nodes = [...nodes, ...newFlow.nodes];
     const _edges = [...edges, ...newFlow.edges];
@@ -461,9 +392,7 @@ const Flow = (props: any) => {
   };
 
   const onDrop = (event: any) => {
-    const { isParent, nodeType } = JSON.parse(
-      event.dataTransfer.getData("from-node-sidebar")
-    );
+    const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
     const position = setMousePosition(event, true);
     handleAddNode(isParent, null, nodeType, position);
   };
@@ -494,17 +423,11 @@ const Flow = (props: any) => {
   );
 
   const handleSelectEdges = (edgeIds: string[]) => {
-    const newEdges = edges.map((item) =>
-      edgeIds.includes(item.id) ? { ...item, selected: true } : item
-    );
+    const newEdges = edges.map((item) => (edgeIds.includes(item.id) ? { ...item, selected: true } : item));
     setEdges(newEdges);
   };
 
-  const handleInputEmpty = (
-    flowNodes: any,
-    nodes: NodeInterface[],
-    nodesSpec: NodeSpecJSON[]
-  ) => {
+  const handleInputEmpty = (flowNodes: any, nodes: NodeInterface[], nodesSpec: NodeSpecJSON[]) => {
     try {
       const newNodes: NodeInterface[] = nodes.map((node) => {
         const flowNode = flowNodes.find((item: any) => item.id === node.id);
@@ -530,18 +453,9 @@ const Flow = (props: any) => {
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
         let [_nodes, _edges] = behaveToFlow(res);
-        _nodes = handleInputEmpty(
-          res.nodes || [],
-          _nodes,
-          nodesSpec as NodeSpecJSON[]
-        );
+        _nodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
 
-        const newNodes = await handleNodesEmptySettings(
-          connUUID,
-          hostUUID,
-          isRemote,
-          _nodes
-        );
+        const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, _nodes);
 
         setNodes(newNodes);
         setEdges(_edges);
@@ -557,12 +471,7 @@ const Flow = (props: any) => {
   }, [connUUID, hostUUID]);
 
   useEffect(() => {
-    if (
-      past &&
-      past.length !== 0 &&
-      undoable.nodes &&
-      undoable.nodes.length > 0
-    ) {
+    if (past && past.length !== 0 && undoable.nodes && undoable.nodes.length > 0) {
       setNodes(undoable.nodes);
       setEdges(undoable.edges);
     }
@@ -586,10 +495,7 @@ const Flow = (props: any) => {
   useEffect(() => {
     if (refreshInterval.current) clearInterval(refreshInterval.current);
 
-    refreshInterval.current = setInterval(
-      handleRefreshValues,
-      flowSettings.refreshTimeout * 1000
-    );
+    refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
 
     return () => {
       if (refreshInterval.current) clearInterval(refreshInterval.current);
@@ -643,11 +549,7 @@ const Flow = (props: any) => {
               onRedo={handleRedo}
             />
             <Controls />
-            <Background
-              variant={BackgroundVariant.Lines}
-              color="#353639"
-              style={{ backgroundColor: "#1E1F22" }}
-            />
+            <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
             <BehaveControls
               onDeleteEdges={handleDeleteEdges}
               onCopyNodes={handleCopyNodes}
@@ -683,23 +585,12 @@ const Flow = (props: any) => {
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
 
-  const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce(
-    (nodes, node) => {
-      nodes[node.type] = (props: any) => <NodePanel {...props} spec={node} />;
-      return nodes;
-    },
-    {} as NodeTypes
-  );
+  const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
+    nodes[node.type] = (props: any) => <NodePanel {...props} spec={node} />;
+    return nodes;
+  }, {} as NodeTypes);
 
-  return (
-    <>
-      {isFetchingNodeSpec ? (
-        <Flow customNodeTypes={customNodeTypes} />
-      ) : (
-        <Spin />
-      )}
-    </>
-  );
+  return <>{isFetchingNodeSpec ? <Flow customNodeTypes={customNodeTypes} /> : <Spin />}</>;
 };
 
 export default RubixFlow;
