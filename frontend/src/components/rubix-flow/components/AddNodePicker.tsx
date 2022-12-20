@@ -62,7 +62,7 @@ export const AddNodeComponent = ({ node, selectedNodeForSubFlow, onClose, instan
     }
 
     const index = nodes.findIndex((n) => n.id === node.id);
-    const parentStyle = { width: 300, height: 300 };
+    const parentStyle = { minWidth: 300, height: 300 };
     nodes[index] = {
       ...node,
       style: isObjectEmpty(nodes[index]?.style || {}) ? parentStyle : nodes[index].style,
