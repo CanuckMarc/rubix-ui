@@ -9,7 +9,7 @@ import (
 
 func Test_EdgeSystem(t *testing.T) {
 	app := MockNewApp()
-	resp, err := app.edgeSystemCtlAction("edge-enviro-office", "rc", "nubeio-rubix-edge-wires", amodel.Restart)
+	resp, err := app.edgeSystemCtlAction("cloud", "rc", "rubix-edge-wires", amodel.Restart)
 	fmt.Println(err)
 	pprint.PrintJOSN(resp)
 }

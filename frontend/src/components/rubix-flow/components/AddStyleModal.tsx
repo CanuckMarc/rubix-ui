@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Spin } from "antd";
 import { JsonForm } from "../../../common/json-schema-form";
-import { useChangeNodeProprerties } from "../hooks/useChangeNodeData";
+import { useChangeNodeProperties } from "../hooks/useChangeNodeData";
 
 type AddStyleModalProps = {
   isModalVisible: boolean;
@@ -14,7 +14,7 @@ export const AddStyleModal = ({
   isModalVisible,
   onCloseModal,
 }: AddStyleModalProps) => {
-  const handleChange = useChangeNodeProprerties(node.id);
+  const handleChange = useChangeNodeProperties(node.id);
   const [formData, setFormData] = useState({} as any);
   const [schema, setSchema] = useState({});
   const [isLoadingForm, setIsLoadingForm] = useState(false);

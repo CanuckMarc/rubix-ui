@@ -2,7 +2,6 @@ import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState
 import ReactFlow, {
   Background,
   BackgroundVariant,
-  Connection,
   Controls,
   NodeTypes,
   OnConnectStartParams,
@@ -41,6 +40,7 @@ import { NodeCategory } from "./lib/Nodes/NodeCategory";
 import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
+import { flowToBehave } from "./transformers/flowToBehave";
 
 const edgeTypes = {
   default: CustomEdge,
@@ -51,12 +51,21 @@ type SelectableBoxType = {
   rect: DOMRect | null;
 };
 
+// this is save all nodes
+declare global {
+  interface Window {
+    allNodes: NodeInterface[];
+  }
+}
+
 const Flow = (props: any) => {
   const { customNodeTypes } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
+  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface | undefined>(undefined);
+  const [currentNodesAndEdges, setCurrentNodesAndEdges] = useState({ nodes, edges });
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
@@ -101,12 +110,10 @@ const Flow = (props: any) => {
 
   // delete selected wires
   useOnPressKey("Backspace", () => {
-    const newEdges = edges.filter((item) => !item.selected);
-    setEdges(newEdges);
-    setUndoable({
-      nodes,
-      edges: newEdges,
-    });
+    const edgesDeleted = edges.filter((item) => item.selected);
+    if (edgesDeleted.length > 0) {
+      updateCurrentNodesAndEdges([], edgesDeleted);
+    }
   });
 
   const onMove = () => setShouldUpdateMiniMap((s) => !s);
@@ -118,7 +125,7 @@ const Flow = (props: any) => {
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
       const newNode = {
         id: generateUuid(),
-        isParent,
+        isParent: selectedNodeForSubFlow ? false : isParent,
         style,
         type: nodeType,
         position,
@@ -126,8 +133,10 @@ const Flow = (props: any) => {
           inputs: convertDataSpec(spec.inputs || []),
           out: convertDataSpec(spec.outputs || []),
         },
+        parentId: selectedNodeForSubFlow?.id || undefined,
         settings: nodeSettings,
       };
+
       onNodesChange([{ type: "add", item: newNode }]);
 
       if (lastConnectStart === undefined) return;
@@ -146,6 +155,60 @@ const Flow = (props: any) => {
     },
     [lastConnectStart, nodes, onEdgesChange, onNodesChange]
   );
+
+  const handleAddSubFlow = (node: NodeInterface) => {
+    setSelectedNodeForSubFlow(node);
+    // save current data
+    setCurrentNodesAndEdges({
+      nodes: [...nodes],
+      edges: [...edges],
+    });
+
+    const subNodes = nodes.filter((nodeItem: NodeInterface) => nodeItem.parentId === node.id);
+    const subEdges = edges.filter((edgeItem) => {
+      const haveEdge = subNodes.find((nodeItem: NodeInterface) =>
+        [edgeItem.source, edgeItem.target].includes(nodeItem.id)
+      );
+      return !!haveEdge;
+    });
+    setNodes(subNodes);
+    setEdges(subEdges);
+  };
+
+  const getAllNodesAndEdges = () => {
+    const oldsNodes = currentNodesAndEdges.nodes.filter((node: NodeInterface) => {
+      const nodeExist = nodes.find((nodeItem) => node.id === nodeItem.id);
+      return !nodeExist;
+    });
+    const oldsEdges = currentNodesAndEdges.edges.filter((edgeItemOld) => {
+      const edge = edges.find((edgeItem) => edgeItemOld.id === edgeItem.id);
+      return !edge;
+    });
+    return {
+      nodes: [...oldsNodes, ...nodes],
+      edges: [...oldsEdges, ...edges],
+    };
+  };
+
+  const onSaveSubFlow = () => {
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+    setNodes(allNodes);
+    setEdges(allEdges);
+    setCurrentNodesAndEdges({ nodes: [], edges: [] });
+    setSelectedNodeForSubFlow(undefined);
+  };
+
+  const onHandelSaveFlow = async () => {
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+    const graphJson = flowToBehave(allNodes, allEdges);
+    await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
+
+    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, allNodes);
+    setCurrentNodesAndEdges({ nodes: [], edges: [] });
+    setSelectedNodeForSubFlow(undefined);
+    setNodes(newNodes);
+    setEdges(allEdges);
+  };
 
   const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
     setLastConnectStart(params);
@@ -349,10 +412,36 @@ const Flow = (props: any) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
-  const handleDeleteEdges = (_nodes: any, _edges: any) => {
+  const updateCurrentNodesAndEdges = (_nodesDeleted: any, _edgesDeleted: any) => {
+    const nodesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.nodes : nodes;
+    const edgesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.edges : edges;
+
+    const newNodes = nodesWillHandle.filter((currItem: NodeInterface) => {
+      const item = _nodesDeleted.find((nodeDeleted: NodeInterface) => {
+        if (nodeDeleted.isParent) {
+          return nodeDeleted.id === currItem.id || nodeDeleted.id === currItem.parentId;
+        }
+        return nodeDeleted.id === currItem.id;
+      });
+      return !item;
+    });
+
+    const newEdges = edgesWillHandle.filter((currItem) => {
+      const item = _edgesDeleted.find((edge: NodeInterface) => edge.id === currItem.id);
+      return !item;
+    });
+
+    if (selectedNodeForSubFlow) {
+      setCurrentNodesAndEdges({
+        nodes: newNodes,
+        edges: newEdges,
+      });
+    }
+    setNodes(newNodes);
+    setEdges(newEdges);
     setUndoable({
-      nodes: _nodes,
-      edges: _edges,
+      nodes: newNodes,
+      edges: newEdges,
     });
   };
 
@@ -478,6 +567,8 @@ const Flow = (props: any) => {
   }, [undoable]);
 
   useEffect(() => {
+    if (selectedNodeForSubFlow) return;
+
     //When deleting a container, will also delete the nodes that belong to it
     const subNodes = nodes.filter((n: any) => n.parentId) as any[];
     if (subNodes.length === 0) return;
@@ -490,7 +581,7 @@ const Flow = (props: any) => {
       }
     }
     setNodes(newNodes);
-  }, [nodes]);
+  }, [nodes, selectedNodeForSubFlow]);
 
   useEffect(() => {
     if (refreshInterval.current) clearInterval(refreshInterval.current);
@@ -502,6 +593,29 @@ const Flow = (props: any) => {
     };
   }, [flowSettings.refreshTimeout]);
 
+  const getNodesAndEdges = useCallback(() => {
+    const newNodes = nodes.filter((node: NodeInterface) => {
+      if (selectedNodeForSubFlow) {
+        return !node.isParent && node.parentId === selectedNodeForSubFlow.id;
+      }
+      return !node.parentId;
+    });
+    const newEdges = edges.filter((edge) => {
+      const item = newNodes.find((node) => [edge.source, edge.target].includes(node.id));
+      return !!item;
+    });
+    return {
+      nodes: newNodes,
+      edges: newEdges,
+    };
+  }, [selectedNodeForSubFlow, nodes, edges]);
+
+  useEffect(() => {
+    window.allNodes = nodes;
+  }, [nodes]);
+
+  const { nodes: nodesFiltered, edges: edgesFiltered } = getNodesAndEdges();
+
   return (
     <div className="rubix-flow">
       <ReactFlowProvider>
@@ -510,8 +624,8 @@ const Flow = (props: any) => {
           <ReactFlow
             nodeTypes={customNodeTypes}
             edgeTypes={edgeTypes}
-            nodes={nodes}
-            edges={edges}
+            nodes={nodesFiltered}
+            edges={edgesFiltered}
             onMove={onMove}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -533,7 +647,7 @@ const Flow = (props: any) => {
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
-                nodes={nodes}
+                nodes={nodesFiltered}
                 shouldUpdate={shouldUpdateMiniMap}
                 className={cx("absolute", {
                   "top-20 right-4": flowSettings.positionMiniMap === "top",
@@ -551,18 +665,21 @@ const Flow = (props: any) => {
             <Controls />
             <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
             <BehaveControls
-              onDeleteEdges={handleDeleteEdges}
+              onDeleteEdges={updateCurrentNodesAndEdges}
               onCopyNodes={handleCopyNodes}
               onUndo={undo}
               onRedo={handleRedo}
               onRefreshValues={handleRefreshValues}
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
+              selectedNodeForSubFlow={selectedNodeForSubFlow}
+              onSaveSubFlow={onSaveSubFlow}
+              onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
               <NodePicker
                 position={nodePickerVisibility}
-                filters={getNodePickerFilters(nodes, lastConnectStart)}
+                filters={getNodePickerFilters(nodesFiltered, lastConnectStart)}
                 onPickNode={handleAddNode}
                 onClose={closeNodePicker}
               />
@@ -573,6 +690,8 @@ const Flow = (props: any) => {
                 node={selectedNode}
                 onClose={closeNodePicker}
                 isDoubleClick={isDoubleClick}
+                handleAddSubFlow={handleAddSubFlow}
+                selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
           </ReactFlow>
@@ -586,7 +705,7 @@ export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
-    nodes[node.type] = (props: any) => <NodePanel {...props} spec={node} />;
+    nodes[node.type] = (props: any) => <NodePanel {...props} spec={node} key={node.id} />;
     return nodes;
   }, {} as NodeTypes);
 

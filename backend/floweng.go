@@ -10,6 +10,8 @@ import (
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-edge-wires/flow"
 	"github.com/NubeIO/rubix-ui/backend/flowcli"
+	"github.com/bsm/ratelimit"
+	"time"
 )
 
 var flowEngIP = "0.0.0.0"
@@ -428,7 +430,7 @@ func (inst *App) NodeSchema(connUUID, hostUUID string, isRemote bool, nodeName s
 	if isRemote {
 		resp, err := inst.nodeSchema(connUUID, hostUUID, nodeName)
 		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			// inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
 		return resp
@@ -515,8 +517,14 @@ func (inst *App) downloadFlow(connUUID, hostUUID string, encodedNodes interface{
 	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
 }
 
+var downloadRateLimit = ratelimit.New(1, 5*time.Second)
+
 func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedNodes interface{}, restartFlow bool) *flow.Message {
 	if isRemote {
+		if downloadRateLimit.Limit() {
+			inst.uiWarningMessage("downloads are limited to one every 5 seconds")
+			return nil
+		}
 		resp, err := inst.downloadFlow(connUUID, hostUUID, encodedNodes, restartFlow)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -530,6 +538,7 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 			}
 			inst.uiSuccessMessage("restarted rubix-edge-wires ok")
 		}
+
 		return resp
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})

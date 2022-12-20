@@ -7,7 +7,6 @@ import (
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/NubeIO/rubix-edge/service/system"
 	"github.com/NubeIO/rubix-ui/backend/constants"
-	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 )
 
 func (inst *App) EdgeGetNetworks(connUUID, hostUUID string) []networking.NetworkInterfaces {
@@ -26,7 +25,7 @@ func (inst *App) EdgeGetNetworks(connUUID, hostUUID string) []networking.Network
 type IpSettings struct {
 	Type     string   `json:"type" default:"string"`
 	Title    string   `json:"title" default:"ip setting"`
-	Options  []string `json:"enum" default:"[\"dhcp\",\"static\"]"`
+	Options  []string `json:"enum" default:"[\"dhcp-dynamic\",\"static-fixed\"]"`
 	EnumName []string `json:"enumNames" default:"[\"dhcp-dynamic\",\"static-fixed\"]"`
 	ReadOnly bool     `json:"readOnly" default:"false"`
 }
@@ -78,32 +77,141 @@ type RcNetworkBody struct {
 	Eth1Gateway    string `json:"eth1_gateway"`
 }
 
+const (
+	dhcpDynamic = "dhcp-dynamic"
+	staticFixed = "static-fixed"
+)
+
 func (inst *App) RcSetNetworks(connUUID, hostUUID string, rcNetworkBody *RcNetworkBody) {
+	if rcNetworkBody == nil {
+		inst.uiErrorMessage(fmt.Sprintf("edit networks body can not be empty"))
+	}
+	if rcNetworkBody.Eth0IpSettings == "" && rcNetworkBody.Eth1IpSettings == "" {
+		inst.uiErrorMessage("ip setting cant not be empty, please select dhcp-dynamic or static")
+		return
+	}
+	if rcNetworkBody.Eth0Interface == "" && rcNetworkBody.Eth1Interface == "" {
+		inst.uiErrorMessage("network interface eth0 or eth1 must be provided")
+		return
+	}
+
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(err)
 		return
 	}
 	deviceInfo, err := assistClient.GetEdgeDeviceInfo(hostUUID)
-	if deviceInfo == nil {
-		inst.uiErrorMessage(err)
+	if deviceInfo == nil || err != nil {
+		if err != nil {
+			inst.uiErrorMessage(err)
+		}
+		inst.uiErrorMessage("failed to get device info")
 		return
 	}
 	deviceType := deviceInfo.DeviceType
-	if rcNetworkBody == nil {
-		inst.uiErrorMessage(fmt.Sprintf("edit networks body can not be empty"))
+
+	if deviceType == constants.RubixCompute.String() || deviceType == constants.RubixCompute5.String() || deviceType == constants.RubixComputeIO.String() {
+
+	} else {
+		inst.uiErrorMessage("networks can only be updated on a nube-io device")
+		return
 	}
-
-	fmt.Println(deviceType)
-
-	if deviceType == constants.RubixCompute.String() || deviceType == constants.RubixCompute5.String() {
-
+	// set ETH0
+	if rcNetworkBody.Eth0Interface != "" {
+		inst.uiSuccessMessage(fmt.Sprintf("try and update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
+		if rcNetworkBody.Eth0IpSettings == dhcpDynamic {
+			resp, err := inst.EdgeDHCPSetAsAuto(connUUID, hostUUID, &system.NetworkingBody{
+				PortName: "eth0",
+			})
+			if err != nil {
+				inst.uiErrorMessage(err.Error())
+				return
+			}
+			inst.uiSuccessMessage(fmt.Sprintf(resp.Message))
+			return
+		}
+		if rcNetworkBody.Eth0IpSettings == staticFixed {
+			_, err := inst.EdgeDHCPSetStaticIP(connUUID, hostUUID, &dhcpd.SetStaticIP{
+				Ip:                   rcNetworkBody.Eth0Ip,
+				NetMask:              rcNetworkBody.Eth0Netmask,
+				IFaceName:            "eth0",
+				GatewayIP:            rcNetworkBody.Eth0Gateway,
+				DnsIP:                "8.8.8.8",
+				CheckInterfaceExists: false,
+				SaveFile:             true,
+			})
+			if err != nil {
+				inst.uiErrorMessage(err.Error())
+				return
+			}
+			inst.uiSuccessMessage("update eth0 to fixed ip ok, please now reboot or repower the device")
+			return
+		}
 	}
-
-	if deviceType == constants.RubixComputeIO.String() {
-
+	// set ETH1
+	if rcNetworkBody.Eth1Interface != "" {
+		inst.uiSuccessMessage(fmt.Sprintf("try and update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
+		if rcNetworkBody.Eth1IpSettings == dhcpDynamic {
+			resp, err := inst.EdgeDHCPSetAsAuto(connUUID, hostUUID, &system.NetworkingBody{
+				PortName: "eth1",
+			})
+			if err != nil {
+				inst.uiErrorMessage(err.Error())
+				return
+			}
+			inst.uiSuccessMessage(fmt.Sprintf(resp.Message))
+			return
+		}
+		if rcNetworkBody.Eth1IpSettings == staticFixed {
+			_, err := inst.EdgeDHCPSetStaticIP(connUUID, hostUUID, &dhcpd.SetStaticIP{
+				Ip:                   rcNetworkBody.Eth1Ip,
+				NetMask:              rcNetworkBody.Eth1Netmask,
+				IFaceName:            "eth1",
+				GatewayIP:            rcNetworkBody.Eth1Gateway,
+				DnsIP:                "8.8.8.8",
+				CheckInterfaceExists: false,
+				SaveFile:             true,
+			})
+			if err != nil {
+				inst.uiErrorMessage(err.Error())
+				return
+			}
+			inst.uiSuccessMessage("update eth1 to fixed ip ok, please now reboot or repower the device")
+			return
+		}
 	}
-	pprint.PrintJOSN(rcNetworkBody)
+}
+
+func (inst *App) EdgeDHCPSetAsAuto(connUUID, hostUUID string, body *system.NetworkingBody) (*system.Message, error) {
+	client, err := inst.getAssistClient(&AssistClient{
+		ConnUUID: connUUID,
+	})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil, err
+	}
+	resp, err := client.EdgeDHCPSetAsAuto(hostUUID, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (inst *App) EdgeDHCPSetStaticIP(connUUID, hostUUID string, body *dhcpd.SetStaticIP) (string, error) {
+	client, err := inst.getAssistClient(&AssistClient{
+		ConnUUID: connUUID,
+	})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return "", err
+	}
+	resp, err := client.EdgeDHCPSetStaticIP(hostUUID, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return "", err
+	}
+	return resp, nil
 }
 
 func (inst *App) setEth0(connUUID, hostUUID string, eth0Body networking.NetworkInterfaces) Eth0 {
@@ -252,36 +360,4 @@ func (inst *App) EdgeDHCPPortExists(connUUID, hostUUID string, body *system.Netw
 		return nil
 	}
 	return exists
-}
-
-func (inst *App) EdgeDHCPSetAsAuto(connUUID, hostUUID string, body *system.NetworkingBody) *system.Message {
-	// client, err := inst.initConnectionAuth(&AssistClient{
-	//	ConnUUID: connUUID,
-	// })
-	// if err != nil {
-	//	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	//	return nil
-	// }
-	// resp, err := client.EdgeDHCPSetAsAuto(hostUUID, body)
-	// if err != nil {
-	//	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	//	return  nil
-	// }
-	return nil
-}
-
-func (inst *App) EdgeDHCPSetStaticIP(connUUID, hostUUID string, body *dhcpd.SetStaticIP) string {
-	// client, err := inst.initConnectionAuth(&AssistClient{
-	//	ConnUUID: connUUID,
-	// })
-	// if err != nil {
-	//	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	//	return ""
-	// }
-	// resp, err := client.EdgeDHCPSetStaticIP(hostUUID, body)
-	// if err != nil {
-	//	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	//	return  ""
-	// }
-	return ""
 }

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useReactFlow } from "react-flow-renderer/nocss";
+import { NodeInterface } from '../lib/Nodes/NodeInterface';
 
 export const useChangeNodeData = (id: string) => {
   const instance = useReactFlow();
@@ -23,20 +24,19 @@ export const useChangeNodeData = (id: string) => {
   );
 };
 
-export const useChangeNodeProprerties = (id: string) => {
+export const useChangeNodeProperties = (id: string) => {
   const instance = useReactFlow();
 
   return useCallback(
     (key: string, value: any) => {
-      instance.setNodes((nodes) =>
-        nodes.map((n) => {
-          if (n.id !== id) return n;
-          return {
-            ...n,
-            [key]: value,
-          };
-        })
-      );
+      const newNodes = window.allNodes.map((node: NodeInterface) => {
+        if (node.id !== id) return node;
+        return {
+          ...node,
+          [key]: value,
+        };
+      });
+      instance.setNodes(newNodes);
     },
     [instance, id]
   );

@@ -128,6 +128,8 @@ github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6r
 github.com/bep/debounce v1.2.1 h1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY=
 github.com/bep/debounce v1.2.1/go.mod h1:H8yggRPQKLUhUoqrJC1bO2xNya7vanpDl7xR3ISbCJ0=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
+github.com/bsm/ratelimit v2.0.0+incompatible h1:cV5yEqApIEkLumVjN65y/PlVrzJfCfz+b7BUQrNvCxA=
+github.com/bsm/ratelimit v2.0.0+incompatible/go.mod h1:CKXgBlwczX35ERUvw2g6Nl+CT0QNd5m+xh3fpzjgbzo=
 github.com/carlmjohnson/errutil v0.21.5/go.mod h1:DMNW3MBHsaV/EPm8pjs4sA/gNjNsG4rUzbAfOh++gSM=
 github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
 github.com/carlmjohnson/flagext v0.22.1/go.mod h1:SKojRbVQTvw04RKgb+4Y1mSlAPFC3p76pUNXGUaJZuQ=

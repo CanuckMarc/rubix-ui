@@ -25,6 +25,7 @@ require (
 	github.com/NubeIO/rubix-edge v0.3.0
 	github.com/NubeIO/rubix-edge-wires v0.2.0
 	github.com/NubeIO/rubix-registry-go v1.0.0
+	github.com/bsm/ratelimit v2.0.0+incompatible
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/go-github/v32 v32.1.0
 	github.com/hashicorp/go-version v1.6.0

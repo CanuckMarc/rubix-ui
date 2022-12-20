@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Spin } from "antd";
 import { JsonForm } from "../../../common/json-schema-form";
 import { FlowFactory } from "../factory";
-import { useChangeNodeProprerties } from "../hooks/useChangeNodeData";
+import { useChangeNodeProperties } from "../hooks/useChangeNodeData";
 import { useParams } from "react-router-dom";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
@@ -17,7 +17,7 @@ export const SettingsModal = ({
   isModalVisible,
   onCloseModal,
 }: SettingsModalProps) => {
-  const handleChange = useChangeNodeProprerties(node.id);
+  const handleChange = useChangeNodeProperties(node.id);
   const [settings, setSettings] = useState({} as any);
   const [formData, setFormData] = useState({});
   const [isLoadingForm, setIsLoadingForm] = useState(false);
