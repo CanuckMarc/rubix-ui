@@ -1,9 +1,5 @@
-import { Button, Tabs, Spin } from "antd";
-import {
-  PlusOutlined,
-  PlayCircleOutlined,
-  StopOutlined,
-} from "@ant-design/icons";
+import { Tabs, Spin, Space } from "antd";
+import { PlusOutlined, PlayCircleOutlined, StopOutlined, EditOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import RbTable from "../../../../../../common/rb-table";
@@ -13,6 +9,7 @@ import { FlowNetworkFactory } from "../../networks/factory";
 import { FlowPluginFactory } from "../factory";
 import { CreateModal } from "./create";
 import { PluginDistributionTable } from "./plugin-distribution-table";
+import { PluginConfig } from "./plugin-config";
 
 const { TabPane } = Tabs;
 const pluginsKey = "MODULES";
@@ -24,16 +21,36 @@ export const FlowPluginsTable = () => {
   const [pluginName, setPluginName] = useState<string>();
   const [pluginsNames, setPluginsNames] = useState([] as Array<string>);
   const [networkSchema, setNetworkSchema] = useState({});
+  const [selectedItem, setSelectedItem] = useState<any>(undefined);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isOpenDrawer, setIsOpenDrawer] = useState<any>(false);
 
   const flowNetworkFactory = new FlowNetworkFactory();
   const factory = new FlowPluginFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
-  const columns = PLUGIN_HEADERS;
+  const columns = [
+    ...PLUGIN_HEADERS,
+    {
+      title: "Config",
+      dataIndex: "config",
+      key: "config",
+      render: (_: any, item: any) => (
+        <Space size="middle">
+          <a
+            onClick={() => {
+              showDrawer(item);
+            }}
+          >
+            <EditOutlined />
+          </a>
+        </Space>
+      ),
+    },
+  ];
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: Array<any>) => {
@@ -47,14 +64,7 @@ export const FlowPluginsTable = () => {
       fetchPlugins();
     };
 
-    return (
-      <RbButton
-        type="primary"
-        text="enable plugins"
-        icon={<PlayCircleOutlined />}
-        onClick={enable}
-      />
-    );
+    return <RbButton type="primary" text="enable plugins" icon={<PlayCircleOutlined />} onClick={enable} />;
   };
 
   const DisablePluginsButton = () => {
@@ -63,14 +73,7 @@ export const FlowPluginsTable = () => {
       fetchPlugins();
     };
 
-    return (
-      <RbButton
-        type="ghost"
-        text="disable plugins"
-        onClick={disable}
-        icon={<StopOutlined />}
-      />
-    );
+    return <RbButton type="ghost" text="disable plugins" onClick={disable} icon={<StopOutlined />} />;
   };
 
   const AddNetworkButton = () => {
@@ -78,14 +81,7 @@ export const FlowPluginsTable = () => {
       setIsModalVisible(true);
     };
 
-    return (
-      <RbButton
-        type="ghost"
-        text="add network"
-        onClick={showModal}
-        icon={<PlusOutlined />}
-      />
-    );
+    return <RbButton type="ghost" text="add network" onClick={showModal} icon={<PlusOutlined />} />;
   };
 
   const getSchema = async () => {
@@ -93,11 +89,7 @@ export const FlowPluginsTable = () => {
     if (pluginsNames.length > 0) {
       const pluginName = pluginsNames.at(0) || "";
       setPluginName(pluginName);
-      const res = await flowNetworkFactory.Schema(
-        connUUID,
-        hostUUID,
-        pluginName
-      );
+      const res = await flowNetworkFactory.Schema(connUUID, hostUUID, pluginName);
       const jsonSchema = {
         properties: res,
       };
@@ -116,6 +108,11 @@ export const FlowPluginsTable = () => {
     } finally {
       setIsFetching(false);
     }
+  };
+
+  const showDrawer = (item: any) => {
+    setSelectedItem(item);
+    setIsOpenDrawer(true);
   };
 
   useEffect(() => {
@@ -149,6 +146,9 @@ export const FlowPluginsTable = () => {
         onCloseModal={() => setIsModalVisible(false)}
         pluginName={pluginName}
       />
+      {selectedItem && isOpenDrawer && (
+        <PluginConfig isVisible={isOpenDrawer} pluginName={selectedItem.name} onclose={() => setIsOpenDrawer(false)} />
+      )}
     </>
   );
 };
