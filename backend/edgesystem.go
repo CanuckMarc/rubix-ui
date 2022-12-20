@@ -4,7 +4,22 @@ import (
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-assist/namings"
+	"github.com/NubeIO/rubix-edge/service/system"
 )
+
+func (inst *App) EdgeHostReboot(connUUID, hostUUID string) *system.Message {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	data, err := client.EdgeHostReboot(hostUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return data
+}
 
 func (inst *App) EdgeServiceStart(connUUID, hostUUID, appName string) *amodel.Message {
 	ctl, err := inst.edgeSystemCtlAction(connUUID, hostUUID, appName, amodel.Enable)
