@@ -1,4 +1,5 @@
-import { Drawer } from "antd";
+import { Button, Drawer, Space } from "antd";
+import { SaveOutlined } from "@ant-design/icons";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import theme from "prism-react-renderer/themes/nightOwl";
 import { useState, Fragment, useEffect } from "react";
@@ -10,6 +11,7 @@ export const PluginConfig = (props: any) => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const { isVisible, pluginName, onclose } = props;
   const [code, setCode] = useState<string>(``);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const factory = new FlowPluginFactory();
   factory.connectionUUID = connUUID;
@@ -33,6 +35,14 @@ export const PluginConfig = (props: any) => {
     </Highlight>
   );
 
+  const saveButton = () => {
+    return (
+      <Space>
+        <Button type="link" icon={<SaveOutlined />} loading={confirmLoading} onClick={updateConfig} />
+      </Space>
+    );
+  };
+
   const onCloseDrawer = () => {
     onclose();
     setCode(``);
@@ -47,12 +57,29 @@ export const PluginConfig = (props: any) => {
     setCode(data);
   };
 
+  const updateConfig = async () => {
+    try {
+      setConfirmLoading(true);
+      await factory.EdgeUpdateConfigPlugin(connUUID, hostUUID, pluginName, code);
+      onCloseDrawer();
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   useEffect(() => {
     getPluginConfig();
   }, []);
 
   return (
-    <Drawer title={pluginName} placement="right" onClose={onCloseDrawer} visible={isVisible} maskClosable={false}>
+    <Drawer
+      title={pluginName}
+      placement="right"
+      onClose={onCloseDrawer}
+      visible={isVisible}
+      maskClosable={false}
+      extra={saveButton()}
+    >
       <Editor
         value={code}
         onValueChange={onValueChange}
