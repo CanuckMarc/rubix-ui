@@ -1,6 +1,6 @@
-import { Tabs, Spin, Space, Drawer } from "antd";
+import { Tabs, Spin, Space } from "antd";
 import { PlusOutlined, PlayCircleOutlined, StopOutlined, EditOutlined } from "@ant-design/icons";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import RbTable from "../../../../../../common/rb-table";
 import { RbButton } from "../../../../../../common/rb-table-actions";
@@ -9,9 +9,7 @@ import { FlowNetworkFactory } from "../../networks/factory";
 import { FlowPluginFactory } from "../factory";
 import { CreateModal } from "./create";
 import { PluginDistributionTable } from "./plugin-distribution-table";
-import Highlight, { defaultProps } from "prism-react-renderer";
-import theme from "prism-react-renderer/themes/nightOwl";
-import Editor from "react-simple-code-editor";
+import { PluginConfig } from "./plugin-config";
 
 const { TabPane } = Tabs;
 const pluginsKey = "MODULES";
@@ -28,33 +26,11 @@ export const FlowPluginsTable = () => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isOpenDrawer, setIsOpenDrawer] = useState<any>(false);
-  const [code, setCode] = useState<string>(``);
 
   const flowNetworkFactory = new FlowNetworkFactory();
   const factory = new FlowPluginFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
-
-  const highlight = () => (
-    <Highlight {...defaultProps} theme={theme} code={code} language="jsx">
-      {({ className, style, tokens, getLineProps, getTokenProps }) => {
-        console.log("code", selectedItem.data);
-        console.log("tokens", tokens);
-
-        return (
-          <Fragment>
-            {tokens.map((line, i) => (
-              <div {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
-          </Fragment>
-        );
-      }}
-    </Highlight>
-  );
 
   const columns = [
     ...PLUGIN_HEADERS,
@@ -134,24 +110,9 @@ export const FlowPluginsTable = () => {
     }
   };
 
-  const getPluginConfig = async (pluginName: string) => {
-    const { data } = await factory.EdgeGetConfigPlugin(connUUID, hostUUID, pluginName);
-    setCode(data);
-  };
-
   const showDrawer = (item: any) => {
     setSelectedItem(item);
-    getPluginConfig(item.name);
     setIsOpenDrawer(true);
-  };
-
-  const onCloseDrawer = () => {
-    setIsOpenDrawer(false);
-  };
-
-  const onValueChange = (value: any) => {
-    console.log("onValueChange", value);
-    setCode(value);
   };
 
   useEffect(() => {
@@ -186,25 +147,7 @@ export const FlowPluginsTable = () => {
         pluginName={pluginName}
       />
       {selectedItem && isOpenDrawer && (
-        <Drawer
-          title={selectedItem.name}
-          placement="right"
-          onClose={onCloseDrawer}
-          visible={isOpenDrawer}
-          maskClosable={false}
-        >
-          <Editor
-            value={code}
-            onValueChange={onValueChange}
-            highlight={highlight}
-            padding={10}
-            style={{
-              boxSizing: "border-box",
-              fontFamily: '"Dank Mono", "Fira Code", monospace',
-              ...theme.plain,
-            }}
-          />
-        </Drawer>
+        <PluginConfig isVisible={isOpenDrawer} pluginName={selectedItem.name} onclose={() => setIsOpenDrawer(false)} />
       )}
     </>
   );
