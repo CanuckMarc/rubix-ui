@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 )
 
 const bacnetMasterPlg = "bacnetmaster"
@@ -96,5 +97,31 @@ func (inst *App) BacnetWhois(connUUID, hostUUID, networkUUID, pluginName string)
 		return nil
 	}
 	return devices
+}
+
+func (inst *App) BACnetWriteConfig(connUUID, hostUUID string, config assistcli.ConfigBACnetServer) {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+
+	}
+	writeConfig, err := client.BACnetWriteConfig(hostUUID, "bacnet-server-driver", config)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(writeConfig)
+
+}
+
+func (inst *App) BACnetReadConfig(connUUID, hostUUID string) {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+
+	}
+	writeConfig, connectionError, requestErr := client.EdgeReadConfig(hostUUID, "bacnet-server-driver", "config.yml")
+	fmt.Println(connectionError, requestErr)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(writeConfig)
 
 }

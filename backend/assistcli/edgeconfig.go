@@ -9,10 +9,14 @@ import (
 )
 
 type Mqtt struct {
-	BrokerIp   string `json:"broker_ip"  yaml:"broker_ip"`
-	BrokerPort int    `json:"broker_port"  yaml:"broker_port"`
-	Debug      bool   `json:"debug" yaml:"debug"`
-	Enable     bool   `json:"enable" yaml:"enable"`
+	BrokerIp          string `json:"broker_ip"  yaml:"broker_ip"`
+	BrokerPort        int    `json:"broker_port"  yaml:"broker_port"`
+	Debug             bool   `json:"debug" yaml:"debug"`
+	Enable            bool   `json:"enable" yaml:"enable"`
+	WriteViaSubscribe bool   `json:"write_via_subscribe" yaml:"write_via_subscribe"`
+	RetryEnable       bool   `json:"retry_enable" yaml:"retry_enable"`
+	RetryLimit        int    `json:"retry_limit" yaml:"retry_limit"`
+	RetryInterval     int    `json:"retry_interval" yaml:"retry_interval"`
 }
 
 type ConfigBACnetServer struct {
@@ -96,6 +100,43 @@ func (inst *Client) EdgeReadConfig(hostIDName, appName, configName string) (*amo
 	return resp.Result().(*amodel.EdgeConfigResponse), nil, nil
 }
 
+func (inst *Client) BACnetWriteConfig(hostIDName, appName string, config ConfigBACnetServer) (*Message, error) {
+	pushConfig := false
+	var writeConfig amodel.EdgeConfig
+	if appName == constants.BacnetServerDriver {
+		pushConfig = true
+		resp, connectionErr, _ := inst.EdgeReadConfig(hostIDName, appName, constants.ConfigYml)
+		if connectionErr != nil {
+			return nil, connectionErr
+		}
+		if resp != nil {
+			err := yaml.Unmarshal(resp.Data, &config)
+			if err != nil {
+				return nil, err
+			}
+		}
+		writeConfig = amodel.EdgeConfig{
+			AppName:    constants.BacnetServerDriver,
+			Body:       inst.defaultWrapperBACnetConfig(config),
+			ConfigName: constants.ConfigYml,
+		}
+	}
+	if pushConfig {
+		url := fmt.Sprintf("/api/edge/config")
+		resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+			SetHeader("host_uuid", hostIDName).
+			SetHeader("host_name", hostIDName).
+			SetResult(&Message{}).
+			SetBody(writeConfig).
+			Post(url))
+		if err != nil {
+			return nil, err
+		}
+		return resp.Result().(*Message), nil
+	}
+	return nil, nil
+}
+
 func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) ConfigBACnetServer {
 	if config.ServerName == "" {
 		config.ServerName = "Nube IO"
@@ -123,6 +164,18 @@ func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) Config
 	}
 	if config.AvMax == 0 {
 		config.AvMax = 2
+	}
+	if config.Mqtt.BrokerIp == "" {
+		config.Mqtt.BrokerIp = "127.0.0.1"
+	}
+	if config.Mqtt.BrokerPort == 0 {
+		config.Mqtt.BrokerPort = 1883
+	}
+	if config.Mqtt.RetryLimit == 0 {
+		config.Mqtt.RetryLimit = 5
+	}
+	if config.Mqtt.RetryInterval == 0 {
+		config.Mqtt.RetryInterval = 10
 	}
 	return config
 }
