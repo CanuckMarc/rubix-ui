@@ -8,6 +8,19 @@ import (
 	"github.com/NubeIO/rubix-edge/service/system"
 )
 
+func (inst *Client) EdgeHostReboot(hostIDName string) (*system.Message, error) {
+	url := fmt.Sprintf("proxy/api/system/reboot/")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host_uuid", hostIDName).
+		SetHeader("host_name", hostIDName).
+		SetResult(&system.Message{}).
+		Post(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*system.Message), nil
+}
+
 func (inst *Client) EdgeGetNetworks(hostIDName string) ([]networking.NetworkInterfaces, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
@@ -22,7 +35,7 @@ func (inst *Client) EdgeGetNetworks(hostIDName string) ([]networking.NetworkInte
 	return *data, nil
 }
 
-// EdgeDHCPPortExists check if the interface is a staic or fixed ip, will return true if port is a set to dhcp
+// EdgeDHCPPortExists check if the interface is a static or fixed ip, will return true if port is a set to dhcp
 func (inst *Client) EdgeDHCPPortExists(hostIDName string, body *system.NetworkingBody) (*system.DHCPPortExists, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/interfaces/exists")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().

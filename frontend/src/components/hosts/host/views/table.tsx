@@ -13,7 +13,7 @@ const { TabPane } = Tabs;
 
 const info = "INFO";
 const networking = "NETWORKING";
-const time = "TIME";
+const time = "DATE/TIME";
 
 export const HostTable = () => {
   let { connUUID = "", hostUUID = "" } = useParams();
