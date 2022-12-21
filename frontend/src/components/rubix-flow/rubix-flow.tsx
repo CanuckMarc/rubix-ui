@@ -664,7 +664,7 @@ const Flow = (props: any) => {
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onSaveSubFlow={onSaveSubFlow}
+              onSaveSubFlow={onHandelSaveFlow}
               onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
