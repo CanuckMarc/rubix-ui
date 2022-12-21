@@ -58,6 +58,14 @@ export function AddWiresConnection(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['AddWiresConnection'](arg1, arg2, arg3, arg4);
 }
 
+export function BACnetReadConfig(arg1, arg2) {
+  return window['go']['backend']['App']['BACnetReadConfig'](arg1, arg2);
+}
+
+export function BACnetWriteConfig(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['BACnetWriteConfig'](arg1, arg2, arg3);
+}
+
 export function BacnetWhois(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['BacnetWhois'](arg1, arg2, arg3, arg4);
 }
@@ -218,6 +226,10 @@ export function DownloadFlow(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['DownloadFlow'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function EdgeAppsInfo(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeAppsInfo'](arg1, arg2);
+}
+
 export function EdgeBiosInstalledRubixEdgeVersion(arg1, arg2) {
   return window['go']['backend']['App']['EdgeBiosInstalledRubixEdgeVersion'](arg1, arg2);
 }
@@ -270,16 +282,40 @@ export function EdgeDHCPSetStaticIP(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPSetStaticIP'](arg1, arg2, arg3);
 }
 
-export function EdgeDeviceInfoAndApps(arg1, arg2) {
-  return window['go']['backend']['App']['EdgeDeviceInfoAndApps'](arg1, arg2);
-}
-
 export function EdgeEnablePlugins(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeEnablePlugins'](arg1, arg2, arg3, arg4);
 }
 
+export function EdgeFirewallDisable(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeFirewallDisable'](arg1, arg2);
+}
+
+export function EdgeFirewallEnable(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeFirewallEnable'](arg1, arg2);
+}
+
+export function EdgeFirewallList(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeFirewallList'](arg1, arg2);
+}
+
+export function EdgeFirewallPortClose(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeFirewallPortClose'](arg1, arg2, arg3);
+}
+
+export function EdgeFirewallPortOpen(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeFirewallPortOpen'](arg1, arg2, arg3);
+}
+
+export function EdgeFirewallStatus(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeFirewallStatus'](arg1, arg2);
+}
+
 export function EdgeGetConfigPlugin(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeGetConfigPlugin'](arg1, arg2, arg3);
+}
+
+export function EdgeGetHardwareTZ(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetHardwareTZ'](arg1, arg2);
 }
 
 export function EdgeGetNetworks(arg1, arg2) {
@@ -292,6 +328,14 @@ export function EdgeGetPlugins(arg1, arg2) {
 
 export function EdgeGetPluginsDistribution(arg1, arg2) {
   return window['go']['backend']['App']['EdgeGetPluginsDistribution'](arg1, arg2);
+}
+
+export function EdgeGetTimeZoneList(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetTimeZoneList'](arg1, arg2);
+}
+
+export function EdgeHostReboot(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeHostReboot'](arg1, arg2);
 }
 
 export function EdgeInstallApp(arg1, arg2, arg3, arg4) {
@@ -340,6 +384,14 @@ export function EdgeUninstallPlugin(arg1, arg2, arg3) {
 
 export function EdgeUpdateConfigPlugin(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeUpdateConfigPlugin'](arg1, arg2, arg3, arg4);
+}
+
+export function EdgeUpdateSystemTime(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeUpdateSystemTime'](arg1, arg2, arg3);
+}
+
+export function EdgeUpdateTimezone(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeUpdateTimezone'](arg1, arg2, arg3);
 }
 
 export function EditConsumer(arg1, arg2, arg3, arg4) {
@@ -396,6 +448,10 @@ export function ExportNetworksBulk(arg1, arg2, arg3, arg4) {
 
 export function ExportPointBulk(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['ExportPointBulk'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function FakeEdgeAppsInfoModelCreationOnUI() {
+  return window['go']['backend']['App']['FakeEdgeAppsInfoModelCreationOnUI']();
 }
 
 export function GetBackup(arg1) {

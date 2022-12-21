@@ -6,9 +6,7 @@ import { DownloadOutlined, LeftOutlined } from "@ant-design/icons";
 import RbVersion, { VERSION_STATES } from "../../../common/rb-version";
 import RbTag from "../../../common/rb-tag";
 import { tagMessageStateResolver } from "./utils";
-import {
-  InstallRubixAppModal
-} from "./install-rubix-app/install-rubix-app-modal";
+import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-modal";
 import { InstallAppFactory } from "./install-rubix-app/factory";
 import { rumodel } from "../../../../wailsjs/go/models";
 import { ReleasesFactory } from "../../release/factory";
@@ -19,7 +17,7 @@ const releaseFactory = new ReleasesFactory();
 const { Text, Title } = Typography;
 let installAppFactory = new InstallAppFactory();
 
-export const AppInstallInfo = (props: any) => {
+export const EdgeAppInfo = (props: any) => {
   let timeout;
   let { connUUID = "" } = useParams();
   installAppFactory.connectionUUID = connUUID;
@@ -42,28 +40,20 @@ export const AppInstallInfo = (props: any) => {
     };
   }, []);
 
-  const fetchAppInfo = () => {
+  const fetchAppInfo = async () => {
     updateAppInfoMsg("");
     updateIsLoading(true);
-    return releaseFactory
-      .EdgeDeviceInfoAndApps(connUUID, host.uuid)
-      .then((appInfo: any) => {
-        if (!appInfo) {
-          return updateAppInfoMsg("Apps are not downloaded yet.");
-        }
-        if (appInfo.installed_apps) {
-          updateInstalledApps(appInfo.installed_apps);
-        }
-        if (appInfo.apps_available_for_install) {
-          updateAvailableApps(appInfo.apps_available_for_install);
-        }
-      })
-      .catch(() => {
-        return updateAppInfoMsg("Error to fetch edge device info and apps");
-      })
-      .finally(() => {
-        updateIsLoading(false);
-      });
+    try {
+      const response = await releaseFactory.EdgeAppsInfo(connUUID, host.uuid);
+      if (response?.code === 0) {
+        updateInstalledApps(response?.data?.installed_apps);
+        updateAvailableApps(response?.data?.apps_available_for_install);
+      } else {
+        updateAppInfoMsg(response?.msg || "fetch edge apps info gone wrong");
+      }
+    } finally {
+      updateIsLoading(false);
+    }
   };
 
   if (appInfoMsg) {

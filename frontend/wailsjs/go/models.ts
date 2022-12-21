@@ -224,6 +224,83 @@ export namespace amodel {
 
 export namespace assistcli {
 	
+	export class Mqtt {
+	    broker_ip: string;
+	    broker_port: number;
+	    debug: boolean;
+	    enable: boolean;
+	    write_via_subscribe: boolean;
+	    retry_enable: boolean;
+	    retry_limit: number;
+	    retry_interval: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Mqtt(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.broker_ip = source["broker_ip"];
+	        this.broker_port = source["broker_port"];
+	        this.debug = source["debug"];
+	        this.enable = source["enable"];
+	        this.write_via_subscribe = source["write_via_subscribe"];
+	        this.retry_enable = source["retry_enable"];
+	        this.retry_limit = source["retry_limit"];
+	        this.retry_interval = source["retry_interval"];
+	    }
+	}
+	export class ConfigBACnetServer {
+	    server_name: string;
+	    device_id: number;
+	    port: number;
+	    iface: string;
+	    bi_max: number;
+	    bo_max: number;
+	    bv_max: number;
+	    ai_max: number;
+	    ao_max: number;
+	    av_max: number;
+	    mqtt: Mqtt;
+	
+	    static createFrom(source: any = {}) {
+	        return new ConfigBACnetServer(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.server_name = source["server_name"];
+	        this.device_id = source["device_id"];
+	        this.port = source["port"];
+	        this.iface = source["iface"];
+	        this.bi_max = source["bi_max"];
+	        this.bo_max = source["bo_max"];
+	        this.bv_max = source["bv_max"];
+	        this.ai_max = source["ai_max"];
+	        this.ao_max = source["ao_max"];
+	        this.av_max = source["av_max"];
+	        this.mqtt = this.convertValues(source["mqtt"], Mqtt);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	export class Response {
 	    code: number;
 	    message: any;
@@ -2292,12 +2369,12 @@ export namespace rumodel {
 	        this.sub_state = source["sub_state"];
 	    }
 	}
-	export class EdgeDeviceInfo {
+	export class EdgeAppsInfo {
 	    installed_apps?: InstalledApps[];
 	    apps_available_for_install?: AppsAvailableForInstall[];
 	
 	    static createFrom(source: any = {}) {
-	        return new EdgeDeviceInfo(source);
+	        return new EdgeAppsInfo(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -2850,6 +2927,49 @@ export namespace system {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.port_name = source["port_name"];
+	    }
+	}
+	export class UFWBody {
+	    port: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new UFWBody(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.port = source["port"];
+	    }
+	}
+
+}
+
+export namespace ufw {
+	
+	export class Message {
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Message(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.message = source["message"];
+	    }
+	}
+	export class UFWStatus {
+	    port: number;
+	    status: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UFWStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.port = source["port"];
+	        this.status = source["status"];
 	    }
 	}
 
