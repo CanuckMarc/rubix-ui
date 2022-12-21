@@ -22,15 +22,15 @@ export const isValidConnection = (
   ];
   const occurrences = arrHandleIds.reduce(function (acc, curr) {
     return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;
-  }, {}); /* eg return: {string: 1:, number: 1} */
+  }, {}); /* eg return: {string: 1:, boolean: 1} */
   const occString = occurrences["string"];
 
-  return !occString || occString === 0 || occString === 2;
+  return !occString || occString === 2;
 };
 
 const getNodeType = (node: NodeInterface, handleId: string) => {
   let nodeHandle;
-  if (handleId && handleId.indexOf("in") !== -1) {
+  if (handleId && handleId.startsWith("in")) {
     nodeHandle = node?.data?.inputs.find((item: any) => item.pin === handleId);
   } else {
     nodeHandle = node?.data?.out.find((item: any) => item.pin === handleId);
