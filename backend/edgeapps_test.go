@@ -6,9 +6,9 @@ import (
 	"testing"
 )
 
-func TestApp_EdgeDeviceInfoAndApps(t *testing.T) {
+func TestApp_EdgeAppsInfo(t *testing.T) {
 	app := MockNewApp()
-	resp := app.EdgeDeviceInfoAndApps(connection, "rc")
+	resp := app.EdgeAppsInfo(connection, "rc")
 	pprint.PrintJOSN(resp)
 }
 

@@ -15,7 +15,7 @@ import { TokenModal } from "../../../common/token/token-modal";
 import { EdgeBiosTokenFactory } from "../../edgebios/token-factory";
 import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-modal";
 import { InstallFactory } from "./install-rubix-edge/factory";
-import { AppInstallInfo } from "./install-app-info";
+import { EdgeAppInfo } from "./install-app-info";
 import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
 import Location = amodel.Location;
@@ -24,7 +24,7 @@ import UUIDs = backend.UUIDs;
 const ExpandedRow = (props: any) => {
   return (
     <div>
-      <AppInstallInfo {...props} />
+      <EdgeAppInfo {...props} />
     </div>
   );
 };
@@ -125,12 +125,15 @@ export const HostsTable = (props: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
-    setHostSchema(jsonSchema);
-    setIsLoadingForm(false);
+    try {
+      const res = await factory.Schema();
+      const jsonSchema = {
+        properties: res,
+      };
+      setHostSchema(jsonSchema);
+    } finally {
+      setIsLoadingForm(false);
+    }
   };
 
   const bulkDelete = async () => {

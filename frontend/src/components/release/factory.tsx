@@ -1,6 +1,6 @@
 import { amodel, store, } from "../../../wailsjs/go/models";
 import {
-  EdgeDeviceInfoAndApps,
+  EdgeAppsInfo,
   EdgeServiceRestart,
   EdgeServiceStart,
   EdgeServiceStop,
@@ -8,8 +8,7 @@ import {
   GetRelease,
   GetReleases,
   GitDownloadRelease,
-  GitListReleases,
-  StoreDownloadApp,
+  GitListReleases
 } from "../../../wailsjs/go/backend/App";
 
 export class ReleasesFactory {
@@ -47,8 +46,8 @@ export class ReleasesFactory {
     return await EdgeUnInstallApp(connUUID, hostUUID, appName);
   }
 
-  async EdgeDeviceInfoAndApps(connUUID: string, hostUUID: string) {
-    return await EdgeDeviceInfoAndApps(connUUID, hostUUID);
+  async EdgeAppsInfo(connUUID: string, hostUUID: string) {
+    return await EdgeAppsInfo(connUUID, hostUUID);
   }
 
   async EdgeServiceStart(connUUID: string, hostUUID: string, appName: string) {

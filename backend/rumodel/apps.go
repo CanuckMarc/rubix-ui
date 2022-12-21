@@ -22,7 +22,7 @@ type AppsAvailableForInstall struct {
 	MaxVersion string `json:"max_version,omitempty"`
 }
 
-type EdgeDeviceInfo struct {
+type EdgeAppsInfo struct {
 	InstalledApps           []InstalledApps           `json:"installed_apps,omitempty"`
 	AppsAvailableForInstall []AppsAvailableForInstall `json:"apps_available_for_install,omitempty"`
 }

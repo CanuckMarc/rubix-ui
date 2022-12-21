@@ -4,14 +4,15 @@ import {storage} from '../models';
 import {model} from '../models';
 import {amodel} from '../models';
 import {db} from '../models';
-import {backend} from '../models';
 import {assistcli} from '../models';
+import {backend} from '../models';
 import {flow} from '../models';
+import {rumodel} from '../models';
 import {ebmodel} from '../models';
 import {externaltoken} from '../models';
 import {system} from '../models';
 import {dhcpd} from '../models';
-import {rumodel} from '../models';
+import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
 import {store} from '../models';
@@ -46,6 +47,10 @@ export function AddProducer(arg1:string,arg2:string,arg3:model.Producer):Promise
 export function AddStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
 
 export function AddWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:db.Connection):Promise<db.Connection>;
+
+export function BACnetReadConfig(arg1:string,arg2:string):Promise<void>;
+
+export function BACnetWriteConfig(arg1:string,arg2:string,arg3:assistcli.ConfigBACnetServer):Promise<void>;
 
 export function BacnetWhois(arg1:string,arg2:string,arg3:string,arg4:string):Promise<Array<model.Device>>;
 
@@ -127,6 +132,8 @@ export function DoBackup(arg1:string,arg2:string,arg3:string,arg4:string,arg5:st
 
 export function DownloadFlow(arg1:string,arg2:string,arg3:boolean,arg4:any,arg5:boolean):Promise<flow.Message>;
 
+export function EdgeAppsInfo(arg1:string,arg2:string):Promise<rumodel.Response>;
+
 export function EdgeBiosInstalledRubixEdgeVersion(arg1:string,arg2:string):Promise<ebmodel.Version>;
 
 export function EdgeBiosLogin(arg1:string,arg2:string,arg3:string,arg4:string):Promise<model.TokenResponse>;
@@ -153,17 +160,33 @@ export function EdgeDHCPSetAsAuto(arg1:string,arg2:string,arg3:system.Networking
 
 export function EdgeDHCPSetStaticIP(arg1:string,arg2:string,arg3:dhcpd.SetStaticIP):Promise<string>;
 
-export function EdgeDeviceInfoAndApps(arg1:string,arg2:string):Promise<rumodel.EdgeDeviceInfo>;
-
 export function EdgeEnablePlugins(arg1:string,arg2:string,arg3:Array<string>,arg4:boolean):Promise<rumodel.Response>;
 
+export function EdgeFirewallDisable(arg1:string,arg2:string):Promise<ufw.Message>;
+
+export function EdgeFirewallEnable(arg1:string,arg2:string):Promise<ufw.Message>;
+
+export function EdgeFirewallList(arg1:string,arg2:string):Promise<Array<ufw.UFWStatus>>;
+
+export function EdgeFirewallPortClose(arg1:string,arg2:string,arg3:system.UFWBody):Promise<ufw.Message>;
+
+export function EdgeFirewallPortOpen(arg1:string,arg2:string,arg3:system.UFWBody):Promise<ufw.Message>;
+
+export function EdgeFirewallStatus(arg1:string,arg2:string):Promise<ufw.Message>;
+
 export function EdgeGetConfigPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function EdgeGetHardwareTZ(arg1:string,arg2:string):Promise<string>;
 
 export function EdgeGetNetworks(arg1:string,arg2:string):Promise<Array<networking.NetworkInterfaces>>;
 
 export function EdgeGetPlugins(arg1:string,arg2:string):Promise<rumodel.Response>;
 
 export function EdgeGetPluginsDistribution(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function EdgeGetTimeZoneList(arg1:string,arg2:string):Promise<Array<string>>;
+
+export function EdgeHostReboot(arg1:string,arg2:string):Promise<system.Message>;
 
 export function EdgeInstallApp(arg1:string,arg2:string,arg3:string,arg4:string):Promise<rumodel.Response>;
 
@@ -188,6 +211,10 @@ export function EdgeUnInstallApp(arg1:string,arg2:string,arg3:string):Promise<am
 export function EdgeUninstallPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function EdgeUpdateConfigPlugin(arg1:string,arg2:string,arg3:string,arg4:string):Promise<rumodel.Response>;
+
+export function EdgeUpdateSystemTime(arg1:string,arg2:string,arg3:string):Promise<datelib.Time>;
+
+export function EdgeUpdateTimezone(arg1:string,arg2:string,arg3:string):Promise<system.Message>;
 
 export function EditConsumer(arg1:string,arg2:string,arg3:string,arg4:model.Consumer):Promise<model.Consumer>;
 
@@ -216,6 +243,8 @@ export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Array<string>):Promise<storage.Backup>;
 
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
+
+export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
 
 export function GetBackup(arg1:string):Promise<storage.Backup>;
 

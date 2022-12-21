@@ -191,18 +191,16 @@ func (inst *App) EdgeUnInstallApp(connUUID, hostUUID, appName string) *amodel.Me
 	return resp
 }
 
-// EdgeDeviceInfoAndApps list the installed apps
-func (inst *App) EdgeDeviceInfoAndApps(connUUID, hostUUID string) *rumodel.EdgeDeviceInfo {
-	edgeAppsAndService, err := inst.edgeDeviceInfoAndApps(connUUID, hostUUID)
+func (inst *App) EdgeAppsInfo(connUUID, hostUUID string) *rumodel.Response {
+	edgeAppsAndService, err := inst.edgeAppsInfo(connUUID, hostUUID)
 	if err != nil {
-		inst.uiErrorMessage(err)
-		return nil
+		return inst.fail(err)
 	}
-	return edgeAppsAndService
+	return inst.successResponse(edgeAppsAndService)
 }
 
-// edgeDeviceInfoAndApps get the complete app info of the device, installed apps, what apps can be installed and the product info
-func (inst *App) edgeDeviceInfoAndApps(connUUID, hostUUID string) (*rumodel.EdgeDeviceInfo, error) {
+// edgeAppsInfo get the complete app info of the device, installed apps, what apps can be installed and the product info
+func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo, error) {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return nil, err
@@ -288,7 +286,7 @@ func (inst *App) edgeDeviceInfoAndApps(connUUID, hostUUID string) (*rumodel.Edge
 		}
 	}
 
-	return &rumodel.EdgeDeviceInfo{
+	return &rumodel.EdgeAppsInfo{
 		InstalledApps:           appsList,
 		AppsAvailableForInstall: appsAvailable,
 	}, nil
@@ -336,4 +334,8 @@ func (inst *App) getReleaseVersion(assistClient *assistcli.Client, hostUUID stri
 		releaseVersion = release
 	}
 	return &releaseVersion, nil
+}
+
+func (inst *App) FakeEdgeAppsInfoModelCreationOnUI() *rumodel.EdgeAppsInfo { // this is just for frontend
+	return nil
 }
