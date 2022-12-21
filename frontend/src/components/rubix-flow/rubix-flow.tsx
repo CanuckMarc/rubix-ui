@@ -240,8 +240,8 @@ const Flow = (props: any) => {
       const isTrueHandleId =
         handleId &&
         lastHandleId &&
-        ((handleId.indexOf("in") > -1 && lastHandleId.indexOf("in") > -1) ||
-          (handleId.indexOf("out") > -1 && lastHandleId.indexOf("out") > -1));
+        ((handleId.startsWith("in") && lastHandleId.startsWith("in")) ||
+          (handleId.startsWith("out") && lastHandleId.startsWith("out")));
 
       if (isDragSelected && isTrueHandleId) {
         let newEdges;
@@ -273,23 +273,14 @@ const Flow = (props: any) => {
           const { x, y } = setMousePosition(evt);
           setNodePickerVisibility({ x, y });
         }
-
         /* Add connect for input added by InputCount setting */
-        if (
-          lastConnectStart &&
-          nodeId &&
-          handleId &&
-          !isTrueHandleId &&
-          isValidConnection(nodes, lastConnectStart, { nodeId, handleId })
-        ) {
+        if (lastConnectStart && nodeId && handleId && !isTrueHandleId && isValidConnection(nodes, lastConnectStart, { nodeId, handleId })){
           const isSource = lastConnectStart.handleType === "source" || false;
           const conNodeId = lastConnectStart.nodeId || "";
           const conHandleId = lastConnectStart.handleId || "";
           const target = !isSource ? conNodeId : nodeId;
           const targetHandle = !isSource ? conHandleId : handleId;
-
           if (isInputExistConnection(edges, target, targetHandle)) return;
-
           const newEdge = {
             id: generateUuid(),
             source: isSource ? conNodeId : nodeId,
