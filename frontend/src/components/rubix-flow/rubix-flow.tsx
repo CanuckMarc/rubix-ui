@@ -190,22 +190,22 @@ const Flow = (props: any) => {
     };
   };
 
-  const onSaveSubFlow = () => {
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-    setNodes(allNodes);
-    setEdges(allEdges);
-    setCurrentNodesAndEdges({ nodes: [], edges: [] });
-    setSelectedNodeForSubFlow(undefined);
-  };
+  // const onSaveSubFlow = () => {
+  //   const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+  //   setNodes(allNodes);
+  //   setEdges(allEdges);
+  //   setCurrentNodesAndEdges({ nodes: [], edges: [] });
+  //   setSelectedNodeForSubFlow(undefined);
+  // };
 
-  const onHandelSaveFlow = async () => {
+  const onHandelSaveFlow = async (isCloseSubFlow = false) => {
     const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     const graphJson = flowToBehave(allNodes, allEdges);
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
     const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, allNodes);
     setCurrentNodesAndEdges({ nodes: [], edges: [] });
-    setSelectedNodeForSubFlow(undefined);
+    isCloseSubFlow && setSelectedNodeForSubFlow(undefined);
     setNodes(newNodes);
     setEdges(allEdges);
   };
@@ -664,8 +664,7 @@ const Flow = (props: any) => {
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onSaveSubFlow={onHandelSaveFlow}
-              onHandelSaveFlow={onHandelSaveFlow}
+              onSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
               <NodePicker
