@@ -1,30 +1,16 @@
-import {
-  Layout,
-  Select,
-  Divider,
-  Row,
-  Menu,
-  Dropdown,
-  Avatar,
-  Switch,
-  Tooltip,
-  MenuProps,
-  Spin,
-  Image,
-} from "antd";
+import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip, } from "antd";
 import {
   ApartmentOutlined,
+  CloudServerOutlined,
+  KeyOutlined,
+  LeftOutlined,
+  LockFilled,
+  LockTwoTone,
   ToolOutlined,
   UserOutlined,
-  KeyOutlined,
-  LockFilled,
-  LeftOutlined,
-  LockTwoTone,
-  AppstoreOutlined,
-  CloudServerOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/nube-frog-green.png";
 import { ROUTES } from "../../constants/routes";
 import { useConnections } from "../../hooks/useConnection";
@@ -128,7 +114,7 @@ const TokenMenuItem = (props: any) => {
   const { setIsModalVisible } = props;
 
   return (
-    <a className="my-2" onClick={() => setIsModalVisible(true)}>
+    <a onClick={() => setIsModalVisible(true)}>
       <KeyOutlined /> Token Update
     </a>
   );
@@ -147,7 +133,7 @@ const SwitchThemeMenuItem = () => {
     const theme = checked ? DARK_THEME : LIGHT_THEME;
     setDarkMode(checked);
     const newSettings = { ...settings, theme };
-    settingsFactory.Update(settings.uuid, newSettings);
+    settingsFactory.Update(newSettings).catch(console.error);
     window.location.reload();
   };
 
@@ -184,7 +170,7 @@ const AutoRefreshPointsMenuItem = () => {
       auto_refresh_enable: enable,
       auto_refresh_rate: refreshTime,
     };
-    await settingsFactory.Update(settings.uuid, newSettings);
+    await settingsFactory.Update(newSettings);
     openNotificationWithIcon("info", "Please refresh page to apply");
   };
 

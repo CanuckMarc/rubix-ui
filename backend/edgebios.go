@@ -3,7 +3,6 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
-	"github.com/NubeIO/rubix-ui/backend/constants"
 	"github.com/NubeIO/rubix-ui/backend/store"
 	log "github.com/sirupsen/logrus"
 )
@@ -29,7 +28,7 @@ func (inst *App) edgeBiosRubixEdgeInstall(connUUID, hostUUID, version string) er
 		return err
 	}
 
-	token, err := inst.GetGitToken(constants.SettingUUID, false)
+	token, err := inst.DB.GetGitToken(false)
 	app := store.App{
 		Name:    appName,
 		Version: version,

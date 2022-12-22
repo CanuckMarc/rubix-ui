@@ -1,52 +1,57 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Input, Modal } from "antd";
 import { SettingsFactory } from "../factory";
 import { openNotificationWithIcon } from "../../../utils/utils";
-import { storage } from "../../../../wailsjs/go/models";
 import { useSettings } from "../use-settings";
+import { hasError } from "../../../utils/response";
 
 export const TokenModal = (props: any) => {
   const { isModalVisible, onClose } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isTokenChange, setIsTokenChange] = useState(false);
   const [token, setToken] = useState("");
-  const [settings, setSettings] = useSettings();
+  const [_, setSettings] = useSettings();
 
   const factory = new SettingsFactory();
 
   useEffect(() => {
-    getToken();
+    getToken().then();
   }, [isModalVisible]);
 
-  const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setToken(e.target.value);
+    setIsTokenChange(true);
   };
 
   const getToken = async () => {
     try {
-      const gitToken = await factory.GitToken(settings.uuid);
-      gitToken ? setToken(gitToken) : setToken("");
+      const res = await factory.GetGitToken();
+      if (!hasError(res)) {
+        setToken(res.data);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleOk = async () => {
-    try {
-      setConfirmLoading(true);
-      const payload = {
-        ...settings,
-        git_token: token,
-      } as storage.Settings;
-      const res = await factory.Update(settings.uuid, payload);
-      setSettings(res);
-      openNotificationWithIcon("success", "Update Token Successful!");
+    if (!isTokenChange) {
+      openNotificationWithIcon("warning", "Token is not changed!");
       onClose();
-    } catch {
-      setToken("");
-    } finally {
-      setConfirmLoading(false);
+    } else {
+      setConfirmLoading(true);
+      try {
+        const res = await factory.SetGitToken(token);
+        if (!hasError(res)) {
+          setSettings(res.data);
+          openNotificationWithIcon("success", "Token is updated successfully!");
+        }
+        onClose();
+      } catch {
+        setToken("");
+      } finally {
+        setConfirmLoading(false);
+      }
     }
   };
 

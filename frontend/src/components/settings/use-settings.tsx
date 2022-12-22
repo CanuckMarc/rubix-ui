@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SettingsFactory } from "./factory";
 import { SettingUUID } from "../../constants/constants";
+import { hasError } from "../../utils/response";
 
 const _settings = {
   auto_refresh_enable: false,
@@ -18,16 +19,15 @@ export const useSettings = () => {
   const [settings, setSettings] = useState(getSettings);
 
   useEffect(() => {
-    fetch(settings.uuid);
-  }, [settings.uuid]);
+    fetch().then();
+  }, []);
 
-  const fetch = async (uuid: string) => {
+  const fetch = async () => {
     try {
-      let res = await factory.Get(uuid);
-      if (!res) {
-        res = getSettings();
+      let res = await factory.Get();
+      if (!hasError(res)) {
+        setSettings(res.data || getSettings());
       }
-      setSettings(res);
     } catch (error) {
       console.log(error);
     }

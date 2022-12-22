@@ -1,32 +1,38 @@
 package backend
 
 import (
-	"fmt"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 )
 
-func (inst *App) GetGitToken(uuid string, previewToken bool) (string, error) {
-	out, err := inst.DB.GetGitToken(uuid, previewToken)
+func (inst *App) GetSettings() *rumodel.Response {
+	out, err := inst.DB.GetSettings()
 	if err != nil {
-		return "", err
+		return inst.fail(err)
 	}
-	return out, nil
+	return inst.successResponse(out)
 }
 
-func (inst *App) UpdateSettings(uuid string, body *storage.Settings) *storage.Settings {
-	out, err := inst.DB.UpdateSettings(uuid, body)
+func (inst *App) UpdateSettings(body *storage.Settings) *rumodel.Response {
+	out, err := inst.DB.UpdateSettings(body)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error on update settings: %s", err.Error()))
-		return nil
+		return inst.fail(err)
 	}
-	return out
+	return inst.successResponse(out)
 }
 
-func (inst *App) GetSetting(uuid string) *storage.Settings {
-	out, err := inst.DB.GetSetting(uuid)
+func (inst *App) GetGitToken() *rumodel.Response {
+	out, err := inst.DB.GetGitToken(true)
 	if err != nil {
-		// inst.uiErrorMessage(fmt.Sprintf("error on update settings: %s", err.Error()))
-		return nil
+		return inst.fail(err)
 	}
-	return out
+	return inst.successResponse(out)
+}
+
+func (inst *App) SetGitToken(token string) *rumodel.Response {
+	out, err := inst.DB.SetGitToken(token)
+	if err != nil {
+		return inst.fail(err)
+	}
+	return inst.successResponse(out)
 }

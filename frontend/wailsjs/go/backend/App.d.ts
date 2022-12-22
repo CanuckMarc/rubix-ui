@@ -288,7 +288,7 @@ export function GetFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<Ar
 
 export function GetFlowPointSchema(arg1:string,arg2:string,arg3:string):Promise<any>;
 
-export function GetGitToken(arg1:string,arg2:boolean):Promise<string>;
+export function GetGitToken():Promise<rumodel.Response>;
 
 export function GetHost(arg1:string,arg2:string):Promise<amodel.Host>;
 
@@ -372,7 +372,7 @@ export function GetServerNetworking(arg1:string):Promise<any>;
 
 export function GetServerTime(arg1:string):Promise<any>;
 
-export function GetSetting(arg1:string):Promise<storage.Settings>;
+export function GetSettings():Promise<rumodel.Response>;
 
 export function GetStream(arg1:string,arg2:string,arg3:string):Promise<model.Stream>;
 
@@ -448,6 +448,8 @@ export function RubixAssistTokens(arg1:string,arg2:string):Promise<externaltoken
 
 export function Scanner(arg1:string,arg2:string,arg3:number,arg4:Array<string>):Promise<any>;
 
+export function SetGitToken(arg1:string):Promise<rumodel.Response>;
+
 export function StoreDownloadApp(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<store.InstallResponse>;
 
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<storage.RubixConnection>;
@@ -456,7 +458,7 @@ export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStora
 
 export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<amodel.Location>;
 
-export function UpdateSettings(arg1:string,arg2:storage.Settings):Promise<storage.Settings>;
+export function UpdateSettings(arg1:storage.Settings):Promise<rumodel.Response>;
 
 export function UpdateWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:string,arg5:db.Connection):Promise<db.Connection>;
 
