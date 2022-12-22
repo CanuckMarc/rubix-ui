@@ -43,7 +43,7 @@ func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.
 		inst.uiWarningMessage(requestErr)
 	}
 
-	token, err := inst.GetGitToken(constants.SettingUUID, false)
+	token, err := inst.DB.GetGitToken(false)
 	if err != nil {
 		return inst.fail(fmt.Sprintf("failed to get git token %s", err))
 	}
@@ -219,7 +219,7 @@ func (inst *App) edgeUploadPlugin(assistClient *assistcli.Client, hostUUID strin
 
 	_, checkPlugin, err := inst.storeGetPluginPath(body)
 	if checkPlugin == nil || err != nil {
-		token, err := inst.GetGitToken(constants.SettingUUID, false)
+		token, err := inst.DB.GetGitToken(false)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("failed to get git token %s", err))
 			return err

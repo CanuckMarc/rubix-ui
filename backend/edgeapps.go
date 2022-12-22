@@ -94,7 +94,7 @@ func (inst *App) EdgeInstallApp(connUUID, hostUUID, appName, appVersion string) 
 
 	err = inst.appStore.StoreCheckAppAndVersionExists(app)
 	if err != nil {
-		token, err := inst.GetGitToken(constants.SettingUUID, false)
+		token, err := inst.DB.GetGitToken(false)
 		if err != nil {
 			inst.fail(fmt.Sprintf("failed to get git token %s", err))
 			return nil
@@ -212,7 +212,7 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 	release, err := inst.DB.GetRelease(*releaseVersion)
 	if release == nil {
 		// if not exist then try and download the version
-		token, err := inst.GetGitToken(constants.SettingUUID, false)
+		token, err := inst.DB.GetGitToken(false)
 		if err != nil {
 			return nil, err
 		}

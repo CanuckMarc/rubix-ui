@@ -2,7 +2,6 @@ package backend
 
 import (
 	"fmt"
-	"github.com/NubeIO/rubix-ui/backend/constants"
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/store"
 	"github.com/hashicorp/go-version"
@@ -60,7 +59,7 @@ func (inst *App) addRelease(token, version string) (*store.Release, error) {
 }
 
 func (inst *App) GitDownloadReleases() *rumodel.Response {
-	gitToken, err := inst.GetGitToken(constants.SettingUUID, false)
+	gitToken, err := inst.DB.GetGitToken(false)
 	if err != nil {
 		return inst.fail(err)
 	}

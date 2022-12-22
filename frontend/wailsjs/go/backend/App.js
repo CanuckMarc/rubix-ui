@@ -538,8 +538,8 @@ export function GetFlowPointSchema(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetFlowPointSchema'](arg1, arg2, arg3);
 }
 
-export function GetGitToken(arg1, arg2) {
-  return window['go']['backend']['App']['GetGitToken'](arg1, arg2);
+export function GetGitToken() {
+  return window['go']['backend']['App']['GetGitToken']();
 }
 
 export function GetHost(arg1, arg2) {
@@ -706,8 +706,8 @@ export function GetServerTime(arg1) {
   return window['go']['backend']['App']['GetServerTime'](arg1);
 }
 
-export function GetSetting(arg1) {
-  return window['go']['backend']['App']['GetSetting'](arg1);
+export function GetSettings() {
+  return window['go']['backend']['App']['GetSettings']();
 }
 
 export function GetStream(arg1, arg2, arg3) {
@@ -858,6 +858,10 @@ export function Scanner(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['Scanner'](arg1, arg2, arg3, arg4);
 }
 
+export function SetGitToken(arg1) {
+  return window['go']['backend']['App']['SetGitToken'](arg1);
+}
+
 export function StoreDownloadApp(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['StoreDownloadApp'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -874,8 +878,8 @@ export function UpdateLocation(arg1, arg2, arg3) {
   return window['go']['backend']['App']['UpdateLocation'](arg1, arg2, arg3);
 }
 
-export function UpdateSettings(arg1, arg2) {
-  return window['go']['backend']['App']['UpdateSettings'](arg1, arg2);
+export function UpdateSettings(arg1) {
+  return window['go']['backend']['App']['UpdateSettings'](arg1);
 }
 
 export function UpdateWiresConnection(arg1, arg2, arg3, arg4, arg5) {

@@ -16,7 +16,7 @@ func (inst *App) EdgeBiosRubixEdgeVersions() []string {
 }
 
 func (inst *App) getRepoVersions(owner string, repo string) []string {
-	token, err := inst.GetGitToken(constants.SettingUUID, false)
+	token, err := inst.DB.GetGitToken(false)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("failed to get git token %s", err.Error()))
 		return make([]string, 0)
