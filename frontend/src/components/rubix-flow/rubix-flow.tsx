@@ -198,7 +198,7 @@ const Flow = (props: any) => {
     setSelectedNodeForSubFlow(undefined);
   };
 
-  const onHandelSaveFlow = async (isCloseSubFlow = false) => {
+  const onHandelSaveFlow = async () => {
     const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     const graphJson = flowToBehave(allNodes, allEdges);
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
