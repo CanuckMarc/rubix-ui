@@ -28,9 +28,7 @@ type IStorage interface {
 	GetBackupsByHostUUID(uuid string) ([]Backup, error)
 
 	GetSettings() (*Settings, error)
-	AddSettings(body *Settings) (*Settings, error)
 	UpdateSettings(body *Settings) (*Settings, error)
-	DeleteSettings() error
 	GetGitToken(previewToken bool) (string, error)
 	SetGitToken(token string) (*Settings, error)
 }
