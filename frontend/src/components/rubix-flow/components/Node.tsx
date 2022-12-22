@@ -185,7 +185,7 @@ export const Node = (props: NodeProps) => {
           !data[input.name] &&
           data[input.name] !== null &&
           ((input.valueType === "number" && data[input.name] !== 0) ||
-            input.valueType === "boolean")
+          (input.valueType === "boolean" && data[input.name]?.toString && !['null','true','false'].includes(data[input.name]?.toString())))
         ) {
           data[input.name] = input.defaultValue;
         }
