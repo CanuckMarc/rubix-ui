@@ -24,7 +24,8 @@ type ControlProps = {
   onRefreshValues: () => void;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
-  onSaveFlow: (isCloseSubFlow?: boolean) => void;
+  onHandelSaveFlow: () => void;
+  onSaveSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
 };
 
@@ -37,7 +38,8 @@ const Controls = ({
   settings,
   onSaveSettings,
   selectedNodeForSubFlow,
-  onSaveFlow,
+  onSaveSubFlow,
+  onHandelSaveFlow,
 }: ControlProps) => {
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -129,7 +131,7 @@ const Controls = ({
 
   /* Ctrl + S (key): Download/deploy flow */
   useCtrlPressKey("KeyS", () => {
-    onSaveFlow(false);
+    onHandelSaveFlow();
   });
 
   /* Ctrl + X (key): Refresh node values */
@@ -144,7 +146,7 @@ const Controls = ({
           <div
             className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
             title="Save sub flow"
-            onClick={() => onSaveFlow(true)}
+            onClick={onSaveSubFlow}
           >
             Close Sub Flow
           </div>
@@ -184,11 +186,7 @@ const Controls = ({
         >
           <RestOutlined className="p-2 text-gray-700 align-middle" />
         </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Run"
-          onClick={() => onSaveFlow(false)}
-        >
+        <div className="cursor-pointer border-r bg-white hover:bg-gray-100" title="Run" onClick={onHandelSaveFlow}>
           <PlayCircleOutlined className="p-2 text-gray-700 align-middle" />
         </div>
       </div>

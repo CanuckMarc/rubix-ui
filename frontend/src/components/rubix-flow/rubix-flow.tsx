@@ -190,13 +190,13 @@ const Flow = (props: any) => {
     };
   };
 
-  // const onSaveSubFlow = () => {
-  //   const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-  //   setNodes(allNodes);
-  //   setEdges(allEdges);
-  //   setCurrentNodesAndEdges({ nodes: [], edges: [] });
-  //   setSelectedNodeForSubFlow(undefined);
-  // };
+  const onSaveSubFlow = () => {
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+    setNodes(allNodes);
+    setEdges(allEdges);
+    setCurrentNodesAndEdges({ nodes: [], edges: [] });
+    setSelectedNodeForSubFlow(undefined);
+  };
 
   const onHandelSaveFlow = async (isCloseSubFlow = false) => {
     const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
@@ -205,7 +205,6 @@ const Flow = (props: any) => {
 
     const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, allNodes);
     setCurrentNodesAndEdges({ nodes: [], edges: [] });
-    isCloseSubFlow && setSelectedNodeForSubFlow(undefined);
     setNodes(newNodes);
     setEdges(allEdges);
   };
@@ -664,7 +663,8 @@ const Flow = (props: any) => {
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onSaveFlow={onHandelSaveFlow}
+              onSaveSubFlow={onSaveSubFlow}
+              onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
               <NodePicker
