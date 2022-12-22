@@ -113,6 +113,7 @@ func (inst *db) UpdateSettings(body *Settings) (*Settings, error) {
 		}
 		return addSettings, err
 	}
+	body.UUID = constants.SettingUUID
 	body.GitToken = settingsList[0].GitToken // don't edit git token
 	j, err := json.Marshal(body)
 	if err != nil {
