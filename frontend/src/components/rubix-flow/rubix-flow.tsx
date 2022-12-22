@@ -205,7 +205,6 @@ const Flow = (props: any) => {
 
     const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, allNodes);
     setCurrentNodesAndEdges({ nodes: [], edges: [] });
-    setSelectedNodeForSubFlow(undefined);
     setNodes(newNodes);
     setEdges(allEdges);
   };
@@ -664,7 +663,7 @@ const Flow = (props: any) => {
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onSaveSubFlow={onHandelSaveFlow}
+              onSaveSubFlow={onSaveSubFlow}
               onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
