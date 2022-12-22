@@ -23,41 +23,14 @@ type Settings struct {
 	AutoRefreshRate   int    `json:"auto_refresh_rate"`
 }
 
-func (inst *db) GetSettingsList() ([]Settings, error) {
-	var resp []Settings
-	err := inst.DB.View(func(tx *buntdb.Tx) error {
-		err := tx.Ascend("", func(key, value string) bool {
-			var data Settings
-			err := json.Unmarshal([]byte(value), &data)
-			if err != nil {
-				return false
-			}
-			if matchSettingsUUID(key) {
-				resp = append(resp, data)
-			}
-			return true
-		})
-		return err
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	return resp, nil
-}
-
 func (inst *db) GetSettings() (*Settings, error) {
-	settingsList, err := inst.GetSettingsList()
-	if err != nil {
-		return nil, err
-	}
-	if len(settingsList) == 0 {
-		return nil, errors.New("no settings have been added")
-	}
 	var data *Settings
-	err = inst.DB.View(func(tx *buntdb.Tx) error {
+	err := inst.DB.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(constants.SettingUUID)
 		if err != nil {
+			if err == buntdb.ErrNotFound {
+				return errors.New("no settings has been added")
+			}
 			return err
 		}
 		err = json.Unmarshal([]byte(val), &data)
@@ -73,47 +46,12 @@ func (inst *db) GetSettings() (*Settings, error) {
 	return data, nil
 }
 
-func (inst *db) AddSettings(body *Settings) (*Settings, error) {
-	settingsList, err := inst.GetSettingsList()
-	if err != nil {
-		return nil, err
-	}
-	if len(settingsList) > 0 {
-		return nil, errors.New("settings can only be added once")
-	}
-	body.UUID = constants.SettingUUID
-	if body.GitToken != "" {
-		body.GitToken = encodeToken(body.GitToken)
-	}
-	data, err := json.Marshal(body)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	err = inst.DB.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(body.UUID, string(data), nil)
-		return err
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	return body, nil
-}
-
 func (inst *db) UpdateSettings(body *Settings) (*Settings, error) {
-	settingsList, err := inst.GetSettingsList()
-	if err != nil {
-		return nil, err
+	settings, _ := inst.GetSettings()
+	body.UUID = constants.SettingUUID
+	if settings != nil {
+		body.GitToken = settings.GitToken // don't edit git token
 	}
-	if len(settingsList) == 0 { // add settings if not existing
-		addSettings, err := inst.AddSettings(body)
-		if err != nil {
-			return nil, err
-		}
-		return addSettings, err
-	}
-	body.GitToken = settingsList[0].GitToken // don't edit git token
 	j, err := json.Marshal(body)
 	if err != nil {
 		log.Error(err)
@@ -128,26 +66,6 @@ func (inst *db) UpdateSettings(body *Settings) (*Settings, error) {
 		return nil, err
 	}
 	return body, nil
-}
-
-func (inst *db) DeleteSettings() error {
-	settingsList, err := inst.GetSettingsList()
-	if err != nil {
-		return err
-	}
-	if len(settingsList) == 0 {
-		return errors.New("no settings have been added")
-	}
-	uuid := settingsList[0].UUID
-	err = inst.DB.Update(func(tx *buntdb.Tx) error {
-		_, err := tx.Delete(uuid)
-		return err
-	})
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	return nil
 }
 
 func (inst *db) GetGitToken(previewToken bool) (string, error) {
@@ -180,11 +98,8 @@ func (inst *db) SetGitToken(token string) (*Settings, error) {
 	if len(token) <= 13 || token[10:13] == "..." {
 		return nil, errors.New("token validation failed")
 	}
-	settingsList, err := inst.GetSettingsList()
-	if err != nil {
-		return nil, err
-	}
-	if len(settingsList) == 0 { // add settings if not existing
+	settings, _ := inst.GetSettings()
+	if settings == nil { // add settings if not existing
 		setting := Settings{
 			UUID:              constants.SettingUUID,
 			Theme:             "dark",
@@ -192,16 +107,15 @@ func (inst *db) SetGitToken(token string) (*Settings, error) {
 			AutoRefreshEnable: false,
 			AutoRefreshRate:   5000,
 		}
-		_settings, err := inst.AddSettings(&setting)
+		_settings, err := inst.UpdateSettings(&setting)
 		if err != nil {
 			return nil, err
 		}
 		_settings.GitToken = getPreviewToken(_settings.GitToken)
 		return _settings, nil
 	} else {
-		_settings := settingsList[0]
-		_settings.GitToken = encodeToken(token)
-		j, err := json.Marshal(_settings)
+		settings.GitToken = encodeToken(token)
+		j, err := json.Marshal(settings)
 		if err != nil {
 			log.Error(err)
 			return nil, err
@@ -214,8 +128,8 @@ func (inst *db) SetGitToken(token string) (*Settings, error) {
 			log.Error(err)
 			return nil, err
 		}
-		_settings.GitToken = getPreviewToken(_settings.GitToken)
-		return &_settings, nil
+		settings.GitToken = getPreviewToken(settings.GitToken)
+		return settings, nil
 	}
 }
 
