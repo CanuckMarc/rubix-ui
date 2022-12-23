@@ -4,15 +4,8 @@ import { Link, useParams } from "react-router-dom";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../../constants/routes";
-import {
-  FLOW_NETWORKS_HEADERS,
-  FLOW_NETWORKS_SCHEMA,
-} from "../../../../../../../constants/headers";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { FLOW_NETWORKS_HEADERS, FLOW_NETWORKS_SCHEMA } from "../../../../../../../constants/headers";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import RbTable from "../../../../../../../common/rb-table";
 import RbTableFilterNameInput from "../../../../../../../common/rb-table-filter-name-input";
 import { CreateEditModal } from "./create";
@@ -22,12 +15,7 @@ import FlowNetwork = model.FlowNetwork;
 
 export const FlowNetworksTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
-  const {
-    connUUID = "",
-    hostUUID = "",
-    netUUID = "",
-    locUUID = "",
-  } = useParams();
+  const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [dataSource, setDataSource] = useState(data);
   const [schema, setSchema] = useState({});
@@ -44,30 +32,17 @@ export const FlowNetworksTable = (props: any) => {
       title: "name",
       dataIndex: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => {
-        return (
-          <RbTableFilterNameInput
-            defaultData={data}
-            setFilteredData={setDataSource}
-          />
-        );
-      },
+      filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
     },
     ...FLOW_NETWORKS_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, network: FlowNetwork) => (
         <Space size="middle">
           <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
-          <a
-            onClick={() => {
-              showModal(network);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showModal(network)}>Edit</a>
         </Space>
       ),
     },

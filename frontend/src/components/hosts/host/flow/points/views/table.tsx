@@ -99,9 +99,7 @@ export const FlowPointsTable = (props: any) => {
           }
         },
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-        filterDropdown: () => {
-          return <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />;
-        },
+        filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
       },
       ...FLOW_POINT_HEADERS,
     ] as any;
@@ -151,25 +149,17 @@ export const FlowPointsTable = (props: any) => {
       },
       {
         title: "Actions",
-        dataIndex: "actions",
         key: "actions",
+        fixed: "right",
         render: (_: any, point: Point) => (
           <Space size="middle">
             <Tooltip title="Edit">
-              <a
-                onClick={() => {
-                  showEditModal(point);
-                }}
-              >
+              <a onClick={() => showEditModal(point)}>
                 <FormOutlined />
               </a>
             </Tooltip>
             <Tooltip title="Write Point">
-              <a
-                onClick={() => {
-                  showWritePointModal(point);
-                }}
-              >
+              <a onClick={() => showWritePointModal(point)}>
                 <EditOutlined />
               </a>
             </Tooltip>

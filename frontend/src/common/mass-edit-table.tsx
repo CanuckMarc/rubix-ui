@@ -1,6 +1,7 @@
 import { Checkbox, Input, InputNumber, Select, Table } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { useEffect } from "react";
+import RbTable from "./rb-table";
 
 interface Options {
   value: "number" | "string";
@@ -30,9 +31,7 @@ export const createColumns = (properties: any) => {
         for (let i = 0; i < properties[key].enum.length; i++) {
           options.push({
             value: properties[key].enum[i],
-            label: properties[key].enumNames
-              ? properties[key].enumNames[i]
-              : properties[key].enum[i],
+            label: properties[key].enumNames ? properties[key].enumNames[i] : properties[key].enum[i],
           });
         }
       }
@@ -40,10 +39,7 @@ export const createColumns = (properties: any) => {
         key: key,
         title: key.replaceAll("_", " "),
         dataIndex: key,
-        type:
-          properties[key].enum && properties[key].enum.length > 0
-            ? "array"
-            : properties[key].type,
+        type: properties[key].enum && properties[key].enum.length > 0 ? "array" : properties[key].type,
         editable: !properties[key].readOnly || false,
         defaultValue: properties[key].default || undefined,
         options: options,
@@ -56,7 +52,7 @@ export const createColumns = (properties: any) => {
 };
 
 export const MassEditTable = (props: any) => {
-  let { items, setItems, columns, count, parentPropId } = props;
+  const { items, setItems, columns, count, parentPropId } = props;
 
   const EditableCell: React.FC<EditableCellProps> = ({
     editing,
@@ -71,10 +67,7 @@ export const MassEditTable = (props: any) => {
     ...restProps
   }) => {
     const _defaultValue =
-      record &&
-      (record[dataIndex] ||
-        record[dataIndex] === false ||
-        record[dataIndex] === 0)
+      record && (record[dataIndex] || record[dataIndex] === false || record[dataIndex] === 0)
         ? record[dataIndex]
         : defaultValue;
 
@@ -92,21 +85,14 @@ export const MassEditTable = (props: any) => {
         break;
       case "string":
         inputNode = (
-          <Input
-            defaultValue={_defaultValue}
-            onChange={(e) =>
-              onChangeValue(e.target.value, dataIndex, record.uuid)
-            }
-          />
+          <Input defaultValue={_defaultValue} onChange={(e) => onChangeValue(e.target.value, dataIndex, record.uuid)} />
         );
         break;
       case "boolean":
         inputNode = (
           <Checkbox
             defaultChecked={_defaultValue ?? false}
-            onChange={(e: CheckboxChangeEvent) =>
-              onChangeValue(e.target.checked, dataIndex, record.uuid)
-            }
+            onChange={(e: CheckboxChangeEvent) => onChangeValue(e.target.checked, dataIndex, record.uuid)}
           />
         );
         break;
@@ -144,11 +130,7 @@ export const MassEditTable = (props: any) => {
     };
   });
 
-  const onChangeValue = (
-    value: number | string | boolean,
-    dataIndex: string,
-    uuid: string
-  ) => {
+  const onChangeValue = (value: number | string | boolean, dataIndex: string, uuid: string) => {
     const index = items.findIndex((i: any) => i.uuid === uuid);
     items[index][dataIndex] = value;
     setItems(items);
@@ -180,19 +162,17 @@ export const MassEditTable = (props: any) => {
   }, [count]);
 
   return (
-    <>
-      <Table
-        rowKey="uuid"
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-        bordered
-        dataSource={items}
-        columns={mergedColumns}
-        rowClassName="editable-row"
-      />
-    </>
+    <RbTable
+      rowKey="uuid"
+      rowClassName="editable-row"
+      bordered
+      dataSource={items}
+      columns={mergedColumns}
+      components={{
+        body: {
+          cell: EditableCell,
+        },
+      }}
+    />
   );
 };

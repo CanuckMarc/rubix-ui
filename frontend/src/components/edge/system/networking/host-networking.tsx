@@ -22,20 +22,10 @@ export const HostNetworking = () => {
   const extraColumns = [
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: any) => (
-        <Space size="middle">
-          {item.editable ? (
-            <a
-              onClick={() => {
-                showModal(item);
-              }}
-            >
-              Edit
-            </a>
-          ) : null}
-        </Space>
+        <Space size="middle">{item.editable ? <a onClick={() => showModal(item)}>Edit</a> : null}</Space>
       ),
     },
   ] as never[];
@@ -98,12 +88,7 @@ export const HostNetworking = () => {
 
   return (
     <>
-      <ScannerTable
-        data={data}
-        isFetching={isFetching}
-        rowKey="id"
-        extraColumns={extraColumns}
-      />
+      <ScannerTable rowKey="id" data={data} isFetching={isFetching} extraColumns={extraColumns} />
 
       <EditModal
         currentItem={currentItem}

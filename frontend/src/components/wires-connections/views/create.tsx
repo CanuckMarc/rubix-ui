@@ -43,12 +43,7 @@ export const CreateModal = (props: any) => {
       maskClosable={false}
       style={{ textAlign: "start" }}
     >
-      <JsonForm
-        formData={formData}
-        jsonSchema={schema}
-        setFormData={setFormData}
-        handleSubmit={handleSubmit}
-      />
+      <JsonForm formData={formData} jsonSchema={schema} setFormData={setFormData} handleSubmit={handleSubmit} />
     </Modal>
   );
 };

@@ -154,16 +154,12 @@ export const FlowDeviceTable = (props: any) => {
       },
       {
         title: "Actions",
-        dataIndex: "actions",
         key: "actions",
+        fixed: "right",
         render: (_: any, device: Device) => (
           <Space size="middle">
             <Tooltip title="Edit">
-              <a
-                onClick={() => {
-                  showEditModal(device);
-                }}
-              >
+              <a onClick={() => showEditModal(device)}>
                 <FormOutlined />
               </a>
             </Tooltip>

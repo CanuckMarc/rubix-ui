@@ -6,11 +6,7 @@ import { FlowConsumerFactory } from "../factory";
 import { CONSUMER_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
@@ -39,18 +35,12 @@ export const ConsumersTable = (props: any) => {
     ...CONSUMER_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: Consumer) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Writers</Link>
-          <a
-            onClick={() => {
-              showModal(item);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showModal(item)}>Edit</a>
         </Space>
       ),
     },
