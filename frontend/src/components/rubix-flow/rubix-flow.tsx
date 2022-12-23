@@ -413,7 +413,7 @@ const Flow = (props: any) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
-  const updateCurrentNodesAndEdges = (_nodesDeleted = [], _edgesDeleted = []) => {
+  const updateCurrentNodesAndEdges = (_nodesDeleted: any, _edgesDeleted: any) => {
     const nodesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.nodes : nodes;
     const edgesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.edges : edges;
     const newNodes: NodeInterface[] = _nodesDeleted.length > 0 ? [] : nodesWillHandle;
