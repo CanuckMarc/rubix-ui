@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useReactFlow } from "react-flow-renderer/nocss";
-import { NodeInterface } from '../lib/Nodes/NodeInterface';
+import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 export const useChangeNodeData = (id: string) => {
   const instance = useReactFlow();
@@ -35,6 +35,7 @@ export const useChangeNodeProperties = (id: string) => {
           ...node,
           [key]: value,
         };
+       
       });
       instance.setNodes(newNodes);
     },
