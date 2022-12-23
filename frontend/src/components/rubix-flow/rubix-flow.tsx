@@ -273,7 +273,13 @@ const Flow = (props: any) => {
           setNodePickerVisibility({ x, y });
         }
         /* Add connect for input added by InputCount setting */
-        if (lastConnectStart && nodeId && handleId && !isTrueHandleId && isValidConnection(nodes, lastConnectStart, { nodeId, handleId })){
+        if (
+          lastConnectStart &&
+          nodeId &&
+          handleId &&
+          !isTrueHandleId &&
+          isValidConnection(nodes, lastConnectStart, { nodeId, handleId })
+        ) {
           const isSource = lastConnectStart.handleType === "source" || false;
           const conNodeId = lastConnectStart.nodeId || "";
           const conHandleId = lastConnectStart.handleId || "";
@@ -308,7 +314,7 @@ const Flow = (props: any) => {
     setIsDoubleClick(false);
   };
 
-  const handlePaneClick = () => {
+  const handlePaneClick = (e: ReactMouseEvent) => {
     const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     setNodes(allNodes.map((node) => ({ ...node, selected: false })));
     setEdges(allEdges.map((ed) => ({ ...ed, selected: false })));
@@ -407,19 +413,26 @@ const Flow = (props: any) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
-  const updateCurrentNodesAndEdges = (_nodesDeleted: any, _edgesDeleted: any) => {
+  const updateCurrentNodesAndEdges = (_nodesDeleted = [], _edgesDeleted = []) => {
     const nodesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.nodes : nodes;
     const edgesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.edges : edges;
+    const newNodes: NodeInterface[] = _nodesDeleted.length > 0 ? [] : nodesWillHandle;
 
-    const newNodes = nodesWillHandle.filter((currItem: NodeInterface) => {
-      const item = _nodesDeleted.find((nodeDeleted: NodeInterface) => {
-        const isSelf = nodeDeleted.id === currItem.id;
+    _nodesDeleted.forEach((nodeDeleted: NodeInterface) => {
+      nodesWillHandle.forEach((nodeHandle: NodeInterface) => {
+        const isSelf = nodeDeleted.id === nodeHandle.id;
         if (selectedNodeForSubFlow) {
-          return isSelf;
+          if (!isSelf) {
+            newNodes.push(nodeHandle);
+          }
+        } else {
+          if (nodeDeleted.isParent && nodeDeleted.id !== nodeHandle.parentId) {
+            newNodes.push(nodeHandle);
+          } else if (!isSelf) {
+            newNodes.push(nodeHandle);
+          }
         }
-        return isSelf || (nodeDeleted.isParent && nodeDeleted.id === currItem.parentId);
       });
-      return !item;
     });
 
     const newEdges = edgesWillHandle.filter((currItem) => {
