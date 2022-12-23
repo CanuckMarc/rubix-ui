@@ -30,17 +30,12 @@ export const useChangeNodeProperties = (id: string) => {
   return useCallback(
     (key: string, value: any) => {
       const newNodes = window.allNodes.map((node: NodeInterface) => {
-        if (node.id === id) {
-          node[key as keyof NodeInterface] = value;
-          if (value.inputCount) {
-            if (node.id !== id) return node;
-            return {
-              ...node,
-              [key]: value,
-            };
-          }
-        }
-        return node;
+        if (node.id !== id) return node;
+        return {
+          ...node,
+          [key]: value,
+        };
+       
       });
       instance.setNodes(newNodes);
     },
