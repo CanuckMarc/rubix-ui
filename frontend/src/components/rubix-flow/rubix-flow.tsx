@@ -308,7 +308,12 @@ const Flow = (props: any) => {
     setIsDoubleClick(false);
   };
 
-  const handlePaneClick = () => closeNodePicker();
+  const handlePaneClick = () => {
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+    setNodes(allNodes.map((node) => ({ ...node, selected: false })));
+    setEdges(allEdges.map((ed) => ({ ...ed, selected: false })));
+    closeNodePicker();
+  };
 
   const handlePaneContextMenu = (event: ReactMouseEvent) => {
     const { x, y } = setMousePosition(event);
@@ -408,10 +413,11 @@ const Flow = (props: any) => {
 
     const newNodes = nodesWillHandle.filter((currItem: NodeInterface) => {
       const item = _nodesDeleted.find((nodeDeleted: NodeInterface) => {
-        if (nodeDeleted.isParent) {
-          return nodeDeleted.id === currItem.id || nodeDeleted.id === currItem.parentId;
+        const isSelf = nodeDeleted.id === currItem.id;
+        if (selectedNodeForSubFlow) {
+          return isSelf;
         }
-        return nodeDeleted.id === currItem.id;
+        return isSelf || (nodeDeleted.isParent && nodeDeleted.id === currItem.parentId);
       });
       return !item;
     });
