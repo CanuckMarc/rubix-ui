@@ -33,15 +33,11 @@ export const useChangeNodeProperties = (id: string) => {
         if (node.id === id) {
           node[key as keyof NodeInterface] = value;
           if (value.inputCount) {
-            node.data.inputs = new Array(value.inputCount)
-              .fill(() => 1)
-              .map(
-                (_, index) =>
-                  node.data.inputs[index] || {
-                    ...node.data.inputs[0],
-                    pin: `in${index + 1}`,
-                  }
-              );
+            if (node.id !== id) return node;
+            return {
+              ...node,
+              [key]: value,
+            };
           }
         }
         return node;

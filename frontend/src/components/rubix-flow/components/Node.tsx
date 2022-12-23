@@ -54,8 +54,8 @@ const getInputs = (
     for (let i = 1; i <= node.settings.inputCount; i++) {
       const item = {
         pin: `in${i}`,
-        dataType: "number",
-        value: null,
+        dataType: nodeInputs[0]?.dataType,
+        value: nodeInputs[0]?.defaultValue,
       };
       if (newData) {
         newData.push(item);
@@ -185,7 +185,7 @@ export const Node = (props: NodeProps) => {
           !data[input.name] &&
           data[input.name] !== null &&
           ((input.valueType === "number" && data[input.name] !== 0) ||
-          (input.valueType === "boolean" && data[input.name]?.toString && !['null','true','false'].includes(data[input.name]?.toString())))
+          (input.valueType === "boolean" && data[input.name] === undefined))
         ) {
           data[input.name] = input.defaultValue;
         }
