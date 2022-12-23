@@ -28,9 +28,7 @@ export const openNotificationWithIcon = (type: NotificationType, data: any) => {
     message: type.charAt(0).toUpperCase() + type.slice(1),
     description: data,
     placement: "bottomRight",
-    icon: (
-      <InfoCircleOutlined style={{ marginLeft: "-180px", color: getColor() }} />
-    ),
+    icon: <InfoCircleOutlined style={{ marginLeft: "-180px", color: getColor() }} />,
   });
 };
 
@@ -97,10 +95,7 @@ export const copyToClipboard = (text: string) => {
     }
     return openNotificationWithIcon("success", "Copied to clipboard!");
   } catch (ex) {
-    return openNotificationWithIcon(
-      "error",
-      "Failure on copying on clipboard!"
-    );
+    return openNotificationWithIcon("error", "Failure on copying on clipboard!");
   }
 };
 
@@ -112,4 +107,14 @@ export const downloadJSON = (fileName: string, data: any) => {
   a.href = window.URL.createObjectURL(blob);
   e.initEvent("click", true, false);
   a.dispatchEvent(e);
+};
+
+export const orderBy = (dataArray = [], fieldName: string) => {
+  return dataArray.sort((a: any, b: any) => {
+    if (typeof a[fieldName] === "string") {
+      return a[fieldName].localeCompare(b[fieldName]);
+    } else {
+      return a[fieldName] - b[fieldName]; //case type boolean or number
+    }
+  });
 };

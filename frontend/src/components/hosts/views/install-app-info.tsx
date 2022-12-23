@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { RbRefreshButton } from "../../../common/rb-table-actions";
-import { Button, Card, Dropdown, List, Menu, Typography } from "antd";
+import { Typography, List, Dropdown, Menu, Card, Button } from "antd";
 import { DownloadOutlined, LeftOutlined } from "@ant-design/icons";
-import RbVersion, { VERSION_STATES } from "../../../common/rb-version";
-import RbTag from "../../../common/rb-tag";
-import { tagMessageStateResolver } from "./utils";
-import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-modal";
-import { InstallAppFactory } from "./install-rubix-app/factory";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
+import { RbRefreshButton } from "../../../common/rb-table-actions";
+import RbTag from "../../../common/rb-tag";
+import RbVersion, { VERSION_STATES } from "../../../common/rb-version";
+import { orderBy } from "../../../utils/utils";
 import { ReleasesFactory } from "../../release/factory";
+import { InstallAppFactory } from "./install-rubix-app/factory";
+import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-modal";
+import { tagMessageStateResolver } from "./utils";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
-
 const releaseFactory = new ReleasesFactory();
 const { Text, Title } = Typography;
 let installAppFactory = new InstallAppFactory();
@@ -32,7 +32,6 @@ export const EdgeAppInfo = (props: any) => {
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
   const { host } = props;
 
-
   useEffect(() => {
     fetchAppInfo().catch(console.error);
     return () => {
@@ -46,8 +45,10 @@ export const EdgeAppInfo = (props: any) => {
     try {
       const response = await releaseFactory.EdgeAppsInfo(connUUID, host.uuid);
       if (response?.code === 0) {
-        updateInstalledApps(response?.data?.installed_apps);
-        updateAvailableApps(response?.data?.apps_available_for_install);
+        const _installed_apps = orderBy(response?.data?.installed_apps, "app_name");
+        const _apps_available_for_install = orderBy(response?.data?.apps_available_for_install, "app_name");
+        updateInstalledApps(_installed_apps);
+        updateAvailableApps(_apps_available_for_install);
       } else {
         updateAppInfoMsg(response?.msg || "fetch edge apps info gone wrong");
       }
@@ -91,8 +92,7 @@ export const EdgeAppInfo = (props: any) => {
   };
 
   const setIsInstallRubixAppModalVisible = (item: any) => {
-    const selectedInstalledApp = installedApps
-      .find(app => app.app_name == item.app_name)?.version;
+    const selectedInstalledApp = installedApps.find((app) => app.app_name == item.app_name)?.version;
     updateSelectedApp(item);
     updateInstalledVersion(selectedInstalledApp || "");
     updateIsInstallRubixAppModalVisible(true);
@@ -113,10 +113,7 @@ export const EdgeAppInfo = (props: any) => {
         }}
       >
         <Title level={5}>App details</Title>
-        <RbRefreshButton
-          style={{ marginLeft: 10 }}
-          refreshList={() => fetchAppInfo()}
-        />
+        <RbRefreshButton style={{ marginLeft: 10 }} refreshList={() => fetchAppInfo()} />
       </div>
 
       <List
@@ -130,8 +127,7 @@ export const EdgeAppInfo = (props: any) => {
               title={<span>{item.app_name}</span>}
               description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
             />
-            <DownloadOutlined
-              onClick={() => setIsInstallRubixAppModalVisible(item)} />
+            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} />
           </List.Item>
         )}
       />
@@ -144,17 +140,19 @@ export const EdgeAppInfo = (props: any) => {
         renderItem={(item) => (
           <List.Item style={{ padding: "8px 16px" }}>
             <span style={{ width: "250px" }}>
-              <span>
-                {item.app_name}
-              </span>
+              <span>{item.app_name}</span>
             </span>
             <span style={{ width: 100, float: "right" }}>
-              <RbVersion state={
-                item.downgrade_required ?
-                  VERSION_STATES.DOWNGRADE : item.upgrade_required ?
-                    VERSION_STATES.UPGRADE : VERSION_STATES.NONE
-              } version={item.version}>
-              </RbVersion>
+              <RbVersion
+                state={
+                  item.downgrade_required
+                    ? VERSION_STATES.DOWNGRADE
+                    : item.upgrade_required
+                    ? VERSION_STATES.UPGRADE
+                    : VERSION_STATES.NONE
+                }
+                version={item.version}
+              ></RbVersion>
             </span>
             <span
               className="flex-1"
@@ -173,19 +171,13 @@ export const EdgeAppInfo = (props: any) => {
               </span>
 
               <Text style={{ paddingTop: 5 }} type="secondary" italic>
-                {tagMessageStateResolver(
-                  item.state,
-                  item.sub_state,
-                  item.active_state
-                )}
+                {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
               </Text>
             </span>
             <span className="flex-1" style={{ textAlign: "right" }}>
               <Dropdown.Button
                 loading={isActionLoading[item.app_name || ""] || false}
-                overlay={() => (
-                  <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />
-                )}
+                overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
               />
             </span>
           </List.Item>
@@ -259,10 +251,7 @@ const ConfirmActionMenu = (props: any) => {
             >
               Cancel
             </Button>
-            <Button
-              className="nube-primary white--text"
-              onClick={() => onMenuClick(selectedAction, item)}
-            >
+            <Button className="nube-primary white--text" onClick={() => onMenuClick(selectedAction, item)}>
               OK
             </Button>
           </div>

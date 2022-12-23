@@ -27,21 +27,8 @@ import Device = model.Device;
 import UUIDs = backend.UUIDs;
 
 export const FlowDeviceTable = (props: any) => {
-  const {
-    connUUID = "",
-    locUUID = "",
-    netUUID = "",
-    hostUUID = "",
-    networkUUID = "",
-    pluginName = "",
-  } = useParams();
-  const {
-    data,
-    isFetching,
-    refreshList,
-    dataSource,
-    setDataSource,
-  } = props;
+  const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", networkUUID = "", pluginName = "" } = useParams();
+  const { data, isFetching, refreshList, dataSource, setDataSource } = props;
   const [schema, setSchema] = useState({});
   const [currentItem, setCurrentItem] = useState({});
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -55,8 +42,7 @@ export const FlowDeviceTable = (props: any) => {
 
   const flowDeviceFactory = new FlowDeviceFactory();
   const flowPluginFactory = new FlowPluginFactory();
-  flowDeviceFactory.connectionUUID = flowPluginFactory.connectionUUID =
-    connUUID;
+  flowDeviceFactory.connectionUUID = flowPluginFactory.connectionUUID = connUUID;
   flowDeviceFactory.hostUUID = flowPluginFactory.hostUUID = hostUUID;
 
   const rowSelection = {
@@ -99,11 +85,7 @@ export const FlowDeviceTable = (props: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await flowDeviceFactory.Schema(
-      connUUID,
-      hostUUID,
-      pluginName as unknown as string
-    );
+    const res = await flowDeviceFactory.Schema(connUUID, hostUUID, pluginName as unknown as string);
     const jsonSchema = {
       properties: res,
     };
@@ -122,12 +104,7 @@ export const FlowDeviceTable = (props: any) => {
         key: "name",
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
         filterDropdown: () => {
-          return (
-            <RbTableFilterNameInput
-              defaultData={data}
-              setFilteredData={setDataSource}
-            />
-          );
+          return <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />;
         },
       },
       ...FLOW_DEVICE_HEADERS,
@@ -137,10 +114,7 @@ export const FlowDeviceTable = (props: any) => {
     const columnKeys = columns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title:
-          key === "name" || key === "uuid"
-            ? key.replaceAll("_", " ")
-            : MassEditTitle(key, schema),
+        title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
         sorter: (a: any, b: any) => {
@@ -158,9 +132,7 @@ export const FlowDeviceTable = (props: any) => {
     //styling columns
     headers = headers.map((header: any) => {
       if (columnKeys.includes(header.key)) {
-        const headerFromColumns = columns.find(
-          (col: any) => col.key === header.key
-        );
+        const headerFromColumns = columns.find((col: any) => col.key === header.key);
         if (headerFromColumns) headerFromColumns.title = header.title;
         return headerFromColumns;
       } else {
@@ -209,14 +181,11 @@ export const FlowDeviceTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return (
-      <MassEdit fullSchema={schema} keyName={key} handleOk={handleMassEdit} />
-    );
+    return <MassEdit fullSchema={schema} keyName={key} handleOk={handleMassEdit} />;
   };
 
   const handleMassEdit = async (updateData: any) => {
-    const selectedItems =
-      JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
+    const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
     const promises = [];
     for (let item of selectedItems) {
       item = { ...item, ...updateData };
