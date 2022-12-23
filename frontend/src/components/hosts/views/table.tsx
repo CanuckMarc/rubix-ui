@@ -1,10 +1,10 @@
 import { Space, Spin, Tooltip } from "antd";
-import { ArrowRightOutlined, DownloadOutlined, FormOutlined, LinkOutlined, ScanOutlined, } from "@ant-design/icons";
+import { ArrowRightOutlined, DownloadOutlined, FormOutlined, LinkOutlined, ScanOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import { RbAddButton, RbDeleteButton, RbRefreshButton, RbSyncButton, } from "../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton, RbSyncButton } from "../../../common/rb-table-actions";
 import { HOST_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
@@ -37,13 +37,10 @@ export const HostsTable = (props: any) => {
   const [hostSchema, setHostSchema] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
-  const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] =
-    useState(false);
+  const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
   const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
-  const [tokenFactory, setTokenFactory] = useState(
-    new EdgeBiosTokenFactory(connUUID)
-  );
+  const [tokenFactory, setTokenFactory] = useState(new EdgeBiosTokenFactory(connUUID));
 
   const factory = new HostsFactory();
   const installFactory = new InstallFactory();
@@ -56,49 +53,31 @@ export const HostsTable = (props: any) => {
       title: "network",
       dataIndex: "network_uuid",
       key: "network_uuid",
-      render: (network_uuid: string) => (
-        <span>{getNetworkNameByUUID(network_uuid)}</span>
-      ),
+      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
     },
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, host: Host) => (
         <Space size="middle">
           <Tooltip title="Ping">
-            <a
-              onClick={(e) => {
-                handlePing(host.uuid, e);
-              }}
-            >
+            <a onClick={(e) => handlePing(host.uuid, e)}>
               <LinkOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Edit">
-            <a
-              onClick={(e) => {
-                showModal(host, e);
-              }}
-            >
+            <a onClick={(e) => showModal(host, e)}>
               <FormOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Install Rubix Edge">
-            <a
-              onClick={(e) => {
-                showRubixEdgeInstallModal(host, e);
-              }}
-            >
+            <a onClick={(e) => showRubixEdgeInstallModal(host, e)}>
               <DownloadOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Tokens">
-            <a
-              onClick={(e) => {
-                showTokenModal(host, e);
-              }}
-            >
+            <a onClick={(e) => showTokenModal(host, e)}>
               <ScanOutlined />
             </a>
           </Tooltip>
@@ -188,9 +167,7 @@ export const HostsTable = (props: any) => {
   };
 
   useEffect(() => {
-    const _tokenFactory: EdgeBiosTokenFactory = new EdgeBiosTokenFactory(
-      connUUID
-    );
+    const _tokenFactory: EdgeBiosTokenFactory = new EdgeBiosTokenFactory(connUUID);
     _tokenFactory.hostUUID = currentHost.uuid;
     setTokenFactory(_tokenFactory);
   }, [currentHost]);

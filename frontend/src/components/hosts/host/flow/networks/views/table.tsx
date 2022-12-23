@@ -3,8 +3,7 @@ import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
-import RbTableFilterNameInput
-  from "../../../../../../common/rb-table-filter-name-input";
+import RbTableFilterNameInput from "../../../../../../common/rb-table-filter-name-input";
 import RbTable from "../../../../../../common/rb-table";
 import {
   RbAddButton,
@@ -26,12 +25,7 @@ import UUIDs = backend.UUIDs;
 import Network = model.Network;
 
 export const FlowNetworkTable = () => {
-  let {
-    connUUID = "",
-    hostUUID = "",
-    netUUID = "",
-    locUUID = "",
-  } = useParams();
+  let { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [currentItem, setCurrentItem] = useState({});
   const [networkSchema, setNetworkSchema] = useState({});
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -57,27 +51,18 @@ export const FlowNetworkTable = () => {
       key: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       filterDropdown: () => {
-        return (
-          <RbTableFilterNameInput
-            defaultData={networks}
-            setFilteredData={setDataSource}
-          />
-        );
+        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
       },
     },
     ...NETWORK_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, network: model.Network) => (
         <Space size="middle">
           <Tooltip title="Edit">
-            <a
-              onClick={() => {
-                showModal(network);
-              }}
-            >
+            <a onClick={() => showModal(network)}>
               <FormOutlined />
             </a>
           </Tooltip>
@@ -156,10 +141,7 @@ export const FlowNetworkTable = () => {
     setIsExportModalVisible(true);
   };
 
-  const getNavigationLink = (
-    networkUUID: string,
-    pluginName: string
-  ): string => {
+  const getNavigationLink = (networkUUID: string, pluginName: string): string => {
     return ROUTES.DEVICES.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)

@@ -6,22 +6,13 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { STREAM_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 
 import UUIDs = backend.UUIDs;
 import StreamClone = model.StreamClone;
 
 export const StreamClonesTable = () => {
-  const {
-    connUUID = "",
-    hostUUID = "",
-    netUUID = "",
-    locUUID = "",
-    flNetworkCloneUUID = "",
-  } = useParams();
+  const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkCloneUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [streamClones, setStreamClones] = useState([] as StreamClone[]);
   const [isFetching, setIsFetching] = useState(false);
@@ -34,8 +25,8 @@ export const StreamClonesTable = () => {
     ...STREAM_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: StreamClone) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Consumers</Link>

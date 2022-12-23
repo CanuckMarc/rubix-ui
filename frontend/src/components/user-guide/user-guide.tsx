@@ -14,8 +14,7 @@ const NodeHelpTable = (props: any) => {
   if (data.settings) {
     //fix duplicate key 'help'
     Object.keys(data.settings.schema.properties).forEach((key) => {
-      data.settings.schema.properties[key][`${key}_help`] =
-        data.settings.schema.properties[key].help || "";
+      data.settings.schema.properties[key][`${key}_help`] = data.settings.schema.properties[key].help || "";
       delete data.settings.schema.properties[key].help;
     });
   }
@@ -28,10 +27,10 @@ const NodeHelpTable = (props: any) => {
 };
 
 export const UserGuide = () => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [nodeHelps, setNodeHelps] = useState<any>();
   const [filterHelps, setFilterHelps] = useState<any>();
   const [search, setSearch] = useState("");
-  const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = connUUID && hostUUID ? true : false;
 
   const factory = new FlowFactory();
@@ -49,11 +48,7 @@ export const UserGuide = () => {
   useEffect(() => {
     const keyword = search.toLowerCase().trim();
     const newHelps =
-      keyword.length > 0
-        ? nodeHelps.filter((item: any) =>
-            item.name.toLowerCase().includes(keyword)
-          )
-        : nodeHelps;
+      keyword.length > 0 ? nodeHelps.filter((item: any) => item.name.toLowerCase().includes(keyword)) : nodeHelps;
     setFilterHelps(newHelps);
   }, [search]);
 
@@ -67,13 +62,7 @@ export const UserGuide = () => {
         User Guide
       </Title>
       <Card bordered={false} className="help-list">
-        <Input
-          placeholder="Search name..."
-          allowClear
-          value={search}
-          onChange={handleChangeSearch}
-          size="large"
-        />
+        <Input placeholder="Search name..." allowClear value={search} onChange={handleChangeSearch} size="large" />
 
         {filterHelps &&
           filterHelps.map((item: any, i: number) => (

@@ -4,10 +4,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
 import { RbAddButton, RbDeleteButton } from "../../../common/rb-table-actions";
-import {
-  WIRES_CONNECTIONS_HEADERS,
-  WIRES_CONNECTION_SCHEMA,
-} from "../../../constants/headers";
+import { WIRES_CONNECTIONS_HEADERS, WIRES_CONNECTION_SCHEMA } from "../../../constants/headers";
 import { FlowFactory } from "../../rubix-flow/factory";
 import { CreateModal } from "./create";
 import { EditModal } from "./edit";
@@ -30,17 +27,11 @@ export const WiresConnectionsTable = (props: any) => {
     ...WIRES_CONNECTIONS_HEADERS,
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, connection: Connection) => (
         <Space size="middle">
-          <a
-            onClick={() => {
-              showEditModal(connection);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showEditModal(connection)}>Edit</a>
         </Space>
       ),
     },
@@ -54,12 +45,7 @@ export const WiresConnectionsTable = (props: any) => {
 
   const bulkDelete = async () => {
     try {
-      await factory.BulkDeleteWiresConnection(
-        connUUID,
-        hostUUID,
-        isRemote,
-        selectedUUIDs
-      );
+      await factory.BulkDeleteWiresConnection(connUUID, hostUUID, isRemote, selectedUUIDs);
     } catch (error) {
       console.log(error);
     } finally {

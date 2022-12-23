@@ -4,11 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { FlowStreamFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { STREAM_HEADERS } from "../../../../../../../constants/headers";
 import { CreateEditModal } from "./create";
@@ -18,13 +14,7 @@ import Stream = model.Stream;
 
 export const StreamsTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
-  const {
-    connUUID = "",
-    hostUUID = "",
-    netUUID = "",
-    locUUID = "",
-    flNetworkUUID = "",
-  } = useParams();
+  const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [schema, setSchema] = useState({});
   const [currentItem, setCurrentItem] = useState({} as Stream);
@@ -38,18 +28,12 @@ export const StreamsTable = (props: any) => {
     ...STREAM_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: Stream) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Producers</Link>
-          <a
-            onClick={() => {
-              showModal(item);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showModal(item)}>Edit</a>
         </Space>
       ),
     },

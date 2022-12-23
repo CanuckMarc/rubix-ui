@@ -1,6 +1,6 @@
 import Table from "antd/lib/table";
 
-const DISPLAY_MAX_WIDTH = 1024;
+const DISPLAY_MAX_WIDTH = "max-content";
 
 const RbTable = (props: any) => {
   return (
@@ -14,6 +14,8 @@ const RbTable = (props: any) => {
         locale: { items_per_page: "" },
       }}
       showSorterTooltip={false}
+      tableLayout="auto"
+      style={{ whiteSpace: "nowrap" }} //keep one row
     />
   );
 };

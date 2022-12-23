@@ -1,6 +1,6 @@
-import { Modal, Spin, Switch } from "antd";
+import { Input, Modal, Row, Spin, Switch } from "antd";
 import { ExclamationCircleFilled } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import RbTable from "../../../../../../common/rb-table";
 import { FlowPluginFactory } from "../factory";
@@ -12,9 +12,11 @@ const { confirm } = Modal;
 export const PluginDistributionTable = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState<any[]>([]);
+  const [filteredPlugins, setFilteredPlugins] = useState<any[]>([]);
   const [pluginName, setPluginName] = useState<any>();
   const [isFetching, setIsFetching] = useState(false);
   const [isInstallModalVisible, setIsInstallModalVisible] = useState(false);
+  const [search, setSearch] = useState("");
 
   const factory = new FlowPluginFactory();
 
@@ -34,9 +36,7 @@ export const PluginDistributionTable = () => {
       key: "is_installed",
       dataIndex: "is_installed",
       render(is_installed: boolean, item: any) {
-        return (
-          <Switch checked={is_installed} onChange={() => onChange(item)} />
-        );
+        return <Switch checked={is_installed} onChange={() => onChange(item)} />;
       },
     },
   ];
@@ -48,6 +48,10 @@ export const PluginDistributionTable = () => {
     } else {
       showUnInstallConfirm(item.name);
     }
+  };
+
+  const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.currentTarget.value);
   };
 
   const showUnInstallConfirm = (pluginName: string) => {
@@ -71,11 +75,10 @@ export const PluginDistributionTable = () => {
   const fetchPlugins = async () => {
     try {
       setIsFetching(true);
-      const { data = [] } = await factory.GetPluginsDistribution(
-        connUUID,
-        hostUUID
-      );
+      const { data = [] } = await factory.GetPluginsDistribution(connUUID, hostUUID);
       setPlugins(data);
+      setFilteredPlugins(data);
+      setSearch("");
     } catch (error) {
       console.log(error);
     } finally {
@@ -87,16 +90,23 @@ export const PluginDistributionTable = () => {
     fetchPlugins();
   }, []);
 
+  useEffect(() => {
+    const keyword = search.toLowerCase().trim();
+    const _filteredPlugins =
+      keyword.length > 0 ? plugins.filter((item: any) => item.name.toLowerCase().includes(keyword)) : plugins;
+    setFilteredPlugins(_filteredPlugins);
+  }, [search]);
+
   return (
     <>
       <RbRefreshButton refreshList={fetchPlugins} />
+      <Input placeholder="Search name..." allowClear value={search} onChange={handleChangeSearch} className="mt-2" />
       <RbTable
         rowKey="name"
-        dataSource={plugins}
+        dataSource={filteredPlugins}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
-
       <PluginDownloadModal
         isModalVisible={isInstallModalVisible}
         pluginName={pluginName}

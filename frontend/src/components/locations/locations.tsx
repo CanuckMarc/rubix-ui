@@ -11,7 +11,7 @@ import { LocationFactory } from "./factory";
 import { CreateEditModal } from "./views/create";
 import { LocationsTable } from "./views/table";
 import useTitlePrefix from "../../hooks/usePrefixedTitle";
-import { ArrowRightOutlined, FormOutlined, } from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import Location = amodel.Location;
 import RubixConnection = storage.RubixConnection;
 
@@ -112,22 +112,17 @@ export const Locations = () => {
         },
         {
           title: "Actions",
-          dataIndex: "actions",
           key: "actions",
+          fixed: "right",
           render: (_: any, location: Location) => (
             <Space size="middle">
               <Tooltip title="Edit">
-                <a onClick={() => {
-                  showModal(location);
-                }}>
+                <a onClick={() => showModal(location)}>
                   <FormOutlined />
                 </a>
               </Tooltip>
               <Link
-                to={ROUTES.LOCATION_NETWORKS.replace(
-                  ":connUUID",
-                  connUUID || ""
-                ).replace(":locUUID", location.uuid)}
+                to={ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", location.uuid)}
               >
                 <Tooltip title="View">
                   <ArrowRightOutlined />
@@ -138,8 +133,7 @@ export const Locations = () => {
         },
       ];
       setTableSchema(tableSchema);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const routes = [

@@ -6,25 +6,14 @@ import { FlowProducerFactory } from "../factory";
 import { PRODUCER_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
 
 export const ProducersTable = (props: any) => {
-  const {
-    connUUID = "",
-    locUUID = "",
-    netUUID = "",
-    hostUUID = "",
-    flNetworkUUID = "",
-    streamUUID = "",
-  } = useParams();
+  const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "", streamUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [producers, setProducers] = useState([] as Producer[]);
   const [currentItem, setCurrentItem] = useState({} as Producer);
@@ -39,18 +28,12 @@ export const ProducersTable = (props: any) => {
     ...PRODUCER_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: Producer) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Writer Clones</Link>
-          <a
-            onClick={() => {
-              showModal(item);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showModal(item)}>Edit</a>
         </Space>
       ),
     },

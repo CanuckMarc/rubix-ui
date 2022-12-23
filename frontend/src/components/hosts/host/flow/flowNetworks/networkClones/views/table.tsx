@@ -5,10 +5,7 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { FlowFrameworkNetworkCloneFactory } from "../factory";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
-import {
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import RbTable from "../../../../../../../common/rb-table";
 
 import UUIDs = backend.UUIDs;
@@ -16,12 +13,7 @@ import FlowNetworkClone = model.FlowNetworkClone;
 import RbTableFilterNameInput from "../../../../../../../common/rb-table-filter-name-input";
 
 export const NetworkClonesTable = (props: any) => {
-  const {
-    connUUID = "",
-    hostUUID = "",
-    netUUID = "",
-    locUUID = "",
-  } = useParams();
+  const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Array<UUIDs>);
   const [dataSource, setDataSource] = useState(networks);
@@ -38,19 +30,14 @@ export const NetworkClonesTable = (props: any) => {
       dataIndex: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       filterDropdown: () => {
-        return (
-          <RbTableFilterNameInput
-            defaultData={networks}
-            setFilteredData={setDataSource}
-          />
-        );
+        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
       },
     },
     ...FLOW_NETWORKS_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, network: FlowNetworkClone) => (
         <Space size="middle">
           <Link to={getNavigationLink(network.uuid)}>View Streams</Link>

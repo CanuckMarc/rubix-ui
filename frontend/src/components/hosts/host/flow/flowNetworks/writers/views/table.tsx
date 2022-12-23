@@ -6,11 +6,7 @@ import { WritersFactory } from "../factory";
 import { FlowConsumerFactory } from "../../consumers/factory";
 import { WRITER_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
@@ -35,17 +31,11 @@ export const WritersTable = () => {
     ...WRITER_HEADERS,
     {
       title: "actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, item: Writer) => (
         <Space size="middle">
-          <a
-            onClick={() => {
-              showModal(item);
-            }}
-          >
-            Edit
-          </a>
+          <a onClick={() => showModal(item)}>Edit</a>
         </Space>
       ),
     },

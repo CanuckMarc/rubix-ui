@@ -4,22 +4,13 @@ import { Link } from "react-router-dom";
 import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
 import { backend, storage } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../common/rb-table-actions";
 import { CONNECTION_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
-import {
-  ArrowRightOutlined,
-  FormOutlined,
-  LinkOutlined,
-  ScanOutlined
-} from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined, LinkOutlined, ScanOutlined } from "@ant-design/icons";
 import { TokenModal } from "../../../common/token/token-modal";
 import { RubixAssistTokenFactory } from "./token-factory";
 import RubixConnection = storage.RubixConnection;
@@ -28,9 +19,7 @@ import UUIDs = backend.UUIDs;
 export const ConnectionsTable = () => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [connections, setConnections] = useState([] as RubixConnection[]);
-  const [currentConnection, setCurrentConnection] = useState(
-    {} as RubixConnection
-  );
+  const [currentConnection, setCurrentConnection] = useState({} as RubixConnection);
   const [connectionSchema, setConnectionSchema] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -43,30 +32,22 @@ export const ConnectionsTable = () => {
     ...CONNECTION_HEADERS,
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, conn: RubixConnection) => (
         <Space size="middle">
           <Tooltip title="Ping">
-            <a onClick={() => {
-              pingConnection(conn.uuid);
-            }}>
+            <a onClick={() => pingConnection(conn.uuid)}>
               <LinkOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Edit">
-            <a onClick={() => {
-              showModal(conn);
-            }}>
+            <a onClick={() => showModal(conn)}>
               <FormOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Tokens">
-            <a
-              onClick={(e) => {
-                showTokenModal(conn, e);
-              }}
-            >
+            <a onClick={(e) => showTokenModal(conn, e)}>
               <ScanOutlined />
             </a>
           </Tooltip>

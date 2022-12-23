@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, amodel } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../common/rb-table-actions";
 import { HOST_NETWORK_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty } from "../../../utils/utils";
@@ -40,22 +36,16 @@ export const NetworksTable = () => {
       title: "Location",
       dataIndex: "location_uuid",
       key: "location_uuid",
-      render: (location_uuid: string) => (
-        <span>{getLocationNameByUUID(location_uuid)}</span>
-      ),
+      render: (location_uuid: string) => <span>{getLocationNameByUUID(location_uuid)}</span>,
     },
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
+      fixed: "right",
       render: (_: any, network: amodel.Network) => (
         <Space size="middle">
           <Tooltip title="Edit">
-            <a
-              onClick={() => {
-                showModal(network);
-              }}
-            >
+            <a onClick={() => showModal(network)}>
               <FormOutlined />
             </a>
           </Tooltip>
@@ -131,9 +121,7 @@ export const NetworksTable = () => {
   };
 
   const getLocationNameByUUID = (location_uuid: string) => {
-    const location = locations.find(
-      (l: amodel.Location) => l.uuid === location_uuid
-    );
+    const location = locations.find((l: amodel.Location) => l.uuid === location_uuid);
     return location ? location.name : "";
   };
 
