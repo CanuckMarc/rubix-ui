@@ -1,6 +1,6 @@
 import { Button, Menu, Dropdown, Space, Spin, Tag, Tooltip } from "antd";
 import type { MenuProps } from "antd";
-import { FormOutlined, EditOutlined, ImportOutlined } from "@ant-design/icons";
+import { FormOutlined, GoldOutlined, ImportOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
@@ -160,7 +160,7 @@ export const FlowPointsTable = (props: any) => {
             </Tooltip>
             <Tooltip title="Write Point">
               <a onClick={() => showWritePointModal(point)}>
-                <EditOutlined />
+                <GoldOutlined style={{ color: "#fa8c16" }} />
               </a>
             </Tooltip>
           </Space>
