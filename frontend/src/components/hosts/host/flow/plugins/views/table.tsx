@@ -33,23 +33,19 @@ export const FlowPluginsTable = () => {
   factory.hostUUID = hostUUID;
 
   const columns = [
-    ...PLUGIN_HEADERS,
     {
-      title: "Config",
+      title: "config",
       dataIndex: "config",
       key: "config",
       render: (_: any, item: any) => (
         <Space size="middle">
-          <a
-            onClick={() => {
-              showDrawer(item);
-            }}
-          >
+          <a onClick={() => showDrawer(item)}>
             <EditOutlined />
           </a>
         </Space>
       ),
     },
+    ...PLUGIN_HEADERS,
   ];
 
   const rowSelection = {

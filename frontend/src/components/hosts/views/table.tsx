@@ -48,17 +48,10 @@ export const HostsTable = (props: any) => {
   installFactory.connectionUUID = connUUID;
 
   const columns = [
-    ...HOST_HEADERS,
     {
-      title: "network",
-      dataIndex: "network_uuid",
-      key: "network_uuid",
-      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
-    },
-    {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, host: Host) => (
         <Space size="middle">
           <Tooltip title="Ping">
@@ -93,6 +86,13 @@ export const HostsTable = (props: any) => {
           </Link>
         </Space>
       ),
+    },
+    ...HOST_HEADERS,
+    {
+      title: "network",
+      dataIndex: "network_uuid",
+      key: "network_uuid",
+      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
     },
   ];
 

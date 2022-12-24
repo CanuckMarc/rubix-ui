@@ -22,17 +22,17 @@ export const StreamClonesTable = () => {
   factory.hostUUID = hostUUID;
 
   const columns = [
-    ...STREAM_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: StreamClone) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Consumers</Link>
         </Space>
       ),
     },
+    ...STREAM_HEADERS,
   ];
 
   const rowSelection = {

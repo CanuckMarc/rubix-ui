@@ -28,17 +28,17 @@ export const WritersTable = () => {
   factory.hostUUID = consumerFactory.hostUUID = hostUUID;
 
   const columns = [
-    ...WRITER_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: Writer) => (
         <Space size="middle">
           <a onClick={() => showModal(item)}>Edit</a>
         </Space>
       ),
     },
+    ...WRITER_HEADERS,
   ];
 
   const rowSelection = {

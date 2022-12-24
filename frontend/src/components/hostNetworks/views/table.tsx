@@ -31,17 +31,10 @@ export const NetworksTable = () => {
   factory.connectionUUID = locationFactory.connectionUUID = connUUID;
 
   const columns = [
-    ...HOST_NETWORK_HEADERS,
     {
-      title: "Location",
-      dataIndex: "location_uuid",
-      key: "location_uuid",
-      render: (location_uuid: string) => <span>{getLocationNameByUUID(location_uuid)}</span>,
-    },
-    {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, network: amodel.Network) => (
         <Space size="middle">
           <Tooltip title="Edit">
@@ -60,6 +53,13 @@ export const NetworksTable = () => {
           </Link>
         </Space>
       ),
+    },
+    ...HOST_NETWORK_HEADERS,
+    {
+      title: "Location",
+      dataIndex: "location_uuid",
+      key: "location_uuid",
+      render: (location_uuid: string) => <span>{getLocationNameByUUID(location_uuid)}</span>,
     },
   ];
 

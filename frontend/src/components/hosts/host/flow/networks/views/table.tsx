@@ -46,19 +46,9 @@ export const FlowNetworkTable = () => {
 
   const columns = [
     {
-      title: "name",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => {
-        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
-      },
-    },
-    ...NETWORK_HEADERS,
-    {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, network: model.Network) => (
         <Space size="middle">
           <Tooltip title="Edit">
@@ -74,6 +64,16 @@ export const FlowNetworkTable = () => {
         </Space>
       ),
     },
+    {
+      title: "name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+      filterDropdown: () => {
+        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
+      },
+    },
+    ...NETWORK_HEADERS,
   ];
 
   const rowSelection = {

@@ -141,21 +141,10 @@ export const FlowDeviceTable = (props: any) => {
     });
 
     const headerWithActions = [
-      ...headers,
       {
-        title: "plugin name",
-        key: "plugin_name",
-        dataIndex: "plugin_name",
-        render() {
-          let colour = "#4d4dff";
-          let text = pluginName.toUpperCase();
-          return <Tag color={colour}>{text}</Tag>;
-        },
-      },
-      {
-        title: "Actions",
+        title: "actions",
         key: "actions",
-        fixed: "right",
+        fixed: "left",
         render: (_: any, device: Device) => (
           <Space size="middle">
             <Tooltip title="Edit">
@@ -170,6 +159,17 @@ export const FlowDeviceTable = (props: any) => {
             </Link>
           </Space>
         ),
+      },
+      ...headers,
+      {
+        title: "plugin name",
+        key: "plugin_name",
+        dataIndex: "plugin_name",
+        render() {
+          let colour = "#4d4dff";
+          let text = pluginName.toUpperCase();
+          return <Tag color={colour}>{text}</Tag>;
+        },
       },
     ];
 

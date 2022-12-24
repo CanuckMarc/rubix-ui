@@ -32,11 +32,10 @@ export const ConsumersTable = (props: any) => {
   factory.hostUUID = hostUUID;
 
   const columns = [
-    ...CONSUMER_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: Consumer) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Writers</Link>
@@ -44,6 +43,7 @@ export const ConsumersTable = (props: any) => {
         </Space>
       ),
     },
+    ...CONSUMER_HEADERS,
   ];
 
   const rowSelection = {

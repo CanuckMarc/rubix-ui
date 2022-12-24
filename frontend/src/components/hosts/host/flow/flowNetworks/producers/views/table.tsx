@@ -25,11 +25,10 @@ export const ProducersTable = (props: any) => {
   factory.hostUUID = hostUUID;
 
   const columns = [
-    ...PRODUCER_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: Producer) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Writer Clones</Link>
@@ -37,6 +36,7 @@ export const ProducersTable = (props: any) => {
         </Space>
       ),
     },
+    ...PRODUCER_HEADERS,
   ];
 
   const rowSelection = {

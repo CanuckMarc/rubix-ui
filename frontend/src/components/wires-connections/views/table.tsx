@@ -24,17 +24,17 @@ export const WiresConnectionsTable = (props: any) => {
   const factory = new FlowFactory();
 
   const columns = [
-    ...WIRES_CONNECTIONS_HEADERS,
     {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, connection: Connection) => (
         <Space size="middle">
           <a onClick={() => showEditModal(connection)}>Edit</a>
         </Space>
       ),
     },
+    ...WIRES_CONNECTIONS_HEADERS,
   ];
 
   const rowSelection = {

@@ -103,17 +103,10 @@ export const Locations = () => {
     try {
       let tableSchema = await locationFactory.TableSchema();
       tableSchema = [
-        ...tableSchema,
         {
-          title: "Networks count",
-          dataIndex: "networks",
-          key: "networks",
-          render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
-        },
-        {
-          title: "Actions",
+          title: "actions",
           key: "actions",
-          fixed: "right",
+          fixed: "left",
           render: (_: any, location: Location) => (
             <Space size="middle">
               <Tooltip title="Edit">
@@ -130,6 +123,13 @@ export const Locations = () => {
               </Link>
             </Space>
           ),
+        },
+        ...tableSchema,
+        {
+          title: "Networks count",
+          dataIndex: "networks",
+          key: "networks",
+          render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
         },
       ];
       setTableSchema(tableSchema);

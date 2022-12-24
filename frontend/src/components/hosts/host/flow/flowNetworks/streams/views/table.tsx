@@ -25,11 +25,10 @@ export const StreamsTable = (props: any) => {
   factory.hostUUID = hostUUID;
 
   const columns = [
-    ...STREAM_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: Stream) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Producers</Link>
@@ -37,6 +36,7 @@ export const StreamsTable = (props: any) => {
         </Space>
       ),
     },
+    ...STREAM_HEADERS,
   ];
 
   const rowSelection = {

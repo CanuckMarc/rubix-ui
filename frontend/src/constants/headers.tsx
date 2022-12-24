@@ -213,24 +213,24 @@ export const CONNECTION_HEADERS = [
     key: "uuid",
   },
   {
-    title: "Name",
+    title: "name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "Description",
+    title: "description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "Address",
+    title: "address",
     dataIndex: "ip",
     key: "ip",
     sorter: (a: any, b: any) => a.ip.localeCompare(b.ip),
   },
   {
-    title: "Port",
+    title: "port",
     dataIndex: "port",
     key: "port",
     sorter: (a: any, b: any) => a.port - b.port,
@@ -244,25 +244,25 @@ export const CONNECTION_HEADERS = [
 
 export const HOST_NETWORK_HEADERS = [
   {
-    title: "Name",
+    title: "name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "Description",
+    title: "description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "Controllers number",
+    title: "controllers number",
     dataIndex: "hosts",
     key: "hosts",
     render: (hosts: []) => <a>{hosts ? hosts.length : 0}</a>,
   },
 
   {
-    title: "UUID",
+    title: "uuid",
     dataIndex: "uuid",
     key: "uuid",
   },
@@ -462,7 +462,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
 export const PLUGIN_HEADERS = [
   {
     title: "name",
-    key: "name",
+    key: "name_image",
     dataIndex: "name",
     render(name: string) {
       let image = pluginLogo(name);
@@ -481,7 +481,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "Tags",
+    title: "tags",
     key: "has_network",
     dataIndex: "has_network",
     render(has_network: boolean) {
@@ -545,19 +545,19 @@ export const BACNET_HEADERS = [
 
 export const LOG_HEADERS = [
   {
-    title: "Timestamp",
+    title: "timestamp",
     dataIndex: "time",
     key: "time",
     sorter: (a: any, b: any) => a.time.localeCompare(b.time),
   },
   {
-    title: "Table",
+    title: "table",
     dataIndex: "function",
     key: "function",
     sorter: (a: any, b: any) => a.function.localeCompare(b.function),
   },
   {
-    title: "Action Type",
+    title: "action type",
     dataIndex: "type",
     key: "type",
     sorter: (a: any, b: any) => a.type.localeCompare(b.type),
@@ -611,7 +611,7 @@ export const BACKUP_HEADERS = [
     sorter: (a: any, b: any) => a.backup_info.localeCompare(b.backup_info),
   },
   {
-    title: "Comments",
+    title: "comments",
     dataIndex: "user_comment",
     key: "user_comment",
   },
@@ -624,13 +624,13 @@ export const BACKUP_HEADERS = [
 
 export const SCANNER_HEADERS = [
   {
-    title: "Ip",
+    title: "ip",
     dataIndex: "ip",
     key: "ip",
     sorter: (a: any, b: any) => a.ip.localeCompare(b.ip),
   },
   {
-    title: "Port",
+    title: "ports",
     dataIndex: "ports",
     render: (services: any[]) =>
       services.map((service, index) => <p key={index}> {`${service.service}: ${service.port}`} </p>),
@@ -640,32 +640,32 @@ export const SCANNER_HEADERS = [
 
 export const NETWORKING_HEADERS = [
   {
-    title: "Gateway",
+    title: "gateway",
     key: "gateway",
     dataIndex: "gateway",
   },
   {
-    title: "Interface",
+    title: "interface",
     key: "interface",
     dataIndex: "interface",
   },
   {
-    title: "Ip",
+    title: "ip",
     key: "ip",
     dataIndex: "ip",
   },
   {
-    title: "Ip And Mask",
+    title: "ip and mask",
     key: "ip_and_mask",
     dataIndex: "ip_and_mask",
   },
   {
-    title: "Mac Address",
+    title: "mac address",
     key: "mac_address",
     dataIndex: "mac_address",
   },
   {
-    title: "Netmask",
+    title: "netmask",
     key: "netmask",
     dataIndex: "netmask",
   },

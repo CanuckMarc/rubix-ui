@@ -25,6 +25,16 @@ export const NetworkClonesTable = (props: any) => {
 
   const columns = [
     {
+      title: "actions",
+      key: "actions",
+      fixed: "left",
+      render: (_: any, network: FlowNetworkClone) => (
+        <Space size="middle">
+          <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
+        </Space>
+      ),
+    },
+    {
       key: "name",
       title: "name",
       dataIndex: "name",
@@ -34,16 +44,6 @@ export const NetworkClonesTable = (props: any) => {
       },
     },
     ...FLOW_NETWORKS_HEADERS,
-    {
-      title: "actions",
-      key: "actions",
-      fixed: "right",
-      render: (_: any, network: FlowNetworkClone) => (
-        <Space size="middle">
-          <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
-        </Space>
-      ),
-    },
   ];
 
   const rowSelection = {

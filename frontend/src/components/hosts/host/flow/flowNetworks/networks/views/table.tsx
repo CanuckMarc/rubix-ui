@@ -28,17 +28,9 @@ export const FlowNetworksTable = (props: any) => {
 
   const columns = [
     {
-      key: "name",
-      title: "name",
-      dataIndex: "name",
-      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
-    },
-    ...FLOW_NETWORKS_HEADERS,
-    {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, network: FlowNetwork) => (
         <Space size="middle">
           <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
@@ -46,6 +38,14 @@ export const FlowNetworksTable = (props: any) => {
         </Space>
       ),
     },
+    {
+      key: "name",
+      title: "name",
+      dataIndex: "name",
+      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+      filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
+    },
+    ...FLOW_NETWORKS_HEADERS,
   ];
 
   const rowSelection = {

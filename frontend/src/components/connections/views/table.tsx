@@ -1,4 +1,5 @@
 import { Space, Spin, Tooltip } from "antd";
+import { ArrowRightOutlined, FormOutlined, LinkOutlined, ScanOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
@@ -10,7 +11,6 @@ import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
-import { ArrowRightOutlined, FormOutlined, LinkOutlined, ScanOutlined } from "@ant-design/icons";
 import { TokenModal } from "../../../common/token/token-modal";
 import { RubixAssistTokenFactory } from "./token-factory";
 import RubixConnection = storage.RubixConnection;
@@ -29,11 +29,10 @@ export const ConnectionsTable = () => {
   const factory = new ConnectionFactory();
 
   const columns = [
-    ...CONNECTION_HEADERS,
     {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, conn: RubixConnection) => (
         <Space size="middle">
           <Tooltip title="Ping">
@@ -59,6 +58,7 @@ export const ConnectionsTable = () => {
         </Space>
       ),
     },
+    ...CONNECTION_HEADERS,
   ];
 
   useEffect(() => {
