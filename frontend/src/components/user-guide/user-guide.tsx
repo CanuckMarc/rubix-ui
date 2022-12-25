@@ -29,29 +29,22 @@ const NodeHelpTable = (props: any) => {
 
 export const UserGuide = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
-  const [nodeHelps, setNodeHelps] = useState<any>();
-  const [filterHelps, setFilterHelps] = useState<any>();
-  const [search, setSearch] = useState("");
   const isRemote = connUUID && hostUUID ? true : false;
+  const [nodeHelps, setNodeHelps] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const factory = new FlowFactory();
+
+  const config = {
+    originData: nodeHelps,
+    setFilteredData: setFilteredData,
+  };
 
   const fetchNodeHelp = async () => {
     const res = (await factory.NodesHelp(connUUID, hostUUID, isRemote)) || [];
     setNodeHelps(res);
-    setFilterHelps(res);
+    setFilteredData(res);
   };
-
-  const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.currentTarget.value);
-  };
-
-  useEffect(() => {
-    const keyword = search.toLowerCase().trim();
-    const newHelps =
-      keyword.length > 0 ? nodeHelps.filter((item: any) => item.name.toLowerCase().includes(keyword)) : nodeHelps;
-    setFilterHelps(newHelps);
-  }, [search]);
 
   useEffect(() => {
     fetchNodeHelp();
@@ -63,9 +56,10 @@ export const UserGuide = () => {
         User Guide
       </Title>
       <Card bordered={false} className="help-list">
-        <RbSearchInput search={search} onChange={handleChangeSearch} size="large" />
-        {filterHelps &&
-          filterHelps.map((item: any, i: number) => (
+        {nodeHelps.length > 0 && <RbSearchInput config={config} size="large" />}
+
+        {filteredData &&
+          filteredData.map((item: any, i: number) => (
             <div key={i} className="help-list_item">
               <div className="help-list_item__title">{item.name}</div>
               <NodeHelpTable item={item} />
