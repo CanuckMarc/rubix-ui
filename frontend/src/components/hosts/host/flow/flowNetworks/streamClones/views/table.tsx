@@ -10,12 +10,19 @@ import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-
 
 import UUIDs = backend.UUIDs;
 import StreamClone = model.StreamClone;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const StreamClonesTable = () => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkCloneUUID = "" } = useParams();
+  const [isFetching, setIsFetching] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [streamClones, setStreamClones] = useState([] as StreamClone[]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [filteredData, setFilteredData] = useState<StreamClone[]>([]);
+
+  const config = {
+    originData: streamClones,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new FlowStreamCloneFactory();
   factory.connectionUUID = connUUID;
@@ -41,10 +48,6 @@ export const StreamClonesTable = () => {
     },
   };
 
-  useEffect(() => {
-    fetch();
-  }, []);
-
   const getNavigationLink = (streamCloneUUID: string): string => {
     return ROUTES.CONSUMERS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
@@ -64,6 +67,7 @@ export const StreamClonesTable = () => {
       setIsFetching(true);
       const res = await factory.GetAll();
       setStreamClones(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -71,14 +75,20 @@ export const StreamClonesTable = () => {
     }
   };
 
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {streamClones.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={streamClones}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

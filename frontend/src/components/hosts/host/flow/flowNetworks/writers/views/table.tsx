@@ -12,6 +12,7 @@ import { CreateEditModal } from "./create";
 import UUIDs = backend.UUIDs;
 import Writer = model.Writer;
 import Consumer = model.Consumer;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const WritersTable = () => {
   const { connUUID = "", hostUUID = "", consumerUUID = "" } = useParams();
@@ -21,6 +22,12 @@ export const WritersTable = () => {
   const [currentItem, setCurrentItem] = useState({} as Writer);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [filteredData, setFilteredData] = useState<Writer[]>([]);
+
+  const config = {
+    originData: writers,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new WritersFactory();
   const consumerFactory = new FlowConsumerFactory();
@@ -47,10 +54,6 @@ export const WritersTable = () => {
     },
   };
 
-  useEffect(() => {
-    fetch();
-  }, []);
-
   const showModal = async (item: Writer) => {
     if (!thingClass && (!item || !item.uuid)) {
       await setNewItem();
@@ -71,6 +74,7 @@ export const WritersTable = () => {
       setIsFetching(true);
       const res = await factory.GetAll();
       setWriters(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -91,16 +95,21 @@ export const WritersTable = () => {
     setCurrentItem(item);
   };
 
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as Writer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {writers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={writers}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

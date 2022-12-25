@@ -11,14 +11,21 @@ import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
 import Stream = model.Stream;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const StreamsTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkUUID = "" } = useParams();
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [schema, setSchema] = useState({});
   const [currentItem, setCurrentItem] = useState({} as Stream);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [filteredData, setFilteredData] = useState(data);
+
+  const config = {
+    originData: data,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new FlowStreamFactory();
   factory.connectionUUID = connUUID;
@@ -99,10 +106,12 @@ export const StreamsTable = (props: any) => {
       <RbRefreshButton refreshList={refreshList} />
       <RbAddButton handleClick={() => showModal({} as Stream)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={data}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

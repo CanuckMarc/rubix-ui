@@ -5,19 +5,23 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { WriterClonesFactory } from "../factory";
 import { WRITER_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import {
-  RbDeleteButton,
-  RbRefreshButton,
-} from "../../../../../../../common/rb-table-actions";
+import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 
 import UUIDs = backend.UUIDs;
 import WriterClone = model.WriterClone;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const WriterClonesTable = (props: any) => {
   const { connUUID = "", hostUUID = "" } = useParams();
+  const [isFetching, setIsFetching] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [writerClones, setWriterClones] = useState([] as WriterClone[]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [filteredData, setFilteredData] = useState<WriterClone[]>([]);
+
+  const config = {
+    originData: writerClones,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new WriterClonesFactory();
   factory.connectionUUID = connUUID;
@@ -31,15 +35,12 @@ export const WriterClonesTable = (props: any) => {
     },
   };
 
-  useEffect(() => {
-    fetch();
-  }, []);
-
   const fetch = async () => {
     try {
       setIsFetching(true);
       const res = await factory.GetAll();
       setWriterClones(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -52,15 +53,20 @@ export const WriterClonesTable = (props: any) => {
     fetch();
   };
 
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {writerClones.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={writerClones}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

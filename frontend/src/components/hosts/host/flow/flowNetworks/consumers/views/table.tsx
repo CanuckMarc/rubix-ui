@@ -11,6 +11,7 @@ import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
 import Consumer = model.Consumer;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const ConsumersTable = (props: any) => {
   const {
@@ -23,6 +24,7 @@ export const ConsumersTable = (props: any) => {
   } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [consumers, setConsumers] = useState([] as Consumer[]);
+  const [filteredData, setFilteredData] = useState<Consumer[]>([]);
   const [currentItem, setCurrentItem] = useState({} as Consumer);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -30,6 +32,11 @@ export const ConsumersTable = (props: any) => {
   const factory = new FlowConsumerFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+
+  const config = {
+    originData: consumers,
+    setFilteredData: setFilteredData,
+  };
 
   const columns = [
     {
@@ -81,6 +88,7 @@ export const ConsumersTable = (props: any) => {
       setIsFetching(true);
       const res = await factory.GetAll(false);
       setConsumers(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -99,10 +107,11 @@ export const ConsumersTable = (props: any) => {
       <RbAddButton handleClick={() => showModal({} as Consumer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
 
+      {consumers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={consumers}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
