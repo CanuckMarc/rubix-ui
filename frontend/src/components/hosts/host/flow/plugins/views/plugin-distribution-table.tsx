@@ -6,6 +6,7 @@ import RbTable from "../../../../../../common/rb-table";
 import { FlowPluginFactory } from "../factory";
 import { PluginDownloadModal } from "./plugin-download-modal";
 import { RbRefreshButton } from "../../../../../../common/rb-table-actions";
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 
 const { confirm } = Modal;
 
@@ -100,7 +101,7 @@ export const PluginDistributionTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetchPlugins} />
-      <Input placeholder="Search name..." allowClear value={search} onChange={handleChangeSearch} className="mt-2" />
+      <RbSearchInput search={search} onChange={handleChangeSearch} />
       <RbTable
         rowKey="name"
         dataSource={filteredPlugins}

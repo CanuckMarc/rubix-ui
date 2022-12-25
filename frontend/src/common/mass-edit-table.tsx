@@ -1,6 +1,7 @@
 import { Checkbox, Input, InputNumber, Select, Table } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { RbSearchInput } from "./rb-search-input";
 import RbTable from "./rb-table";
 
 interface Options {
@@ -53,6 +54,8 @@ export const createColumns = (properties: any) => {
 
 export const MassEditTable = (props: any) => {
   const { items, setItems, columns, count, parentPropId } = props;
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
 
   const EditableCell: React.FC<EditableCellProps> = ({
     editing,
@@ -136,6 +139,10 @@ export const MassEditTable = (props: any) => {
     setItems(items);
   };
 
+  const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.currentTarget.value);
+  };
+
   const setItemsByCount = (count: number) => {
     if (count) {
       const data = [];
@@ -161,18 +168,27 @@ export const MassEditTable = (props: any) => {
     setItemsByCount(count);
   }, [count]);
 
+  useEffect(() => {
+    const keyword = search.toLowerCase().trim();
+    const data = keyword.length > 0 ? items.filter((item: any) => item.name.toLowerCase().includes(keyword)) : items;
+    setFilteredData(data);
+  }, [search, items]);
+
   return (
-    <RbTable
-      rowKey="uuid"
-      rowClassName="editable-row"
-      bordered
-      dataSource={items}
-      columns={mergedColumns}
-      components={{
-        body: {
-          cell: EditableCell,
-        },
-      }}
-    />
+    <>
+      {filteredData.length > 0 ? <RbSearchInput search={search} onChange={handleChangeSearch} /> : null}
+      <RbTable
+        rowKey="uuid"
+        rowClassName="editable-row"
+        bordered
+        dataSource={filteredData}
+        columns={mergedColumns}
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+      />
+    </>
   );
 };

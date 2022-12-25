@@ -2,6 +2,7 @@ import { Card, Input, Typography } from "antd";
 import { ChangeEvent, useEffect, useState } from "react";
 import { JsonTable } from "react-json-to-html";
 import { useParams } from "react-router-dom";
+import { RbSearchInput } from "../../common/rb-search-input";
 import { FlowFactory } from "../rubix-flow/factory";
 import "./user-guide.css";
 
@@ -62,8 +63,7 @@ export const UserGuide = () => {
         User Guide
       </Title>
       <Card bordered={false} className="help-list">
-        <Input placeholder="Search name..." allowClear value={search} onChange={handleChangeSearch} size="large" />
-
+        <RbSearchInput search={search} onChange={handleChangeSearch} size="large" />
         {filterHelps &&
           filterHelps.map((item: any, i: number) => (
             <div key={i} className="help-list_item">
