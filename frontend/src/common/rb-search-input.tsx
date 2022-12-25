@@ -12,7 +12,7 @@ export const RbSearchInput = (props: any) => {
   useEffect(() => {
     const keyword = search.toLowerCase().trim();
     const _filteredData =
-      keyword.length > 0 ? originData.filter((item: any) => item.name.toLowerCase().includes(keyword)) : originData;
+      keyword.length > 0 ? originData.filter((item: any) => item.name?.toLowerCase().includes(keyword)) : originData;
     setFilteredData(_filteredData);
   }, [search, originData]);
 
