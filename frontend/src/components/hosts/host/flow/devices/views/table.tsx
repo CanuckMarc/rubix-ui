@@ -25,14 +25,16 @@ import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
 
 import Device = model.Device;
 import UUIDs = backend.UUIDs;
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 
 export const FlowDeviceTable = (props: any) => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", networkUUID = "", pluginName = "" } = useParams();
-  const { data, isFetching, refreshList, dataSource, setDataSource } = props;
+  const { data, isFetching, refreshList } = props;
   const [schema, setSchema] = useState({});
   const [currentItem, setCurrentItem] = useState({});
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [tableHeaders, setTableHeaders] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<Device[]>(data);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
@@ -44,6 +46,11 @@ export const FlowDeviceTable = (props: any) => {
   const flowPluginFactory = new FlowPluginFactory();
   flowDeviceFactory.connectionUUID = flowPluginFactory.connectionUUID = connUUID;
   flowDeviceFactory.hostUUID = flowPluginFactory.hostUUID = hostUUID;
+
+  const config = {
+    originData: data,
+    setFilteredData: setFilteredData,
+  };
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -103,9 +110,6 @@ export const FlowDeviceTable = (props: any) => {
         dataIndex: "name",
         key: "name",
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-        filterDropdown: () => {
-          return <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />;
-        },
       },
       ...FLOW_DEVICE_HEADERS,
     ];
@@ -231,11 +235,12 @@ export const FlowDeviceTable = (props: any) => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={dataSource}
+        dataSource={filteredData}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

@@ -23,6 +23,7 @@ import { ExportModal, ImportModal } from "./import-export";
 import "./style.css";
 import UUIDs = backend.UUIDs;
 import Network = model.Network;
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 
 export const FlowNetworkTable = () => {
   let { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
@@ -30,7 +31,7 @@ export const FlowNetworkTable = () => {
   const [networkSchema, setNetworkSchema] = useState({});
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Network[]);
-  const [dataSource, setDataSource] = useState(networks);
+  const [filteredData, setFilteredData] = useState<Network[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
@@ -38,6 +39,11 @@ export const FlowNetworkTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+
+  const config = {
+    originData: networks,
+    setFilteredData: setFilteredData,
+  };
 
   const networkFactory = new FlowNetworkFactory();
   const flowPluginFactory = new FlowPluginFactory();
@@ -69,9 +75,6 @@ export const FlowNetworkTable = () => {
       dataIndex: "name",
       key: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => {
-        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
-      },
     },
     ...NETWORK_HEADERS,
   ];
@@ -87,7 +90,7 @@ export const FlowNetworkTable = () => {
       setIsFetching(true);
       const res = (await networkFactory.GetAll(false)) || [];
       setNetworks(res);
-      setDataSource(res);
+      setFilteredData(res);
     } catch (error) {
     } finally {
       setIsFetching(false);
@@ -162,11 +165,12 @@ export const FlowNetworkTable = () => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
+      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={dataSource}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

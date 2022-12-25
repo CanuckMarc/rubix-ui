@@ -4,14 +4,17 @@ import { backend } from "../../../../wailsjs/go/models";
 import { LocationFactory } from "../factory";
 import RbTable from "../../../common/rb-table";
 import { RbDeleteButton } from "../../../common/rb-table-actions";
+import { RbSearchInput } from "../../../common/rb-search-input";
 
 export const LocationsTable = (props: any) => {
-  const { locations, isFetching, tableSchema, connUUID, refreshList } = props;
-  if (!locations) return <></>;
+  const { locations = [], isFetching, tableSchema, connUUID, refreshList } = props;
+  const [selectedUUIDs, setSelectedUUIDs] = useState<backend.UUIDs[]>([]);
+  const [filteredData, setFilteredData] = useState(locations);
 
-  const [selectedUUIDs, setSelectedUUIDs] = useState(
-    [] as Array<backend.UUIDs>
-  );
+  const config = {
+    originData: locations,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new LocationFactory();
   factory.connectionUUID = connUUID as string;
@@ -30,10 +33,12 @@ export const LocationsTable = (props: any) => {
   return (
     <div>
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {locations.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={locations}
+        dataSource={filteredData}
         columns={tableSchema}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

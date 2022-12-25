@@ -1,5 +1,5 @@
-import { Card, Input, Typography } from "antd";
-import { ChangeEvent, useEffect, useState } from "react";
+import { Card, Typography } from "antd";
+import { useEffect, useState } from "react";
 import { JsonTable } from "react-json-to-html";
 import { useParams } from "react-router-dom";
 import { RbSearchInput } from "../../common/rb-search-input";
@@ -33,12 +33,12 @@ export const UserGuide = () => {
   const [nodeHelps, setNodeHelps] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
-  const factory = new FlowFactory();
-
   const config = {
     originData: nodeHelps,
     setFilteredData: setFilteredData,
   };
+
+  const factory = new FlowFactory();
 
   const fetchNodeHelp = async () => {
     const res = (await factory.NodesHelp(connUUID, hostUUID, isRemote)) || [];
