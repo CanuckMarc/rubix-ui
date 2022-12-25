@@ -6,10 +6,17 @@ import RbTable from "../../../../../common/rb-table";
 import { RbAddButton } from "../../../../../common/rb-table-actions";
 
 import Device = model.Device;
+import { RbSearchInput } from "../../../../../common/rb-search-input";
 
 export const BacnetWhoIsTable = (props: any) => {
   const { data, isFetching, handleAdd, addBtnText, headers } = props;
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<Device>);
+  const [filteredData, setFilteredData] = useState<any[]>(data);
+
+  const config = {
+    originData: data,
+    setFilteredData: setFilteredData,
+  };
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -27,10 +34,11 @@ export const BacnetWhoIsTable = (props: any) => {
   return (
     <>
       <RbAddButton handleClick={Add} text={addBtnText} />
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={data}
+        dataSource={filteredData}
         columns={headers}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

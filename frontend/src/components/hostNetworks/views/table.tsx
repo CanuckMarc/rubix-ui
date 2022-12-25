@@ -14,11 +14,13 @@ import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import Network = amodel.Network;
 import Location = amodel.Location;
 import UUIDs = backend.UUIDs;
+import { RbSearchInput } from "../../../common/rb-search-input";
 
 export const NetworksTable = () => {
   const { connUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Network[]);
+  const [filteredData, setFilteredData] = useState<Network[]>([]);
   const [locations, setLocations] = useState([] as Location[]);
   const [currentNetwork, setCurrentNetwork] = useState({} as Network);
   const [networkSchema, setNetworkSchema] = useState({});
@@ -29,6 +31,11 @@ export const NetworksTable = () => {
   const factory = new NetworksFactory();
   const locationFactory = new LocationFactory();
   factory.connectionUUID = locationFactory.connectionUUID = connUUID;
+
+  const config = {
+    originData: networks,
+    setFilteredData: setFilteredData,
+  };
 
   const columns = [
     {
@@ -69,22 +76,13 @@ export const NetworksTable = () => {
     },
   };
 
-  useEffect(() => {
-    if (locations.length === 0) {
-      fetchLocations();
-    }
-  }, []);
-
-  useEffect(() => {
-    fetch();
-  }, [locUUID, connUUID]);
-
   const fetch = async () => {
     try {
       setIsFetching(true);
       const res = await factory.GetAll();
       const networksByLocUUID = res.filter((n) => n.location_uuid === locUUID);
       setNetworks(networksByLocUUID);
+      setFilteredData(networksByLocUUID);
     } catch (error) {
       console.log(error);
     } finally {
@@ -138,15 +136,27 @@ export const NetworksTable = () => {
     setCurrentNetwork({} as amodel.Network);
   };
 
+  useEffect(() => {
+    if (locations.length === 0) {
+      fetchLocations();
+    }
+  }, []);
+
+  useEffect(() => {
+    fetch();
+  }, [locUUID, connUUID]);
+
   return (
     <div>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as amodel.Network)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={networks}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
