@@ -24,6 +24,7 @@ type ControlProps = {
   onRefreshValues: () => void;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
+  onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onSaveSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
@@ -38,6 +39,7 @@ const Controls = ({
   settings,
   onSaveSettings,
   selectedNodeForSubFlow,
+  onClearAllNodes,
   onSaveSubFlow,
   onHandelSaveFlow,
 }: ControlProps) => {
@@ -193,7 +195,7 @@ const Controls = ({
       <LoadModal open={loadModalOpen} onClose={() => setLoadModalOpen(false)} />
       <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
       <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
-      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} />
+      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
       <FlowSettingsModal
         settings={settings}
         open={settingRefreshModalOpen}
