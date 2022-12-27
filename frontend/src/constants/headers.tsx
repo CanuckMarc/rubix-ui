@@ -702,6 +702,27 @@ export const WIRES_CONNECTIONS_HEADERS = [
   },
 ];
 
+export const SCHEDULES_HEADERS = [
+  {
+    title: "name",
+    dataIndex: "name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name)
+  },
+  {
+    title: "name",
+    dataIndex: "name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name)
+  },
+  {
+    title: "uuid",
+    dataIndex: "uuid",
+    key: "uuid",
+    sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid)
+  }
+];
+
 //--------------schema-------------//
 export const FLOW_NETWORKS_SCHEMA = {
   name: {
@@ -796,3 +817,23 @@ export const WIRES_CONNECTION_SCHEMA = {
     type: "string",
   },
 };
+
+export const SCHEDULES_SCHEMA = [
+  {
+    maxLength: 50,
+    minLength: 2,
+    title: "name",
+    type: "string",
+  },
+  {
+    maxLength: 50,
+    minLength: 2,
+    title: "name",
+    type: "string",
+  },
+  {
+    readOnly: true,
+    title: "uuid",
+    type: "string",
+  }
+];
