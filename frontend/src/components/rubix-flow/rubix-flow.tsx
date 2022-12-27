@@ -511,15 +511,15 @@ const Flow = (props: any) => {
     nodes.forEach((item) => (item.selected = false));
     edges.forEach((item) => (item.selected = false));
 
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied);
+    const newFlow = handleCopyNodesAndEdges(_copied, { nodes: allNodes, edges: allEdges });
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
-
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     const _nodes = [...nodes, ...newFlow.nodes, ...allNodes];
     const _edges = [...edges, ...newFlow.edges, ...allEdges];
     const nodesUniq = uniqArray(_nodes);

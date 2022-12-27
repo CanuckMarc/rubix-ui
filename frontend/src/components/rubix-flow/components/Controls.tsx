@@ -15,10 +15,11 @@ import {
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
   onDeleteEdges: (nodesDeleted: any, edgesDeleted: any) => void;
-  onCopyNodes: (nodes: any) => void;
+  onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
   onRefreshValues: () => void;
@@ -73,10 +74,10 @@ const Controls = ({
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
-    const _nodes = instance.getNodes();
+    // const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
-    const newNodes = _nodes.map((item) => {
+    const newNodes = window.allNodes.map((item) => {
       item.selected = true;
       return item;
     });
