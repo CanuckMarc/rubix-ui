@@ -16,7 +16,6 @@ func (inst *Client) AddStreamToExistingFlow(hostIDName, flowNetworkUUID string, 
 		},
 	}
 	body.FlowNetworks = append(body.FlowNetworks, flowNetwork)
-
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host_uuid", hostIDName).
 		SetHeader("host_name", hostIDName).
