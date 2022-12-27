@@ -15,15 +15,17 @@ import {
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
   onDeleteEdges: (nodesDeleted: any, edgesDeleted: any) => void;
-  onCopyNodes: (nodes: any) => void;
+  onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
   onRefreshValues: () => void;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
+  onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onSaveSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
@@ -38,6 +40,7 @@ const Controls = ({
   settings,
   onSaveSettings,
   selectedNodeForSubFlow,
+  onClearAllNodes,
   onSaveSubFlow,
   onHandelSaveFlow,
 }: ControlProps) => {
@@ -71,10 +74,10 @@ const Controls = ({
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
-    const _nodes = instance.getNodes();
+    // const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
-    const newNodes = _nodes.map((item) => {
+    const newNodes = window.allNodes.map((item) => {
       item.selected = true;
       return item;
     });
@@ -193,7 +196,7 @@ const Controls = ({
       <LoadModal open={loadModalOpen} onClose={() => setLoadModalOpen(false)} />
       <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
       <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
-      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} />
+      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
       <FlowSettingsModal
         settings={settings}
         open={settingRefreshModalOpen}

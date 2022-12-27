@@ -41,6 +41,7 @@ import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
 import { flowToBehave } from "./transformers/flowToBehave";
+import { uniqArray } from "../../utils/utils";
 
 const edgeTypes = {
   default: CustomEdge,
@@ -76,6 +77,7 @@ const Flow = (props: any) => {
   const rubixFlowWrapper = useRef<null | any>(null);
   const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
+  const isDragSelection = useRef<boolean>(false);
 
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = connUUID && hostUUID ? true : false;
@@ -85,7 +87,7 @@ const Flow = (props: any) => {
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
-      if (lastConnectStart) return;
+      if (lastConnectStart || isDragSelection.current) return;
       const selectedEdgeIds: string[] = [];
       selectableBoxes.current.forEach((item: SelectableBoxType) => {
         if (item.rect && boxesIntersect(box, item.rect)) {
@@ -95,6 +97,7 @@ const Flow = (props: any) => {
       handleSelectEdges(selectedEdgeIds);
     },
     onSelectionStart: () => {
+      isDragSelection.current = true;
       const elemEdges: SelectableBoxType[] = [];
       edges.forEach((item) => {
         const eleEdgeId = document.getElementById(item.id);
@@ -105,7 +108,10 @@ const Flow = (props: any) => {
       });
       selectableBoxes.current = elemEdges;
     },
-    onSelectionEnd: () => (selectableBoxes.current = []),
+    onSelectionEnd: () => {
+      selectableBoxes.current = [];
+      isDragSelection.current = true;
+    },
   });
 
   // delete selected wires
@@ -188,6 +194,26 @@ const Flow = (props: any) => {
       nodes: [...oldsNodes, ...nodes],
       edges: [...oldsEdges, ...edges],
     };
+  };
+
+  const onClearAllNodes = () => {
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+    if (selectedNodeForSubFlow) {
+      const nodeIdsCleared = allNodes
+        .filter((node: NodeInterface) => node.parentId === selectedNodeForSubFlow.id)
+        .map((item) => item.id);
+      const edgeIdsCleared = allEdges
+        .filter((edge: Edge) => nodeIdsCleared.includes(edge.target) || nodeIdsCleared.includes(edge.source))
+        .map((item) => item.id);
+      const remainingNodes = allNodes.filter((item) => !nodeIdsCleared.includes(item.id));
+      const remainingEdges = allEdges.filter((item: Edge) => !edgeIdsCleared.includes(item.id));
+      setNodes(remainingNodes);
+      setEdges(remainingEdges);
+      setCurrentNodesAndEdges({ nodes: remainingNodes, edges: remainingEdges });
+    } else {
+      setNodes([]);
+      setEdges([]);
+    }
   };
 
   const onSaveSubFlow = () => {
@@ -286,8 +312,8 @@ const Flow = (props: any) => {
           const target = !isSource ? conNodeId : nodeId;
           const targetHandle = !isSource ? conHandleId : handleId;
           if (isInputExistConnection(edges, target, targetHandle)) {
-            return
-          };
+            return;
+          }
           const newEdge = {
             id: generateUuid(),
             source: isSource ? conNodeId : nodeId,
@@ -415,7 +441,7 @@ const Flow = (props: any) => {
 
   const handleNodeDragStop = (e: React.MouseEvent, node: any) => {
     const newNodes = nodes.map((item) => {
-      if (item.id === node.id) {
+      if (item.id === node?.id) {
         item.position = node.position;
       }
 
@@ -453,12 +479,12 @@ const Flow = (props: any) => {
           }
         }
       });
-      edgesWillHandle = edgesWillHandle.filter(edge => {
+      edgesWillHandle = edgesWillHandle.filter((edge) => {
         if (edge.target === nodeDeleted.id || edge.source === nodeDeleted.id) {
           return false;
         }
         return true;
-      })
+      });
     });
 
     const newEdges = edgesWillHandle.filter((currItem) => {
@@ -485,19 +511,23 @@ const Flow = (props: any) => {
     nodes.forEach((item) => (item.selected = false));
     edges.forEach((item) => (item.selected = false));
 
+    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
+
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied);
+    const newFlow = handleCopyNodesAndEdges(_copied, { nodes: allNodes, edges: allEdges });
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
+    const _nodes = [...nodes, ...newFlow.nodes, ...allNodes];
+    const _edges = [...edges, ...newFlow.edges, ...allEdges];
+    const nodesUniq = uniqArray(_nodes);
+    const edgesUniq = uniqArray(_edges);
 
-    const _nodes = [...nodes, ...newFlow.nodes];
-    const _edges = [...edges, ...newFlow.edges];
-    setNodes(_nodes);
-    setEdges(_edges);
-    setUndoable({ edges: _edges, nodes: _nodes });
+    setNodes(nodesUniq);
+    setEdges(edgesUniq);
+    setUndoable({ edges: edgesUniq, nodes: nodesUniq });
   };
 
   const handleRefreshValues = async () => {
@@ -709,6 +739,7 @@ const Flow = (props: any) => {
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
+              onClearAllNodes={onClearAllNodes}
               onSaveSubFlow={onSaveSubFlow}
               onHandelSaveFlow={onHandelSaveFlow}
             />

@@ -1,22 +1,16 @@
 import { FC } from "react";
-import { useReactFlow } from "react-flow-renderer/nocss";
 import { Modal } from "./Modal";
 
 export type ClearModalProps = {
   open?: boolean;
   onClose: () => void;
+  onClear: () => void;
 };
 
-export const ClearModal: FC<ClearModalProps> = ({ open = false, onClose }) => {
-  const instance = useReactFlow();
+export const ClearModal: FC<ClearModalProps> = ({ open = false, onClose, onClear }) => {
 
   const handleClear = () => {
-    instance.setNodes([]);
-    instance.setEdges([]);
-    // TODO better way to call fit vew after edges render
-    setTimeout(() => {
-      instance.fitView();
-    }, 100);
+    onClear();
     onClose();
   };
 

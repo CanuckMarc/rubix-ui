@@ -118,3 +118,14 @@ export const orderBy = (dataArray = [], fieldName: string) => {
     }
   });
 };
+
+export function uniqArray<T>(arr: T[]) {
+  const result: T[] = [];
+  for (let i = 0; i < arr.length; i++) {
+    const isExist = result.some((item: any) => item.id === (arr[i] as any).id);
+    if (!isExist) {
+      result.push(arr[i]);
+    }
+  }
+  return result;
+}
