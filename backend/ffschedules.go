@@ -59,3 +59,17 @@ func (inst *App) EditSchedule(connUUID, hostUUID, uuid string, body *model.Sched
 	}
 	return sch
 }
+
+func (inst *App) DeleteSchedule(connUUID, hostUUID, uuid string) interface{} {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	sch, err := client.FFDeleteSchedule(hostUUID, uuid)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return sch
+}
