@@ -42,6 +42,7 @@ import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
 import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
+import { ModalError } from "./components/ModalError";
 
 const edgeTypes = {
   default: CustomEdge,
@@ -56,6 +57,7 @@ type SelectableBoxType = {
 declare global {
   interface Window {
     allNodes: NodeInterface[];
+    allEdges: Edge[]
   }
 }
 
@@ -78,6 +80,7 @@ const Flow = (props: any) => {
   const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
   const isDragSelection = useRef<boolean>(false);
+  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = connUUID && hostUUID ? true : false;
@@ -225,6 +228,10 @@ const Flow = (props: any) => {
   };
 
   const onHandelSaveFlow = async () => {
+    if (selectedNodeForSubFlow) {
+      setErrorModal(true);
+      return;
+    }
     const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     const graphJson = flowToBehave(allNodes, allEdges);
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
@@ -677,7 +684,8 @@ const Flow = (props: any) => {
 
   useEffect(() => {
     window.allNodes = nodes;
-  }, [nodes]);
+    window.allEdges = edges;
+  }, [nodes, edges]);
 
   const { nodes: nodesFiltered, edges: edgesFiltered } = getNodesAndEdges();
 
@@ -761,6 +769,7 @@ const Flow = (props: any) => {
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
+            <ModalError open={errorModal} onClose={() => setErrorModal(false)} />
           </ReactFlow>
         </div>
       </ReactFlowProvider>

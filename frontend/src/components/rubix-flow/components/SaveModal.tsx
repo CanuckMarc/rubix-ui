@@ -12,9 +12,9 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
 
-  const edges = useEdges();
-  const nodes = useNodes();
-
+  const edges = (window.allEdges|| []);
+  const nodes = (window.allNodes || []);
+  
   const flow = useMemo(() => flowToBehave(nodes, edges), [nodes, edges]);
 
   const handleCopy = () => {
