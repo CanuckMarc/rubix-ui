@@ -56,6 +56,7 @@ type SelectableBoxType = {
 declare global {
   interface Window {
     allNodes: NodeInterface[];
+    allEdges: Edge[]
   }
 }
 
@@ -677,7 +678,8 @@ const Flow = (props: any) => {
 
   useEffect(() => {
     window.allNodes = nodes;
-  }, [nodes]);
+    window.allEdges = edges;
+  }, [nodes, edges]);
 
   const { nodes: nodesFiltered, edges: edgesFiltered } = getNodesAndEdges();
 

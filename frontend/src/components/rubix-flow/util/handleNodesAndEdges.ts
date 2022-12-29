@@ -27,7 +27,8 @@ export const handleCopyNodesAndEdges = (
     const newNodeId = generateUuid();
 
     if (item.isParent) {
-      const subChildren = allData.nodes
+      const allNodes = allData.nodes.length > 0 ? allData.nodes : flow.nodes
+      const subChildren = allNodes
         .filter(n => n.parentId === item.id)
         .map(child => ({
           ...child,
@@ -35,9 +36,9 @@ export const handleCopyNodesAndEdges = (
           oldId: child.id,
           parentId: newNodeId,
         }));
-      subNodes.push(...subChildren);
+      subNodes.push(...subChildren);     
     }
-
+    
     /*
      * Generate new id of edges
      * Add new id source and target of edges
@@ -63,7 +64,8 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  allData.edges.forEach((edge) => {
+  const allEdges = allData.edges.length > 0 ? allData.edges : flow.edges
+  allEdges.forEach((edge) => {
     const itemClone = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target || node.oldId === edge.source);
     if (itemClone) {
       const target = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target);
