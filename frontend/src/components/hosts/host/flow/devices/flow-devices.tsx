@@ -25,17 +25,9 @@ const devices = "DEVICES";
 const bacnet = "BACNET";
 
 export const FlowDevices = () => {
-  const {
-    connUUID = "",
-    hostUUID = "",
-    networkUUID = "",
-    locUUID = "",
-    netUUID = "",
-    pluginName = "",
-  } = useParams();
+  const { connUUID = "", hostUUID = "", networkUUID = "", locUUID = "", netUUID = "", pluginName = "" } = useParams();
   const [pluginUUID, setPluginUUID] = useState<any>();
   const [data, setDevices] = useState([] as Device[]);
-  const [dataSource, setDataSource] = useState([] as Device[]);
   const [whoIs, setWhoIs] = useState([] as Device[]);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingWhoIs, setIsFetchingWhoIs] = useState(false);
@@ -44,14 +36,8 @@ export const FlowDevices = () => {
   const bacnetFactory = new BacnetFactory();
   const flowDeviceFactory = new FlowDeviceFactory();
   const flowNetworkFactory = new FlowNetworkFactory();
-  flowDeviceFactory.connectionUUID =
-    bacnetFactory.connectionUUID =
-    flowNetworkFactory.connectionUUID =
-      connUUID;
-  flowDeviceFactory.hostUUID =
-    bacnetFactory.hostUUID =
-    flowNetworkFactory.hostUUID =
-      hostUUID;
+  flowDeviceFactory.connectionUUID = bacnetFactory.connectionUUID = flowNetworkFactory.connectionUUID = connUUID;
+  flowDeviceFactory.hostUUID = bacnetFactory.hostUUID = flowNetworkFactory.hostUUID = hostUUID;
 
   const routes = [
     {
@@ -63,10 +49,7 @@ export const FlowDevices = () => {
       breadcrumbName: "Location",
     },
     {
-      path: ROUTES.LOCATION_NETWORKS.replace(
-        ":connUUID",
-        connUUID || ""
-      ).replace(":locUUID", locUUID || ""),
+      path: ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", locUUID || ""),
       breadcrumbName: "Group",
     },
     {
@@ -105,7 +88,6 @@ export const FlowDevices = () => {
       setDevices(devices);
       setPluginUUID(res.plugin_conf_id);
       addPrefix(res.name);
-      setDataSource(devices);
       setDataLocalStorage(devices); //handle mass edit
     } catch (error) {
       console.log(error);
@@ -119,10 +101,7 @@ export const FlowDevices = () => {
       setIsFetchingWhoIs(true);
       const res = await bacnetFactory.Whois(networkUUID, pluginName);
       if (res) {
-        openNotificationWithIcon(
-          "success",
-          `device count found: ${res.length}`
-        );
+        openNotificationWithIcon("success", `device count found: ${res.length}`);
       }
       setWhoIs(res);
     } catch (error) {
@@ -148,22 +127,11 @@ export const FlowDevices = () => {
         <Tabs defaultActiveKey={devices}>
           <TabPane tab={devices} key={devices}>
             <RbRefreshButton refreshList={fetch} />
-            <FlowDeviceTable
-              data={data}
-              pluginUUID={pluginUUID}
-              isFetching={isFetching}
-              dataSource={dataSource}
-              setDataSource={setDataSource}
-              refreshList={fetch}
-            />
+            <FlowDeviceTable data={data} pluginUUID={pluginUUID} isFetching={isFetching} refreshList={fetch} />
           </TabPane>
           {pluginName === PLUGINS.bacnetmaster ? (
             <TabPane tab={bacnet} key={bacnet}>
-              <Button
-                type="primary"
-                onClick={runWhois}
-                style={{ margin: "0 6px 10px 0", float: "left" }}
-              >
+              <Button type="primary" onClick={runWhois} style={{ margin: "0 6px 10px 0", float: "left" }}>
                 <RedoOutlined /> WHO-IS
               </Button>
               <BacnetWhoIsTable

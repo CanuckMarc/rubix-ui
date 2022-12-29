@@ -19,7 +19,7 @@ export const ScannerTable = (props: any) => {
   });
 
   if (extraColumns && extraColumns.length > 0) {
-    columns = columns.concat(extraColumns);
+    columns = extraColumns.concat(columns);
   }
 
   const rowSelection = {

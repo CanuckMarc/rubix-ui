@@ -1,4 +1,5 @@
-import { Space } from "antd";
+import { Space, Tooltip } from "antd";
+import { FormOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ScannerTable } from "../../../pc/networking/scanner-table";
@@ -21,11 +22,19 @@ export const HostNetworking = () => {
 
   const extraColumns = [
     {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: any) => (
-        <Space size="middle">{item.editable ? <a onClick={() => showModal(item)}>Edit</a> : null}</Space>
+        <Space size="middle">
+          {item.editable ? (
+            <Tooltip title="Edit">
+              <a onClick={() => showModal(item)}>
+                <FormOutlined />
+              </a>
+            </Tooltip>
+          ) : null}
+        </Space>
       ),
     },
   ] as never[];

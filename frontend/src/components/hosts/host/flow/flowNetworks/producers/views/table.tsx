@@ -11,6 +11,7 @@ import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const ProducersTable = (props: any) => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "", streamUUID = "" } = useParams();
@@ -19,17 +20,22 @@ export const ProducersTable = (props: any) => {
   const [currentItem, setCurrentItem] = useState({} as Producer);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [filteredData, setFilteredData] = useState<Producer[]>([]);
 
   const factory = new FlowProducerFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
+  const config = {
+    originData: producers,
+    setFilteredData: setFilteredData,
+  };
+
   const columns = [
-    ...PRODUCER_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, item: Producer) => (
         <Space size="middle">
           <Link to={getNavigationLink(item.uuid)}>View Writer Clones</Link>
@@ -37,6 +43,7 @@ export const ProducersTable = (props: any) => {
         </Space>
       ),
     },
+    ...PRODUCER_HEADERS,
   ];
 
   const rowSelection = {
@@ -44,10 +51,6 @@ export const ProducersTable = (props: any) => {
       setSelectedUUIDs(selectedRows);
     },
   };
-
-  useEffect(() => {
-    fetch();
-  }, []);
 
   const showModal = (item: Producer) => {
     setCurrentItem(item);
@@ -74,6 +77,7 @@ export const ProducersTable = (props: any) => {
       setIsFetching(true);
       const res = await factory.GetAll();
       setProducers(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -86,16 +90,21 @@ export const ProducersTable = (props: any) => {
     fetch();
   };
 
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as Producer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {producers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={producers}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

@@ -20,6 +20,7 @@ import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
 import Location = amodel.Location;
 import UUIDs = backend.UUIDs;
+import { RbSearchInput } from "../../../common/rb-search-input";
 
 const ExpandedRow = (props: any) => {
   return (
@@ -41,6 +42,12 @@ export const HostsTable = (props: any) => {
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
   const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
   const [tokenFactory, setTokenFactory] = useState(new EdgeBiosTokenFactory(connUUID));
+  const [filteredData, setFilteredData] = useState(hosts);
+
+  const config = {
+    originData: hosts,
+    setFilteredData: setFilteredData,
+  };
 
   const factory = new HostsFactory();
   const installFactory = new InstallFactory();
@@ -48,17 +55,10 @@ export const HostsTable = (props: any) => {
   installFactory.connectionUUID = connUUID;
 
   const columns = [
-    ...HOST_HEADERS,
     {
-      title: "network",
-      dataIndex: "network_uuid",
-      key: "network_uuid",
-      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
-    },
-    {
-      title: "Actions",
+      title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, host: Host) => (
         <Space size="middle">
           <Tooltip title="Ping">
@@ -93,6 +93,13 @@ export const HostsTable = (props: any) => {
           </Link>
         </Space>
       ),
+    },
+    ...HOST_HEADERS,
+    {
+      title: "network",
+      dataIndex: "network_uuid",
+      key: "network_uuid",
+      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
     },
   ];
 
@@ -194,11 +201,12 @@ export const HostsTable = (props: any) => {
       <RbAddButton handleClick={(e: any) => showModal({} as Host, e)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
+      {hosts.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={hosts}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
         expandable={{

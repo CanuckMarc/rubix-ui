@@ -40,7 +40,6 @@ export const FlowPoints = () => {
   const { prefixedTitle, addPrefix } = useTitlePrefix("Points");
   const [settings] = useSettings();
   const [data, setPoints] = useState([] as Point[]);
-  const [dataSource, setDataSource] = useState([] as Point[]);
   const [discoveries, setDiscoveries] = useState([] as Point[]);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingDiscoveries, setIsFetchingDiscoveries] = useState(false);
@@ -122,7 +121,6 @@ export const FlowPoints = () => {
     try {
       const res = (await flowPointFactory.GetPointsForDevice(deviceUUID)) || [];
       setPoints(res);
-      setDataSource(res);
       setDataLocalStorage(res); //handle mass edit
     } catch {
       setIsFetching(false);
@@ -161,14 +159,7 @@ export const FlowPoints = () => {
         <Tabs defaultActiveKey={points}>
           <TabPane tab={points} key={points}>
             <RbRefreshButton refreshList={fetch} />
-            <FlowPointsTable
-              data={data}
-              isFetching={isFetching}
-              pluginName={pluginName}
-              dataSource={dataSource}
-              setDataSource={setDataSource}
-              refreshList={fetch}
-            />
+            <FlowPointsTable data={data} isFetching={isFetching} pluginName={pluginName} refreshList={fetch} />
           </TabPane>
           {pluginName === PLUGINS.bacnetmaster ? (
             <TabPane tab={discover} key={discover}>

@@ -1,35 +1,34 @@
-import { Button, Menu, Dropdown, Space, Spin, Tag, Tooltip } from "antd";
-import type { MenuProps } from "antd";
-import { FormOutlined, EditOutlined, ImportOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { FormOutlined, GoldOutlined, ImportOutlined } from "@ant-design/icons";
+import { Tag, Space, Tooltip, Spin, MenuProps, Menu, Dropdown, Button } from "antd";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { backend, model } from "../../../../../../../wailsjs/go/models";
+import { model, backend } from "../../../../../../../wailsjs/go/models";
+import MassEdit from "../../../../../../common/mass-edit";
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../common/rb-table";
 import {
+  RbRestartButton,
   RbAddButton,
   RbDeleteButton,
   RbExportButton,
-  RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
-import RbTableFilterNameInput from "../../../../../../common/rb-table-filter-name-input";
-import MassEdit from "../../../../../../common/mass-edit";
 import { FLOW_POINT_HEADERS, FLOW_POINT_HEADERS_TABLE } from "../../../../../../constants/headers";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
 import { FlowNetworkFactory } from "../../networks/factory";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { FlowPointFactory } from "../factory";
-import { CreateBulkModal, CreateModal } from "./create";
+import { CreateModal, CreateBulkModal } from "./create";
 import { EditModal } from "./edit";
-import { ExportModal, ImportExcelModal, ImportJsonModal } from "./import-export";
+import { ExportModal, ImportJsonModal, ImportExcelModal } from "./import-export";
 import { WritePointValueModal } from "./write-point-value";
-import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
 
 import Point = model.Point;
 import UUIDs = backend.UUIDs;
 
 export const FlowPointsTable = (props: any) => {
   const { connUUID = "", hostUUID = "", deviceUUID = "", pluginName = "" } = useParams();
-  const { data, isFetching, refreshList, dataSource, setDataSource } = props;
+  const { data, isFetching, refreshList } = props;
   const [schema, setSchema] = useState({} as any);
   const [currentItem, setCurrentItem] = useState({} as Point);
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -41,7 +40,12 @@ export const FlowPointsTable = (props: any) => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
   const [isWritePointModalVisible, setIsWritePointModalVisible] = useState(false);
+  const [filteredData, setFilteredData] = useState(data);
 
+  const config = {
+    originData: data,
+    setFilteredData: setFilteredData,
+  };
   const flowPointFactory = new FlowPointFactory();
   const flowNetworkFactory = new FlowNetworkFactory();
   const flowPluginFactory = new FlowPluginFactory();
@@ -87,22 +91,7 @@ export const FlowPointsTable = (props: any) => {
   const getTableHeaders = (schema: any) => {
     if (!schema) return;
 
-    const columns = [
-      {
-        title: "name",
-        dataIndex: "name",
-        key: "name",
-        render(name: string) {
-          if (name != undefined) {
-            let colour = "#4d4dff";
-            return <Tag color={colour}>{name}</Tag>;
-          }
-        },
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-        filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
-      },
-      ...FLOW_POINT_HEADERS,
-    ] as any;
+    const columns = [...FLOW_POINT_HEADERS] as any;
 
     delete schema.plugin_name; //prevent mass edit on plugin_name
     const columnKeys = columns.map((c: any) => c.key);
@@ -135,6 +124,25 @@ export const FlowPointsTable = (props: any) => {
     });
 
     const headerWithActions = [
+      {
+        title: "actions",
+        key: "actions",
+        fixed: "left",
+        render: (_: any, point: Point) => (
+          <Space size="middle">
+            <Tooltip title="Edit">
+              <a onClick={() => showEditModal(point)}>
+                <FormOutlined />
+              </a>
+            </Tooltip>
+            <Tooltip title="Write Point">
+              <a onClick={() => showWritePointModal(point)}>
+                <GoldOutlined style={{ color: "#fa8c16" }} />
+              </a>
+            </Tooltip>
+          </Space>
+        ),
+      },
       ...headers,
       ...FLOW_POINT_HEADERS_TABLE,
       {
@@ -146,25 +154,6 @@ export const FlowPointsTable = (props: any) => {
           let text = pluginName.toUpperCase();
           return <Tag color={colour}>{text}</Tag>;
         },
-      },
-      {
-        title: "Actions",
-        key: "actions",
-        fixed: "right",
-        render: (_: any, point: Point) => (
-          <Space size="middle">
-            <Tooltip title="Edit">
-              <a onClick={() => showEditModal(point)}>
-                <FormOutlined />
-              </a>
-            </Tooltip>
-            <Tooltip title="Write Point">
-              <a onClick={() => showWritePointModal(point)}>
-                <EditOutlined />
-              </a>
-            </Tooltip>
-          </Space>
-        ),
       },
     ];
     setTableHeaders(headerWithActions);
@@ -238,10 +227,12 @@ export const FlowPointsTable = (props: any) => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <ImportDropdownButton refreshList={refreshList} schema={schema} />
       <RbExportButton handleExport={handleExport} />
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={dataSource}
+        dataSource={filteredData}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

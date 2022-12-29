@@ -1,13 +1,13 @@
 import { Space, Spin } from "antd";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { FlowFrameworkNetworkFactory } from "../factory";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
-import { ROUTES } from "../../../../../../../constants/routes";
-import { FLOW_NETWORKS_HEADERS, FLOW_NETWORKS_SCHEMA } from "../../../../../../../constants/headers";
-import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
-import RbTableFilterNameInput from "../../../../../../../common/rb-table-filter-name-input";
+import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
+import { FLOW_NETWORKS_HEADERS, FLOW_NETWORKS_SCHEMA } from "../../../../../../../constants/headers";
+import { ROUTES } from "../../../../../../../constants/routes";
+import { FlowFrameworkNetworkFactory } from "../factory";
 import { CreateEditModal } from "./create";
 
 import UUIDs = backend.UUIDs;
@@ -17,7 +17,7 @@ export const FlowNetworksTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
-  const [dataSource, setDataSource] = useState(data);
+  const [filteredData, setFilteredData] = useState(data);
   const [schema, setSchema] = useState({});
   const [currentNetwork, setCurrentNetwork] = useState({} as FlowNetwork);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,19 +26,16 @@ export const FlowNetworksTable = (props: any) => {
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
+  const config = {
+    originData: data,
+    setFilteredData: setFilteredData,
+  };
+
   const columns = [
-    {
-      key: "name",
-      title: "name",
-      dataIndex: "name",
-      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => <RbTableFilterNameInput defaultData={data} setFilteredData={setDataSource} />,
-    },
-    ...FLOW_NETWORKS_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, network: FlowNetwork) => (
         <Space size="middle">
           <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
@@ -46,6 +43,13 @@ export const FlowNetworksTable = (props: any) => {
         </Space>
       ),
     },
+    {
+      key: "name",
+      title: "name",
+      dataIndex: "name",
+      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+    },
+    ...FLOW_NETWORKS_HEADERS,
   ];
 
   const rowSelection = {
@@ -53,10 +57,6 @@ export const FlowNetworksTable = (props: any) => {
       setSelectedUUIDs(selectedRows);
     },
   };
-
-  useEffect(() => {
-    return setDataSource(data);
-  }, [data.length]);
 
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
@@ -94,10 +94,12 @@ export const FlowNetworksTable = (props: any) => {
       <RbRefreshButton refreshList={refreshList} />
       <RbAddButton handleClick={() => showModal({} as FlowNetwork)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={dataSource}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

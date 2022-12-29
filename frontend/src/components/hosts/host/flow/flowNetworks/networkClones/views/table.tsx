@@ -1,49 +1,51 @@
 import { Space, Spin } from "antd";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
-import { FlowFrameworkNetworkCloneFactory } from "../factory";
-import { ROUTES } from "../../../../../../../constants/routes";
-import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
-import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
+import { RbRefreshButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
+import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
+import { ROUTES } from "../../../../../../../constants/routes";
+import { FlowFrameworkNetworkCloneFactory } from "../factory";
 
 import UUIDs = backend.UUIDs;
 import FlowNetworkClone = model.FlowNetworkClone;
-import RbTableFilterNameInput from "../../../../../../../common/rb-table-filter-name-input";
 
 export const NetworkClonesTable = (props: any) => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Array<UUIDs>);
-  const [dataSource, setDataSource] = useState(networks);
+  const [filteredData, setFilteredData] = useState(networks);
   const [isFetching, setIsFetching] = useState(false);
 
   const factory = new FlowFrameworkNetworkCloneFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
+  const config = {
+    originData: networks,
+    setFilteredData: setFilteredData,
+  };
+
   const columns = [
-    {
-      key: "name",
-      title: "name",
-      dataIndex: "name",
-      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      filterDropdown: () => {
-        return <RbTableFilterNameInput defaultData={networks} setFilteredData={setDataSource} />;
-      },
-    },
-    ...FLOW_NETWORKS_HEADERS,
     {
       title: "actions",
       key: "actions",
-      fixed: "right",
+      fixed: "left",
       render: (_: any, network: FlowNetworkClone) => (
         <Space size="middle">
           <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
         </Space>
       ),
     },
+    {
+      key: "name",
+      title: "name",
+      dataIndex: "name",
+      sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+    },
+    ...FLOW_NETWORKS_HEADERS,
   ];
 
   const rowSelection = {
@@ -51,14 +53,6 @@ export const NetworkClonesTable = (props: any) => {
       setSelectedUUIDs(selectedRows);
     },
   };
-
-  useEffect(() => {
-    fetch();
-  }, []);
-
-  useEffect(() => {
-    return setDataSource(networks);
-  }, [networks.length]);
 
   const getNavigationLink = (flNetworkCloneUUID: string): string => {
     return ROUTES.STREAMCLONES.replace(":connUUID", connUUID)
@@ -73,6 +67,7 @@ export const NetworkClonesTable = (props: any) => {
       setIsFetching(true);
       const res = (await factory.GetAll(false)) || [];
       setNetworks(res);
+      setFilteredData(res);
     } catch (error) {
       console.log(error);
     } finally {
@@ -85,14 +80,20 @@ export const NetworkClonesTable = (props: any) => {
     fetch();
   };
 
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
+      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={dataSource}
+        dataSource={filteredData}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

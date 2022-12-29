@@ -1,6 +1,7 @@
 import { Checkbox, Input, InputNumber, Select, Table } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { RbSearchInput } from "./rb-search-input";
 import RbTable from "./rb-table";
 
 interface Options {
@@ -53,6 +54,12 @@ export const createColumns = (properties: any) => {
 
 export const MassEditTable = (props: any) => {
   const { items, setItems, columns, count, parentPropId } = props;
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+
+  const config = {
+    originData: items,
+    setFilteredData: setFilteredData,
+  };
 
   const EditableCell: React.FC<EditableCellProps> = ({
     editing,
@@ -162,17 +169,21 @@ export const MassEditTable = (props: any) => {
   }, [count]);
 
   return (
-    <RbTable
-      rowKey="uuid"
-      rowClassName="editable-row"
-      bordered
-      dataSource={items}
-      columns={mergedColumns}
-      components={{
-        body: {
-          cell: EditableCell,
-        },
-      }}
-    />
+    <>
+      {items.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+
+      <RbTable
+        rowKey="uuid"
+        rowClassName="editable-row"
+        bordered
+        dataSource={filteredData}
+        columns={mergedColumns}
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+      />
+    </>
   );
 };
