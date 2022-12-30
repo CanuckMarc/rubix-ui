@@ -22,7 +22,7 @@ import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
-import { Edge, ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
+import { Edge, EdgeProps, ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
 import { Spin } from "antd";
 import { NodeSpecJSON } from "./lib";
@@ -42,11 +42,6 @@ import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
 import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
-import { ModalError } from "./components/ModalError";
-
-const edgeTypes = {
-  default: CustomEdge,
-};
 
 type SelectableBoxType = {
   edgeId: string;
@@ -56,19 +51,23 @@ type SelectableBoxType = {
 // this is save all nodes
 declare global {
   interface Window {
-    allNodes: NodeInterface[];
-    allEdges: Edge[]
+    selectedNodeForSubFlow: NodeInterface | undefined;
   }
 }
 
-const Flow = (props: any) => {
-  const { customNodeTypes } = props;
+type FlowProps = {
+  customEdgeTypes: any;
+  customNodeTypes: any;
+  selectedNodeForSubFlow: NodeInterface | undefined;
+  setSelectedNodeForSubFlow: (node: NodeInterface | undefined) => void;
+};
+
+const Flow = (props: FlowProps) => {
+  const { customNodeTypes, customEdgeTypes, selectedNodeForSubFlow, setSelectedNodeForSubFlow } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
-  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface | undefined>(undefined);
-  const [currentNodesAndEdges, setCurrentNodesAndEdges] = useState({ nodes, edges });
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
@@ -80,7 +79,6 @@ const Flow = (props: any) => {
   const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
   const isDragSelection = useRef<boolean>(false);
-  const [errorModal, setErrorModal] = useState<boolean>(false);
 
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = connUUID && hostUUID ? true : false;
@@ -121,7 +119,7 @@ const Flow = (props: any) => {
   useOnPressKey("Backspace", () => {
     const edgesDeleted = edges.filter((item) => item.selected);
     if (edgesDeleted.length > 0) {
-      updateCurrentNodesAndEdges([], edgesDeleted);
+      deleteNodesAndEdges([], edgesDeleted);
     }
   });
 
@@ -144,9 +142,13 @@ const Flow = (props: any) => {
         },
         parentId: selectedNodeForSubFlow?.id || undefined,
         settings: nodeSettings,
+        selected: false,
       };
 
       onNodesChange([{ type: "add", item: newNode }]);
+      setTimeout(() => {
+        setNodes((newNodes) => newNodes.map((item) => ({ ...item, selected: false })));
+      }, 100);
 
       if (lastConnectStart === undefined) return;
 
@@ -162,57 +164,25 @@ const Flow = (props: any) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
     },
-    [lastConnectStart, nodes, onEdgesChange, onNodesChange]
+    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow]
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
     setSelectedNodeForSubFlow(node);
-    // save current data
-    setCurrentNodesAndEdges({
-      nodes: [...nodes],
-      edges: [...edges],
-    });
-
-    const subNodes = nodes.filter((nodeItem: NodeInterface) => nodeItem.parentId === node.id);
-    const subEdges = edges.filter((edgeItem) => {
-      const haveEdge = subNodes.find((nodeItem: NodeInterface) =>
-        [edgeItem.source, edgeItem.target].includes(nodeItem.id)
-      );
-      return !!haveEdge;
-    });
-    setNodes(subNodes);
-    setEdges(subEdges);
-  };
-
-  const getAllNodesAndEdges = () => {
-    const oldsNodes = currentNodesAndEdges.nodes.filter((node: NodeInterface) => {
-      const nodeExist = nodes.find((nodeItem) => node.id === nodeItem.id);
-      return !nodeExist;
-    });
-    const oldsEdges = currentNodesAndEdges.edges.filter((edgeItemOld) => {
-      const edge = edges.find((edgeItem) => edgeItemOld.id === edgeItem.id);
-      return !edge;
-    });
-    return {
-      nodes: [...oldsNodes, ...nodes],
-      edges: [...oldsEdges, ...edges],
-    };
   };
 
   const onClearAllNodes = () => {
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
     if (selectedNodeForSubFlow) {
-      const nodeIdsCleared = allNodes
+      const nodeIdsCleared = nodes
         .filter((node: NodeInterface) => node.parentId === selectedNodeForSubFlow.id)
         .map((item) => item.id);
-      const edgeIdsCleared = allEdges
+      const edgeIdsCleared = edges
         .filter((edge: Edge) => nodeIdsCleared.includes(edge.target) || nodeIdsCleared.includes(edge.source))
         .map((item) => item.id);
-      const remainingNodes = allNodes.filter((item) => !nodeIdsCleared.includes(item.id));
-      const remainingEdges = allEdges.filter((item: Edge) => !edgeIdsCleared.includes(item.id));
+      const remainingNodes = nodes.filter((item) => !nodeIdsCleared.includes(item.id));
+      const remainingEdges = edges.filter((item: Edge) => !edgeIdsCleared.includes(item.id));
       setNodes(remainingNodes);
       setEdges(remainingEdges);
-      setCurrentNodesAndEdges({ nodes: remainingNodes, edges: remainingEdges });
     } else {
       setNodes([]);
       setEdges([]);
@@ -220,26 +190,16 @@ const Flow = (props: any) => {
   };
 
   const onSaveSubFlow = () => {
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-    setNodes(allNodes);
-    setEdges(allEdges);
-    setCurrentNodesAndEdges({ nodes: [], edges: [] });
     setSelectedNodeForSubFlow(undefined);
   };
 
   const onHandelSaveFlow = async () => {
-    if (selectedNodeForSubFlow) {
-      setErrorModal(true);
-      return;
-    }
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-    const graphJson = flowToBehave(allNodes, allEdges);
+    const graphJson = flowToBehave(nodes, edges);
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
-    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, allNodes);
-    setCurrentNodesAndEdges({ nodes: [], edges: [] });
+    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, nodes);
     setNodes(newNodes);
-    setEdges(allEdges);
+    setEdges(edges);
   };
 
   const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
@@ -346,23 +306,24 @@ const Flow = (props: any) => {
   };
 
   const handlePaneClick = (e: ReactMouseEvent) => {
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-    setNodes(allNodes.map((node) => ({ ...node, selected: false })));
-    setEdges(allEdges.map((ed) => ({ ...ed, selected: false })));
+    setNodes(nodes.map((node) => ({ ...node, selected: false })));
+    setEdges(edges.map((ed) => ({ ...ed, selected: false })));
     closeNodePicker();
   };
 
-  const onChangeSelection = ({ nodes, edges }: { nodes: NodeInterface[]; edges: Edge[] }) => {
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-
-    const newNodes = allNodes.map((node) => {
-      const found = nodes.find((i) => i.id === node.id);
-      node.selected = !!found;
+  const onChangeSelection = ({
+    nodes: newNodesChange,
+    edges: newEdgesChange,
+  }: {
+    nodes: NodeInterface[];
+    edges: Edge[];
+  }) => {
+    const newNodes = nodes.map((node) => {
+      node.selected = newNodesChange.some((i) => i.id === node.id);
       return node;
     });
-    const newEdges = allEdges.map((edge) => {
-      const found = edges.find((i) => i.id === edge.id);
-      edge.selected = !!found;
+    const newEdges = edges.map((edge) => {
+      edge.selected = newEdgesChange.some((i) => i.id === edge.id);
       return edge;
     });
 
@@ -462,50 +423,15 @@ const Flow = (props: any) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
-  const updateCurrentNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const nodesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.nodes : nodes;
-    let edgesWillHandle = selectedNodeForSubFlow ? currentNodesAndEdges.edges : edges;
-    const newNodes: NodeInterface[] = _nodesDeleted.length > 0 ? [] : nodesWillHandle;
+  const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+    const remainingNodes = nodes.filter((item) => !_nodesDeleted.some((item2) => item.id === item2.id));
+    const remainingEdges = edges.filter((item) => !_edgesDeleted.some((item2) => item.id === item2.id));
 
-    _nodesDeleted.forEach((nodeDeleted: NodeInterface) => {
-      nodesWillHandle.forEach((nodeHandle: NodeInterface) => {
-        const isSelf = nodeDeleted.id === nodeHandle.id;
-        if (selectedNodeForSubFlow) {
-          if (!isSelf) {
-            newNodes.push(nodeHandle);
-          }
-        } else {
-          if (nodeDeleted.isParent && nodeDeleted.id !== nodeHandle.parentId && !isSelf) {
-            newNodes.push(nodeHandle);
-          } else if (!isSelf) {
-            newNodes.push(nodeHandle);
-          }
-        }
-      });
-      edgesWillHandle = edgesWillHandle.filter((edge) => {
-        if (edge.target === nodeDeleted.id || edge.source === nodeDeleted.id) {
-          return false;
-        }
-        return true;
-      });
-    });
-
-    const newEdges = edgesWillHandle.filter((currItem) => {
-      const item = _edgesDeleted.find((edge: Edge) => edge.id === currItem.id);
-      return !item;
-    });
-
-    if (selectedNodeForSubFlow) {
-      setCurrentNodesAndEdges({
-        nodes: newNodes,
-        edges: newEdges,
-      });
-    }
-    setNodes(newNodes);
-    setEdges(newEdges);
+    setNodes(remainingNodes);
+    setEdges(remainingEdges);
     setUndoable({
-      nodes: newNodes,
-      edges: newEdges,
+      nodes: remainingNodes,
+      edges: remainingEdges,
     });
   };
 
@@ -514,17 +440,15 @@ const Flow = (props: any) => {
     nodes.forEach((item) => (item.selected = false));
     edges.forEach((item) => (item.selected = false));
 
-    const { nodes: allNodes, edges: allEdges } = getAllNodesAndEdges();
-
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, { nodes: allNodes, edges: allEdges });
+    const newFlow = handleCopyNodesAndEdges(_copied, nodes, edges);
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
-    const _nodes = [...nodes, ...newFlow.nodes, ...allNodes];
-    const _edges = [...edges, ...newFlow.edges, ...allEdges];
+    const _nodes = [...nodes, ...newFlow.nodes];
+    const _edges = [...edges, ...newFlow.edges];
     const nodesUniq = uniqArray(_nodes);
     const edgesUniq = uniqArray(_edges);
 
@@ -661,29 +585,9 @@ const Flow = (props: any) => {
     };
   }, [flowSettings.refreshTimeout]);
 
-  const getNodesAndEdges = useCallback(() => {
-    const newNodes = nodes.filter((node: NodeInterface) => {
-      if (selectedNodeForSubFlow) {
-        return !node.isParent && node.parentId === selectedNodeForSubFlow.id;
-      }
-      return !node.parentId;
-    });
-    const newEdges = edges.filter((edge) => {
-      const item = newNodes.find((node) => [edge.source, edge.target].includes(node.id));
-      return !!item;
-    });
-    return {
-      nodes: newNodes,
-      edges: newEdges,
-    };
-  }, [selectedNodeForSubFlow, nodes, edges]);
-
   useEffect(() => {
-    window.allNodes = nodes;
-    window.allEdges = edges;
-  }, [nodes, edges]);
-
-  const { nodes: nodesFiltered, edges: edgesFiltered } = getNodesAndEdges();
+    window.selectedNodeForSubFlow = selectedNodeForSubFlow;
+  }, [selectedNodeForSubFlow]);
 
   return (
     <div className="rubix-flow">
@@ -692,9 +596,9 @@ const Flow = (props: any) => {
         <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
           <ReactFlow
             nodeTypes={customNodeTypes}
-            edgeTypes={edgeTypes}
-            nodes={nodesFiltered}
-            edges={edgesFiltered}
+            edgeTypes={customEdgeTypes}
+            nodes={nodes}
+            edges={edges}
             onMove={onMove}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -717,7 +621,12 @@ const Flow = (props: any) => {
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
-                nodes={nodesFiltered}
+                nodes={nodes.filter((node: NodeInterface) => {
+                  if (selectedNodeForSubFlow) {
+                    return node.parentId === selectedNodeForSubFlow.id;
+                  }
+                  return !node.parentId;
+                })}
                 shouldUpdate={shouldUpdateMiniMap}
                 className={cx("absolute", {
                   "top-20 right-4": flowSettings.positionMiniMap === "top",
@@ -735,7 +644,7 @@ const Flow = (props: any) => {
             <Controls />
             <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
             <BehaveControls
-              onDeleteEdges={updateCurrentNodesAndEdges}
+              deleteNodesAndEdges={deleteNodesAndEdges}
               onCopyNodes={handleCopyNodes}
               onUndo={undo}
               onRedo={handleRedo}
@@ -750,7 +659,7 @@ const Flow = (props: any) => {
             {nodePickerVisibility && (
               <NodePicker
                 position={nodePickerVisibility}
-                filters={getNodePickerFilters(nodesFiltered, lastConnectStart)}
+                filters={getNodePickerFilters(nodes, lastConnectStart)}
                 onPickNode={handleAddNode}
                 onClose={closeNodePicker}
               />
@@ -765,7 +674,6 @@ const Flow = (props: any) => {
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
-            <ModalError open={errorModal} onClose={() => setErrorModal(false)} />
           </ReactFlow>
         </div>
       </ReactFlowProvider>
@@ -775,13 +683,33 @@ const Flow = (props: any) => {
 
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface | undefined>(undefined);
+
+  const customEdgeTypes = {
+    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={selectedNodeForSubFlow?.id} />,
+  };
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
-    nodes[node.type] = (props: any) => <NodePanel {...props} spec={node} key={node.id} />;
+    nodes[node.type] = (props: any) => (
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={selectedNodeForSubFlow?.id} />
+    );
     return nodes;
   }, {} as NodeTypes);
 
-  return <>{isFetchingNodeSpec ? <Flow customNodeTypes={customNodeTypes} /> : <Spin />}</>;
+  return (
+    <>
+      {isFetchingNodeSpec ? (
+        <Flow
+          customEdgeTypes={customEdgeTypes}
+          customNodeTypes={customNodeTypes}
+          selectedNodeForSubFlow={selectedNodeForSubFlow}
+          setSelectedNodeForSubFlow={setSelectedNodeForSubFlow}
+        />
+      ) : (
+        <Spin />
+      )}
+    </>
+  );
 };
 
 export default RubixFlow;

@@ -29,15 +29,13 @@ export const useChangeNodeProperties = (id: string) => {
 
   return useCallback(
     (key: string, value: any) => {
-      const newNodes = window.allNodes.map((node: NodeInterface) => {
+      instance.setNodes((nodes => nodes.map(node => {
         if (node.id !== id) return node;
         return {
           ...node,
           [key]: value,
         };
-       
-      });
-      instance.setNodes(newNodes);
+      })));
     },
     [instance, id]
   );

@@ -18,7 +18,7 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
-  onDeleteEdges: (nodesDeleted: any, edgesDeleted: any) => void;
+  deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -32,7 +32,7 @@ type ControlProps = {
 };
 
 const Controls = ({
-  onDeleteEdges,
+  deleteNodesAndEdges,
   onCopyNodes,
   onUndo,
   onRedo,
@@ -69,20 +69,22 @@ const Controls = ({
     const nodesDeleted = _nodes.filter((item) => item.selected);
     const edgesDeleted = _edges.filter((item) => item.selected);
 
-    onDeleteEdges(nodesDeleted, edgesDeleted);
+    deleteNodesAndEdges(nodesDeleted, edgesDeleted);
   });
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
-    // const _nodes = instance.getNodes();
+    const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
-    const newNodes = window.allNodes.map((item) => {
-      item.selected = true;
+    const newNodes = _nodes.map((item: NodeInterface) => {
+      item.selected = window.selectedNodeForSubFlow
+        ? item.parentId === window.selectedNodeForSubFlow.id
+        : !item.parentId;
       return item;
     });
     const newEdges = _edges.map((item) => {
-      item.selected = true;
+      item.selected = newNodes.some((node) => [item.target, item.source].includes(node.id));
       return item;
     });
 
@@ -116,6 +118,7 @@ const Controls = ({
     const edgesCopied = instance
       .getEdges()
       .filter((item) => item.selected && nodeIdCopied.includes(item.source) && nodeIdCopied.includes(item.target));
+
     onCopyNodes({
       nodes: nodesCopied,
       edges: edgesCopied,

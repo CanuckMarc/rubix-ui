@@ -12,9 +12,9 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
 
-  const edges = (window.allEdges|| []);
-  const nodes = (window.allNodes || []);
-  
+  const edges = useEdges();
+  const nodes = useNodes();
+
   const flow = useMemo(() => flowToBehave(nodes, edges), [nodes, edges]);
 
   const handleCopy = () => {
@@ -31,7 +31,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
     const selectedNodes: NodeJSON[] = flowToBehave(
       nodes.filter((item: NodeInterface) => item.selected),
       edges
-    ).nodes;    
+    ).nodes;
     const newNodes: NodeJSON[] = selectedNodes.length === 0 ? flow.nodes : selectedNodes;
     setNodeRender(JSON.stringify({ nodes: newNodes }, null, 2));
   };
