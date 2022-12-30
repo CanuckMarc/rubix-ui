@@ -1,18 +1,10 @@
 import { useState } from "react";
-import {
-  NodeProps as FlowNodeProps,
-  useEdges,
-  useNodes,
-} from "react-flow-renderer/nocss";
+import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
 
 import { useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import {
-  InputSocketSpecJSON,
-  NodeSpecJSON,
-  OutputSocketSpecJSON,
-} from "../lib";
+import { InputSocketSpecJSON, NodeSpecJSON, OutputSocketSpecJSON } from "../lib";
 import { NodeContainer } from "./NodeContainer";
 import { InputSocket } from "./InputSocket";
 import { OutputSocket } from "./OutputSocket";
@@ -22,6 +14,7 @@ import { DEFAULT_NODE_SPEC_JSON } from "./NodeMenu";
 
 type NodeProps = FlowNodeProps & {
   spec: NodeSpecJSON;
+  parentNodeId?: string;
 };
 
 const getTitle = (type: string) => {
@@ -40,11 +33,7 @@ const getPairs = <T, U>(arr1: T[], arr2: U[]) => {
   return pairs;
 };
 
-const getInputs = (
-  specInputs: InputSocketSpecJSON[],
-  nodeInputs: any,
-  node: NodeInterface
-) => {
+const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: any, node: NodeInterface) => {
   if (specInputs.length === 0) return [];
   if (specInputs.length > 0 && !nodeInputs) return specInputs;
 
@@ -113,7 +102,7 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any) => {
 };
 
 export const Node = (props: NodeProps) => {
-  const { id, data, spec, selected } = props;
+  const { id, data, spec, selected, parentNodeId } = props;
   const edges = useEdges();
   const nodes = useNodes();
   const [nodesSpec] = useNodesSpec();
@@ -123,6 +112,12 @@ export const Node = (props: NodeProps) => {
   const [isSettingModal, setIsSettingModal] = useState(false);
 
   const node: NodeInterface | any = nodes.find((item) => item.id === id);
+  const isHidden = parentNodeId ? node.parentId !== parentNodeId : node.parentId;
+
+  if (isHidden) {
+    return null;
+  }
+
   const pairs = getPairs(
     getInputs(spec.inputs || [], node.data.inputs, node),
     getOutputs(spec.outputs || [], node.data.out)
@@ -137,9 +132,7 @@ export const Node = (props: NodeProps) => {
   };
 
   const handleDbClickTitle = () => {
-    const nodeType =
-      (nodesSpec as NodeSpecJSON[]).find((item) => item.type === node.type) ||
-      DEFAULT_NODE_SPEC_JSON;
+    const nodeType = (nodesSpec as NodeSpecJSON[]).find((item) => item.type === node.type) || DEFAULT_NODE_SPEC_JSON;
     const isAllowSetting = nodeType?.allowSettings || false;
 
     if (isAllowSetting) setIsSettingModal(true);
@@ -150,18 +143,14 @@ export const Node = (props: NodeProps) => {
   };
 
   const getConnectionOutput = (targetHandle: string) => {
-    const edge = edges.find(
-      (item) => item.target === id && item.targetHandle === targetHandle
-    );
+    const edge = edges.find((item) => item.target === id && item.targetHandle === targetHandle);
     if (!edge) return null;
 
     /* Find the output of the edge connected */
     let output = null;
     const node: NodeInterface | null = nodes.find((item) => item.id === edge.source) || null;
     if (node?.data?.out) {
-      output =
-        node.data.out.find((item: any) => item.pin === edge.sourceHandle) ||
-        null;
+      output = node.data.out.find((item: any) => item.pin === edge.sourceHandle) || null;
     }
 
     return output;
@@ -185,21 +174,15 @@ export const Node = (props: NodeProps) => {
           !data[input.name] &&
           data[input.name] !== null &&
           ((input.valueType === "number" && data[input.name] !== 0) ||
-          (input.valueType === "boolean" && data[input.name] === undefined))
+            (input.valueType === "boolean" && data[input.name] === undefined))
         ) {
           data[input.name] = input.defaultValue;
         }
 
-        const borderB =
-          ix === pairs.length - 1 && node.style?.height
-            ? "border-b pb-3 border-gray-500"
-            : "";
+        const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";
 
         return (
-          <div
-            key={ix}
-            className={`flex flex-row justify-between gap-8 relative px-4 my-2 ${borderB}`}
-          >
+          <div key={ix} className={`flex flex-row justify-between gap-8 relative px-4 my-2 ${borderB}`}>
             {input && (
               <InputSocket
                 {...input}
@@ -224,11 +207,7 @@ export const Node = (props: NodeProps) => {
           </div>
         );
       })}
-      <SettingsModal
-        node={node}
-        isModalVisible={isSettingModal}
-        onCloseModal={handleCloseModalSetting}
-      />
+      <SettingsModal node={node} isModalVisible={isSettingModal} onCloseModal={handleCloseModalSetting} />
     </NodeContainer>
   );
 };

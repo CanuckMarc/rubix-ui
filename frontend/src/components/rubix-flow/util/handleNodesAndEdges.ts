@@ -11,14 +11,11 @@ type NodesAndEdgesType = {
 
 export const handleCopyNodesAndEdges = (
   flow: NodesAndEdgesType,
-  allData: NodesAndEdgesType = {
-    nodes: [],
-    edges: [],
-  },
+  nodes: NodeInterface[] = [],
+  edges: Edge[] = [],
   isAutoSelected = true
 ) => {
   let newEdges: Edge[] = [...flow.edges];
-
   const subNodes: NodeWithOldId[] = [];
   const subEdges: Edge[] = [];
 
@@ -27,18 +24,17 @@ export const handleCopyNodesAndEdges = (
     const newNodeId = generateUuid();
 
     if (item.isParent) {
-      const allNodes = allData.nodes.length > 0 ? allData.nodes : flow.nodes
-      const subChildren = allNodes
-        .filter(n => n.parentId === item.id)
+      const subChildren = nodes
+        .filter((n: NodeInterface) => n.parentId === item.id)
         .map(child => ({
           ...child,
           id: generateUuid(),
           oldId: child.id,
           parentId: newNodeId,
         }));
-      subNodes.push(...subChildren);     
+      subNodes.push(...subChildren);
     }
-    
+
     /*
      * Generate new id of edges
      * Add new id source and target of edges
@@ -64,8 +60,7 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  const allEdges = allData.edges.length > 0 ? allData.edges : flow.edges
-  allEdges.forEach((edge) => {
+  edges.forEach((edge) => {
     const itemClone = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target || node.oldId === edge.source);
     if (itemClone) {
       const target = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target);
