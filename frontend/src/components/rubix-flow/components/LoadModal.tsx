@@ -43,6 +43,12 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
     oldNodes.forEach((item) => (item.selected = false));
     oldEdges.forEach((item) => (item.selected = false));
 
+    // add nodes into sub flow if have
+    if (window.selectedNodeForSubFlow) {
+      nodes = nodes.map((node) => ({ ...node, parentId: window.selectedNodeForSubFlow!!.id, isParent: false }));
+    }
+
+
     // Create new uuid for nodes and edges
     const newFlow = handleCopyNodesAndEdges({ nodes, edges });
     nodes = newFlow.nodes;

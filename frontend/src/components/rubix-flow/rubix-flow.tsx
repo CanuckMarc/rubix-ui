@@ -142,9 +142,13 @@ const Flow = (props: FlowProps) => {
         },
         parentId: selectedNodeForSubFlow?.id || undefined,
         settings: nodeSettings,
+        selected: false,
       };
 
       onNodesChange([{ type: "add", item: newNode }]);
+      setTimeout(() => {
+        setNodes((newNodes) => newNodes.map((item) => ({ ...item, selected: false })));
+      }, 100);
 
       if (lastConnectStart === undefined) return;
 
