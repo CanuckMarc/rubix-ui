@@ -262,11 +262,7 @@ const Flow = (props: any) => {
       });
 
       const lastHandleId = lastConnectStart.handleId;
-      const isTrueHandleId =
-        handleId &&
-        lastHandleId &&
-        ((handleId.startsWith("in") && lastHandleId.startsWith("in")) ||
-          (handleId.startsWith("out") && lastHandleId.startsWith("out")));
+      const isTrueHandleId = handleId && lastHandleId;
 
       if (isDragSelected && isTrueHandleId) {
         let newEdges;
@@ -303,8 +299,8 @@ const Flow = (props: any) => {
           lastConnectStart &&
           nodeId &&
           handleId &&
-          !isTrueHandleId &&
-          isValidConnection(nodes, lastConnectStart, { nodeId, handleId })
+          isTrueHandleId &&
+          isValidConnection(nodes, lastConnectStart, { nodeId, handleId },isTarget)
         ) {
           const isSource = lastConnectStart.handleType === "source" || false;
           const conNodeId = lastConnectStart.nodeId || "";
