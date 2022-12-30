@@ -300,7 +300,7 @@ const Flow = (props: any) => {
           nodeId &&
           handleId &&
           isTrueHandleId &&
-          isValidConnection(nodes, lastConnectStart, { nodeId, handleId },isTarget)
+          isValidConnection(nodes, lastConnectStart, { nodeId, handleId }, isTarget)
         ) {
           const isSource = lastConnectStart.handleType === "source" || false;
           const conNodeId = lastConnectStart.nodeId || "";

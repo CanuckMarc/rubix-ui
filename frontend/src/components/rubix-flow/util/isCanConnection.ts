@@ -10,28 +10,20 @@ export const isValidConnection = (
   nodes: NodeInterface[],
   firstConnect: OnConnectStartParams,
   lastConnect: LastConnectParams,
-  isTarget : boolean
+  isTarget: boolean
 ) => {
-  const firstNode = nodes.find((item) => item.id === firstConnect.nodeId);
-  const lastNode = nodes.find((item) => item.id === lastConnect.nodeId);
-
-  const nodeTarget = nodes.find((item) => item.id === lastConnect.nodeId);
-  const tempArr = isTarget ? nodeTarget!!.data.inputs : nodeTarget!!.data.out;
-
-  const dataTypeOfTarget = tempArr.find((i: any) => i.pin === lastConnect.handleId);
-
   const nodeSource = nodes.find((item) => item.id === firstConnect?.nodeId);
+  const nodeTarget = nodes.find((item) => item.id === lastConnect.nodeId);
 
-  const tempArr2 = isTarget ? nodeSource!!.data.out : nodeSource!!.data.inputs;
-  const dataTypeOfSource = tempArr2.find((i: any) => i.pin === firstConnect?.handleId);
+  if (!nodeSource || !nodeTarget) return false;
 
-  if (!firstNode || !lastNode) return false;
+  const tempTarget = isTarget ? nodeTarget!!.data.inputs : nodeTarget!!.data.out;
+  const tempSource = isTarget ? nodeSource!!.data.out : nodeSource!!.data.inputs;
+  const dataTypeOfSource = tempSource.find((i: any) => i.pin === firstConnect?.handleId);
+  const dataTypeOfTarget = tempTarget.find((i: any) => i.pin === lastConnect.handleId);
   
-  
-  const arrHandleIds = [
-    dataTypeOfSource.dataType,
-    dataTypeOfTarget.dataType,
-  ];
+  const arrHandleIds = [dataTypeOfSource.dataType, dataTypeOfTarget.dataType];
+
   const occurrences = arrHandleIds.reduce(function (acc, curr) {
     return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;
   }, {}); /* eg return: {string: 1:, boolean: 1} */
