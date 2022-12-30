@@ -9,17 +9,21 @@ type LastConnectParams = {
 export const isValidConnection = (
   nodes: NodeInterface[],
   firstConnect: OnConnectStartParams,
-  lastConnect: LastConnectParams
+  lastConnect: LastConnectParams,
+  isTarget: boolean
 ) => {
-  const firstNode = nodes.find((item) => item.id === firstConnect.nodeId);
-  const lastNode = nodes.find((item) => item.id === lastConnect.nodeId);
+  const nodeSource = nodes.find((item) => item.id === firstConnect?.nodeId);
+  const nodeTarget = nodes.find((item) => item.id === lastConnect.nodeId);
 
-  if (!firstNode || !lastNode) return false;
+  if (!nodeSource || !nodeTarget) return false;
 
-  const arrHandleIds = [
-    getNodeType(firstNode, firstConnect.handleId || ""),
-    getNodeType(lastNode, lastConnect.handleId || ""),
-  ];
+  const tempTarget = isTarget ? nodeTarget!!.data.inputs : nodeTarget!!.data.out;
+  const tempSource = isTarget ? nodeSource!!.data.out : nodeSource!!.data.inputs;
+  const dataTypeOfSource = tempSource.find((i: any) => i.pin === firstConnect?.handleId);
+  const dataTypeOfTarget = tempTarget.find((i: any) => i.pin === lastConnect.handleId);
+  
+  const arrHandleIds = [dataTypeOfSource.dataType, dataTypeOfTarget.dataType];
+
   const occurrences = arrHandleIds.reduce(function (acc, curr) {
     return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;
   }, {}); /* eg return: {string: 1:, boolean: 1} */
@@ -28,15 +32,6 @@ export const isValidConnection = (
   return !occString || occString === 2;
 };
 
-const getNodeType = (node: NodeInterface, handleId: string) => {
-  let nodeHandle;
-  if (handleId && handleId.startsWith("in")) {
-    nodeHandle = node?.data?.inputs.find((item: any) => item.pin === handleId);
-  } else {
-    nodeHandle = node?.data?.out.find((item: any) => item.pin === handleId);
-  }
-  return nodeHandle && nodeHandle.dataType;
-};
 
 /* Max one connection per input */
 export const isInputExistConnection = (
