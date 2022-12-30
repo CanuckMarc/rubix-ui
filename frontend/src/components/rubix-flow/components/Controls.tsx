@@ -77,8 +77,6 @@ const Controls = ({
     const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
-    console.log("window.selectedNodeForSubFlow", window.selectedNodeForSubFlow);
-
     const newNodes = _nodes.map((item: NodeInterface) => {
       item.selected = window.selectedNodeForSubFlow
         ? item.parentId === window.selectedNodeForSubFlow.id

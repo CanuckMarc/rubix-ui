@@ -587,23 +587,6 @@ const Flow = (props: FlowProps) => {
     };
   }, [flowSettings.refreshTimeout]);
 
-  const getNodesAndEdges = useCallback(() => {
-    const newNodes = nodes.filter((node: NodeInterface) => {
-      if (selectedNodeForSubFlow) {
-        return !node.isParent && node.parentId === selectedNodeForSubFlow.id;
-      }
-      return !node.parentId;
-    });
-    const newEdges = edges.filter((edge) => {
-      const item = newNodes.find((node) => [edge.source, edge.target].includes(node.id));
-      return !!item;
-    });
-    return {
-      nodes: newNodes,
-      edges: newEdges,
-    };
-  }, [selectedNodeForSubFlow, nodes, edges]);
-
   useEffect(() => {
     window.selectedNodeForSubFlow = selectedNodeForSubFlow;
   }, [selectedNodeForSubFlow]);
