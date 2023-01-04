@@ -27,12 +27,32 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
     }, 1000);
   };
 
+  const findAllNodes = (id: string) => {
+    const nodesChild: NodeInterface[] = nodes.filter((item: NodeInterface) => item.parentId === id);
+    const allNodes: NodeInterface[] = [];
+
+    nodesChild.forEach((item) => {
+      allNodes.push(item);
+      if (item.isParent) {
+        allNodes.push(...findAllNodes(item.id));
+      }
+    });
+
+    return allNodes;
+  };
+
   const handleNodeRender = () => {
-    const selectedNodes: NodeJSON[] = flowToBehave(
-      nodes.filter((item: NodeInterface) => item.selected),
-      edges
-    ).nodes;
-    const newNodes: NodeJSON[] = selectedNodes.length === 0 ? flow.nodes : selectedNodes;
+    const selectedNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.selected);
+    const allNodes: NodeInterface[] = [];
+
+    selectedNodes.forEach((item) => {
+      allNodes.push(item);
+      if (item.isParent) {
+        allNodes.push(...findAllNodes(item.id));
+      }
+    });
+
+    const newNodes: NodeJSON[] = allNodes.length > 0 ? flowToBehave(allNodes, edges).nodes : flow.nodes;
     setNodeRender(JSON.stringify({ nodes: newNodes }, null, 2));
   };
 
