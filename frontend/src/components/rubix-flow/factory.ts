@@ -99,6 +99,7 @@ export class FlowFactory {
     return await NodeValues(connUUID, hostUUID, isRemote);
   }
 
+  // NodesValuesSubFlow get all the node current values from the runtime for a parent node with sub-flow inputs and outputs values
   async NodesValuesSubFlow(
     connUUID: string,
     hostUUID: string,
@@ -108,6 +109,7 @@ export class FlowFactory {
     return await NodesValuesSubFlow(connUUID, hostUUID, parentID, isRemote);
   }
 
+  // NodesValuesInsideParent get all the node current values from the runtime for one parent
   async NodesValuesInsideParent(
     connUUID: string,
     hostUUID: string,
