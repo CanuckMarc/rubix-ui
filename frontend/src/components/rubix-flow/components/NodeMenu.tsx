@@ -131,10 +131,10 @@ const NodeMenu = ({
           >
             Set Name
           </div>
-          {node.isParent && !selectedNodeForSubFlow && (
+          {node.isParent && (
             <div
               key="Sub flow"
-              className="cursor-pointer border-b border-gray-600 ant-menu-item"
+              className="cursor-pointer border-b border-gray-600  ant-menu-item"
               onClick={onSubFlowClick}
             >
               Open Sub Flow

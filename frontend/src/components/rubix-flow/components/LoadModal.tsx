@@ -53,8 +53,7 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
         ...node,
         id: generateUuid(),
         parentId: window.selectedNodeForSubFlow!!.id,
-        oldId: node.id,
-        isParent: false,
+        oldId: node.id
       }));
     } else {
       // filter parent nodes and nodes not belonging to sub flow

@@ -45,7 +45,7 @@ export const AddNodeComponent = ({ node, selectedNodeForSubFlow, onClose, instan
     closeNodePicker();
     const newNode = {
       id: generateUuid(),
-      isParent: selectedNodeForSubFlow ? false : isParent,
+      isParent,
       style,
       type: nodeType,
       position: {
