@@ -9,7 +9,7 @@ import {
   NodeHelpByName,
   NodePallet,
   NodePayload,
-  NodeSchema,
+  NodeSchema, NodesValuesInsideParent, NodesValuesSubFlow,
   NodeValue,
   NodeValues,
   UpdateWiresConnection,
@@ -97,6 +97,24 @@ export class FlowFactory {
     isRemote: boolean
   ): Promise<Array<node.Values>> {
     return await NodeValues(connUUID, hostUUID, isRemote);
+  }
+
+  async NodesValuesSubFlow(
+    connUUID: string,
+    hostUUID: string,
+    parentID: string,
+    isRemote: boolean
+  ): Promise<Array<node.Values>> {
+    return await NodesValuesSubFlow(connUUID, hostUUID, parentID, isRemote);
+  }
+
+  async NodesValuesInsideParent(
+    connUUID: string,
+    hostUUID: string,
+    parentID: string,
+    isRemote: boolean
+  ): Promise<Array<node.Values>> {
+    return await NodesValuesInsideParent(connUUID, hostUUID, parentID, isRemote);
   }
 
   async NodesHelp(

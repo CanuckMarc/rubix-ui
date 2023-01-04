@@ -300,6 +300,78 @@ func (inst *App) NodeValues(connUUID, hostUUID string, isRemote bool) []node.Val
 	return resp
 }
 
+func (inst *App) nodesValuesInsideParent(connUUID, hostUUID, parentID string) ([]node.Values, error) {
+	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	path := fmt.Sprintf("/api/nodes/values/parent/%s", parentID)
+	resp, err := c.ProxyGET(hostUUID, path)
+	if err != nil {
+		return nil, err
+	}
+	if resp.IsSuccess() {
+		var out []node.Values
+		err := json.Unmarshal(resp.Body(), &out)
+		return out, err
+	}
+	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
+}
+
+func (inst *App) NodesValuesInsideParent(connUUID, hostUUID, parentID string, isRemote bool) []node.Values {
+	if isRemote {
+		resp, err := inst.nodesValuesInsideParent(connUUID, hostUUID, parentID)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return resp
+		}
+		return resp
+	}
+	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
+	resp, err := client.NodesValuesInsideParent(parentID)
+	if err != nil {
+		inst.uiErrorMessage("flow runtime is not running")
+		return resp
+	}
+	return resp
+}
+
+func (inst *App) nodesValuesSubFlow(connUUID, hostUUID, parentID string) ([]node.Values, error) {
+	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	path := fmt.Sprintf("/api/nodes/values/sub/%s", parentID)
+	resp, err := c.ProxyGET(hostUUID, path)
+	if err != nil {
+		return nil, err
+	}
+	if resp.IsSuccess() {
+		var out []node.Values
+		err := json.Unmarshal(resp.Body(), &out)
+		return out, err
+	}
+	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
+}
+
+func (inst *App) NodesValuesSubFlow(connUUID, hostUUID, parentID string, isRemote bool) []node.Values {
+	if isRemote {
+		resp, err := inst.nodesValuesSubFlow(connUUID, hostUUID, parentID)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return resp
+		}
+		return resp
+	}
+	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
+	resp, err := client.NodesValuesSubFlow(parentID)
+	if err != nil {
+		inst.uiErrorMessage("flow runtime is not running")
+		return resp
+	}
+	return resp
+}
+
 func (inst *App) nodeHelp(connUUID, hostUUID string) ([]node.Help, error) {
 	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {

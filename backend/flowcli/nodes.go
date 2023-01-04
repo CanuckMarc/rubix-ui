@@ -28,6 +28,32 @@ func (inst *FlowClient) NodeValue(nodeUUID string) (*node.Values, error) {
 	return resp.Result().(*node.Values), nil
 }
 
+// NodesValuesInsideParent get all the node current values from the runtime for one parent
+func (inst *FlowClient) NodesValuesInsideParent(parentID string) ([]node.Values, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&[]node.Values{}).
+		Get(fmt.Sprintf("/api/nodes/values/parent/%s", parentID)))
+	if err != nil {
+		return nil, err
+	}
+	var out []node.Values
+	out = *resp.Result().(*[]node.Values)
+	return out, nil
+}
+
+// NodesValuesSubFlow get all the node current values from the runtime for a parent node with sub-flow inputs and outputs values
+func (inst *FlowClient) NodesValuesSubFlow(parentID string) ([]node.Values, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&[]node.Values{}).
+		Get(fmt.Sprintf("/api/nodes/values/sub/%s", parentID)))
+	if err != nil {
+		return nil, err
+	}
+	var out []node.Values
+	out = *resp.Result().(*[]node.Values)
+	return out, nil
+}
+
 func (inst *FlowClient) NodeValues() ([]node.Values, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&[]node.Values{}).
