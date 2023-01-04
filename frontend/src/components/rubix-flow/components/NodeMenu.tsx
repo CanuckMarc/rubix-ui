@@ -131,12 +131,16 @@ const NodeMenu = ({
           >
             Set Name
           </div>
-          <HelpComponent node={node} onClose={onClose} />
           {node.isParent && !selectedNodeForSubFlow && (
-            <div key="Sub flow" className="cursor-pointer ant-menu-item" onClick={onSubFlowClick}>
+            <div
+              key="Sub flow"
+              className="cursor-pointer border-b border-gray-600 ant-menu-item"
+              onClick={onSubFlowClick}
+            >
               Open Sub Flow
             </div>
           )}
+          <HelpComponent node={node} onClose={onClose} />
         </div>
       )}
       {isShowSetting && <SettingsModal node={node} isModalVisible={isModalVisible} onCloseModal={onClose} />}
