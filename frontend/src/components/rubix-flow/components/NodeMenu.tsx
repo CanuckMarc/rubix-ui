@@ -132,7 +132,7 @@ const NodeMenu = ({
             Set Name
           </div>
           <HelpComponent node={node} onClose={onClose} />
-          {node.isParent && !selectedNodeForSubFlow && (
+          {node.isParent && (
             <div key="Sub flow" className="cursor-pointer ant-menu-item" onClick={onSubFlowClick}>
               Open Sub Flow
             </div>

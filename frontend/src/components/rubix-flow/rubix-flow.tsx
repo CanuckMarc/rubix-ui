@@ -132,7 +132,7 @@ const Flow = (props: FlowProps) => {
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
       const newNode = {
         id: generateUuid(),
-        isParent: selectedNodeForSubFlow ? false : isParent,
+        isParent,
         style,
         type: nodeType,
         position,
