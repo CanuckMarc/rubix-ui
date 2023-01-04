@@ -93,7 +93,7 @@ export const PluginDistributionTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetchPlugins} />
-      {plugins.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {plugins && plugins.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="name"

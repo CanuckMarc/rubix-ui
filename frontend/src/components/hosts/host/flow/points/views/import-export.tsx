@@ -1,13 +1,4 @@
-import {
-  Input,
-  Modal,
-  Select,
-  UploadProps,
-  message,
-  Upload,
-  Steps,
-  Button,
-} from "antd";
+import { Input, Modal, Select, UploadProps, message, Upload, Steps, Button } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import { InboxOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -20,10 +11,7 @@ import * as xlsx from "xlsx";
 
 import Point = model.Point;
 import Backup = storage.Backup;
-import {
-  createColumns,
-  MassEditTable,
-} from "../../../../../../common/mass-edit-table";
+import { createColumns, MassEditTable } from "../../../../../../common/mass-edit-table";
 
 const { Dragger } = Upload;
 const { Option } = Select;
@@ -75,11 +63,7 @@ export const ExportModal = (props: any) => {
       onCancel={handleCloseModal}
       confirmLoading={confirmLoading}
     >
-      <Input
-        value={comment}
-        onChange={onChangeComment}
-        placeholder="please enter a comment"
-      />
+      <Input value={comment} onChange={onChangeComment} placeholder="please enter a comment" />
     </Modal>
   );
 };
@@ -106,12 +90,7 @@ export const ImportJsonModal = (props: any) => {
 
   const fetchBackups = async () => {
     try {
-      let res =
-        (await backupFactory.GetBackupsByApplication(
-          application,
-          subApplication,
-          true
-        )) || [];
+      let res = (await backupFactory.GetBackupsByApplication(application, subApplication, true)) || [];
       setBackups(res);
     } catch (error) {
       console.log(error);
@@ -150,13 +129,7 @@ export const ImportJsonModal = (props: any) => {
       onCancel={handleClose}
       confirmLoading={confirmLoading}
     >
-      <Select
-        showSearch
-        placeholder="select a backup"
-        style={{ width: "100%" }}
-        onChange={onChange}
-        value={backupUUID}
-      >
+      <Select showSearch placeholder="select a backup" style={{ width: "100%" }} onChange={onChange} value={backupUUID}>
         {backups.map((data: Backup) => (
           <Option key={data.uuid} value={data.uuid}>
             {data.user_comment}
@@ -212,20 +185,15 @@ export const ImportExcelModal = (props: any) => {
     fileReader.onload = (event: any) => {
       let data = event.target.result;
       let workbook = xlsx.read(data, { type: "binary" });
-      const rowObject = xlsx.utils
-        .sheet_to_json(workbook.Sheets[workbook.SheetNames[0]])
-        .map((row: any) => {
-          for (let key in row) {
-            const newKey = key.trimEnd();
-            const value =
-              row[key] && (row[key] == "true" || row[key] == "false")
-                ? JSON.parse(row[key])
-                : row[key];
-            delete row[key];
-            row = { ...row, [newKey]: value };
-          }
-          return row;
-        });
+      const rowObject = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]).map((row: any) => {
+        for (let key in row) {
+          const newKey = key.trimEnd();
+          const value = row[key] && (row[key] == "true" || row[key] == "false") ? JSON.parse(row[key]) : row[key];
+          delete row[key];
+          row = { ...row, [newKey]: value };
+        }
+        return row;
+      });
       setItems(rowObject);
     };
   };
@@ -267,18 +235,14 @@ export const ImportExcelModal = (props: any) => {
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">
-          Click or drag file to this area to upload
-        </p>
+        <p className="ant-upload-text">Click or drag file to this area to upload</p>
         <p className="ant-upload-hint">Support for a single upload</p>
       </Dragger>
     );
   };
 
   const EditTableComponent = () => {
-    return (
-      <MassEditTable columns={columns} items={items} setItems={setItems} />
-    );
+    return <MassEditTable columns={columns} items={items} setItems={setItems} />;
   };
 
   const next = () => {

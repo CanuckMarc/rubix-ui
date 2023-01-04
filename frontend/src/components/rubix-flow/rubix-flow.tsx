@@ -591,9 +591,9 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <ReactFlowProvider>
-        <NodeSideBar />
-        <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
+      <NodeSideBar />
+      <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
+        <ReactFlowProvider>
           <ReactFlow
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
@@ -675,8 +675,8 @@ const Flow = (props: FlowProps) => {
               />
             )}
           </ReactFlow>
-        </div>
-      </ReactFlowProvider>
+        </ReactFlowProvider>
+      </div>
     </div>
   );
 };

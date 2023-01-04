@@ -22,7 +22,7 @@ export const HelpComponent = ({ node, onClose }: Props) => {
 
   return (
     <>
-      <div key="help" className="cursor-pointer border-b border-gray-600 ant-menu-item" onClick={openModal}>
+      <div key="help" className="cursor-pointer ant-menu-item" onClick={openModal}>
         Help
       </div>
       <NodeHelpModal node={node} open={isModalVisible} onClose={closeModal} />
