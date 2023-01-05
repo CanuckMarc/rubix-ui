@@ -59,7 +59,6 @@ const HeaderSider = (props: any) => {
         <div className="title">
           Rubix Platform
           <LeftOutlined
-            style={{ marginLeft: "2rem" }}
             onClick={() => {
               if (!collapseDisabled) setCollapsed(!collapsed);
             }}
@@ -285,7 +284,7 @@ export const MenuSidebar = () => {
 
   return (
     <Sider
-      width={300}
+      width={280}
       style={{ minHeight: "100vh" }}
       collapsed={collapsed}
       onClick={() => {
