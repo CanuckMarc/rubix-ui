@@ -233,7 +233,7 @@ export const Node = (props: NodeProps) => {
 
         return (
           <div key={ix} className={`flex flex-row justify-between gap-8 relative px-4 my-2 ${borderB}`}>
-            {input && (
+            {input && !input.hideInput && (
               <InputSocket
                 {...input}
                 value={data[input.name]}
@@ -245,7 +245,7 @@ export const Node = (props: NodeProps) => {
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
-            {output && (
+            {output && !output.hideOutput && (
               <OutputSocket
                 {...output}
                 minWidth={widthOutput}

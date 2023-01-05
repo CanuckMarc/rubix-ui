@@ -7,12 +7,14 @@ export type InputSocketSpecJSON = {
   defaultValue?: any;
   dataType?: string;
   nodeId?: string;
+  hideInput?: boolean;
 };
 
 export type OutputSocketSpecJSON = {
   name: string;
   valueType: string;
   nodeId?: string;
+  hideOutput?: boolean;
 };
 
 export type InfoSpecJson = {
