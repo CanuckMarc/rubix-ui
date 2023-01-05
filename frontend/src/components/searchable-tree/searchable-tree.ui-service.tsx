@@ -118,19 +118,13 @@ export const getTreeDataIterative = (connections: any) => {
             value: getItemValue(network, ObjectType.NETWORKS),
             children: (network.hosts || []).map((host: RubixObjectI) => ({
               ...getTreeObject(
-                host,
+                { ...host, name: host.name + " (controller)" },
                 ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
                 ""
               ),
               next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
               value: getItemValue(host, ObjectType.HOSTS),
               children: [
-                {
-                  ...getTreeObject({ name: "controller", uuid: "controller_" + host.uuid }, undefined, ""),
-                  next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
-                  children: null,
-                },
                 {
                   ...getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, ""),
                   next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
