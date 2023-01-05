@@ -1,4 +1,4 @@
-import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip, } from "antd";
+import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip } from "antd";
 import {
   ApartmentOutlined,
   CloudServerOutlined,
@@ -41,15 +41,9 @@ const DividerLock = (props: any) => {
       }}
     >
       {collapseDisabled ? (
-        <LockTwoTone
-          onClick={(e: any) => handleLockSider(e)}
-          style={{ fontSize: "18px" }}
-        />
+        <LockTwoTone onClick={(e: any) => handleLockSider(e)} style={{ fontSize: "18px" }} />
       ) : (
-        <LockFilled
-          onClick={(e: any) => handleLockSider(e)}
-          style={{ fontSize: "18px" }}
-        />
+        <LockFilled onClick={(e: any) => handleLockSider(e)} style={{ fontSize: "18px" }} />
       )}
     </Divider>
   );
@@ -98,11 +92,7 @@ const AvatarDropdown = (props: any) => {
   );
 
   return (
-    <Dropdown
-      overlay={menu}
-      trigger={["click"]}
-      overlayClassName="settings-dropdown"
-    >
+    <Dropdown overlay={menu} trigger={["click"]} overlayClassName="settings-dropdown">
       <a onClick={(e) => e.stopPropagation()}>
         <Avatar icon={<UserOutlined />} className="avar" />
       </a>
@@ -137,15 +127,7 @@ const SwitchThemeMenuItem = () => {
     window.location.reload();
   };
 
-  return (
-    <Switch
-      className="my-2"
-      checkedChildren="🌙"
-      unCheckedChildren="☀"
-      checked={darkMode}
-      onChange={onChange}
-    />
-  );
+  return <Switch className="my-2" checkedChildren="🌙" unCheckedChildren="☀" checked={darkMode} onChange={onChange} />;
 };
 
 const AutoRefreshPointsMenuItem = () => {
@@ -187,18 +169,9 @@ const AutoRefreshPointsMenuItem = () => {
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <Tooltip title="Auto Refresh Points">
-        <Switch
-          style={{ marginRight: "10px" }}
-          checked={isEnable}
-          onChange={handleChangeEnable}
-        />
+        <Switch style={{ marginRight: "10px" }} checked={isEnable} onChange={handleChangeEnable} />
       </Tooltip>
-      <Select
-        style={{ width: 120 }}
-        value={time}
-        disabled={!isEnable}
-        onChange={handleChangeTime}
-      >
+      <Select style={{ width: 120 }} value={time} disabled={!isEnable} onChange={handleChangeTime}>
         <Option value="5000">5 sec</Option>
         <Option value="15000">15 sec</Option>
         <Option value="30000">30 sec</Option>
@@ -277,9 +250,7 @@ export const MenuSidebar = () => {
           {
             key: ROUTES.WIRES_CONNECTIONS,
             name: ROUTES.WIRES_CONNECTIONS,
-            label: (
-              <NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink>
-            ),
+            label: <NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink>,
           },
           {
             key: ROUTES.USER_GUIDE,
@@ -314,7 +285,7 @@ export const MenuSidebar = () => {
 
   return (
     <Sider
-      width={250}
+      width={300}
       style={{ minHeight: "100vh" }}
       collapsed={collapsed}
       onClick={() => {
@@ -325,16 +296,8 @@ export const MenuSidebar = () => {
         <Spin />
       ) : (
         <>
-          <HeaderSider
-            collapsed={collapsed}
-            collapseDisabled={collapseDisabled}
-            setCollapsed={handleCollapse}
-          />
-          <DividerLock
-            collapsed={collapsed}
-            collapseDisabled={collapseDisabled}
-            setCollapseDisabled={handleBlock}
-          />
+          <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
+          <DividerLock collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapseDisabled={handleBlock} />
           <Menu
             mode="inline"
             theme="dark"
@@ -344,10 +307,7 @@ export const MenuSidebar = () => {
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
 
-          <TokenModal
-            isModalVisible={isModalVisible}
-            onClose={() => setIsModalVisible(false)}
-          />
+          <TokenModal isModalVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
         </>
       )}
     </Sider>
