@@ -91,18 +91,6 @@ export const FlowPoints = () => {
     },
   ];
 
-  useEffect(() => {
-    fetch();
-    flowDeviceFactory.GetOne(false).then((flowDevice) => {
-      if (flowDevice) addPrefix(flowDevice.name);
-    });
-  }, []);
-
-  useEffect(() => {
-    const interval = startInterval();
-    return () => stopInterval(interval);
-  }, [settings.auto_refresh_enable, settings.auto_refresh_rate]); //handle auto refresh points
-
   const startInterval = () => {
     if (settings.auto_refresh_enable && settings.auto_refresh_rate && settings.auto_refresh_rate !== 0) {
       const intervalId = setInterval(() => {
@@ -117,16 +105,9 @@ export const FlowPoints = () => {
   };
 
   const fetch = async () => {
-    setIsFetching(true);
-    try {
-      const res = (await flowPointFactory.GetPointsForDevice(deviceUUID)) || [];
-      setPoints(res);
-      setDataLocalStorage(res); //handle mass edit
-    } catch {
-      setIsFetching(false);
-    } finally {
-      setIsFetching(false);
-    }
+    const res = (await flowPointFactory.GetPointsForDevice(deviceUUID)) || [];
+    setPoints(res);
+    setDataLocalStorage(res); //handle mass edit
   };
 
   const runDiscover = async () => {
@@ -146,8 +127,29 @@ export const FlowPoints = () => {
 
   const addPoints = async (selectedUUIDs: Array<Point>) => {
     await flowPointFactory.AddBulk(selectedUUIDs);
-    fetch();
+    fetchWithSpinningWheel();
   };
+
+  const fetchWithSpinningWheel = async () => {
+    try {
+      setIsFetching(true);
+      await fetch();
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWithSpinningWheel();
+    flowDeviceFactory.GetOne(false).then((flowDevice) => {
+      if (flowDevice) addPrefix(flowDevice.name);
+    });
+  }, []);
+
+  useEffect(() => {
+    const interval = startInterval();
+    return () => stopInterval(interval);
+  }, [settings.auto_refresh_enable, settings.auto_refresh_rate]); //handle auto refresh points
 
   return (
     <>
@@ -158,8 +160,13 @@ export const FlowPoints = () => {
         <RbxBreadcrumb routes={routes} />
         <Tabs defaultActiveKey={points}>
           <TabPane tab={points} key={points}>
-            <RbRefreshButton refreshList={fetch} />
-            <FlowPointsTable data={data} isFetching={isFetching} pluginName={pluginName} refreshList={fetch} />
+            <RbRefreshButton refreshList={fetchWithSpinningWheel} />
+            <FlowPointsTable
+              data={data}
+              isFetching={isFetching}
+              pluginName={pluginName}
+              refreshList={fetchWithSpinningWheel}
+            />
           </TabPane>
           {pluginName === PLUGINS.bacnetmaster ? (
             <TabPane tab={discover} key={discover}>
@@ -167,7 +174,7 @@ export const FlowPoints = () => {
                 <RedoOutlined /> Discover
               </Button>
               <BacnetWhoIsTable
-                refreshDeviceList={fetch}
+                refreshDeviceList={fetchWithSpinningWheel}
                 data={discoveries}
                 isFetching={isFetchingDiscoveries}
                 handleAdd={addPoints}
