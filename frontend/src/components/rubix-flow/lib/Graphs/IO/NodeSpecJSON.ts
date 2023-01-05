@@ -5,11 +5,14 @@ export type InputSocketSpecJSON = {
   name: string;
   valueType: string;
   defaultValue?: any;
+  dataType?: string;
+  nodeId?: string;
 };
 
 export type OutputSocketSpecJSON = {
   name: string;
   valueType: string;
+  nodeId?: string;
 };
 
 export type InfoSpecJson = {

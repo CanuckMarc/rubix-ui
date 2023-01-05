@@ -18,6 +18,7 @@ export type InputSocketProps = {
   connected?: boolean;
   value: any | undefined;
   minWidth?: number;
+  subName?: string;
   dataInput?: any;
   dataOutput?: OutputNodeValueType;
   onChange: (key: string, value: any) => void;
@@ -66,6 +67,7 @@ export const InputSocket = ({
   value,
   onChange,
   name,
+  subName,
   valueType,
   minWidth,
   onSetWidthInput,
@@ -81,7 +83,7 @@ export const InputSocket = ({
   const refName = useRef<HTMLDivElement>(null);
 
   const showFlowIcon = valueType === "flow";
-  const colorName = valueTypeColorMap[valueType];
+  const colorName = valueTypeColorMap[valueType || 'number'];
   const [backgroundColor, borderColor] = colors[colorName];
 
   const handleChangeInput = (value: string) => onChange(name, value);
@@ -175,7 +177,7 @@ export const InputSocket = ({
               minWidth: minWidth === -1 ? "max-content" : minWidth,
             }}
           >
-            {name}
+            {subName || name}
           </div>
           <div className="flex-1">
             {valueType === "string" && (

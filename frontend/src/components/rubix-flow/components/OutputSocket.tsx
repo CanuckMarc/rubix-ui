@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CaretRightOutlined } from "@ant-design/icons";
-import {
-  Connection,
-  Handle,
-  Position,
-  useReactFlow,
-} from "react-flow-renderer/nocss";
+import { Connection, Handle, Position, useReactFlow } from "react-flow-renderer/nocss";
 import cx from "classnames";
 import { colors, valueTypeColorMap } from "../util/colors";
 import { isValidConnection } from "../util/isValidConnection";
@@ -15,6 +10,7 @@ import { AutoSizeInput } from "./AutoSizeInput";
 export type OutputSocketProps = {
   connected: boolean;
   minWidth: number;
+  subName?: string;
   dataOut: Array<any>;
   onSetWidthInput: (width: number) => void;
 } & OutputSocketSpecJSON;
@@ -23,6 +19,7 @@ export const OutputSocket = ({
   connected,
   valueType,
   name,
+  subName,
   minWidth,
   dataOut,
   onSetWidthInput,
@@ -32,20 +29,18 @@ export const OutputSocket = ({
   const [outValue, setOutValue] = useState<string | number>("");
 
   const showFlowIcon = valueType === "flow";
-  const colorName = valueTypeColorMap[valueType];
+  const colorName = valueTypeColorMap[valueType || 'number'];
   const [backgroundColor, borderColor] = colors[colorName];
 
   const getValueOutput = useCallback(
     (outputName: string) => {
       if (dataOut) {
-        const out = dataOut.find(
-          (item: { pin: string }) => item.pin === outputName
-        );
+        const out = dataOut.find((item: { pin: string }) => item.pin === outputName);
         if (valueType === "number" && out) {
           if (out.value === null) out.value = "null";
           return out.value !== undefined ? `${out.value}` : "";
         }
-        return out.value;
+        return out?.value;
       }
       return "";
     },
@@ -65,10 +60,7 @@ export const OutputSocket = ({
   };
 
   useEffect(() => {
-    const val =
-      valueType === "boolean"
-        ? getValueOptions(getValueOutput(name))
-        : getValueOutput(name);
+    const val = valueType === "boolean" ? getValueOptions(getValueOutput(name)) : getValueOutput(name);
 
     setOutValue(val);
   }, [valueType, name, dataOut]);
@@ -90,29 +82,23 @@ export const OutputSocket = ({
           minWidth={40}
           disabled
         />
-        {showFlowIcon && (
+        {showFlowIcon ? (
           <CaretRightOutlined style={{ color: "#ffffff", fontSize: "large" }} />
-        )}
-        {showFlowIcon === false && (
+        ) : (
           <div
             ref={refName}
             className="flex justify-end"
             style={{ minWidth: minWidth === -1 ? "max-content" : minWidth }}
           >
-            {name}
+            {subName || name}
           </div>
         )}
         <Handle
           id={name}
           type="source"
           position={Position.Right}
-          className={cx(
-            borderColor,
-            connected ? backgroundColor : "bg-gray-1100"
-          )}
-          isValidConnection={(connection: Connection) =>
-            isValidConnection(connection, instance)
-          }
+          className={cx(borderColor, connected ? backgroundColor : "bg-gray-1100")}
+          isValidConnection={(connection: Connection) => isValidConnection(connection, instance)}
         />
       </div>
     </div>

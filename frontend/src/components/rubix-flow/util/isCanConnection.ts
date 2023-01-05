@@ -17,12 +17,12 @@ export const isValidConnection = (
 
   if (!nodeSource || !nodeTarget) return false;
 
-  const tempTarget = isTarget ? nodeTarget!!.data.inputs : nodeTarget!!.data.out;
   const tempSource = isTarget ? nodeSource!!.data.out : nodeSource!!.data.inputs;
-  const dataTypeOfSource = tempSource.find((i: any) => i.pin === firstConnect?.handleId);
-  const dataTypeOfTarget = tempTarget.find((i: any) => i.pin === lastConnect.handleId);
-  
-  const arrHandleIds = [dataTypeOfSource.dataType, dataTypeOfTarget.dataType];
+  const tempTarget = isTarget ? nodeTarget!!.data.inputs : nodeTarget!!.data.out;
+  const dataTypeOfSource = (tempSource || []).find((i: any) => i.pin === firstConnect?.handleId);
+  const dataTypeOfTarget = (tempTarget || []).find((i: any) => i.pin === lastConnect.handleId);
+
+  const arrHandleIds = [dataTypeOfSource?.dataType, dataTypeOfTarget?.dataType];
 
   const occurrences = arrHandleIds.reduce(function (acc, curr) {
     return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;

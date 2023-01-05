@@ -33,33 +33,36 @@ const getPairs = <T, U>(arr1: T[], arr2: U[]) => {
   return pairs;
 };
 
-const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: any, node: NodeInterface) => {
-  if (specInputs.length === 0) return [];
-  if (specInputs.length > 0 && !nodeInputs) return specInputs;
-
-  /* Is check InputCount setting equals node inputs length? */
-  if (node.settings.inputCount !== nodeInputs.length) {
-    let newData: any = [];
-    for (let i = 1; i <= node.settings.inputCount; i++) {
-      const item = {
-        pin: `in${i}`,
-        dataType: nodeInputs[0]?.dataType,
-        value: nodeInputs[0]?.defaultValue,
-      };
-      if (newData) {
-        newData.push(item);
-      } else {
-        newData = [item];
-      }
-    }
-    nodeInputs = newData;
-  }
+const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpecJSON[], node: NodeInterface) => {
+  if (specInputs.length === 0 && !node.isParent) return [];
+  if (specInputs.length > 0 && !nodeInputs && !node.isParent) return specInputs;
 
   let newInputs: InputSocketSpecJSON[] = [];
-  if (nodeInputs.length > 0 && nodeInputs.length < specInputs.length) {
-    newInputs = specInputs.filter((item, idx) => idx < nodeInputs.length);
-  } else {
-    newInputs = [...specInputs];
+
+  if (!node.isParent) {
+    /* Is check InputCount setting equals node inputs length? */
+    if (node.settings.inputCount !== nodeInputs.length) {
+      let newData: any = [];
+      for (let i = 1; i <= node.settings.inputCount; i++) {
+        const item = {
+          pin: `in${i}`,
+          dataType: nodeInputs[0]?.dataType,
+          value: nodeInputs[0]?.defaultValue,
+        };
+        if (newData) {
+          newData.push(item);
+        } else {
+          newData = [item];
+        }
+      }
+      nodeInputs = newData;
+    }
+
+    if (nodeInputs.length > 0 && nodeInputs.length < specInputs.length) {
+      newInputs = specInputs.filter((item, idx) => idx < nodeInputs.length);
+    } else {
+      newInputs = [...specInputs];
+    }
   }
 
   /* Add new inputs when set InputCount setting */
@@ -68,6 +71,8 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: any, node: Nod
     if (!isExist) {
       newInputs.push({
         name: item.pin,
+        nodeId: item.nodeId,
+        subName: item.subName,
         valueType: item.dataType,
         defaultValue: item.value,
       } as InputSocketSpecJSON);
@@ -77,15 +82,18 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: any, node: Nod
   return newInputs;
 };
 
-const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any) => {
-  if (specOutputs.length === 0) return [];
-  if (specOutputs.length > 0 && !nodeOutputs) return specOutputs;
+const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, isParent = false) => {
+  if (specOutputs.length === 0 && !isParent) return [];
+  if (specOutputs.length > 0 && !nodeOutputs && !isParent) return specOutputs;
 
   let newOutputs: OutputSocketSpecJSON[] = [];
-  if (nodeOutputs.length > 0 && nodeOutputs.length < specOutputs.length) {
-    newOutputs = specOutputs.filter((item, idx) => idx < nodeOutputs.length);
-  } else {
-    newOutputs = [...specOutputs];
+
+  if (!isParent) {
+    if (nodeOutputs.length > 0 && nodeOutputs.length < specOutputs.length) {
+      newOutputs = specOutputs.filter((item, idx) => idx < nodeOutputs.length);
+    } else {
+      newOutputs = [...specOutputs];
+    }
   }
 
   nodeOutputs.forEach((item: any) => {
@@ -93,6 +101,8 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any) => {
     if (!isExist) {
       newOutputs.push({
         name: item.pin,
+        subName: item.subName,
+        nodeId: item.nodeId,
         valueType: item.dataType,
       } as OutputSocketSpecJSON);
     }
@@ -114,13 +124,52 @@ export const Node = (props: NodeProps) => {
   const node: NodeInterface | any = nodes.find((item) => item.id === id);
   const isHidden = parentNodeId ? node.parentId !== parentNodeId : node.parentId;
 
-  if (isHidden) {
-    return null;
-  }
+  const childNodes: NodeInterface[] = node.isParent
+    ? nodes.filter((item: NodeInterface) => item.parentId === node.id)
+    : [];
+
+  const nodeInputs = node.isParent
+    ? childNodes
+        .filter((n: NodeInterface) => {
+          const type = n.type!!.split("/")?.[1];
+          return ["input-float", "input-string", "input-bool"].includes(type);
+        })
+        .map(({ data, id: nodeId, info }, index, arr) => {
+          const firstInput = data.inputs?.[0] || {};
+          return {
+            ...firstInput,
+            valueType: firstInput.dataType,
+            pin: `${firstInput.pin}-${nodeId}`,
+            nodeId,
+            name: firstInput.pin,
+            subName: `${firstInput.pin}${arr.length > 1 ? index + 1 : ""} ${
+              info?.nodeName ? `(${info.nodeName})` : ""
+            }`,
+          };
+        })
+    : node.data.inputs;
+
+  const nodeOutputs = node.isParent
+    ? childNodes
+        .filter((n: NodeInterface) => n.type!!.includes("output-float"))
+        .map(({ data, id: nodeId, info }, index, arr) => {
+          const firstOut = data.out?.[0] || {};
+          return {
+            ...firstOut,
+            pin: `${firstOut.pin}-${nodeId}`,
+            nodeId,
+            name: firstOut.pin,
+            subName: `${firstOut.pin}${arr.length > 1 ? index + 1 : ""} ${info?.nodeName ? `(${info.nodeName})` : ""}`,
+          };
+        })
+    : node.data.out;
+
+  data.inputs = nodeInputs;
+  data.out = nodeOutputs;
 
   const pairs = getPairs(
-    getInputs(spec.inputs || [], node.data.inputs, node),
-    getOutputs(spec.outputs || [], node.data.out)
+    getInputs(spec.inputs || [], nodeInputs, node),
+    getOutputs(spec.outputs || [], nodeOutputs, node.isParent)
   );
 
   const handleSetWidthInput = (width: number) => {
@@ -158,6 +207,7 @@ export const Node = (props: NodeProps) => {
 
   return (
     <NodeContainer
+      isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
       nodeName={node?.info?.nodeName || ""}
@@ -188,7 +238,7 @@ export const Node = (props: NodeProps) => {
                 {...input}
                 value={data[input.name]}
                 onChange={handleChange}
-                connected={isHandleConnected(edges, id, input.name, "target")}
+                connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
                 onSetWidthInput={handleSetWidthInput}
                 dataInput={data.inputs}
@@ -201,7 +251,13 @@ export const Node = (props: NodeProps) => {
                 minWidth={widthOutput}
                 dataOut={data.out}
                 onSetWidthInput={handleSetWidthOutput}
-                connected={isHandleConnected(edges, id, output.name, "source")}
+                connected={isHandleConnected(
+                  edges,
+                  // if have node id that mean id of child node in sub flow and present for output of parent node
+                  output.nodeId || id,
+                  output.nodeId ? "in" : output.name,
+                  output.nodeId ? "target" : "source"
+                )}
               />
             )}
           </div>
