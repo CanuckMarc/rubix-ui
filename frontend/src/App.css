@@ -156,3 +156,8 @@ aside .active {
 svg {
     vertical-align: baseline;
 }
+
+/* remove sidebar tooltip */
+.ant-menu-submenu-popup {
+    display: none;
+}
