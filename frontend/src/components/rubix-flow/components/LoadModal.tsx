@@ -49,28 +49,68 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
 
     // add nodes into sub flow if have
     if (window.selectedNodeForSubFlow) {
-      nodes = nodes.map((node) => ({
-        ...node,
-        id: generateUuid(),
-        parentId: window.selectedNodeForSubFlow!!.id,
-        oldId: node.id
-      }));
+      const nodesL1 = nodes.filter(
+        (node: NodeInterface) => (node.isParent && !node.parentId) || (!node.isParent && !node.parentId)
+      );
+      const nodesRemaining = nodes.filter((node: NodeInterface) => !!node.parentId);
+
+      const newNodes: NodeInterfaceWithOldId[] = [];
+
+      nodesL1.forEach((item: NodeInterface) => {
+        const newNodeId = generateUuid();
+        newNodes.push({ ...item, oldId: item.id, id: newNodeId, parentId: window.selectedNodeForSubFlow!!.id });
+      });
+      nodesRemaining.forEach((item: NodeInterface) => {
+        const newNodeIdB = generateUuid();
+
+        const newNodeL1 = newNodes.find((n) => n.oldId === item.parentId);
+        const newItem = { ...item, oldId: item.id, id: newNodeIdB };
+        
+        if (newNodeL1) {
+          newItem.parentId = newNodeL1.id;
+        }
+
+        newNodes.push(newItem);
+
+        const childNodes = nodes.filter((i2: NodeInterface) => i2.parentId === item.id);
+        
+        childNodes.forEach((child) => {
+          if (newNodes.findIndex((node) => node.oldId === child.id) !== -1){
+            newNodes.push({ ...child, id: generateUuid(), parentId: newNodeIdB, oldId: child.id });
+          }
+        });
+      });
+      nodes = newNodes;
+
     } else {
       // filter parent nodes and nodes not belonging to sub flow
       // generate nodes with new id and keep old id to mapping with edge
       const newNodes: NodeInterfaceWithOldId[] = [];
+
+      const copyAllNode = (id: string, newId: string) => {
+        const childNodes = nodes.filter((node: NodeInterface) => id === node.parentId);
+
+        childNodes.forEach((item: NodeInterface) => {
+          const childNodeId = generateUuid();
+          newNodes.push({ ...item, oldId: item.id, id: childNodeId, parentId: newId });
+
+          if (item.isParent) {
+            copyAllNode(item.id, childNodeId);
+          }
+        });
+      };
+
       const parentNodes = nodes.filter((node: NodeInterface) => node.isParent);
       const remainingNodes = nodes.filter((node: NodeInterface) => !node.isParent && !node.parentId);
 
       parentNodes.forEach((parentNode: NodeInterface) => {
         const newNodeId = generateUuid();
-        const childNodes = nodes.filter((node: NodeInterface) => parentNode.id === node.parentId);
-        if (childNodes.length > 0) {
-          childNodes.forEach((childNode: NodeInterface) => {
-            newNodes.push({ ...childNode, oldId: childNode.id, id: generateUuid(), parentId: newNodeId });
-          });
+        if (newNodes.findIndex((node) => node.oldId === parentNode.id) === -1) {
+          newNodes.push({ ...parentNode, id: newNodeId, oldId: parentNode.id });
         }
-        newNodes.push({ ...parentNode, id: newNodeId, oldId: parentNode.id });
+
+        copyAllNode(parentNode.id, newNodeId);
+        
       });
 
       newNodes.push(
