@@ -86,6 +86,10 @@
     color: #fff;
     align-self: center;
     font-size: 1.7rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 70%;
 }
 
 aside .active {

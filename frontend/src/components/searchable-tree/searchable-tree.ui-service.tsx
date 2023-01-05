@@ -12,64 +12,28 @@ let ObjectType = {
 };
 
 interface ObjectTypeRoute {
-  [objectType: string]: (
-    connUUID?: string,
-    locUUID?: string,
-    netUUID?: string,
-    hostUUID?: string
-  ) => string;
+  [objectType: string]: (connUUID?: string, locUUID?: string, netUUID?: string, hostUUID?: string) => string;
 }
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
-  [ObjectType.CONNECTIONS]: (connUUID: string = "") =>
-    ROUTES.LOCATIONS.replace(":connUUID", connUUID),
+  [ObjectType.CONNECTIONS]: (connUUID: string = "") => ROUTES.LOCATIONS.replace(":connUUID", connUUID),
   [ObjectType.LOCATIONS]: (connUUID: string = "", locUUID: string = "") =>
-    ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID).replace(
-      ":locUUID",
-      locUUID
-    ),
-  [ObjectType.NETWORKS]: (
-    connUUID: string = "",
-    locUUID: string = "",
-    netUUID: string = ""
-  ) =>
+    ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID).replace(":locUUID", locUUID),
+  [ObjectType.NETWORKS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "") =>
     ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID),
-  [ObjectType.HOSTS]: (
-    connUUID: string = "",
-    locUUID: string = "",
-    netUUID: string = "",
-    hostUUID: string = ""
-  ) =>
+  [ObjectType.HOSTS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "", hostUUID: string = "") =>
     ROUTES.HOST.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
       .replace(":hostUUID", hostUUID),
-  [ObjectType.RUBIX_FLOW_REMOTE]: (
-    connUUID: string = "",
-    hostUUID: string = ""
-  ) =>
-    ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(
-      ":hostUUID",
-      hostUUID
-    ),
-  [ObjectType.WIRES_CONNECTIONS_REMOTE]: (
-    connUUID: string = "",
-    hostUUID: string = ""
-  ) =>
-    ROUTES.WIRES_CONNECTIONS_REMOTE.replace(":connUUID", connUUID).replace(
-      ":hostUUID",
-      hostUUID
-    ),
-  [ObjectType.SCHEDULES_REMOTE]: (
-    connUUID: string = "",
-    hostUUID: string = ""
-  ) =>
-    ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(
-      ":hostUUID",
-      hostUUID
-    ),
+  [ObjectType.RUBIX_FLOW_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.WIRES_CONNECTIONS_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.WIRES_CONNECTIONS_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.SCHEDULES_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
 function getItemValue(item: any, type: string) {
@@ -104,152 +68,104 @@ interface RubixObjectI {
   hosts?: any;
 }
 
-const getTreeObject = (item: any, next: string, prependName?: string) => {
-  return {
-    name: item.name,
-    label: (
-      <NavLink to={next} style={{ color: "unset" }}>
+const getTreeObject = (item: any, next: string | undefined, prependName?: string) => {
+  if (!next) {
+    return {
+      name: item.name,
+      label: (
         <span style={{ padding: "10px 0" }}>
-          <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>
-            {prependName}
-          </span>
+          <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
           {item.name}
         </span>
-      </NavLink>
-    ),
-    key: next,
-  };
+      ),
+      key: item.uuid,
+    };
+  } else {
+    return {
+      name: item.name,
+      label: (
+        <NavLink to={next} style={{ color: "unset" }}>
+          <span style={{ padding: "10px 0" }}>
+            <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
+            {item.name}
+          </span>
+        </NavLink>
+      ),
+      key: next,
+    };
+  }
 };
 export const getTreeDataIterative = (connections: any) => {
   return [
     {
-      ...getTreeObject(
-        { name: "Supervisors", uuid: "connections" },
-        ROUTES.CONNECTIONS,
-        ""
-      ),
+      ...getTreeObject({ name: "Supervisors", uuid: "connections" }, ROUTES.CONNECTIONS, ""),
       next: ROUTES.CONNECTIONS,
       children: connections.map((connection: RubixObjectI) => ({
-        ...getTreeObject(
-          connection,
-          ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
-          ""
-        ),
+        ...getTreeObject(connection, ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid), ""),
         next: ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
         value: getItemValue(connection, ObjectType.CONNECTIONS),
-        children: (connection.locations || []).map(
-          (location: RubixObjectI) => ({
+        children: (connection.locations || []).map((location: RubixObjectI) => ({
+          ...getTreeObject(location, ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid), ""),
+          next: ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid),
+          value: getItemValue(location, ObjectType.LOCATIONS),
+          children: (location.networks || []).map((network: RubixObjectI) => ({
             ...getTreeObject(
-              location,
-              ObjectTypesToRoutes[ObjectType.LOCATIONS](
-                connection.uuid,
-                location.uuid
-              ),
+              network,
+              ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
               ""
             ),
-            next: ObjectTypesToRoutes[ObjectType.LOCATIONS](
-              connection.uuid,
-              location.uuid
-            ),
-            value: getItemValue(location, ObjectType.LOCATIONS),
-            children: (location.networks || []).map(
-              (network: RubixObjectI) => ({
-                ...getTreeObject(
-                  network,
-                  ObjectTypesToRoutes[ObjectType.NETWORKS](
-                    connection.uuid,
-                    location.uuid,
-                    network.uuid
-                  ),
-                  ""
-                ),
-                next: ObjectTypesToRoutes[ObjectType.NETWORKS](
-                  connection.uuid,
-                  location.uuid,
-                  network.uuid
-                ),
-                value: getItemValue(network, ObjectType.NETWORKS),
-                children: (network.hosts || []).map((host: RubixObjectI) => ({
-                  ...getTreeObject(
-                    host,
-                    ObjectTypesToRoutes[ObjectType.HOSTS](
-                      connection.uuid,
-                      location.uuid,
-                      network.uuid,
-                      host.uuid
-                    ),
-                    ""
-                  ),
-                  next: ObjectTypesToRoutes[ObjectType.HOSTS](
-                    connection.uuid,
-                    location.uuid,
-                    network.uuid,
-                    host.uuid
-                  ),
-                  value: getItemValue(host, ObjectType.HOSTS),
+            next: ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
+            value: getItemValue(network, ObjectType.NETWORKS),
+            children: (network.hosts || []).map((host: RubixObjectI) => ({
+              ...getTreeObject(
+                { ...host, name: host.name + " (controller)" },
+                ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                ""
+              ),
+              next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+              value: getItemValue(host, ObjectType.HOSTS),
+              children: [
+                {
+                  ...getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, ""),
+                  next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
+                  value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
                   children: [
                     {
                       ...getTreeObject(
-                        { name: "wires editor", uuid: "flow_" + host.uuid },
-                        ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](
-                          connection.uuid,
-                          host.uuid
-                        ),
+                        { name: "sheet", uuid: "flow_" + host.uuid },
+                        ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
                         ""
                       ),
-                      next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](
-                        connection.uuid,
-                        host.uuid
-                      ),
+                      next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
                       value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
                       children: null,
                     },
                     {
                       ...getTreeObject(
-                        {
-                          name: "wires connections",
-                          uuid: "wires_" + host.uuid,
-                        },
-                        ObjectTypesToRoutes[
-                          ObjectType.WIRES_CONNECTIONS_REMOTE
-                        ](connection.uuid, host.uuid),
+                        { name: "connections", uuid: "wires_connections_" + host.uuid },
+                        ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
                         ""
                       ),
-                      next: ObjectTypesToRoutes[
-                        ObjectType.WIRES_CONNECTIONS_REMOTE
-                      ](connection.uuid, host.uuid),
-                      value: getItemValue(
-                        host,
-                        ObjectType.WIRES_CONNECTIONS_REMOTE
-                      ),
-                      children: null,
-                    },
-                    {
-                      ...getTreeObject(
-                        {
-                          name: "schedules",
-                          uuid: "schedules_" + host.uuid,
-                        },
-                        ObjectTypesToRoutes[
-                          ObjectType.SCHEDULES_REMOTE
-                        ](connection.uuid, host.uuid),
-                        ""
-                      ),
-                      next: ObjectTypesToRoutes[
-                        ObjectType.SCHEDULES_REMOTE
-                      ](connection.uuid, host.uuid),
-                      value: getItemValue(
-                        host,
-                        ObjectType.SCHEDULES_REMOTE
-                      ),
+                      next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
+                      value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
                       children: null,
                     },
                   ],
-                })),
-              })
-            ),
-          })
-        ),
+                },
+                {
+                  ...getTreeObject(
+                    { name: "schedules", uuid: "schedules_" + host.uuid },
+                    ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
+                    ""
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
+                  value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
+                  children: null,
+                },
+              ],
+            })),
+          })),
+        })),
       })),
     },
   ];
