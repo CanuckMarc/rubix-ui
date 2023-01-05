@@ -24,7 +24,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7
 	github.com/NubeIO/rubix-assist v0.8.0
 	github.com/NubeIO/rubix-edge v0.3.0
-	github.com/NubeIO/rubix-edge-wires v0.2.0
+	github.com/NubeIO/rubix-edge-wires v0.2.3
 	github.com/NubeIO/rubix-registry-go v1.0.0
 	github.com/bsm/ratelimit v2.0.0+incompatible
 	github.com/go-resty/resty/v2 v2.7.0
