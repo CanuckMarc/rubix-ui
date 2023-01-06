@@ -59,11 +59,13 @@ type FlowProps = {
   customEdgeTypes: any;
   customNodeTypes: any;
   selectedNodeForSubFlow: NodeInterface | undefined;
-  setSelectedNodeForSubFlow: (node: NodeInterface | undefined) => void;
+  setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
+  handlePushSelectedNodeForSubFlow:(node: NodeInterface) => void;
+  handleRemoveSelectedNodeForSubFlow: () => void
 };
 
 const Flow = (props: FlowProps) => {
-  const { customNodeTypes, customEdgeTypes, selectedNodeForSubFlow, setSelectedNodeForSubFlow } = props;
+  const { customNodeTypes, customEdgeTypes, selectedNodeForSubFlow, setSelectedNodeForSubFlow, handlePushSelectedNodeForSubFlow, handleRemoveSelectedNodeForSubFlow} = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -168,7 +170,7 @@ const Flow = (props: FlowProps) => {
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
-    setSelectedNodeForSubFlow(node);
+    handlePushSelectedNodeForSubFlow(node)
   };
 
   const onClearAllNodes = () => {
@@ -189,8 +191,14 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const onSaveSubFlow = () => {
-    setSelectedNodeForSubFlow(undefined);
+  // exit each subflow
+  const onCloseSubFlow = () => {
+    handleRemoveSelectedNodeForSubFlow();
+  };
+
+  // close sub flow
+  const onBackToMain = () => {
+    setSelectedNodeForSubFlow([]);
   };
 
   const onHandelSaveFlow = async () => {
@@ -633,7 +641,8 @@ const Flow = (props: FlowProps) => {
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
               onClearAllNodes={onClearAllNodes}
-              onSaveSubFlow={onSaveSubFlow}
+              onCloseSubFlow={onCloseSubFlow}
+              onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
@@ -663,15 +672,27 @@ const Flow = (props: FlowProps) => {
 
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
-  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface | undefined>(undefined);
+  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
+  const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
+  // push the node which is subflow in to save the flow of subflow 
+  const handlePushSelectedNodeForSubFlow = (node: NodeInterface) => {
+      setSelectedNodeForSubFlow([...selectedNodeForSubFlow,node])
+  }
+
+  // remove the last node to exit each subflow
+  const handleRemoveSelectedNodeForSubFlow = () => {
+      const arrNodeForSubFlow = [...selectedNodeForSubFlow];
+      arrNodeForSubFlow.pop();
+      setSelectedNodeForSubFlow(arrNodeForSubFlow);
+  }
   const customEdgeTypes = {
-    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={selectedNodeForSubFlow?.id} />,
+    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
   };
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={selectedNodeForSubFlow?.id} />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} />
     );
     return nodes;
   }, {} as NodeTypes);
@@ -682,8 +703,10 @@ export const RubixFlow = () => {
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
-          selectedNodeForSubFlow={selectedNodeForSubFlow}
+          selectedNodeForSubFlow={nodeForSubFlowEnd}
           setSelectedNodeForSubFlow={setSelectedNodeForSubFlow}
+          handlePushSelectedNodeForSubFlow = {handlePushSelectedNodeForSubFlow}
+          handleRemoveSelectedNodeForSubFlow ={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
         <Spin />
