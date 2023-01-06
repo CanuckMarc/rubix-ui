@@ -61,7 +61,7 @@ type FlowProps = {
   selectedNodeForSubFlow: NodeInterface | undefined;
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
   handlePushSelectedNodeForSubFlow:(node: NodeInterface) => void;
-  handleRemoveSelectedNodeForSubFlow: (node: NodeInterface[]) => void
+  handleRemoveSelectedNodeForSubFlow: () => void
 };
 
 const Flow = (props: FlowProps) => {
@@ -191,8 +191,8 @@ const Flow = (props: FlowProps) => {
     }
   };
   // exit each subflow
-  const onBackToMain = (node: NodeInterface[]) => {
-    handleRemoveSelectedNodeForSubFlow(node);
+  const onBackToMain = () => {
+    handleRemoveSelectedNodeForSubFlow();
   };
   // close sub flow
   const onCloseSubFlow = () => {

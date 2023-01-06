@@ -27,8 +27,8 @@ type ControlProps = {
   selectedNodeForSubFlow?: NodeInterface;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
-  onBackToMain: (node: NodeInterface[]) => void;
-  onCloseSubFlow: (node: NodeInterface[]) => void;
+  onBackToMain: () => void;
+  onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
 };
 
@@ -155,14 +155,14 @@ const Controls = ({
           <div
             className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
             title="Save sub flow"
-            onClick={()=>onCloseSubFlow([])}
+            onClick={onCloseSubFlow}
           >
             Close Sub Flow
           </div>
           <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-          title="Back to Main"
-          onClick={()=>onBackToMain([])}
+            className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+            title="Back to Main"
+            onClick={onBackToMain}
           >
             Back to Main
           </div>
