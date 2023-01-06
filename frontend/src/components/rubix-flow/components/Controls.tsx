@@ -27,7 +27,8 @@ type ControlProps = {
   selectedNodeForSubFlow?: NodeInterface;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
-  onSaveSubFlow: () => void;
+  onBackToMain: (node: NodeInterface[]) => void;
+  onCloseSubFlow: (node: NodeInterface[]) => void;
   onSaveSettings: (settings: FlowSettings) => void;
 };
 
@@ -41,7 +42,8 @@ const Controls = ({
   onSaveSettings,
   selectedNodeForSubFlow,
   onClearAllNodes,
-  onSaveSubFlow,
+  onCloseSubFlow,
+  onBackToMain,
   onHandelSaveFlow,
 }: ControlProps) => {
   const [loadModalOpen, setLoadModalOpen] = useState(false);
@@ -149,13 +151,22 @@ const Controls = ({
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
         {!!selectedNodeForSubFlow && (
+         <>
           <div
             className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
             title="Save sub flow"
-            onClick={onSaveSubFlow}
+            onClick={()=>onCloseSubFlow([])}
           >
             Close Sub Flow
           </div>
+          <div
+          className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+          title="Back to Main"
+          onClick={()=>onBackToMain([])}
+          >
+            Back to Main
+          </div>
+         </>
         )}
         <div
           className="cursor-pointer border-r bg-white hover:bg-gray-100"
