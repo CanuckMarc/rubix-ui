@@ -11,11 +11,11 @@ import Connection = db.Connection;
 const { Title } = Typography;
 
 export const WiresConnections = () => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [data, setData] = useState([] as Connection[]);
   const [isFetching, setIsFetching] = useState(false);
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
 
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
   useEffect(() => {
@@ -25,8 +25,7 @@ export const WiresConnections = () => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res =
-        (await factory.GetWiresConnections(connUUID, hostUUID, isRemote)) || [];
+      const res = (await factory.GetWiresConnections(connUUID, hostUUID, isRemote)) || [];
       setData(res);
     } finally {
       setIsFetching(false);
@@ -40,11 +39,7 @@ export const WiresConnections = () => {
       </Title>
       <Card bordered={false}>
         <RbRefreshButton refreshList={fetch} />
-        <WiresConnectionsTable
-          data={data}
-          isFetching={isFetching}
-          refreshList={fetch}
-        />
+        <WiresConnectionsTable data={data} isFetching={isFetching} refreshList={fetch} />
       </Card>
     </>
   );

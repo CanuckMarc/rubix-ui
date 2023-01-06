@@ -11,15 +11,11 @@ export type NodeHelpModalProps = {
   onClose: () => void;
 };
 
-export const NodeHelpModal: FC<NodeHelpModalProps> = ({
-  node,
-  open = false,
-  onClose,
-}) => {
-  const [value, setValue] = useState<object>({});
+export const NodeHelpModal: FC<NodeHelpModalProps> = ({ node, open = false, onClose }) => {
   const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
+  const [value, setValue] = useState<object>({});
 
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
   const handleClose = () => {
@@ -29,8 +25,7 @@ export const NodeHelpModal: FC<NodeHelpModalProps> = ({
 
   const fetchNodeHelp = async () => {
     const type = node.type ? node.type.split("/")[1] : "";
-    const res =
-      (await factory.NodeHelpByName(connUUID, hostUUID, isRemote, type)) || {};
+    const res = (await factory.NodeHelpByName(connUUID, hostUUID, isRemote, type)) || {};
     setValue(res);
   };
 

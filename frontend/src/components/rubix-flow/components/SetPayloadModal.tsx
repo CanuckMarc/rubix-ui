@@ -14,16 +14,11 @@ export type SetPayloadModalProps = {
   onClose: () => void;
 };
 
-export const SetPayloadModal: FC<SetPayloadModalProps> = ({
-  node,
-  nodeType,
-  open = false,
-  onClose,
-}) => {
+export const SetPayloadModal: FC<SetPayloadModalProps> = ({ node, nodeType, open = false, onClose }) => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [payload, setPayload] = useState<any>(null);
 
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
   const handleChange = (key: string, value: any) => {
@@ -31,13 +26,7 @@ export const SetPayloadModal: FC<SetPayloadModalProps> = ({
   };
 
   const handleSave = async () => {
-    await factory.NodePayload(
-      connUUID,
-      hostUUID,
-      isRemote,
-      { payload: payload },
-      node.id
-    );
+    await factory.NodePayload(connUUID, hostUUID, isRemote, { payload: payload }, node.id);
     setPayload(null);
     onClose();
   };

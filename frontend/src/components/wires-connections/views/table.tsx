@@ -15,13 +15,14 @@ import Connection = db.Connection;
 export const WiresConnectionsTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<string>);
-  const [schema, setSchema] = useState({});
   const [currentItem, setCurrentItem] = useState({} as Connection);
+  const [schema, setSchema] = useState({});
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [filteredData, setFilteredData] = useState(data);
+
+  const isRemote = !!connUUID && !!hostUUID;
 
   const config = {
     originData: data,
@@ -51,6 +52,8 @@ export const WiresConnectionsTable = (props: any) => {
   };
 
   const bulkDelete = async () => {
+    console.log(isRemote);
+
     try {
       await factory.BulkDeleteWiresConnection(connUUID, hostUUID, isRemote, selectedUUIDs);
     } catch (error) {

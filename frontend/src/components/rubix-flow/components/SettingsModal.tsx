@@ -12,26 +12,22 @@ type SettingsModalProps = {
   onCloseModal: () => void;
 };
 
-export const SettingsModal = ({
-  node,
-  isModalVisible,
-  onCloseModal,
-}: SettingsModalProps) => {
-  const handleChange = useChangeNodeProperties(node.id);
+export const SettingsModal = ({ node, isModalVisible, onCloseModal }: SettingsModalProps) => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [settings, setSettings] = useState({} as any);
   const [formData, setFormData] = useState({});
   const [isLoadingForm, setIsLoadingForm] = useState(false);
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
 
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
+
+  const handleChange = useChangeNodeProperties(node.id);
 
   const fetchSchemaJson = async () => {
     setIsLoadingForm(true);
 
     const type = (node.type && node.type.split("/")[1]) || "";
-    const res =
-      (await factory.NodeSchema(connUUID, hostUUID, isRemote, type)) || {};
+    const res = (await factory.NodeSchema(connUUID, hostUUID, isRemote, type)) || {};
     setSettings(res);
     setIsLoadingForm(false);
 
@@ -42,9 +38,7 @@ export const SettingsModal = ({
   const handleSetFormData = async (_settings: any) => {
     try {
       const _formData = {} as any;
-      const _node = node.settings
-        ? node
-        : await factory.NodeValue(connUUID, hostUUID, isRemote, node.id);
+      const _node = node.settings ? node : await factory.NodeValue(connUUID, hostUUID, isRemote, node.id);
       const _properties = Object.entries(_settings.schema.properties || {});
 
       for (const [key, value] of _properties) {
