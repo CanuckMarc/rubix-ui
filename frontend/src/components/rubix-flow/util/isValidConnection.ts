@@ -21,8 +21,8 @@ export const isValidConnection = (
     "source"
   );
 
-  const sourceSocket = sourceSockets?.find(
-    (socket) => socket.name === connection.sourceHandle
+  const sourceSocket = (sourceSockets as any)?.find(
+    (socket: any) => socket.name === connection.sourceHandle
   );
 
   const targetSockets = getSocketsByNodeTypeAndHandleType(
@@ -31,8 +31,8 @@ export const isValidConnection = (
     "target"
   );
 
-  const targetSocket = targetSockets?.find(
-    (socket) => socket.name === connection.targetHandle
+  const targetSocket = (targetSockets as any)?.find(
+    (socket: any) => socket.name === connection.targetHandle
   );
 
   if (sourceSocket === undefined || targetSocket === undefined) return false;
