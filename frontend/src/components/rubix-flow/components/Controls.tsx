@@ -154,17 +154,17 @@ const Controls = ({
          <>
           <div
             className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-            title="Save sub flow"
-            onClick={onCloseSubFlow}
-          >
-            Close Sub Flow
-          </div>
-          <div
-            className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
             title="Back to Main"
             onClick={onBackToMain}
           >
             Back to Main
+          </div>
+          <div
+            className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+            title="Close sub flow"
+            onClick={onCloseSubFlow}
+          >
+            Close Sub Flow
           </div>
          </>
         )}

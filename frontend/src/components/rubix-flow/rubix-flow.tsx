@@ -190,12 +190,14 @@ const Flow = (props: FlowProps) => {
       setEdges([]);
     }
   };
+
   // exit each subflow
-  const onBackToMain = () => {
+  const onCloseSubFlow = () => {
     handleRemoveSelectedNodeForSubFlow();
   };
+  
   // close sub flow
-  const onCloseSubFlow = () => {
+  const onBackToMain = () => {
     setSelectedNodeForSubFlow([]);
   };
 
