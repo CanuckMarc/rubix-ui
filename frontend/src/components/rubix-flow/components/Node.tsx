@@ -71,6 +71,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
     if (!isExist) {
       newInputs.push({
         name: item.pin,
+        valueOfChild: item.valueOfChild,
         nodeId: item.nodeId,
         subName: item.subName,
         valueType: item.dataType,
@@ -102,6 +103,7 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, isPar
       newOutputs.push({
         name: item.pin,
         subName: item.subName,
+        valueOfChild: item.valueOfChild || item.value,
         nodeId: item.nodeId,
         valueType: item.dataType,
       } as OutputSocketSpecJSON);
@@ -135,10 +137,12 @@ export const Node = (props: NodeProps) => {
           return ["input-float", "input-string", "input-bool"].includes(type);
         })
         .map(({ data, id: nodeId, info }, index, arr) => {
-          const firstInput = data.inputs?.[0] || {};
+          const firstInput: any = data.inputs?.[0] || {};
+
           return {
             ...firstInput,
             valueType: firstInput.dataType,
+            valueOfChild: firstInput.value,
             pin: `${firstInput.pin}-${nodeId}`,
             nodeId,
             name: firstInput.pin,
@@ -151,11 +155,16 @@ export const Node = (props: NodeProps) => {
 
   const nodeOutputs = node.isParent
     ? childNodes
-        .filter((n: NodeInterface) => n.type!!.includes("output-float"))
+        .filter((n: NodeInterface) => {
+          const type = n.type!!.split("/")?.[1];
+          return ["output-float", "output-string", "output-bool"].includes(type);
+        })
         .map(({ data, id: nodeId, info }, index, arr) => {
           const firstOut = data.out?.[0] || {};
+
           return {
             ...firstOut,
+            valueOfChild: firstOut.value,
             pin: `${firstOut.pin}-${nodeId}`,
             nodeId,
             name: firstOut.pin,
@@ -236,7 +245,7 @@ export const Node = (props: NodeProps) => {
             {input && !input.hideInput && (
               <InputSocket
                 {...input}
-                value={data[input.name]}
+                value={input.valueOfChild || data[input.name]}
                 onChange={handleChange}
                 connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
@@ -245,9 +254,10 @@ export const Node = (props: NodeProps) => {
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
-            {output && !output.hideOutput && (
+            {output && (
               <OutputSocket
                 {...output}
+                valueType={output.valueType || output.dataType!!}
                 minWidth={widthOutput}
                 dataOut={data.out}
                 onSetWidthInput={handleSetWidthOutput}

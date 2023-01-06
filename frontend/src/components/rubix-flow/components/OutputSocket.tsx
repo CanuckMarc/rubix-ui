@@ -29,13 +29,14 @@ export const OutputSocket = ({
   const [outValue, setOutValue] = useState<string | number>("");
 
   const showFlowIcon = valueType === "flow";
-  const colorName = valueTypeColorMap[valueType || 'number'];
+  const colorName = valueTypeColorMap[valueType || "number"];
   const [backgroundColor, borderColor] = colors[colorName];
 
   const getValueOutput = useCallback(
     (outputName: string) => {
       if (dataOut) {
         const out = dataOut.find((item: { pin: string }) => item.pin === outputName);
+
         if (valueType === "number" && out) {
           if (out.value === null) out.value = "null";
           return out.value !== undefined ? `${out.value}` : "";
@@ -44,14 +45,16 @@ export const OutputSocket = ({
       }
       return "";
     },
-    [valueType, dataOut]
+    [valueType, dataOut, name]
   );
 
   const getValueOptions = (value: boolean | null) => {
-    switch (value) {
+    const newVal = value === null ? null : Boolean(value);
+
+    switch (newVal) {
       case true:
       case false:
-        return `${value}`;
+        return `${newVal}`;
       case null:
         return "null";
       default:

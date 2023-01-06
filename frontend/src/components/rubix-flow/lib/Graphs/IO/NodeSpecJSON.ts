@@ -4,6 +4,7 @@ import { NodeCategory } from "../../Nodes/NodeCategory";
 export type InputSocketSpecJSON = {
   name: string;
   valueType: string;
+  valueOfChild?: any;
   defaultValue?: any;
   dataType?: string;
   nodeId?: string;
@@ -13,6 +14,8 @@ export type InputSocketSpecJSON = {
 export type OutputSocketSpecJSON = {
   name: string;
   valueType: string;
+  dataType?: string;
+  valueOfChild?: any;
   nodeId?: string;
   hideOutput?: boolean;
 };
