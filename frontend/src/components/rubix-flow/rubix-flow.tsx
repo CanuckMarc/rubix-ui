@@ -59,12 +59,21 @@ type FlowProps = {
   customEdgeTypes: any;
   customNodeTypes: any;
   selectedNodeForSubFlow: NodeInterface | undefined;
-  setSelectedNodeForSubFlow: (node: NodeInterface | undefined) => void;
+  setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
+  handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
+  handleRemoveSelectedNodeForSubFlow: () => void;
 };
 
 const Flow = (props: FlowProps) => {
   const { connUUID = "", hostUUID = "" } = useParams();
-  const { customNodeTypes, customEdgeTypes, selectedNodeForSubFlow, setSelectedNodeForSubFlow } = props;
+  const {
+    customNodeTypes,
+    customEdgeTypes,
+    selectedNodeForSubFlow,
+    setSelectedNodeForSubFlow,
+    handlePushSelectedNodeForSubFlow,
+    handleRemoveSelectedNodeForSubFlow,
+  } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -167,7 +176,7 @@ const Flow = (props: FlowProps) => {
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
-    setSelectedNodeForSubFlow(node);
+    handlePushSelectedNodeForSubFlow(node);
   };
 
   const onClearAllNodes = () => {
@@ -188,8 +197,14 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const onSaveSubFlow = () => {
-    setSelectedNodeForSubFlow(undefined);
+  // exit each subflow
+  const onCloseSubFlow = () => {
+    handleRemoveSelectedNodeForSubFlow();
+  };
+
+  // close sub flow
+  const onBackToMain = () => {
+    setSelectedNodeForSubFlow([]);
   };
 
   const onHandelSaveFlow = async () => {
@@ -217,6 +232,8 @@ const Flow = (props: FlowProps) => {
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
     const isTarget = position === "left";
+    const targetNodeId = handleId?.includes("-") ? handleId.split("-")[1] : nodeId;
+    const targetHandleId = handleId?.includes("-") ? handleId.split("-")[0] : handleId;
 
     if (lastConnectStart) {
       const isDragSelected = edges.some((item) => {
@@ -228,17 +245,17 @@ const Flow = (props: FlowProps) => {
       });
 
       const lastHandleId = lastConnectStart.handleId;
-      const isTrueHandleId = handleId && lastHandleId;
+      const isTrueHandleId = targetHandleId && lastHandleId;
 
       if (isDragSelected && isTrueHandleId) {
         let newEdges;
-        if (nodeId) {
+        if (targetNodeId) {
           // update selected lines to new node if start and end are same type
           newEdges = edges.map((item) => {
             if (item.selected && lastConnectStart.nodeId === item[lastConnectStart.handleType!!]) {
               const updateKey = isTarget ? "target" : "source";
-              item[`${updateKey}Handle`] = handleId;
-              item[updateKey] = nodeId;
+              item[`${updateKey}Handle`] = targetHandleId;
+              item[updateKey] = targetNodeId;
             }
             return item;
           });
@@ -263,33 +280,28 @@ const Flow = (props: FlowProps) => {
         /* Add connect for input added by InputCount setting */
         if (
           lastConnectStart &&
-          nodeId &&
-          handleId &&
+          targetNodeId &&
+          targetHandleId &&
           isTrueHandleId &&
-          isValidConnection(nodes, lastConnectStart, { nodeId, handleId }, isTarget)
+          isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
         ) {
           const isSource = lastConnectStart.handleType === "source" || false;
           const conNodeId = lastConnectStart.nodeId || "";
           const conHandleId = lastConnectStart.handleId || "";
-          const target = !isSource ? conNodeId : nodeId;
-          const targetHandle = !isSource ? conHandleId : handleId;
-          if (isInputExistConnection(edges, target, targetHandle)) {
-            return;
-          }
-          const newEdge = {
-            id: generateUuid(),
-            source: isSource ? conNodeId : nodeId,
-            sourceHandle: isSource ? conHandleId : handleId,
-            target: target,
-            targetHandle: targetHandle,
-          };
+          const target = !isSource ? conNodeId : targetNodeId;
+          const targetHandle = !isSource ? conHandleId : targetHandleId;
 
-          onEdgesChange([
-            {
-              type: "add",
-              item: newEdge,
-            },
-          ]);
+          if (!isInputExistConnection(edges, target, targetHandle)) {
+            const newEdge = {
+              id: generateUuid(),
+              source: isSource ? conNodeId : targetNodeId,
+              sourceHandle: isSource ? conHandleId : targetHandleId,
+              target: target,
+              targetHandle: targetHandle,
+            };
+
+            onEdgesChange([{ type: "add", item: newEdge }]);
+          }
         }
       }
     }
@@ -558,23 +570,6 @@ const Flow = (props: FlowProps) => {
   }, [undoable]);
 
   useEffect(() => {
-    if (selectedNodeForSubFlow) return;
-
-    //When deleting a container, will also delete the nodes that belong to it
-    const subNodes = nodes.filter((n: any) => n.parentId) as any[];
-    if (subNodes.length === 0) return;
-
-    const allNodeIds = nodes.map((n) => n.id);
-    let newNodes = nodes;
-    for (const subNode of subNodes) {
-      if (!allNodeIds.includes(subNode.parentId)) {
-        newNodes = nodes.filter((n) => n.id !== subNode.id);
-      }
-    }
-    setNodes(newNodes);
-  }, [nodes, selectedNodeForSubFlow]);
-
-  useEffect(() => {
     if (refreshInterval.current) clearInterval(refreshInterval.current);
 
     refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
@@ -652,7 +647,8 @@ const Flow = (props: FlowProps) => {
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}
               onClearAllNodes={onClearAllNodes}
-              onSaveSubFlow={onSaveSubFlow}
+              onCloseSubFlow={onCloseSubFlow}
+              onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
             />
             {nodePickerVisibility && (
@@ -682,15 +678,27 @@ const Flow = (props: FlowProps) => {
 
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
-  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface | undefined>(undefined);
+  const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
+  const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
+  // push the node which is subflow in to save the flow of subflow
+  const handlePushSelectedNodeForSubFlow = (node: NodeInterface) => {
+    setSelectedNodeForSubFlow([...selectedNodeForSubFlow, node]);
+  };
+
+  // remove the last node to exit each subflow
+  const handleRemoveSelectedNodeForSubFlow = () => {
+    const arrNodeForSubFlow = [...selectedNodeForSubFlow];
+    arrNodeForSubFlow.pop();
+    setSelectedNodeForSubFlow(arrNodeForSubFlow);
+  };
   const customEdgeTypes = {
-    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={selectedNodeForSubFlow?.id} />,
+    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
   };
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={selectedNodeForSubFlow?.id} />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} />
     );
     return nodes;
   }, {} as NodeTypes);
@@ -701,8 +709,10 @@ export const RubixFlow = () => {
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
-          selectedNodeForSubFlow={selectedNodeForSubFlow}
+          selectedNodeForSubFlow={nodeForSubFlowEnd}
           setSelectedNodeForSubFlow={setSelectedNodeForSubFlow}
+          handlePushSelectedNodeForSubFlow={handlePushSelectedNodeForSubFlow}
+          handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
         <Spin />

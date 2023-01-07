@@ -16,7 +16,8 @@ export const calculateNewEdge = (
     originNode.type,
     connection.handleType
   );
-  const originSocket = sockets?.find(
+
+  const originSocket = (sockets as any)?.find(
     (socket: any) => socket.name === connection.handleId
   );
 
@@ -25,7 +26,8 @@ export const calculateNewEdge = (
     destinationNodeType,
     connection.handleType === "source" ? "target" : "source"
   );
-  const newSocket = newSockets?.find(
+
+  const newSocket = (newSockets as any)?.find(
     (socket: any) => socket.valueType === originSocket?.valueType
   );
 

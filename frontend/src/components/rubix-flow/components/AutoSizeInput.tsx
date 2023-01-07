@@ -1,13 +1,4 @@
-import {
-  ChangeEvent,
-  CSSProperties,
-  FC,
-  HTMLProps,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, CSSProperties, FC, HTMLProps, useCallback, useEffect, useRef, useState } from "react";
 
 export const MAX_WIDTH_INPUT = 300;
 export type AutoSizeInputProps = HTMLProps<HTMLInputElement> & {
@@ -37,9 +28,7 @@ export const AutoSizeInput: FC<AutoSizeInputProps> = ({
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [styles, setStyles] = useState<CSSProperties>({});
   const [isShowArea, setIsShowArea] = useState<boolean>(false);
-  const [textArea, setTextArea] = useState<
-    string | number | readonly string[] | undefined
-  >(props.value);
+  const [textArea, setTextArea] = useState<string | number | readonly string[] | undefined>(props.value);
 
   // grab the font size of the input on ref mount
   const setRef = useCallback((input: HTMLInputElement | null) => {
@@ -65,10 +54,7 @@ export const AutoSizeInput: FC<AutoSizeInputProps> = ({
   const handleBlurTextArea = () => onChangeInput(textArea);
 
   const handleToggleTextArea = () => {
-    if (
-      measureRef.current &&
-      measureRef.current.clientWidth > MAX_WIDTH_INPUT
-    ) {
+    if (measureRef.current && measureRef.current.clientWidth > MAX_WIDTH_INPUT) {
       setIsShowArea((p) => !p);
     }
   };
@@ -95,16 +81,7 @@ export const AutoSizeInput: FC<AutoSizeInputProps> = ({
 
   return (
     <>
-      {!isShowArea && (
-        <input
-          ref={setRef}
-          onChange={(e) => onChangeInput(e.currentTarget.value)}
-          onMouseOver={handleToggleTextArea}
-          {...props}
-          value={props.value || ""}
-        />
-      )}
-      {isShowArea && (
+      {isShowArea ? (
         <textarea
           ref={setTextAreaRef}
           className={props.className}
@@ -117,6 +94,14 @@ export const AutoSizeInput: FC<AutoSizeInputProps> = ({
           style={{
             width: MAX_WIDTH_INPUT,
           }}
+        />
+      ) : (
+        <input
+          ref={setRef}
+          onChange={(e) => onChangeInput(e.currentTarget.value)}
+          onMouseOver={handleToggleTextArea}
+          {...props}
+          value={props.value || ""}
         />
       )}
       <span ref={measureRef} style={{ ...baseStyles, ...styles }}>

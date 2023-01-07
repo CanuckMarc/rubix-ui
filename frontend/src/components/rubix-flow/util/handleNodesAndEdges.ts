@@ -4,6 +4,7 @@ import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type NodeWithOldId = NodeInterface & { oldId: string; };
+
 type NodesAndEdgesType = {
   nodes: NodeInterface[];
   edges: Edge[];
@@ -19,22 +20,24 @@ export const handleCopyNodesAndEdges = (
   const subNodes: NodeWithOldId[] = [];
   const subEdges: Edge[] = [];
 
+  const copyAllNode = (id: string, newId: string) => {
+    const childNodes = nodes.filter((node: NodeInterface) => id === node.parentId);
+
+    childNodes.forEach((item: NodeInterface) => {
+      const childNodeId = generateUuid();
+      subNodes.push({ ...item, oldId: item.id, id: childNodeId, parentId: newId });
+      
+      if (item.isParent) {
+        copyAllNode(item.id, childNodeId);
+      }
+    });
+  };
+
   /* Generate new id of nodes */
   const newNodes: NodeInterface[] = flow.nodes.map((item) => {
     const newNodeId = generateUuid();
-
-    if (item.isParent) {
-      const subChildren = nodes
-        .filter((n: NodeInterface) => n.parentId === item.id)
-        .map(child => ({
-          ...child,
-          id: generateUuid(),
-          oldId: child.id,
-          parentId: newNodeId,
-        }));
-      subNodes.push(...subChildren);
-    }
-
+    subNodes.push({ ...item, id: newNodeId, oldId: item.id });
+    copyAllNode(item.id, newNodeId);
     /*
      * Generate new id of edges
      * Add new id source and target of edges

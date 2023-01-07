@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import cx from "classnames";
 import { categoryColorMap, colors } from "../util/colors";
 import { NodeSpecJSON } from "../lib";
@@ -13,6 +13,7 @@ type NodeProps = {
   height: number;
   hasChild: boolean;
   status?: any;
+  isHidden?: boolean;
   onDbClickTitle: () => void;
 };
 
@@ -26,8 +27,10 @@ export const NodeContainer = ({
   height,
   hasChild,
   status,
+  isHidden,
   onDbClickTitle,
 }: PropsWithChildren<NodeProps>) => {
+  const [displayStyle, setDisplayStyle] = useState({ display: "block" });
   const colorName = categoryColorMap[category] || "gray";
   let [backgroundColor, borderColor, textColor] = colors[colorName];
 
@@ -41,7 +44,11 @@ export const NodeContainer = ({
         {icon && <span className="pr-3 pt-1">{icon}</span>}
         {nodeName && <span>{nodeName}</span>}
         {status?.activeMessage && renderStatusMessages()}
-        {status?.subTitle && <span className="ml-1 float-right" style={{fontSize: "8px"}}>{status.subTitle}</span>}
+        {status?.subTitle && (
+          <span className="ml-1 float-right" style={{ fontSize: "8px" }}>
+            {status.subTitle}
+          </span>
+        )}
       </div>
     );
   };
@@ -56,12 +63,24 @@ export const NodeContainer = ({
     );
   };
 
+  useEffect(() => {
+    // this is necessary because need to wait node render and draw wires
+    // after that hidden node if isHidden = true
+    setTimeout(() => {
+      setDisplayStyle({ display: isHidden ? "none" : "block" });
+    }, 1000);
+  }, [isHidden]);
+
   return (
     <div
       className={cx([
         `rounded text-white bg-gray-800 min-w-[130px] text-start`,
         { "bg-opacity-50": hasChild, "outline outline-1": selected },
       ])}
+      style={{
+        opacity: isHidden ? 0 : 1,
+        ...displayStyle,
+      }}
     >
       <div className={`flex ${backgroundColor} ${textColor} px-3 py-1 rounded-t`} onDoubleClick={onDbClickTitle}>
         <div style={{ width: "100%" }}>

@@ -7,6 +7,6 @@ export const isHandleConnected = (
   type: "source" | "target"
 ) => {
   return edges.some(
-    (edge) => edge[type] === nodeId && edge[`${type}Handle`] === handleId
+    (edge) => edge[type] === nodeId && edge[`${type}Handle`] === handleId?.split('-')[0]
   );
 };

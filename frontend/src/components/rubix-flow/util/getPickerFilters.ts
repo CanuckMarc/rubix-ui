@@ -20,7 +20,7 @@ export const getNodePickerFilters = (
     params.handleType
   );
 
-  const socket = sockets?.find(
+  const socket = (sockets as any)?.find(
     (socket: any) => socket.name === params.handleId
   );
 
