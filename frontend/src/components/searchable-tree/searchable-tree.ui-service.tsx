@@ -110,7 +110,7 @@ export const getTreeDataIterative = (connections: any) => {
           value: getItemValue(location, ObjectType.LOCATIONS),
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...getTreeObject(
-              network,
+              { ...location, name: location.name + " (devices)" },
               ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
               ""
             ),
@@ -118,7 +118,7 @@ export const getTreeDataIterative = (connections: any) => {
             value: getItemValue(network, ObjectType.NETWORKS),
             children: (network.hosts || []).map((host: RubixObjectI) => ({
               ...getTreeObject(
-                { ...host, name: host.name + " (controller)" },
+                { ...host, name: host.name + " (device)" },
                 ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
                 ""
               ),
