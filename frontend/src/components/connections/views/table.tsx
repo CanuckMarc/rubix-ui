@@ -10,7 +10,7 @@ import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../common/rb
 import { CONNECTION_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
-import { TokenModal } from "../../settings/views/token-modal";
+import { TokenModal } from "../../../common/token/token-modal";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
 import { RubixAssistTokenFactory } from "./token-factory";
