@@ -15,7 +15,7 @@ require (
 	github.com/NubeIO/lib-dhcpd v0.0.2
 	github.com/NubeIO/lib-dirs v0.0.8
 	github.com/NubeIO/lib-files v1.0.0
-	github.com/NubeIO/lib-networking v0.0.8
+	github.com/NubeIO/lib-networking v0.0.9
 	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/lib-ufw v0.0.3
 	github.com/NubeIO/lib-uuid v0.0.3
