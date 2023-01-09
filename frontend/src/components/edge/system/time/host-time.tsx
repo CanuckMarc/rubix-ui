@@ -42,7 +42,7 @@ export const HostTime = () => {
   };
 
   const warning = () => {
-    Modal.warning({
+    Modal.confirm({
       title: "Confirm Are you sure?",
       content: "This will reboot the device",
       onOk() {
