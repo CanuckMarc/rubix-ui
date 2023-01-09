@@ -1,6 +1,7 @@
-import { Descriptions, Spin } from "antd";
+import { Button, Descriptions, Modal, Spin } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { HostSystemFactory } from "../factory-system";
 import { HostTimeFactory } from "./factory";
 import { UpdateTimeSetting } from "./update-time-setting-modal";
 
@@ -8,7 +9,9 @@ export const HostTime = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const [data, setData] = useState({} as any);
   const [isFetching, setIsFetching] = useState(false);
+  const [isRebooting, setIsRebooting] = useState(false);
 
+  const hostSystemFactory = new HostSystemFactory();
   const factory = new HostTimeFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
@@ -29,6 +32,25 @@ export const HostTime = () => {
     }
   };
 
+  const rebootHost = async () => {
+    try {
+      setIsRebooting(true);
+      await hostSystemFactory.EdgeHostReboot(connUUID, hostUUID);
+    } finally {
+      setIsRebooting(false);
+    }
+  };
+
+  const warning = () => {
+    Modal.warning({
+      title: "Confirm Are you sure?",
+      content: "This will reboot the device",
+      onOk() {
+        rebootHost();
+      },
+    });
+  };
+
   return (
     <>
       <Spin spinning={isFetching}>
@@ -44,6 +66,11 @@ export const HostTime = () => {
               <Descriptions.Item label="Time UTC">{data.time_utc}</Descriptions.Item>
             </Descriptions>
             <UpdateTimeSetting />
+            <div className="text-start mt-4">
+              <Button type="primary" onClick={warning} loading={isRebooting} danger>
+                Reboot Host
+              </Button>
+            </div>
           </>
         )}
 
