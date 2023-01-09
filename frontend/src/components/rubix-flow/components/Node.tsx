@@ -254,7 +254,7 @@ export const Node = (props: NodeProps) => {
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
-            {output && (
+            {output && !output.hideOutput && (
               <OutputSocket
                 {...output}
                 valueType={output.valueType || output.dataType!!}
