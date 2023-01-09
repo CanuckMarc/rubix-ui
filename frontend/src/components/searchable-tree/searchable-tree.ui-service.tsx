@@ -1,3 +1,11 @@
+import {
+  NodeIndexOutlined,
+  HomeOutlined,
+  ScheduleOutlined,
+  HeatMapOutlined,
+  LaptopOutlined,
+  ClusterOutlined,
+} from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 
@@ -68,7 +76,7 @@ interface RubixObjectI {
   hosts?: any;
 }
 
-const getTreeObject = (item: any, next: string | undefined, prependName?: string) => {
+const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
   if (!next) {
     return {
       name: item.name,
@@ -79,6 +87,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
         </span>
       ),
       key: item.uuid,
+      icon,
     };
   } else {
     return {
@@ -92,6 +101,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
         </NavLink>
       ),
       key: next,
+      icon,
     };
   }
 };
@@ -101,18 +111,29 @@ export const getTreeDataIterative = (connections: any) => {
       ...getTreeObject({ name: "Supervisors", uuid: "connections" }, ROUTES.CONNECTIONS, ""),
       next: ROUTES.CONNECTIONS,
       children: connections.map((connection: RubixObjectI) => ({
-        ...getTreeObject(connection, ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid), ""),
+        ...getTreeObject(
+          connection,
+          ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
+          "",
+          <HomeOutlined />
+        ),
         next: ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
         value: getItemValue(connection, ObjectType.CONNECTIONS),
         children: (connection.locations || []).map((location: RubixObjectI) => ({
-          ...getTreeObject(location, ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid), ""),
+          ...getTreeObject(
+            location,
+            ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid),
+            "",
+            <HeatMapOutlined />
+          ),
           next: ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid),
           value: getItemValue(location, ObjectType.LOCATIONS),
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...getTreeObject(
               { ...location, name: location.name + " (devices)" },
               ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
-              ""
+              "",
+              <LaptopOutlined />
             ),
             next: ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
             value: getItemValue(network, ObjectType.NETWORKS),
@@ -120,13 +141,14 @@ export const getTreeDataIterative = (connections: any) => {
               ...getTreeObject(
                 { ...host, name: host.name + " (device)" },
                 ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
-                ""
+                "",
+                <ClusterOutlined />
               ),
               next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
               value: getItemValue(host, ObjectType.HOSTS),
               children: [
                 {
-                  ...getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, ""),
+                  ...getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, "", <NodeIndexOutlined />),
                   next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
                   children: [
@@ -156,7 +178,8 @@ export const getTreeDataIterative = (connections: any) => {
                   ...getTreeObject(
                     { name: "schedules", uuid: "schedules_" + host.uuid },
                     ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
-                    ""
+                    "",
+                    <ScheduleOutlined />
                   ),
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
