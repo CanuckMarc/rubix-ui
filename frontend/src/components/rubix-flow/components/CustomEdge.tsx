@@ -60,7 +60,7 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       const newSourceY = sourceIndex >= 0 && parentNode ? parentNode!!.position.y + (70 + sourceIndex * 32) : sourceY;
       const newSourcePosition = sourceIndex >= 0 ? Position.Right : sourcePosition;
       const newTargetX = targetIndex >= 0 && parentNode ? parentNode!!.position.x - 7 : targetX;
-      const newTargetY = targetIndex >= 0 && parentNode ? parentNode!!.position.y + (70 + targetIndex * 32) : targetY;
+      const newTargetY = targetIndex >= 0 && parentNode ? parentNode!!.position.y + (48 + targetIndex * 32) : targetY;
       const newTargetPosition = targetIndex >= 0 ? Position.Left : targetPosition;
 
       setPath(
