@@ -2,6 +2,7 @@ import { Descriptions, Spin } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { HostTimeFactory } from "./factory";
+import { UpdateTimeSetting } from "./update-time-setting-modal";
 
 export const HostTime = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
@@ -32,29 +33,18 @@ export const HostTime = () => {
     <>
       <Spin spinning={isFetching}>
         {data && (
-          <Descriptions>
-            <Descriptions.Item label="Current Day">
-              {data.current_day}
-            </Descriptions.Item>
-            <Descriptions.Item label="Current Day UTC">
-              {data.current_day_utc}
-            </Descriptions.Item>
-            <Descriptions.Item label="Date Format Local">
-              {data.date_format_local}
-            </Descriptions.Item>
-            <Descriptions.Item label="Date Stamp">
-              {data.date_stamp}
-            </Descriptions.Item>
-            <Descriptions.Item label="System Time Zone">
-              {data.system_time_zone}
-            </Descriptions.Item>
-            <Descriptions.Item label="Time Local">
-              {data.time_local}
-            </Descriptions.Item>
-            <Descriptions.Item label="Time UTC">
-              {data.time_utc}
-            </Descriptions.Item>
-          </Descriptions>
+          <>
+            <Descriptions>
+              <Descriptions.Item label="Current Day">{data.current_day}</Descriptions.Item>
+              <Descriptions.Item label="Current Day UTC">{data.current_day_utc}</Descriptions.Item>
+              <Descriptions.Item label="Date Format Local">{data.date_format_local}</Descriptions.Item>
+              <Descriptions.Item label="Date Stamp">{data.date_stamp}</Descriptions.Item>
+              <Descriptions.Item label="System Time Zone">{data.system_time_zone}</Descriptions.Item>
+              <Descriptions.Item label="Time Local">{data.time_local}</Descriptions.Item>
+              <Descriptions.Item label="Time UTC">{data.time_utc}</Descriptions.Item>
+            </Descriptions>
+            <UpdateTimeSetting />
+          </>
         )}
 
         {!data && <h5>No data</h5>}
