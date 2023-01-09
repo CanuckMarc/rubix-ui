@@ -83,13 +83,13 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
   return newInputs;
 };
 
-const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, isParent = false) => {
-  if (specOutputs.length === 0 && !isParent) return [];
-  if (specOutputs.length > 0 && !nodeOutputs && !isParent) return specOutputs;
+const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node: NodeInterface) => {
+  if (specOutputs.length === 0 && !node.isParent) return [];
+  if (specOutputs.length > 0 && !nodeOutputs && !node.isParent) return specOutputs;
 
   let newOutputs: OutputSocketSpecJSON[] = [];
 
-  if (!isParent) {
+  if (!node.isParent) {
     if (nodeOutputs.length > 0 && nodeOutputs.length < specOutputs.length) {
       newOutputs = specOutputs.filter((item, idx) => idx < nodeOutputs.length);
     } else {
@@ -110,7 +110,26 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, isPar
     }
   });
 
+  if (node.isParent) {
+    const out = node.data.out || [];
+    const outs = out.map((item: any) => {
+      const dataOut = specOutputs.find((specItem: { name: string }) => item.pin === specItem.name);
+      return {
+        valueOfChild: item.value,
+        ...dataOut,
+        ...item,
+      };
+    });
+
+    newOutputs.push(...outs);
+  }
+
   return newOutputs;
+};
+
+const isOutputFlow = (type: string) => {
+  const newType = type.split("/")?.[1];
+  return ["output-float", "output-string", "output-bool"].includes(newType);
 };
 
 export const Node = (props: NodeProps) => {
@@ -122,6 +141,7 @@ export const Node = (props: NodeProps) => {
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);
   const [isSettingModal, setIsSettingModal] = useState(false);
+  const newData = { ...data };
 
   const node: NodeInterface | any = nodes.find((item) => item.id === id);
   const isHidden = parentNodeId ? node.parentId !== parentNodeId : node.parentId;
@@ -155,10 +175,7 @@ export const Node = (props: NodeProps) => {
 
   const nodeOutputs = node.isParent
     ? childNodes
-        .filter((n: NodeInterface) => {
-          const type = n.type!!.split("/")?.[1];
-          return ["output-float", "output-string", "output-bool"].includes(type);
-        })
+        .filter((n: NodeInterface) => isOutputFlow(n.type!!))
         .map(({ data, id: nodeId, info }, index, arr) => {
           const firstOut = data.out?.[0] || {};
 
@@ -173,12 +190,12 @@ export const Node = (props: NodeProps) => {
         })
     : node.data.out;
 
-  data.inputs = nodeInputs;
-  data.out = nodeOutputs;
+  newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
+  newData.out = [...(nodeOutputs || []), ...(data.out || [])];
 
   const pairs = getPairs(
     getInputs(spec.inputs || [], nodeInputs, node),
-    getOutputs(spec.outputs || [], nodeOutputs, node.isParent)
+    getOutputs(spec.outputs || [], nodeOutputs, node)
   );
 
   const handleSetWidthInput = (width: number) => {
@@ -245,31 +262,31 @@ export const Node = (props: NodeProps) => {
             {input && !input.hideInput && (
               <InputSocket
                 {...input}
-                value={input.valueOfChild || data[input.name]}
+                value={input.valueOfChild || newData[input.name]}
                 onChange={handleChange}
                 connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
                 onSetWidthInput={handleSetWidthInput}
-                dataInput={data.inputs}
+                dataInput={newData.inputs}
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
-            {output && !output.hideOutput && (
-              <OutputSocket
-                {...output}
-                valueType={output.valueType || output.dataType!!}
-                minWidth={widthOutput}
-                dataOut={data.out}
-                onSetWidthInput={handleSetWidthOutput}
-                connected={isHandleConnected(
-                  edges,
-                  // if have node id that mean id of child node in sub flow and present for output of parent node
-                  output.nodeId || id,
-                  output.nodeId ? "in" : output.name,
-                  output.nodeId ? "target" : "source"
-                )}
-              />
-            )}
+            {output && (parentNodeId ? !isOutputFlow(node.type) : true) && (
+                <OutputSocket
+                  {...output}
+                  valueType={output.valueType || output.dataType!!}
+                  minWidth={widthOutput}
+                  dataOut={newData.out}
+                  onSetWidthInput={handleSetWidthOutput}
+                  connected={isHandleConnected(
+                    edges,
+                    // if have node id that mean id of child node in sub flow and present for output of parent node
+                    output.nodeId || id,
+                    output.nodeId ? "in" : output.name,
+                    output.nodeId ? "target" : "source"
+                  )}
+                />
+              )}
           </div>
         );
       })}
