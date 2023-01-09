@@ -12,7 +12,7 @@ import {
   EditPoint,
   ExportPointBulk,
   GetFlowPointSchema,
-  GetPoint,
+  GetPoint, GetPointPriority,
   GetPoints,
   GetPointsForDevice,
   ImportPointBulk,
@@ -189,6 +189,16 @@ export class FlowPointFactory {
       this.hostUUID,
       pointUUID,
       body
+    );
+  }
+
+  async GetPointPriority(
+    pointUUID: string,
+  ): Promise<model.Point> {
+    return await GetPointPriority(
+      this.connectionUUID,
+      this.hostUUID,
+      pointUUID,
     );
   }
 }

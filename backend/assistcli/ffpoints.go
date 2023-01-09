@@ -68,6 +68,19 @@ func (inst *Client) GetPoints(hostIDName string) ([]model.Point, error) {
 	return out, nil
 }
 
+func (inst *Client) GetPointPriority(hostIDName, uuid string) (*model.Point, error) {
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host_uuid", hostIDName).
+		SetHeader("host_name", hostIDName).
+		SetResult(&model.Point{}).
+		SetPathParams(map[string]string{"uuid": uuid}).
+		Get("proxy/ff/api/points/{uuid}?with_priority=true"))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*model.Point), nil
+}
+
 func (inst *Client) GetPoint(hostIDName, uuid string) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host_uuid", hostIDName).

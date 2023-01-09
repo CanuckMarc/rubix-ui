@@ -157,6 +157,20 @@ func (inst *App) DeletePoint(connUUID, hostUUID, pointUUID string) interface{} {
 	return "delete ok"
 }
 
+func (inst *App) GetPointPriority(connUUID, hostUUID, pointUUID string) *model.Point {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	points, err := client.GetPointPriority(hostUUID, pointUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return points
+}
+
 func (inst *App) GetPoint(connUUID, hostUUID, pointUUID string) *model.Point {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
