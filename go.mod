@@ -15,7 +15,7 @@ require (
 	github.com/NubeIO/lib-dhcpd v0.0.2
 	github.com/NubeIO/lib-dirs v0.0.8
 	github.com/NubeIO/lib-files v1.0.0
-	github.com/NubeIO/lib-networking v0.0.7
+	github.com/NubeIO/lib-networking v0.0.8
 	github.com/NubeIO/lib-schema v0.1.6
 	github.com/NubeIO/lib-ufw v0.0.3
 	github.com/NubeIO/lib-uuid v0.0.3
@@ -73,6 +73,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jackpal/gateway v1.0.7 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
