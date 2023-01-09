@@ -156,7 +156,8 @@ export const getTreeDataIterative = (connections: any) => {
                       ...getTreeObject(
                         { name: "sheet", uuid: "flow_" + host.uuid },
                         ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                        ""
+                        "",
+                        <ClusterOutlined />
                       ),
                       next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
                       value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
@@ -166,7 +167,8 @@ export const getTreeDataIterative = (connections: any) => {
                       ...getTreeObject(
                         { name: "connections", uuid: "wires_connections_" + host.uuid },
                         ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
-                        ""
+                        "",
+                        <ClusterOutlined />
                       ),
                       next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
                       value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),

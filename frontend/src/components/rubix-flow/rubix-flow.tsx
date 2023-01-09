@@ -300,6 +300,12 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
+            if (newEdge.sourceHandle.includes("-")) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split("-");
+              newEdge.source = sourceNodeId;
+              newEdge.sourceHandle = sourceName;
+            }
+
             onEdgesChange([{ type: "add", item: newEdge }]);
           }
         }
@@ -434,9 +440,36 @@ const Flow = (props: FlowProps) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
+  const getChildNodeIds = (parentId: string) => {
+    const childNodes: NodeInterface[] = nodes.filter((node: NodeInterface) => node.parentId === parentId);
+    const nodeIds: string[] = [];
+
+    for (const node of childNodes) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+    return nodeIds;
+  };
+
   const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const remainingNodes = nodes.filter((item) => !_nodesDeleted.some((item2) => item.id === item2.id));
-    const remainingEdges = edges.filter((item) => !_edgesDeleted.some((item2) => item.id === item2.id));
+    const nodeIds: string[] = [];
+
+    for (const node of _nodesDeleted) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+
+    const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeIds.includes(item.target) &&
+        !nodeIds.includes(item.source)
+    );
 
     setNodes(remainingNodes);
     setEdges(remainingEdges);
