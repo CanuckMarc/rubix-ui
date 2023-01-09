@@ -1,5 +1,11 @@
-import { GetHostTime } from "../../../../../wailsjs/go/backend/App";
-import { Helpers } from "../../../../helpers/checks";
+import {
+  EdgeGetTimeZoneList,
+  EdgeUpdateSystemTime,
+  EdgeUpdateTimezone,
+  GetHostTime
+} from "../../../../../wailsjs/go/backend/App";
+import {Helpers} from "../../../../helpers/checks";
+import {datelib, system} from "../../../../../wailsjs/go/models";
 
 function hasUUID(uuid: string): Error {
   return Helpers.IsUndefined(uuid, "get host time has uuid") as Error;
@@ -18,4 +24,17 @@ export class HostTimeFactory {
   public GetHostTime(): Promise<any> {
     return this.callTime();
   }
+
+  public EdgeGetTimeZoneList(connectionUUID: string, hostUUID: string): Promise<Array<string>> {
+    return EdgeGetTimeZoneList(connectionUUID, hostUUID);
+  }
+
+  public EdgeUpdateTimezone(connectionUUID: string, hostUUID: string, timeZone: string): Promise<system.Message> {
+    return EdgeUpdateTimezone(connectionUUID, hostUUID, timeZone);
+  }
+
+  public EdgeUpdateSystemTime(connectionUUID: string, hostUUID: string, timeString: string): Promise<datelib.Time> {
+    return EdgeUpdateSystemTime(connectionUUID, hostUUID, timeString);
+  }
+
 }
