@@ -51,7 +51,7 @@ func (inst *Client) EdgeUpdateTimezone(hostIDName string, timeZone string) (*sys
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host_uuid", hostIDName).
 		SetHeader("host_name", hostIDName).
-		SetBody(system.DateBody{DateTime: timeZone}).
+		SetBody(system.DateBody{TimeZone: timeZone}).
 		SetResult(&system.Message{}).
 		Post(url))
 	if err != nil {
