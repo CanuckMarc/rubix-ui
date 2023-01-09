@@ -301,6 +301,12 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
+            if (newEdge.sourceHandle.includes('-')) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split('-');
+              newEdge.source = sourceNodeId;
+              newEdge.sourceHandle = sourceName;
+            }
+
             onEdgesChange([{ type: "add", item: newEdge }]);
           }
         }
