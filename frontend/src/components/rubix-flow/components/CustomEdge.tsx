@@ -48,15 +48,19 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
         return ["input-float", "input-string", "input-bool"].includes(type);
       });
 
-      const outputNodes = childNodes.filter((n: NodeInterface) => n.type!!.includes("output-float"));
+      const outputNodes = childNodes.filter((n: NodeInterface) => {
+        const type = n.type!!.split("/")?.[1];
+        return ["output-float", "output-string", "output-bool"].includes(type);
+      });
+
       const targetIndex = inputNodes.findIndex((n) => n.id === edge.target);
       const sourceIndex = outputNodes.findIndex((n) => n.id === edge.source);
 
-      const newSourceX = sourceIndex >= 0 ? parentNode!!.position.x - 7 : sourceX;
-      const newSourceY = sourceIndex >= 0 ? parentNode!!.position.y + (24 + sourceIndex * 32) : sourceY;
+      const newSourceX = sourceIndex >= 0 && parentNode ? parentNode!!.position.x - 7 : sourceX;
+      const newSourceY = sourceIndex >= 0 && parentNode ? parentNode!!.position.y + (24 + sourceIndex * 32) : sourceY;
       const newSourcePosition = sourceIndex >= 0 ? Position.Right : sourcePosition;
-      const newTargetX = targetIndex >= 0 ? parentNode!!.position.x - 7 : targetX;
-      const newTargetY = targetIndex >= 0 ? parentNode!!.position.y + (48 + targetIndex * 32) : targetY;
+      const newTargetX = targetIndex >= 0 && parentNode ? parentNode!!.position.x - 7 : targetX;
+      const newTargetY = targetIndex >= 0 && parentNode ? parentNode!!.position.y + (48 + targetIndex * 32) : targetY;
       const newTargetPosition = targetIndex >= 0 ? Position.Left : targetPosition;
 
       setPath(

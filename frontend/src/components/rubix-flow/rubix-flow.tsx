@@ -60,12 +60,19 @@ type FlowProps = {
   customNodeTypes: any;
   selectedNodeForSubFlow: NodeInterface | undefined;
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
-  handlePushSelectedNodeForSubFlow:(node: NodeInterface) => void;
-  handleRemoveSelectedNodeForSubFlow: () => void
+  handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
+  handleRemoveSelectedNodeForSubFlow: () => void;
 };
 
 const Flow = (props: FlowProps) => {
-  const { customNodeTypes, customEdgeTypes, selectedNodeForSubFlow, setSelectedNodeForSubFlow, handlePushSelectedNodeForSubFlow, handleRemoveSelectedNodeForSubFlow} = props;
+  const {
+    customNodeTypes,
+    customEdgeTypes,
+    selectedNodeForSubFlow,
+    setSelectedNodeForSubFlow,
+    handlePushSelectedNodeForSubFlow,
+    handleRemoveSelectedNodeForSubFlow,
+  } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -170,7 +177,7 @@ const Flow = (props: FlowProps) => {
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
-    handlePushSelectedNodeForSubFlow(node)
+    handlePushSelectedNodeForSubFlow(node);
   };
 
   const onClearAllNodes = () => {
@@ -428,9 +435,36 @@ const Flow = (props: FlowProps) => {
     if (undoable.nodes && undoable.nodes.length === 0) redo();
   };
 
+  const getChildNodeIds = (parentId: string) => {
+    const childNodes: NodeInterface[] = nodes.filter((node: NodeInterface) => node.parentId === parentId);
+    const nodeIds: string[] = [];
+
+    for (const node of childNodes) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+    return nodeIds;
+  };
+
   const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const remainingNodes = nodes.filter((item) => !_nodesDeleted.some((item2) => item.id === item2.id));
-    const remainingEdges = edges.filter((item) => !_edgesDeleted.some((item2) => item.id === item2.id));
+    const nodeIds: string[] = [];
+
+    for (const node of _nodesDeleted) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    };
+
+    const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeIds.includes(item.target) &&
+        !nodeIds.includes(item.source)
+    );
 
     setNodes(remainingNodes);
     setEdges(remainingEdges);
@@ -675,17 +709,17 @@ export const RubixFlow = () => {
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
-  // push the node which is subflow in to save the flow of subflow 
+  // push the node which is subflow in to save the flow of subflow
   const handlePushSelectedNodeForSubFlow = (node: NodeInterface) => {
-      setSelectedNodeForSubFlow([...selectedNodeForSubFlow,node])
-  }
+    setSelectedNodeForSubFlow([...selectedNodeForSubFlow, node]);
+  };
 
   // remove the last node to exit each subflow
   const handleRemoveSelectedNodeForSubFlow = () => {
-      const arrNodeForSubFlow = [...selectedNodeForSubFlow];
-      arrNodeForSubFlow.pop();
-      setSelectedNodeForSubFlow(arrNodeForSubFlow);
-  }
+    const arrNodeForSubFlow = [...selectedNodeForSubFlow];
+    arrNodeForSubFlow.pop();
+    setSelectedNodeForSubFlow(arrNodeForSubFlow);
+  };
   const customEdgeTypes = {
     default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
   };
@@ -705,8 +739,8 @@ export const RubixFlow = () => {
           customNodeTypes={customNodeTypes}
           selectedNodeForSubFlow={nodeForSubFlowEnd}
           setSelectedNodeForSubFlow={setSelectedNodeForSubFlow}
-          handlePushSelectedNodeForSubFlow = {handlePushSelectedNodeForSubFlow}
-          handleRemoveSelectedNodeForSubFlow ={handleRemoveSelectedNodeForSubFlow}
+          handlePushSelectedNodeForSubFlow={handlePushSelectedNodeForSubFlow}
+          handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
         <Spin />
