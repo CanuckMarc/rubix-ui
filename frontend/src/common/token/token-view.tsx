@@ -1,5 +1,5 @@
 import { List, Popconfirm, Spin, Tooltip } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, RedoOutlined } from "@ant-design/icons";
 import { externaltoken } from "../../../wailsjs/go/models";
 import { CommonTokenFactory } from "./factory";
