@@ -88,6 +88,10 @@ input::-webkit-inner-spin-button {
   border: 0;
 }
 
-.ant-collapse>.ant-collapse-item>.ant-collapse-header {
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
   color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-collapse > .tree-active > .ant-collapse-header {
+  color: #60a5fa !important;
 }
