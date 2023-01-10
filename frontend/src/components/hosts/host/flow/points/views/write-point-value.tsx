@@ -48,7 +48,7 @@ export const WritePointValueModal = (props: any) => {
     }
   };
   const onChange = (value: number, priorityKey: string) => {
-    formData[priorityKey] = Number(value);
+    formData[priorityKey] = value ? Number(value) : null;
     setFormData(formData);
   };
 
@@ -70,7 +70,6 @@ export const WritePointValueModal = (props: any) => {
   const getPointPriority = async () => {
     const { priority = {} } = await factory.GetPointPriority(point.uuid);
     if (priority) {
-      delete priority.point_uuid;
       initialFormValues(priority);
     } else {
       initialFormValues({});
