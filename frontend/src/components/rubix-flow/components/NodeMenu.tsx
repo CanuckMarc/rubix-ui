@@ -16,7 +16,8 @@ type NodeMenuProps = {
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
-  deleteAllInputsOrOutputs: (isInputs: boolean, nodeId: string) => void;
+  deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
+  deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
 };
 
@@ -32,7 +33,8 @@ const NodeMenu = ({
   isDoubleClick,
   onClose,
   handleAddSubFlow,
-  deleteAllInputsOrOutputs,
+  deleteAllInputOrOutputOfParentNode,
+  deleteAllInputOrOutputConnectionsOfNode,
   selectedNodeForSubFlow,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
@@ -68,10 +70,19 @@ const NodeMenu = ({
     onClose();
   };
 
-  const deleteAllInputs = (isInputs = false) => () => {
-    deleteAllInputsOrOutputs(isInputs, node.id);
-    onClose();
-  };
+  const deleteAllInputs =
+    (isInputs = false) =>
+    () => {
+      deleteAllInputOrOutputOfParentNode(isInputs, node.id);
+      onClose();
+    };
+
+  const deleteAllInputConnection =
+    (isInputs = false) =>
+    () => {
+      deleteAllInputOrOutputConnectionsOfNode(isInputs, node.id);
+      onClose();
+    };
 
   useEffect(() => {
     const nodeType = (nodesSpec as NodeSpecJSON[]).find((item) => item.type === node.type) || DEFAULT_NODE_SPEC_JSON;
@@ -148,21 +159,35 @@ const NodeMenu = ({
                 Open Sub Flow
               </div>
               <div
-                key="Delete all inputs"
+                key="Delete all input"
                 className="cursor-pointer border-b border-gray-600  ant-menu-item"
                 onClick={deleteAllInputs(true)}
               >
-                Delete all inputs
+                Delete all input
               </div>
               <div
-                key="Delete all outputs"
+                key="Delete all output"
                 className="cursor-pointer border-b border-gray-600  ant-menu-item"
                 onClick={deleteAllInputs(false)}
               >
-                Delete all outputs
+                Delete all output
               </div>
             </>
           )}
+          <div
+            key="Delete all input connection"
+            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            onClick={deleteAllInputConnection(true)}
+          >
+            Delete all input connection
+          </div>
+          <div
+            key="Delete all output connection"
+            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            onClick={deleteAllInputConnection(false)}
+          >
+            Delete all output connection
+          </div>
           <HelpComponent node={node} onClose={onClose} />
         </div>
       )}
