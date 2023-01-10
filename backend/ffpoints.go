@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
 	log "github.com/sirupsen/logrus"
@@ -44,6 +45,7 @@ func (inst *App) WritePointValue(connUUID, hostUUID, pointUUID string, value *mo
 }
 
 func (inst *App) writePointValue(connUUID, hostUUID, pointUUID string, body *model.Priority) (*model.Point, error) {
+	pprint.PrintJOSN(body)
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
