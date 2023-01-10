@@ -65,6 +65,7 @@ type FlowProps = {
 };
 
 const Flow = (props: FlowProps) => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const {
     customNodeTypes,
     customEdgeTypes,
@@ -80,19 +81,17 @@ const Flow = (props: FlowProps) => {
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
-  const refreshInterval = useRef<null | any>(null);
   const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] = useUndoable({ nodes: nodes, edges: edges });
   const [isDoubleClick, setIsDoubleClick] = useState(false);
   const [flowSettings, setFlowSettings] = useState(getFlowSettings());
-  const rubixFlowWrapper = useRef<null | any>(null);
   const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
+  const [nodesSpec] = useNodesSpec();
+  const refreshInterval = useRef<null | any>(null);
+  const rubixFlowWrapper = useRef<null | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
   const isDragSelection = useRef<boolean>(false);
 
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
-  const [nodesSpec] = useNodesSpec();
-
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
   const { DragSelection } = useSelectionContainer({
@@ -301,8 +300,8 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
-            if (newEdge.sourceHandle.includes('-')) {
-              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split('-');
+            if (newEdge.sourceHandle.includes("-")) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split("-");
               newEdge.source = sourceNodeId;
               newEdge.sourceHandle = sourceName;
             }
@@ -462,7 +461,7 @@ const Flow = (props: FlowProps) => {
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
-    };
+    }
 
     const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
     const remainingEdges = edges.filter(

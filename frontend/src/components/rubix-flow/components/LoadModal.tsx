@@ -19,11 +19,11 @@ export type LoadModalProps = {
 };
 
 export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
-  const [value, setValue] = useState<string>();
   const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
-
+  const [value, setValue] = useState<string>();
   const instance = useReactFlow();
+
+  const isRemote = !!connUUID && !!hostUUID;
 
   const handleLoad = async () => {
     let graph;
@@ -65,7 +65,7 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
 
         const newNodeL1 = newNodes.find((n) => n.oldId === item.parentId);
         const newItem = { ...item, oldId: item.id, id: newNodeIdB };
-        
+
         if (newNodeL1) {
           newItem.parentId = newNodeL1.id;
         }
@@ -73,15 +73,14 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
         newNodes.push(newItem);
 
         const childNodes = nodes.filter((i2: NodeInterface) => i2.parentId === item.id);
-        
+
         childNodes.forEach((child) => {
-          if (newNodes.findIndex((node) => node.oldId === child.id) !== -1){
+          if (newNodes.findIndex((node) => node.oldId === child.id) !== -1) {
             newNodes.push({ ...child, id: generateUuid(), parentId: newNodeIdB, oldId: child.id });
           }
         });
       });
       nodes = newNodes;
-
     } else {
       // filter parent nodes and nodes not belonging to sub flow
       // generate nodes with new id and keep old id to mapping with edge
@@ -110,7 +109,6 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
         }
 
         copyAllNode(parentNode.id, newNodeId);
-        
       });
 
       newNodes.push(

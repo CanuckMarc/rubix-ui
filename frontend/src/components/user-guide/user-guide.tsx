@@ -29,9 +29,10 @@ const NodeHelpTable = (props: any) => {
 
 export const UserGuide = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
   const [nodeHelps, setNodeHelps] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
+
+  const isRemote = !!connUUID && !!hostUUID;
 
   const config = {
     originData: nodeHelps,

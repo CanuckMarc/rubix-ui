@@ -24,7 +24,8 @@ export const AddNodeComponent = ({ node, selectedNodeForSubFlow, onClose, instan
   const [nodePickerVisibility, setNodePickerVisibility] = useState(false);
   const [nodeList, setNodeList] = useState([] as any[]);
   const nodes = instance.getNodes();
-  const isRemote = connUUID && hostUUID ? true : false;
+
+  const isRemote = !!connUUID && !!hostUUID;
   const category = node.type?.split("/")[0];
   const title = isAddSubNode ? "Add sub node" : "Add node";
   const factory = new FlowFactory();

@@ -8,11 +8,11 @@ import { useParams } from "react-router-dom";
 
 export const CreateModal = (props: any) => {
   const { isModalVisible, schema, onCloseModal, refreshList } = props;
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({} as Connection);
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
 
+  const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
   const add = async (connection: Connection) => {

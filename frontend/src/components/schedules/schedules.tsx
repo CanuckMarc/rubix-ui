@@ -7,10 +7,10 @@ import { SchedulesTable } from "./views/table";
 const { Title } = Typography;
 
 export const Schedules = () => {
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const isRemote = connUUID && hostUUID ? true : false;
+
   const factory = new SchedulesFactory();
 
   const fetch = async () => {
@@ -35,11 +35,7 @@ export const Schedules = () => {
         Schedules
       </Title>
       <Card bordered={false}>
-        <SchedulesTable
-          data={data}
-          isFetching={isFetching}
-          refreshList={fetch}
-        />
+        <SchedulesTable data={data} isFetching={isFetching} refreshList={fetch} />
       </Card>
     </>
   );
