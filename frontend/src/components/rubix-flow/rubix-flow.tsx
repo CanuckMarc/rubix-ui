@@ -17,7 +17,7 @@ import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
-import { Node as NodePanel } from "./components/Node";
+import { isInputFlow, isOutputFlow, Node as NodePanel } from "./components/Node";
 import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
@@ -301,8 +301,8 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
-            if (newEdge.sourceHandle.includes('-')) {
-              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split('-');
+            if (newEdge.sourceHandle.includes("-")) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split("-");
               newEdge.source = sourceNodeId;
               newEdge.sourceHandle = sourceName;
             }
@@ -462,7 +462,7 @@ const Flow = (props: FlowProps) => {
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
-    };
+    }
 
     const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
     const remainingEdges = edges.filter(
@@ -570,6 +570,21 @@ const Flow = (props: FlowProps) => {
       return newNodes;
     } catch (error) {
       return nodes;
+    }
+  };
+
+  const deleteAllInputsOrOutputsOfParentNode = (isInputs: boolean, parentNodeId: string) => {
+    const deletedNodes: NodeInterface[] = nodes
+      .filter((node: NodeInterface) => node.parentId === parentNodeId)
+      .filter(({ type }: NodeInterface) => {
+        if (isInputs) {
+          return isInputFlow(type!!);
+        }
+        return isOutputFlow(type!!);
+      });
+
+    if (deletedNodes.length > 0) {
+      deleteNodesAndEdges(deletedNodes, []);
     }
   };
 
@@ -695,6 +710,7 @@ const Flow = (props: FlowProps) => {
             )}
             {nodeMenuVisibility && (
               <NodeMenu
+                deleteAllInputsOrOutputs={deleteAllInputsOrOutputsOfParentNode}
                 position={nodeMenuVisibility}
                 node={selectedNode}
                 onClose={closeNodePicker}

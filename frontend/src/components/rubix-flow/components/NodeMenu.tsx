@@ -16,6 +16,7 @@ type NodeMenuProps = {
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
+  deleteAllInputsOrOutputs: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
 };
 
@@ -31,6 +32,7 @@ const NodeMenu = ({
   isDoubleClick,
   onClose,
   handleAddSubFlow,
+  deleteAllInputsOrOutputs,
   selectedNodeForSubFlow,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
@@ -63,6 +65,11 @@ const NodeMenu = ({
 
   const onSubFlowClick = () => {
     handleAddSubFlow(node);
+    onClose();
+  };
+
+  const deleteAllInputs = (isInputs = false) => () => {
+    deleteAllInputsOrOutputs(isInputs, node.id);
     onClose();
   };
 
@@ -132,13 +139,29 @@ const NodeMenu = ({
             Set Name
           </div>
           {node.isParent && (
-            <div
-              key="Sub flow"
-              className="cursor-pointer border-b border-gray-600  ant-menu-item"
-              onClick={onSubFlowClick}
-            >
-              Open Sub Flow
-            </div>
+            <>
+              <div
+                key="Sub flow"
+                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                onClick={onSubFlowClick}
+              >
+                Open Sub Flow
+              </div>
+              <div
+                key="Delete all inputs"
+                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                onClick={deleteAllInputs(true)}
+              >
+                Delete all inputs
+              </div>
+              <div
+                key="Delete all outputs"
+                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                onClick={deleteAllInputs(false)}
+              >
+                Delete all outputs
+              </div>
+            </>
           )}
           <HelpComponent node={node} onClose={onClose} />
         </div>
