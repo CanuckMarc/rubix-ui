@@ -31,11 +31,47 @@ const ScannerTable = (props: any) => {
   );
 };
 
+
+
+
 export const PcScanner = () => {
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIpPorts, setSelectedIpPorts] = useState([]);
+
+
+  const fakeDate = {
+    "hosts": [
+      {
+        "ip": "192.168.15.122222",
+        "ports": [
+          {
+            "service": "rubix-assist",
+            "port": "1662"
+          }
+        ]
+      },
+      {
+        "ip": "192.168.15.11",
+        "ports": [
+          {
+            "service": "rubix-assist",
+            "port": "1662"
+          }
+        ]
+      },
+      {
+        "ip": "192.168.15.190",
+        "ports": [
+          {
+            "service": "rubix-assist",
+            "port": "1662"
+          }
+        ]
+      }
+    ]
+  }
 
   useEffect(() => {
     fetch();
