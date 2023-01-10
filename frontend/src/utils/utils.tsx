@@ -75,7 +75,7 @@ export function pluginLogo(plugin: string): string {
   return image;
 }
 
-export const copyToClipboard = (text: string) => {
+export const copyToClipboard = (text: string, successMessage?: string, failMessage?: string) => {
   try {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
@@ -93,9 +93,11 @@ export const copyToClipboard = (text: string) => {
       selection.removeAllRanges();
       document.body.removeChild(textarea);
     }
-    return openNotificationWithIcon("success", "Copied to clipboard!");
+    const _successMessage = successMessage ? successMessage : "Copied to clipboard!";
+    return openNotificationWithIcon("success", _successMessage);
   } catch (ex) {
-    return openNotificationWithIcon("error", "Failure on copying on clipboard!");
+    const _failMessage = failMessage ? failMessage : "Failure on copying on clipboard!";
+    return openNotificationWithIcon("error", _failMessage);
   }
 };
 
