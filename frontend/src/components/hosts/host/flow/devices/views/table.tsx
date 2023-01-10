@@ -34,7 +34,7 @@ export const FlowDeviceTable = (props: any) => {
   const [currentItem, setCurrentItem] = useState({});
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [tableHeaders, setTableHeaders] = useState<any[]>([]);
-  const [filteredData, setFilteredData] = useState<Device[]>(data);
+  const [filteredData, setFilteredData] = useState<Device[]>([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
@@ -227,6 +227,10 @@ export const FlowDeviceTable = (props: any) => {
   useEffect(() => {
     getSchema();
   }, [pluginName]);
+
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
   return (
     <>
