@@ -16,12 +16,6 @@ export const WritePointValueModal = (props: any) => {
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
-  useEffect(() => {
-    if (isModalVisible) {
-      initialFormValues({});
-    }
-  }, [isModalVisible]);
-
   const initialFormValues = (priority: Priority) => {
     const value = {
       _1: getNum(priority["_1"]),
@@ -45,15 +39,16 @@ export const WritePointValueModal = (props: any) => {
   };
 
   const getNum = (value: any) => {
-    if (!value) {
-      return null;
-    }
-    if (typeof value === "number") {
+    if (typeof value === "number" && String(value)) {
+      //include case value = 0
       return value;
+    } else {
+      //include case typeof value = string
+      return null;
     }
   };
   const onChange = (value: number, priorityKey: string) => {
-    formData[priorityKey] = Number(value);
+    formData[priorityKey] = value ? Number(value) : null;
     setFormData(formData);
   };
 
@@ -71,6 +66,21 @@ export const WritePointValueModal = (props: any) => {
       setConfirmLoading(false);
     }
   };
+
+  const getPointPriority = async () => {
+    const { priority = {} } = await factory.GetPointPriority(point.uuid);
+    if (priority) {
+      initialFormValues(priority);
+    } else {
+      initialFormValues({});
+    }
+  };
+
+  useEffect(() => {
+    if (isModalVisible) {
+      getPointPriority();
+    }
+  }, [isModalVisible]);
 
   return (
     <Modal
@@ -91,6 +101,7 @@ export const WritePointValueModal = (props: any) => {
               step="0.01"
               stringMode
               placeholder={priorityKey}
+              defaultValue={formData[priorityKey]}
               onChange={(v: number) => {
                 onChange(v, priorityKey);
               }}
