@@ -33,6 +33,7 @@ import { NodeInterface } from "./lib/Nodes/NodeInterface";
 import { handleGetSettingType, handleNodesEmptySettings } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
+import { NodesTree } from "./components/NodesTree";
 import { NodeSideBar } from "./components/NodeSidebar";
 import "./rubix-flow.css";
 import { categoryColorMap } from "./util/colors";
@@ -633,6 +634,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
+      <NodesTree nodes={nodes} />
       <NodeSideBar />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
