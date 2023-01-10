@@ -57,7 +57,7 @@ func (inst *App) OnQuit() {
 }
 
 func (inst *App) NubeHelp() {
-	url := "https://desk.zoho.com.au/portal/nubeio/en/home"
+	url := "https://nubeio.zohodesk.com.au/portal/en/kb/nube-io/software/rubix-platform-ce"
 	var err error
 	switch runtime.GOOS {
 	case "linux":
