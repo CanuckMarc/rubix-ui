@@ -1,25 +1,25 @@
 .rubix-flow {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
 }
 
 .rubix-flow__node-sidebar {
-    min-width: 210px;
+  min-width: 210px;
 }
 
 .rubix-flow__wrapper {
-    flex-grow: 1;
-    height: 100vh;
+  flex-grow: 1;
+  height: 100vh;
 }
 
 .title-icon {
-    float: right;
-    margin-top: 5px;
-    margin-right: 16px;
-    cursor: pointer;
+  float: right;
+  margin-top: 5px;
+  margin-right: 16px;
+  cursor: pointer;
 }
 
-.node-help-modal>.ant-modal-content>.ant-modal-body>div>table {
-    width: 100%;
+.node-help-modal > .ant-modal-content > .ant-modal-body > div > table {
+  width: 100%;
 }
