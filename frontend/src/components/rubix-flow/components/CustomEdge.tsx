@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Position } from "react-flow-renderer";
 import { Edge, EdgeProps, getBezierPath, useEdges, useNodes } from "react-flow-renderer/nocss";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { isInputFlow, isOutputFlow } from "./Node";
 
 export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
   const {
@@ -43,15 +44,8 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       );
       const childNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.parentId === parentNode?.id);
 
-      const inputNodes = childNodes.filter((n: NodeInterface) => {
-        const type = n.type!!.split("/")?.[1];
-        return ["input-float", "input-string", "input-bool"].includes(type);
-      });
-
-      const outputNodes = childNodes.filter((n: NodeInterface) => {
-        const type = n.type!!.split("/")?.[1];
-        return ["output-float", "output-string", "output-bool"].includes(type);
-      });
+      const inputNodes = childNodes.filter((n: NodeInterface) => isInputFlow(n.type!!));
+      const outputNodes = childNodes.filter((n: NodeInterface) => isOutputFlow(n.type!!));
 
       const targetIndex = inputNodes.findIndex((n) => n.id === edge.target);
       const sourceIndex = outputNodes.findIndex((n) => n.id === edge.source);

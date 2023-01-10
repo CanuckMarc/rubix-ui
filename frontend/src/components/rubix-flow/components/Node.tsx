@@ -127,7 +127,12 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node:
   return newOutputs;
 };
 
-const isOutputFlow = (type: string) => {
+export const isInputFlow = (type: string) => {
+  const newType = type.split("/")?.[1];
+  return ["input-float", "input-string", "input-bool"].includes(newType);
+};
+
+export const isOutputFlow = (type: string) => {
   const newType = type.split("/")?.[1];
   return ["output-float", "output-string", "output-bool"].includes(newType);
 };
@@ -152,10 +157,7 @@ export const Node = (props: NodeProps) => {
 
   const nodeInputs = node.isParent
     ? childNodes
-        .filter((n: NodeInterface) => {
-          const type = n.type!!.split("/")?.[1];
-          return ["input-float", "input-string", "input-bool"].includes(type);
-        })
+        .filter((n: NodeInterface) => isInputFlow(n.type!!))
         .map(({ data, id: nodeId, info }, index, arr) => {
           const firstInput: any = data.inputs?.[0] || {};
 
@@ -259,7 +261,7 @@ export const Node = (props: NodeProps) => {
 
         return (
           <div key={ix} className={`flex flex-row justify-between gap-8 relative px-4 my-2 ${borderB}`}>
-            {input && !input.hideInput && (
+            {input && (parentNodeId ? !isInputFlow(node.type) : true) && (
               <InputSocket
                 {...input}
                 value={input.valueOfChild || newData[input.name]}
@@ -272,21 +274,21 @@ export const Node = (props: NodeProps) => {
               />
             )}
             {output && (parentNodeId ? !isOutputFlow(node.type) : true) && (
-                <OutputSocket
-                  {...output}
-                  valueType={output.valueType || output.dataType!!}
-                  minWidth={widthOutput}
-                  dataOut={newData.out}
-                  onSetWidthInput={handleSetWidthOutput}
-                  connected={isHandleConnected(
-                    edges,
-                    // if have node id that mean id of child node in sub flow and present for output of parent node
-                    output.nodeId || id,
-                    output.nodeId ? "in" : output.name,
-                    output.nodeId ? "target" : "source"
-                  )}
-                />
-              )}
+              <OutputSocket
+                {...output}
+                valueType={output.valueType || output.dataType!!}
+                minWidth={widthOutput}
+                dataOut={newData.out}
+                onSetWidthInput={handleSetWidthOutput}
+                connected={isHandleConnected(
+                  edges,
+                  // if have node id that mean id of child node in sub flow and present for output of parent node
+                  output.nodeId || id,
+                  output.nodeId ? "in" : output.name,
+                  output.nodeId ? "target" : "source"
+                )}
+              />
+            )}
           </div>
         );
       })}

@@ -17,7 +17,7 @@ import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
-import { Node as NodePanel } from "./components/Node";
+import { isInputFlow, isOutputFlow, Node as NodePanel } from "./components/Node";
 import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
@@ -572,6 +572,21 @@ const Flow = (props: FlowProps) => {
     }
   };
 
+  const deleteAllInputsOrOutputsOfParentNode = (isInputs: boolean, parentNodeId: string) => {
+    const deletedNodes: NodeInterface[] = nodes
+      .filter((node: NodeInterface) => node.parentId === parentNodeId)
+      .filter(({ type }: NodeInterface) => {
+        if (isInputs) {
+          return isInputFlow(type!!);
+        }
+        return isOutputFlow(type!!);
+      });
+
+    if (deletedNodes.length > 0) {
+      deleteNodesAndEdges(deletedNodes, []);
+    }
+  };
+
   useEffect(() => {
     closeNodePicker();
     factory
@@ -694,6 +709,7 @@ const Flow = (props: FlowProps) => {
             )}
             {nodeMenuVisibility && (
               <NodeMenu
+                deleteAllInputsOrOutputs={deleteAllInputsOrOutputsOfParentNode}
                 position={nodeMenuVisibility}
                 node={selectedNode}
                 onClose={closeNodePicker}
