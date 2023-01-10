@@ -16,12 +16,6 @@ export const WritePointValueModal = (props: any) => {
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
-  useEffect(() => {
-    if (isModalVisible) {
-      initialFormValues({});
-    }
-  }, [isModalVisible]);
-
   const initialFormValues = (priority: Priority) => {
     const value = {
       _1: getNum(priority["_1"]),
@@ -72,6 +66,22 @@ export const WritePointValueModal = (props: any) => {
     }
   };
 
+  const getPointPriority = async () => {
+    const { priority = {} } = await factory.GetPointPriority(point.uuid);
+    if (priority) {
+      delete priority.point_uuid;
+      initialFormValues(priority);
+    } else {
+      initialFormValues({});
+    }
+  };
+
+  useEffect(() => {
+    if (isModalVisible) {
+      getPointPriority();
+    }
+  }, [isModalVisible]);
+
   return (
     <Modal
       centered
@@ -91,6 +101,7 @@ export const WritePointValueModal = (props: any) => {
               step="0.01"
               stringMode
               placeholder={priorityKey}
+              defaultValue={formData[priorityKey]}
               onChange={(v: number) => {
                 onChange(v, priorityKey);
               }}
