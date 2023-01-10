@@ -33,7 +33,7 @@ import { NodeInterface } from "./lib/Nodes/NodeInterface";
 import { handleGetSettingType, handleNodesEmptySettings } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
-import { EditorNode }from "./components/EditorNode";
+import { NodesTree } from "./components/NodesTree";
 import { NodeSideBar } from "./components/NodeSidebar";
 import "./rubix-flow.css";
 import { categoryColorMap } from "./util/colors";
@@ -302,8 +302,8 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
-            if (newEdge.sourceHandle.includes('-')) {
-              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split('-');
+            if (newEdge.sourceHandle.includes("-")) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split("-");
               newEdge.source = sourceNodeId;
               newEdge.sourceHandle = sourceName;
             }
@@ -463,7 +463,7 @@ const Flow = (props: FlowProps) => {
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
-    };
+    }
 
     const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
     const remainingEdges = edges.filter(
@@ -620,7 +620,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <EditorNode nodes={nodes}/>
+      <NodesTree nodes={nodes} />
       <NodeSideBar />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
