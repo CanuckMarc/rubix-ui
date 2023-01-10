@@ -40,7 +40,7 @@ export const FlowPointsTable = (props: any) => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
   const [isWritePointModalVisible, setIsWritePointModalVisible] = useState(false);
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState<Point[]>([]);
 
   const config = {
     originData: data,
@@ -218,6 +218,10 @@ export const FlowPointsTable = (props: any) => {
   useEffect(() => {
     getSchema(pluginName);
   }, [pluginName]);
+
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
 
   return (
     <>
