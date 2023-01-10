@@ -39,11 +39,12 @@ export const WritePointValueModal = (props: any) => {
   };
 
   const getNum = (value: any) => {
-    if (!value) {
-      return null;
-    }
-    if (typeof value === "number") {
+    if (typeof value === "number" && String(value)) {
+      //include case value = 0
       return value;
+    } else {
+      //include case typeof value = string
+      return null;
     }
   };
   const onChange = (value: number, priorityKey: string) => {
