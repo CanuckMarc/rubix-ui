@@ -573,7 +573,7 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const deleteAllInputsOrOutputsOfParentNode = (isInputs: boolean, parentNodeId: string) => {
+  const deleteAllInputOrOutputOfParentNode = (isInputs: boolean, parentNodeId: string) => {
     const deletedNodes: NodeInterface[] = nodes
       .filter((node: NodeInterface) => node.parentId === parentNodeId)
       .filter(({ type }: NodeInterface) => {
@@ -585,6 +585,34 @@ const Flow = (props: FlowProps) => {
 
     if (deletedNodes.length > 0) {
       deleteNodesAndEdges(deletedNodes, []);
+    }
+  };
+
+  const deleteAllInputOrOutputConnectionsOfNode = (isInputs: boolean, nodeId: string) => {
+    const node: NodeInterface | undefined = nodes.find((n: NodeInterface) => n.id === nodeId);
+
+    if (node) {
+      let deletedEdges: Edge[] = [];
+      if (node.isParent) {
+        const nodesWithConnections: NodeInterface[] = nodes
+          .filter((node: NodeInterface) => node.parentId === nodeId)
+          .filter(({ type }: NodeInterface) => {
+            return isInputs ? isInputFlow(type!!) : isOutputFlow(type!!);
+          });
+
+        deletedEdges = edges.filter((edge: Edge) => {
+          return nodesWithConnections.some((node: NodeInterface) => {
+            return isInputs ? node.id === edge.target : node.id === edge.source;
+          });
+        });
+      } else {
+        deletedEdges = edges.filter((edge: Edge) => {
+          return isInputs ? nodeId === edge.target : nodeId === edge.source;
+        });
+      }
+      if (deletedEdges.length > 0) {
+        deleteNodesAndEdges([], deletedEdges);
+      }
     }
   };
 
@@ -711,7 +739,8 @@ const Flow = (props: FlowProps) => {
             )}
             {nodeMenuVisibility && (
               <NodeMenu
-                deleteAllInputsOrOutputs={deleteAllInputsOrOutputsOfParentNode}
+                deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
+                deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
                 position={nodeMenuVisibility}
                 node={selectedNode}
                 onClose={closeNodePicker}
