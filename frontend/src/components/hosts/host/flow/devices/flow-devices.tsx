@@ -27,7 +27,7 @@ const bacnet = "BACNET";
 export const FlowDevices = () => {
   const { connUUID = "", hostUUID = "", networkUUID = "", locUUID = "", netUUID = "", pluginName = "" } = useParams();
   const [pluginUUID, setPluginUUID] = useState<any>();
-  const [data, setDevices] = useState([] as Device[]);
+  const [data, setData] = useState([] as Device[]);
   const [whoIs, setWhoIs] = useState([] as Device[]);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingWhoIs, setIsFetchingWhoIs] = useState(false);
@@ -85,7 +85,7 @@ export const FlowDevices = () => {
       setIsFetching(true);
       const res = await flowNetworkFactory.GetOne(networkUUID, true);
       const devices = (res.devices || []) as Device[];
-      setDevices(devices);
+      setData(devices);
       setPluginUUID(res.plugin_conf_id);
       addPrefix(res.name);
       setDataLocalStorage(devices); //handle mass edit
