@@ -80,22 +80,22 @@ export const UpdateTimeSetting = () => {
     }
   };
 
-  const handleNPTEnable = async () => {
+  const handleNTPEnable = async () => {
     const res = await factory.EdgeNTPEnable(connUUID, hostUUID)
     // console.log(res)
   }
 
-  const handleNPTDisable = async () => {
+  const handleNTPDisable = async () => {
     const res = await factory.EdgeNTPDisable(connUUID, hostUUID)
     // console.log(res)
   }
 
   const content = (
     <div>
-      <Button type="primary" className="mr-3" onClick={handleNPTEnable}>
+      <Button type="primary" className="mr-3" onClick={handleNTPEnable}>
         Enable
       </Button>
-      <Button type="primary" danger className="mr-3" onClick={handleNPTDisable}>
+      <Button type="primary" danger className="mr-3" onClick={handleNTPDisable}>
         Disable
       </Button>
     </div>
@@ -112,7 +112,7 @@ export const UpdateTimeSetting = () => {
         </Button>
         <Button type="primary" className="mr-3">
           <Popover content={content} title="Actions" trigger="hover">
-            Update NPT Service
+            Update NTP Service
           </Popover>
         </Button>
       </div>
