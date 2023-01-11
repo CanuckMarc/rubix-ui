@@ -738,6 +738,8 @@ const Flow = (props: FlowProps) => {
               <NodeMenu
                 deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
                 deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                deleteNode={deleteNodesAndEdges}
+                duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
                 node={selectedNode}
                 onClose={closeNodePicker}
