@@ -467,6 +467,9 @@ func (inst *App) getFlow(connUUID, hostUUID string) (interface{}, error) {
 func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 	if isRemote {
 		resp, err := inst.getFlow(connUUID, hostUUID)
+		nodeList := &nodes.NodesList{}
+		mapstructure.Decode(resp, &nodeList)
+		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
@@ -475,6 +478,7 @@ func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.GetFlow()
+	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return resp
@@ -546,7 +550,6 @@ func (inst *App) nodePallet(connUUID, hostUUID, filterCategory string) ([]nodes.
 }
 
 func (inst *App) NodePallet(connUUID, hostUUID, filterCategory string, isRemote bool) []nodes.PalletNode {
-
 	if isRemote {
 		resp, err := inst.nodePallet(connUUID, hostUUID, filterCategory)
 		if err != nil {
@@ -596,7 +599,7 @@ var downloadRateLimit = ratelimit.New(1, 5*time.Second)
 func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedNodes interface{}, restartFlow bool) *flow.Message {
 	nodeList := &nodes.NodesList{}
 	mapstructure.Decode(encodedNodes, &nodeList)
-	log.Infof("nodes sent from ui lenght: %d", len(nodeList.Nodes))
+	log.Infof("nodes sent from ui count: %d", len(nodeList.Nodes))
 	if isRemote {
 		if downloadRateLimit.Limit() {
 			inst.uiWarningMessage("downloads are limited to one every 5 seconds")
