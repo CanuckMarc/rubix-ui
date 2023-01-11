@@ -61,6 +61,7 @@ export const SetNameModal: FC<SetNameModalProps> = ({
           name={"Name"}
           valueType="string"
           value={name}
+          autoFocus
           onChange={handleChange}
           isHideConnect
         />

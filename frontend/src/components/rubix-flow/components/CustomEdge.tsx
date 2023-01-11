@@ -50,18 +50,15 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       const targetIndex = inputNodes.findIndex((n) => n.id === edge.target);
       const sourceIndex = outputNodes.findIndex((n) => n.id === edge.source);
       const isHaveSubName = !!parentNode?.info?.nodeName || !!parentNode?.status?.waringIcon;
+      const startPosition = isHaveSubName ? 70 : 48;
 
       const newSourceX = sourceIndex >= 0 && parentNode ? parentNode!!.position.x + parentNode.width!! + 7 : sourceX;
       const newSourceY =
-        sourceIndex >= 0 && parentNode
-          ? parentNode!!.position.y + ((isHaveSubName ? 70 : 48) + sourceIndex * 32)
-          : sourceY;
+        sourceIndex >= 0 && parentNode ? parentNode!!.position.y + (startPosition + sourceIndex * 32) : sourceY;
       const newSourcePosition = sourceIndex >= 0 ? Position.Right : sourcePosition;
       const newTargetX = targetIndex >= 0 && parentNode ? parentNode!!.position.x - 7 : targetX;
       const newTargetY =
-        targetIndex >= 0 && parentNode
-          ? parentNode!!.position.y + ((isHaveSubName ? 70 : 48) + targetIndex * 32)
-          : targetY;
+        targetIndex >= 0 && parentNode ? parentNode!!.position.y + (startPosition + targetIndex * 32) : targetY;
       const newTargetPosition = targetIndex >= 0 ? Position.Left : targetPosition;
 
       setPath(
