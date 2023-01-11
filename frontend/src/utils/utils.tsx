@@ -75,30 +75,6 @@ export function pluginLogo(plugin: string): string {
   return image;
 }
 
-export const copyToClipboard = (text: string) => {
-  try {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      const textarea = document.createElement("textarea");
-      textarea.textContent = text;
-      textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
-      document.body.appendChild(textarea);
-      const selection = window.getSelection() as any;
-      selection.removeAllRanges();
-      const range = document.createRange();
-      range.selectNode(textarea);
-      selection.addRange(range);
-      document.execCommand("copy"); // Security exception may be thrown by some browsers.
-      selection.removeAllRanges();
-      document.body.removeChild(textarea);
-    }
-    return openNotificationWithIcon("success", "Copied to clipboard!");
-  } catch (ex) {
-    return openNotificationWithIcon("error", "Failure on copying on clipboard!");
-  }
-};
-
 export const downloadJSON = (fileName: string, data: any) => {
   const blob = new Blob([data], { type: "text/plain" });
   const e = document.createEvent("MouseEvents"),
