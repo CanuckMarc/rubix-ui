@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/NubeDev/flow-eng/helpers/boolean"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/store"
@@ -92,7 +91,7 @@ func (inst *App) getAssistClient(body *AssistClient) (*assistcli.Client, error) 
 	client := &assistcli.Client{
 		Ip:            connection.IP,
 		Port:          connection.Port,
-		HTTPS:         boolean.NewFalse(),
+		HTTPS:         connection.HTTPS,
 		ExternalToken: connection.ExternalToken,
 	}
 	cli := assistcli.New(client)
@@ -111,7 +110,7 @@ func (inst *App) forceGetAssistClient(uuid string) (*assistcli.Client, error) {
 	client := &assistcli.Client{
 		Ip:            connection.IP,
 		Port:          connection.Port,
-		HTTPS:         boolean.NewFalse(),
+		HTTPS:         connection.HTTPS,
 		ExternalToken: connection.ExternalToken,
 	}
 	cli := assistcli.ForceNew(client)

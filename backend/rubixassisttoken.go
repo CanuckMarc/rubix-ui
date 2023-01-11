@@ -13,7 +13,7 @@ func (inst *App) RubixAssistLogin(connUUID, username, password string) *model.To
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	inst.uiSuccessMessage("STEP-1: on the add button generate a new token")
+	inst.uiSuccessMessage("Step 1: on the add button generate a new token")
 	return resp
 }
 
@@ -41,7 +41,7 @@ func (inst *App) RubixAssistTokenGenerate(connUUID, jwtToken, name string) *exte
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	inst.uiSuccessMessage("STEP-1: copy the token STEP-2: edit the connection and paste in the generated token")
+	inst.uiSuccessMessage("Step 1: copy the token & Step 2: edit the connection and paste in the generated token")
 	return resp
 }
 
