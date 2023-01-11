@@ -7,7 +7,6 @@ import { copyTextToClipboard } from "../../utils/utils";
 
 export const TokenView = (props: ITokenView) => {
   const { jwtToken, tokens = [], isLoading, factory, fetchToken, setIsLoading } = props;
-
   const [displayToken, setDisplayToken] = useState({} as externaltoken.ExternalToken);
   const [regeneratedToken, setRegeneratedToken] = useState({} as externaltoken.ExternalToken);
 
@@ -21,7 +20,9 @@ export const TokenView = (props: ITokenView) => {
     try {
       const externalToken = await factory.Token(jwtToken, token.uuid);
       setDisplayToken(externalToken || ({} as externaltoken.ExternalToken));
-      if (externalToken && externalToken.token) copyTextToClipboard(externalToken.token, "Copy TOKEN to clipboard!");
+      if (externalToken && externalToken.token) {
+        copyTextToClipboard(externalToken.token, "Copy TOKEN to clipboard!");
+      }
     } finally {
       setIsLoading(false);
     }
