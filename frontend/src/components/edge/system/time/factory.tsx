@@ -2,7 +2,8 @@ import {
   EdgeGetTimeZoneList,
   EdgeUpdateSystemTime,
   EdgeUpdateTimezone,
-  GetHostTime
+  GetHostTime,
+  EdgeNTPEnable
 } from "../../../../../wailsjs/go/backend/App";
 import {Helpers} from "../../../../helpers/checks";
 import {datelib, system} from "../../../../../wailsjs/go/models";
@@ -32,9 +33,13 @@ export class HostTimeFactory {
   public EdgeUpdateTimezone(connectionUUID: string, hostUUID: string, timeZone: string): Promise<system.Message> {
     return EdgeUpdateTimezone(connectionUUID, hostUUID, timeZone);
   }
-
+  
   public EdgeUpdateSystemTime(connectionUUID: string, hostUUID: string, timeString: string): Promise<datelib.Time> {
     return EdgeUpdateSystemTime(connectionUUID, hostUUID, timeString);
   }
 
+  public EdgeNTPEnable(connUUID: string, hostUUID: string): Promise<system.Message> {
+    return EdgeNTPEnable(connUUID, hostUUID);
+  }
+  
 }

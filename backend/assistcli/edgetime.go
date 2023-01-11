@@ -2,10 +2,11 @@ package assistcli
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/NubeIO/lib-date/datelib"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-edge/service/system"
-	"time"
 )
 
 func (inst *Client) EdgeSystemTime(hostIDName string) (*datelib.Time, error) {
@@ -78,4 +79,17 @@ func (inst *Client) EdgeUpdateSystemTime(hostIDName, timeString string) (*dateli
 		return nil, err
 	}
 	return resp.Result().(*datelib.Time), nil
+}
+
+func (inst *Client) EdgeNTPEnable(hostIDName string) (*system.Message, error) {
+	url := fmt.Sprintf("proxy/api/time/ntp/enable/")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host_uuid", hostIDName).
+		SetHeader("host_name", hostIDName).
+		SetResult(&system.Message{}).
+		Post(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*system.Message), nil
 }

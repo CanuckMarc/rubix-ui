@@ -1,4 +1,4 @@
-import { Button, DatePicker, DatePickerProps, Descriptions, Modal, Select, Spin } from "antd";
+import { Button, DatePicker, DatePickerProps, Descriptions, Modal, Select, Spin, Popover } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { HostTimeFactory } from "./factory";
@@ -80,14 +80,35 @@ export const UpdateTimeSetting = () => {
     }
   };
 
+  const handleNPTEnable = async () => {
+    const res = await factory.EdgeNTPEnable(connUUID, hostUUID)
+    console.log(res)
+  }
+
+  const content = (
+    <div>
+      <Button type="primary" className="mr-3" onClick={handleNPTEnable}>
+        Enable
+      </Button>
+      <Button type="primary" danger className="mr-3">
+        Disable
+      </Button>
+    </div>
+  );
+
   return (
     <>
       <div className="text-start mt-4 justify-between">
         <Button type="primary" onClick={openTimeSetting} className="mr-3">
           Update Time
         </Button>
-        <Button type="primary" onClick={openTimezoneSetting}>
+        <Button type="primary" onClick={openTimezoneSetting} className="mr-3">
           Update Timezone
+        </Button>
+        <Button type="primary" className="mr-3">
+          <Popover content={content} title="Actions" trigger="hover">
+            Update NPT Service
+          </Popover>
         </Button>
       </div>
 

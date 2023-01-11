@@ -44,6 +44,8 @@ export function AddPointsBulk(arg1:string,arg2:string,arg3:Array<model.Point>):P
 
 export function AddProducer(arg1:string,arg2:string,arg3:model.Producer):Promise<model.Producer>;
 
+export function AddSchedule(arg1:string,arg2:string,arg3:model.Schedule):Promise<any>;
+
 export function AddStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
 
 export function AddWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:db.Connection):Promise<db.Connection>;
@@ -109,6 +111,8 @@ export function DeletePointBulk(arg1:string,arg2:string,arg3:Array<backend.UUIDs
 export function DeleteProducer(arg1:string,arg2:string,arg3:string):Promise<any>;
 
 export function DeleteProducerBulk(arg1:string,arg2:string,arg3:Array<backend.UUIDs>):Promise<any>;
+
+export function DeleteSchedule(arg1:string,arg2:string,arg3:string):Promise<any>;
 
 export function DeleteStream(arg1:string,arg2:string,arg3:string):Promise<any>;
 
@@ -232,6 +236,8 @@ export function EditPoint(arg1:string,arg2:string,arg3:string,arg4:model.Point):
 
 export function EditProducer(arg1:string,arg2:string,arg3:string,arg4:model.Producer):Promise<model.Producer>;
 
+export function EditSchedule(arg1:string,arg2:string,arg3:string,arg4:model.Schedule):Promise<any>;
+
 export function EditStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
 
 export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer,arg5:boolean):Promise<model.Writer>;
@@ -348,6 +354,8 @@ export function GetPcTime():Promise<datelib.Time>;
 
 export function GetPoint(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
 
+export function GetPointPriority(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
+
 export function GetPoints(arg1:string,arg2:string):Promise<Array<model.Point>>;
 
 export function GetPointsForDevice(arg1:string,arg2:string,arg3:string):Promise<Array<model.Point>>;
@@ -365,6 +373,8 @@ export function GetRelease(arg1:string):Promise<store.Release>;
 export function GetReleases():Promise<Array<store.Release>>;
 
 export function GetScannerSchema():Promise<any>;
+
+export function GetSchedule(arg1:string,arg2:string,arg3:string):Promise<any>;
 
 export function GetSchedules(arg1:string,arg2:string):Promise<any>;
 
@@ -417,6 +427,10 @@ export function NodeSchema(arg1:string,arg2:string,arg3:boolean,arg4:string):Pro
 export function NodeValue(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<node.Values>;
 
 export function NodeValues(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Values>>;
+
+export function NodesValuesInsideParent(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<node.Values>>;
+
+export function NodesValuesSubFlow(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<node.Values>>;
 
 export function NubeHelp():Promise<void>;
 
