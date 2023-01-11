@@ -52,6 +52,7 @@ type SelectableBoxType = {
 // this is save all nodes
 declare global {
   interface Window {
+    subFlowIds: string[];
     selectedNodeForSubFlow: NodeInterface | undefined;
   }
 }
@@ -656,13 +657,9 @@ const Flow = (props: FlowProps) => {
     };
   }, [flowSettings.refreshTimeout]);
 
-  useEffect(() => {
-    window.selectedNodeForSubFlow = selectedNodeForSubFlow;
-  }, [selectedNodeForSubFlow]);
-
   return (
     <div className="rubix-flow">
-      <NodesTree nodes={nodes} />
+      <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} />
       <NodeSideBar />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
@@ -761,6 +758,11 @@ export const RubixFlow = () => {
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
+  useEffect(() => {
+    window.subFlowIds = selectedNodeForSubFlow.map((node) => node.id);
+    window.selectedNodeForSubFlow = nodeForSubFlowEnd;
+  }, [selectedNodeForSubFlow, nodeForSubFlowEnd]);
+
   // push the node which is subflow in to save the flow of subflow
   const handlePushSelectedNodeForSubFlow = (node: NodeInterface) => {
     setSelectedNodeForSubFlow([...selectedNodeForSubFlow, node]);
@@ -772,6 +774,7 @@ export const RubixFlow = () => {
     arrNodeForSubFlow.pop();
     setSelectedNodeForSubFlow(arrNodeForSubFlow);
   };
+
   const customEdgeTypes = {
     default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
   };

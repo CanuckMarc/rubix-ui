@@ -16,7 +16,6 @@ func (inst *Client) FFGetSchedules(hostIDName string) ([]model.Schedule, error) 
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(resp.String())
 	var out []model.Schedule
 	out = *resp.Result().(*[]model.Schedule)
 	return out, nil

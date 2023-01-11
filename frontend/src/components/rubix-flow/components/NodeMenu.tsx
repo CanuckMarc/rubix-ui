@@ -115,15 +115,8 @@ const NodeMenu = ({
             node={node}
             onClose={onClose}
             instance={instance}
-            isAddSubNode
             selectedNodeForSubFlow={selectedNodeForSubFlow}
-          />  */}
-          <AddNodeComponent
-            node={node}
-            onClose={onClose}
-            instance={instance}
-            selectedNodeForSubFlow={selectedNodeForSubFlow}
-          />
+          /> */}
           {nodeType.allowPayload && (
             <div
               key="Set Payload"
@@ -163,14 +156,14 @@ const NodeMenu = ({
                 className="cursor-pointer border-b border-gray-600  ant-menu-item"
                 onClick={deleteAllInputs(true)}
               >
-                Delete all input
+                Delete all folder inputs
               </div>
               <div
                 key="Delete all output"
                 className="cursor-pointer border-b border-gray-600  ant-menu-item"
                 onClick={deleteAllInputs(false)}
               >
-                Delete all output
+                Delete all folder outputs
               </div>
             </>
           )}
@@ -179,14 +172,14 @@ const NodeMenu = ({
             className="cursor-pointer border-b border-gray-600  ant-menu-item"
             onClick={deleteAllInputConnection(true)}
           >
-            Delete all input connection
+            Delete all input connections
           </div>
           <div
             key="Delete all output connection"
             className="cursor-pointer border-b border-gray-600  ant-menu-item"
             onClick={deleteAllInputConnection(false)}
           >
-            Delete all output connection
+            Delete all output connections
           </div>
           <HelpComponent node={node} onClose={onClose} />
         </div>

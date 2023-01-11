@@ -544,7 +544,7 @@ func (inst *App) nodePallet(connUUID, hostUUID, filterCategory string) ([]nodes.
 }
 
 func (inst *App) NodePallet(connUUID, hostUUID, filterCategory string, isRemote bool) []nodes.PalletNode {
-	fmt.Println(filterCategory)
+
 	if isRemote {
 		resp, err := inst.nodePallet(connUUID, hostUUID, filterCategory)
 		if err != nil {
