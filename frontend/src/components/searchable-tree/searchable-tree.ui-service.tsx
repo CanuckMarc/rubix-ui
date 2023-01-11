@@ -115,7 +115,7 @@ type TreeObj = {
 }
 
 const objectMap = (treeObj: TreeObj) => {
-  treeObj.label = <Tooltip title={treeObj.name}>{treeObj.label}</Tooltip>
+  treeObj.label = <Tooltip placement="right"  title={treeObj.name}>{treeObj.label}</Tooltip>
   return treeObj
 }
 
