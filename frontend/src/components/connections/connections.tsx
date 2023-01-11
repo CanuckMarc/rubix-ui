@@ -1,12 +1,16 @@
-import { ConnectionsTable } from "./views/table";
-import { Card, Tabs, Typography } from "antd";
+import { Typography, Tabs, Card } from "antd";
 import { ApartmentOutlined, RedoOutlined } from "@ant-design/icons";
-import { PcScanner } from "../pc/scanner/table";
+import { useState, useEffect } from "react";
+import { storage } from "../../../wailsjs/go/models";
+import { ROUTES } from "../../constants/routes";
 import RbxBreadcrumb from "../breadcrumbs/breadcrumbs";
+import { PcScanner } from "../pc/scanner/table";
+import { ConnectionFactory } from "./factory";
+import { ConnectionsTable } from "./views/table";
+
+import RubixConnection = storage.RubixConnection;
 
 const { Title } = Typography;
-
-import { ROUTES } from "../../constants/routes";
 
 const ConnectionsTab = () => {
   return (
@@ -28,6 +32,28 @@ const DiscoverTab = () => {
 
 export const Connections = () => {
   const { TabPane } = Tabs;
+  const [data, setData] = useState([] as RubixConnection[]);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const factory = new ConnectionFactory();
+
+  const fetch = async () => {
+    try {
+      setIsFetching(true);
+      const res = (await factory.GetAll()) || [];
+      setData(res);
+    } catch (error) {
+      setData([]);
+    } finally {
+      setTimeout(() => {
+        setIsFetching(false);
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    fetch().catch(console.error);
+  }, []);
 
   return (
     <>
@@ -35,15 +61,13 @@ export const Connections = () => {
         Supervisors
       </Title>
       <Card bordered={false}>
-        <RbxBreadcrumb
-          routes={[{ path: ROUTES.CONNECTIONS, breadcrumbName: "Supervisors" }]}
-        />
+        <RbxBreadcrumb routes={[{ path: ROUTES.CONNECTIONS, breadcrumbName: "Supervisors" }]} />
         <Tabs defaultActiveKey="1">
           <TabPane tab={ConnectionsTab()} key="Connections">
-            <ConnectionsTable />
+            <ConnectionsTable fetch={fetch} isFetching={isFetching} data={data} />
           </TabPane>
           <TabPane tab={DiscoverTab()} key="Discover">
-            <PcScanner />
+            <PcScanner refreshList={fetch} />
           </TabPane>
         </Tabs>
       </Card>

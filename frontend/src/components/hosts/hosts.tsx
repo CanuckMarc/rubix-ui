@@ -31,7 +31,6 @@ const DiscoverTab = () => {
     </span>
   );
 };
-const networksFactory = new NetworksFactory();
 
 export const Hosts = () => {
   let { connUUID = "", netUUID = "", locUUID = "" } = useParams();
@@ -40,19 +39,30 @@ export const Hosts = () => {
   const [isFetching, setIsFetching] = useState(false);
   const { prefixedTitle, addPrefix } = useTitlePrefix("Controllers");
 
+  const networksFactory = new NetworksFactory();
   networksFactory.uuid = netUUID;
   networksFactory.connectionUUID = connUUID;
 
-  useEffect(() => {
-    if (networks.length === 0) {
-      fetchNetworks();
-    }
-    fetchCurrentLocation();
-  }, []);
-
-  useEffect(() => {
-    fetchList();
-  }, [netUUID]);
+  const routes = [
+    {
+      path: ROUTES.CONNECTIONS,
+      breadcrumbName: "Supervisors",
+    },
+    {
+      path: ROUTES.LOCATIONS.replace(":connUUID", connUUID || ""),
+      breadcrumbName: "Location",
+    },
+    {
+      path: ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", locUUID || ""),
+      breadcrumbName: "Group",
+    },
+    {
+      path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
+        .replace(":locUUID", locUUID || "")
+        .replace(":netUUID", netUUID),
+      breadcrumbName: "Controllers",
+    },
+  ];
 
   const fetchCurrentLocation = () => {
     networksFactory.GetOne().then((network) => {
@@ -82,33 +92,16 @@ export const Hosts = () => {
     setNetworks(res);
   };
 
-  const refreshList = () => {
-    fetchList();
-  };
+  useEffect(() => {
+    if (networks.length === 0) {
+      fetchNetworks();
+    }
+    fetchCurrentLocation();
+  }, []);
 
-  const routes = [
-    {
-      path: ROUTES.CONNECTIONS,
-      breadcrumbName: "Supervisors",
-    },
-    {
-      path: ROUTES.LOCATIONS.replace(":connUUID", connUUID || ""),
-      breadcrumbName: "Location",
-    },
-    {
-      path: ROUTES.LOCATION_NETWORKS.replace(
-        ":connUUID",
-        connUUID || ""
-      ).replace(":locUUID", locUUID || ""),
-      breadcrumbName: "Group",
-    },
-    {
-      path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
-        .replace(":locUUID", locUUID || "")
-        .replace(":netUUID", netUUID),
-      breadcrumbName: "Controllers",
-    },
-  ];
+  useEffect(() => {
+    fetchList();
+  }, [netUUID]);
 
   return (
     <>
@@ -119,15 +112,10 @@ export const Hosts = () => {
         <RbxBreadcrumb routes={routes} />
         <Tabs defaultActiveKey="1">
           <TabPane tab={HostsTab()} key="1">
-            <HostsTable
-              hosts={hosts}
-              networks={networks}
-              isFetching={isFetching}
-              refreshList={refreshList}
-            />
+            <HostsTable hosts={hosts} networks={networks} isFetching={isFetching} refreshList={fetchList} />
           </TabPane>
           <TabPane tab={DiscoverTab()} key="2">
-            <PcScanner />
+            <PcScanner refreshList={fetchList} />
           </TabPane>
         </Tabs>
       </Card>

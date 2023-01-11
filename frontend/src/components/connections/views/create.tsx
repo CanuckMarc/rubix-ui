@@ -8,14 +8,7 @@ import { JsonForm } from "../../../common/json-schema-form";
 import RubixConnection = storage.RubixConnection;
 
 export const CreateEditModal = (props: any) => {
-  const {
-    currentConnection,
-    connectionSchema,
-    isModalVisible,
-    isLoadingForm,
-    refreshList,
-    onCloseModal,
-  } = props;
+  const { currentConnection, connectionSchema, isModalVisible, isLoadingForm, refreshList, onCloseModal } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentConnection);
   const factory = new ConnectionFactory();
@@ -58,18 +51,14 @@ export const CreateEditModal = (props: any) => {
     } else {
       await addConnection(connection);
     }
-    setConfirmLoading(false);
     refreshList();
+    setConfirmLoading(false);
     handleClose();
   };
 
   return (
     <Modal
-      title={
-        currentConnection.uuid
-          ? "Edit " + currentConnection.name
-          : "Add New Supervisor"
-      }
+      title={currentConnection.uuid ? "Edit " + currentConnection.name : "Add New Supervisor"}
       visible={isModalVisible}
       onOk={() => handleSubmit(formData)}
       okText="Save"

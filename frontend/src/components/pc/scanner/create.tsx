@@ -1,15 +1,30 @@
+import { Button, Collapse, Modal, Spin } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { openNotificationWithIcon } from "../../../utils/utils";
-import { Button, Collapse, Modal, Spin } from "antd";
 import { JsonForm } from "../../../common/json-schema-form";
-import { storage } from "../../../../wailsjs/go/models";
-import { PlusOutlined } from "@ant-design/icons";
-import RubixConnection = storage.RubixConnection;
+import { amodel, storage } from "../../../../wailsjs/go/models";
 import { ConnectionFactory } from "../../connections/factory";
+import { HostsFactory } from "../../hosts/factory";
+
+import RubixConnection = storage.RubixConnection;
+import Host = amodel.Host;
+import { useParams } from "react-router-dom";
+
 const { Panel } = Collapse;
 
-export const CreateModal = (props: any) => {
-  const { selectedIpPorts, isModalVisible, setIsModalVisible } = props;
+export const AddButton = (props: any) => {
+  const { showModal } = props;
+
+  return (
+    <Button type="primary" onClick={() => showModal()} style={{ margin: "0 6px 10px 0", float: "left" }}>
+      <PlusOutlined /> Supervisors
+    </Button>
+  );
+};
+
+export const CreateConnectionsModal = (props: any) => {
+  const { selectedIpPorts, isModalVisible, onclose, refreshList } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState([] as RubixConnection[]);
   const [schema, setSchema] = useState({});
@@ -17,20 +32,6 @@ export const CreateModal = (props: any) => {
   const [connections, setConnections] = useState([] as RubixConnection[]);
 
   const factory = new ConnectionFactory();
-
-  useEffect(() => {
-    getSchema();
-  }, []);
-
-  useEffect(() => {
-    const newArr = [] as RubixConnection[];
-    selectedIpPorts.forEach((i: any) => {
-      let connection = {} as RubixConnection;
-      connection = { ...connection, ip: i.ip, port: i.ports[0].port };
-      newArr.push(connection);
-    });
-    setConnections(newArr);
-  }, [selectedIpPorts]);
 
   const getSchema = async () => {
     setIsLoadingForm(true);
@@ -59,7 +60,8 @@ export const CreateModal = (props: any) => {
 
   const handleClose = () => {
     setFormData([]);
-    setIsModalVisible(false);
+    onclose();
+    setConfirmLoading(false);
   };
 
   const handleSubmit = async (connections: RubixConnection[]) => {
@@ -77,11 +79,12 @@ export const CreateModal = (props: any) => {
           promises.push(addConnection(c));
         }
         await Promise.all(promises);
+        refreshList();
+        handleClose();
       } catch (error) {
         console.log(error);
       } finally {
         setConfirmLoading(false);
-        handleClose();
       }
     } else {
       openNotificationWithIcon("error", "Please check again 'name' inputs!");
@@ -93,6 +96,20 @@ export const CreateModal = (props: any) => {
     connections[index] = data;
     setFormData(connections);
   };
+
+  useEffect(() => {
+    getSchema();
+  }, []);
+
+  useEffect(() => {
+    const newArr = [] as RubixConnection[];
+    selectedIpPorts.forEach((i: any) => {
+      let connection = {} as RubixConnection;
+      connection = { ...connection, ip: i.ip, port: i.ports[0].port };
+      newArr.push(connection);
+    });
+    setConnections(newArr);
+  }, [selectedIpPorts]);
 
   return (
     <Modal
@@ -124,16 +141,107 @@ export const CreateModal = (props: any) => {
   );
 };
 
-export const AddButton = (props: any) => {
-  const { showModal } = props;
+export const CreateHostsModal = (props: any) => {
+  const { selectedIpPorts, isModalVisible, onclose, refreshList } = props;
+  const { connUUID = "" } = useParams();
+  const [formData, setFormData] = useState<Host[]>([]);
+  const [hosts, setHosts] = useState<Host[]>([]);
+  const [schema, setSchema] = useState({});
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isLoadingForm, setIsLoadingForm] = useState(false);
+
+  const factory = new HostsFactory();
+  factory.connectionUUID = connUUID;
+
+  const getSchema = async () => {
+    setIsLoadingForm(true);
+    const res = await factory.Schema();
+    const jsonSchema = {
+      properties: res,
+    };
+    setSchema(jsonSchema);
+    setIsLoadingForm(false);
+  };
+
+  const add = async (host: Host) => {
+    factory.this = host;
+    try {
+      await factory.Add();
+      openNotificationWithIcon("success", `added ${host.name} success`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleClose = () => {
+    setFormData([]);
+    onclose();
+    setConfirmLoading(false);
+  };
+
+  const handleSubmit = async (hosts: Host[]) => {
+    try {
+      setConfirmLoading(true);
+      const promises = [];
+      for (const h of hosts) {
+        promises.push(add(h));
+      }
+      await Promise.all(promises);
+      refreshList();
+      handleClose();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  const updateFormData = (data: Host) => {
+    const index = hosts.findIndex((h) => h.ip === data.ip);
+    hosts[index] = data;
+    setFormData(hosts);
+  };
+
+  useEffect(() => {
+    getSchema();
+  }, []);
+
+  useEffect(() => {
+    const newArr = [] as Host[];
+    selectedIpPorts.forEach((i: any) => {
+      let host = {} as Host;
+      host = { ...host, ip: i.ip, port: i.ports[0].port };
+      newArr.push(host);
+    });
+    setHosts(newArr);
+  }, [selectedIpPorts]);
 
   return (
-    <Button
-      type="primary"
-      onClick={() => showModal()}
-      style={{ margin: "0 6px 10px 0", float: "left" }}
+    <Modal
+      title="Add New Hosts"
+      visible={isModalVisible}
+      onOk={() => handleSubmit(formData)}
+      onCancel={handleClose}
+      okText="Save"
+      confirmLoading={confirmLoading}
+      maskClosable={false}
+      style={{ textAlign: "start" }}
     >
-      <PlusOutlined /> Supervisors
-    </Button>
+      <Spin spinning={isLoadingForm}>
+        <Collapse defaultActiveKey={["1"]}>
+          {selectedIpPorts.map((i: any, index: number) => {
+            return (
+              <Panel header={i.ip} key={index + 1}>
+                <JsonForm
+                  formData={{ ip: i.ip, port: Number(i.ports[0].port) }}
+                  jsonSchema={schema}
+                  setFormData={updateFormData}
+                />
+              </Panel>
+            );
+          })}
+        </Collapse>
+      </Spin>
+    </Modal>
   );
 };
