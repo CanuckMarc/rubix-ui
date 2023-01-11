@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { FlowProducerFactory } from "../factory";
 import { PRODUCER_HEADERS } from "../../../../../../../constants/headers";
@@ -8,6 +8,7 @@ import { ROUTES } from "../../../../../../../constants/routes";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
@@ -38,8 +39,16 @@ export const ProducersTable = (props: any) => {
       fixed: "left",
       render: (_: any, item: Producer) => (
         <Space size="middle">
-          <Link to={getNavigationLink(item.uuid)}>View Writer Clones</Link>
-          <a onClick={() => showModal(item)}>Edit</a>
+          <Link to={getNavigationLink(item.uuid)}>
+            <Tooltip title="View Writer Clones">
+              <ArrowRightOutlined />
+            </Tooltip>
+          </Link>
+          <a onClick={() => showModal(item)}>
+            <Tooltip title="Edit">
+              <FormOutlined />
+            </Tooltip>
+          </a>
         </Space>
       ),
     },

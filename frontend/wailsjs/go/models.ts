@@ -356,6 +356,7 @@ export namespace backend {
 	    uuid: schema.UUID;
 	    name: schema.Name;
 	    description: schema.Description;
+	    enable: schema.Enable;
 	    ip: Ip;
 	    port: schema.Port;
 	    https: schema.HTTPS;
@@ -370,6 +371,7 @@ export namespace backend {
 	        this.uuid = this.convertValues(source["uuid"], schema.UUID);
 	        this.name = this.convertValues(source["name"], schema.Name);
 	        this.description = this.convertValues(source["description"], schema.Description);
+	        this.enable = this.convertValues(source["enable"], schema.Enable);
 	        this.ip = this.convertValues(source["ip"], Ip);
 	        this.port = this.convertValues(source["port"], schema.Port);
 	        this.https = this.convertValues(source["https"], schema.HTTPS);
@@ -1878,6 +1880,56 @@ export namespace model {
 	
 	
 	
+	export class Schedule {
+	    uuid: string;
+	    name: string;
+	    enable?: boolean;
+	    thing_class?: string;
+	    thing_type?: string;
+	    is_active?: boolean;
+	    is_global?: boolean;
+	    schedule: number[];
+	    // Go type: time.Time
+	    created_on?: any;
+	    // Go type: time.Time
+	    updated_on?: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Schedule(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uuid = source["uuid"];
+	        this.name = source["name"];
+	        this.enable = source["enable"];
+	        this.thing_class = source["thing_class"];
+	        this.thing_type = source["thing_type"];
+	        this.is_active = source["is_active"];
+	        this.is_global = source["is_global"];
+	        this.schedule = source["schedule"];
+	        this.created_on = this.convertValues(source["created_on"], null);
+	        this.updated_on = this.convertValues(source["updated_on"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	
 	export class TokenResponse {
@@ -1964,6 +2016,8 @@ export namespace node {
 	    type: string;
 	    connections?: OutputConnection[];
 	    help: string;
+	    folderExport: boolean;
+	    hideOutput: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Output(source);
@@ -1975,6 +2029,8 @@ export namespace node {
 	        this.type = source["type"];
 	        this.connections = this.convertValues(source["connections"], OutputConnection);
 	        this.help = source["help"];
+	        this.folderExport = source["folderExport"];
+	        this.hideOutput = source["hideOutput"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2023,6 +2079,8 @@ export namespace node {
 	    // Go type: InputConnection
 	    link?: any;
 	    help: string;
+	    folderExport: boolean;
+	    hideInput: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Input(source);
@@ -2034,6 +2092,8 @@ export namespace node {
 	        this.type = source["type"];
 	        this.link = this.convertValues(source["link"], null);
 	        this.help = source["help"];
+	        this.folderExport = source["folderExport"];
+	        this.hideInput = source["hideInput"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2237,6 +2297,8 @@ export namespace nodes {
 	export class PalletOutputs {
 	    name: string;
 	    valueType: string;
+	    folderExport: boolean;
+	    hideOutput: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new PalletOutputs(source);
@@ -2246,12 +2308,16 @@ export namespace nodes {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.valueType = source["valueType"];
+	        this.folderExport = source["folderExport"];
+	        this.hideOutput = source["hideOutput"];
 	    }
 	}
 	export class PalletInputs {
 	    name: string;
 	    valueType: string;
 	    defaultValue?: any;
+	    folderExport: boolean;
+	    hideInput: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new PalletInputs(source);
@@ -2262,6 +2328,8 @@ export namespace nodes {
 	        this.name = source["name"];
 	        this.valueType = source["valueType"];
 	        this.defaultValue = source["defaultValue"];
+	        this.folderExport = source["folderExport"];
+	        this.hideInput = source["hideInput"];
 	    }
 	}
 	export class PalletNode {
@@ -2682,6 +2750,7 @@ export namespace storage {
 	    uuid: string;
 	    name: string;
 	    description: string;
+	    enable: boolean;
 	    ip: string;
 	    port: number;
 	    https: boolean;
@@ -2696,6 +2765,7 @@ export namespace storage {
 	        this.uuid = source["uuid"];
 	        this.name = source["name"];
 	        this.description = source["description"];
+	        this.enable = source["enable"];
 	        this.ip = source["ip"];
 	        this.port = source["port"];
 	        this.https = source["https"];
