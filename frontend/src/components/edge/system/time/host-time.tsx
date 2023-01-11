@@ -34,7 +34,7 @@ export const HostTime = () => {
   return (
     <>
       <Space align="start" direction="vertical">
-        <Button type="primary" icon={<ReloadOutlined />} size={"middle"} onClick={fetch} />
+        <Button type="primary" icon={<ReloadOutlined />} size={"middle"} onClick={fetch}>Refresh</Button>
         <Spin spinning={isFetching}>
           {data && (
             <>

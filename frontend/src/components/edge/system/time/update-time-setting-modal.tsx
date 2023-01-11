@@ -82,12 +82,12 @@ export const UpdateTimeSetting = () => {
 
   const handleNPTEnable = async () => {
     const res = await factory.EdgeNTPEnable(connUUID, hostUUID)
-    console.log(res)
+    // console.log(res)
   }
 
   const handleNPTDisable = async () => {
     const res = await factory.EdgeNTPDisable(connUUID, hostUUID)
-    console.log(res)
+    // console.log(res)
   }
 
   const content = (
