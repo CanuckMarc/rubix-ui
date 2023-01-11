@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useReactFlow, XYPosition } from "react-flow-renderer/nocss";
+import { useReactFlow, XYPosition, Edge } from "react-flow-renderer/nocss";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
 import { useNodesSpec } from "../use-nodes-spec";
@@ -16,6 +16,8 @@ type NodeMenuProps = {
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
+  deleteNode: (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => void;
+  duplicateNode: (_copied: { nodes: NodeInterface[]; edges: any }) => void;
   deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
@@ -32,6 +34,8 @@ const NodeMenu = ({
   node,
   isDoubleClick,
   onClose,
+  deleteNode,
+  duplicateNode,
   handleAddSubFlow,
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
@@ -69,6 +73,16 @@ const NodeMenu = ({
     handleAddSubFlow(node);
     onClose();
   };
+
+  const handleNodeDeletion = () => {
+    deleteNode([node], []);
+    onClose();
+  }
+  
+  const handleNodeDuplication = () => {
+    duplicateNode({ nodes: [node], edges: [] });
+    onClose();
+  }
 
   const deleteAllInputs =
     (isInputs = false) =>
@@ -180,6 +194,20 @@ const NodeMenu = ({
             onClick={deleteAllInputConnection(false)}
           >
             Delete all output connections
+          </div>
+          <div
+            key="Delete node"
+            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            onClick={handleNodeDeletion}
+          >
+            Delete node
+          </div>
+          <div
+            key="Duplicate node"
+            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            onClick={handleNodeDuplication}
+          >
+            Duplicate node
           </div>
           <HelpComponent node={node} onClose={onClose} />
         </div>
