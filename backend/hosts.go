@@ -53,7 +53,7 @@ func (inst *App) DeleteHostBulk(connUUID string, uuids []UUIDs) interface{} {
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("delete host %s %s", item.Name, msg.Message))
 		} else {
-			inst.uiSuccessMessage(fmt.Sprintf("deleteed host: %s", item.Name))
+			inst.uiSuccessMessage(fmt.Sprintf("deleted host: %s", item.Name))
 		}
 	}
 	return "ok"

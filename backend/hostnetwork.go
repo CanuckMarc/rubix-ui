@@ -63,7 +63,7 @@ func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) interface
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("delete network %s %s", item.Name, msg.Message))
 		} else {
-			inst.uiSuccessMessage(fmt.Sprintf("deleteed network: %s", item.Name))
+			inst.uiSuccessMessage(fmt.Sprintf("deleted network: %s", item.Name))
 		}
 	}
 	return "ok"

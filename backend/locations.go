@@ -77,7 +77,7 @@ func (inst *App) DeleteLocationBulk(connUUID string, uuids []UUIDs) interface{} 
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("delete location %s %s", item.Name, msg.Message))
 		} else {
-			inst.uiSuccessMessage(fmt.Sprintf("deleteed location: %s", item.Name))
+			inst.uiSuccessMessage(fmt.Sprintf("deleted location: %s", item.Name))
 		}
 	}
 	return "ok"
