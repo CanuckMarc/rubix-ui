@@ -7,7 +7,6 @@ import { SettingsModal } from "./SettingsModal";
 import { SetPayloadModal } from "./SetPayloadModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { SetNameModal } from "./Modals";
-import { AddNodeComponent } from "./AddNodePicker";
 import { HelpComponent } from "./NodeHelp";
 
 type NodeMenuProps = {

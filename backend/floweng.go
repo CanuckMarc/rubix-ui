@@ -11,6 +11,8 @@ import (
 	"github.com/NubeIO/rubix-edge-wires/flow"
 	"github.com/NubeIO/rubix-ui/backend/flowcli"
 	"github.com/bsm/ratelimit"
+	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -592,6 +594,9 @@ func (inst *App) downloadFlow(connUUID, hostUUID string, encodedNodes interface{
 var downloadRateLimit = ratelimit.New(1, 5*time.Second)
 
 func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedNodes interface{}, restartFlow bool) *flow.Message {
+	nodeList := &nodes.NodesList{}
+	mapstructure.Decode(encodedNodes, &nodeList)
+	log.Infof("nodes sent from ui lenght: %d", len(nodeList.Nodes))
 	if isRemote {
 		if downloadRateLimit.Limit() {
 			inst.uiWarningMessage("downloads are limited to one every 5 seconds")
