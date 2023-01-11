@@ -261,7 +261,7 @@ export const Node = (props: NodeProps) => {
 
         return (
           <div key={ix} className={`flex flex-row justify-between gap-8 relative px-4 my-2 ${borderB}`}>
-            {input && (parentNodeId ? !isInputFlow(node.type) : true) && (
+            {input && (
               <InputSocket
                 {...input}
                 value={input.valueOfChild || newData[input.name]}
@@ -273,7 +273,7 @@ export const Node = (props: NodeProps) => {
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
-            {output && (parentNodeId ? !isOutputFlow(node.type) : true) && (
+            {output && (
               <OutputSocket
                 {...output}
                 valueType={output.valueType || output.dataType!!}
