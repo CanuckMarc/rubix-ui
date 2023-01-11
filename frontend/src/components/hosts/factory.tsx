@@ -24,6 +24,14 @@ export class HostsFactory {
   connectionUUID!: string;
   private _this!: Host;
 
+  get this(): Host {
+    return this._this;
+  }
+
+  set this(value: Host) {
+    this._this = value;
+  }
+
   async Schema(): Promise<HostSchema> {
     return await GetHostSchema(this.connectionUUID);
   }

@@ -67,7 +67,7 @@ export const Connections = () => {
             <ConnectionsTable fetch={fetch} isFetching={isFetching} data={data} />
           </TabPane>
           <TabPane tab={DiscoverTab()} key="Discover">
-            <PcScanner refreshConnections={fetch} />
+            <PcScanner refreshList={fetch} />
           </TabPane>
         </Tabs>
       </Card>

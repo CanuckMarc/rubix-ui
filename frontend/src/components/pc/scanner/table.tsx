@@ -1,18 +1,21 @@
 import { Spin } from "antd";
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Scanner } from "../../../../wailsjs/go/backend/App";
 import RbTable from "../../../common/rb-table";
 import { RbRefreshButton, RbAddButton } from "../../../common/rb-table-actions";
 import { SCANNER_HEADERS } from "../../../constants/headers";
 import { openNotificationWithIcon } from "../../../utils/utils";
-import { CreateModal } from "./create";
+import { CreateConnectionsModal, CreateHostsModal } from "./create";
 
-export const PcScanner = ({ refreshConnections }: any) => {
+export const PcScanner = ({ refreshList }: any) => {
+  const { connUUID = "" } = useParams();
   const [data, setData] = useState([]);
   const [selectedIpPorts, setSelectedIpPorts] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isHostsModalVisible, setIsHostsModalVisible] = useState(false);
 
   const columns = SCANNER_HEADERS;
 
@@ -28,13 +31,18 @@ export const PcScanner = ({ refreshConnections }: any) => {
     if (selectedIpPorts.length === 0) {
       return openNotificationWithIcon("warning", `Please select Ip`);
     }
-    setIsModalVisible(true);
+    if (!!connUUID) {
+      setIsHostsModalVisible(true);
+    } else {
+      setIsModalVisible(true);
+    }
   };
 
   const onclose = () => {
     setSelectedRowKeys([]);
     setSelectedIpPorts([]);
     setIsModalVisible(false);
+    setIsHostsModalVisible(false);
   };
 
   const fetch = async () => {
@@ -65,10 +73,16 @@ export const PcScanner = ({ refreshConnections }: any) => {
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
-      <CreateModal
+      <CreateConnectionsModal
         isModalVisible={isModalVisible}
         selectedIpPorts={selectedIpPorts}
-        refreshConnections={refreshConnections}
+        refreshList={refreshList}
+        onclose={onclose}
+      />
+      <CreateHostsModal
+        isModalVisible={isHostsModalVisible}
+        selectedIpPorts={selectedIpPorts}
+        refreshList={refreshList}
         onclose={onclose}
       />
     </>
