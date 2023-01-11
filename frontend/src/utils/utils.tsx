@@ -75,27 +75,6 @@ export function pluginLogo(plugin: string): string {
   return image;
 }
 
-export const copyTextToClipboard = (text: string, successMessage?: string, failMessage?: string) => {
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.textContent = text;
-    document.body.appendChild(textarea);
-    const selection = window.getSelection() as any;
-    selection.removeAllRanges();
-    const range = document.createRange();
-    range.selectNode(textarea);
-    selection.addRange(range);
-    document.execCommand("copy"); // Security exception may be thrown by some browsers.
-    selection.removeAllRanges();
-    document.body.removeChild(textarea);
-    const _successMessage = successMessage ? successMessage : "Copying to clipboard was successful!";
-    return openNotificationWithIcon("success", _successMessage);
-  } catch (err) {
-    const _failMessage = failMessage ? failMessage : `Async: Could not copy text: ${err}`;
-    return openNotificationWithIcon("error", _failMessage);
-  }
-};
-
 export const downloadJSON = (fileName: string, data: any) => {
   const blob = new Blob([data], { type: "text/plain" });
   const e = document.createEvent("MouseEvents"),

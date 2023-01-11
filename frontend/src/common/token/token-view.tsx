@@ -1,9 +1,10 @@
 import { List, Popconfirm, Spin, Tooltip } from "antd";
-import { useEffect, useState } from "react";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, RedoOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { externaltoken } from "../../../wailsjs/go/models";
+import { openNotificationWithIcon } from "../../utils/utils";
 import { CommonTokenFactory } from "./factory";
-import { copyTextToClipboard } from "../../utils/utils";
+import copy from "copy-to-clipboard";
 
 export const TokenView = (props: ITokenView) => {
   const { jwtToken, tokens = [], isLoading, factory, fetchToken, setIsLoading } = props;
@@ -21,7 +22,8 @@ export const TokenView = (props: ITokenView) => {
       const externalToken = await factory.Token(jwtToken, token.uuid);
       setDisplayToken(externalToken || ({} as externaltoken.ExternalToken));
       if (externalToken && externalToken.token) {
-        copyTextToClipboard(externalToken.token, "Copy TOKEN to clipboard!");
+        copy(externalToken.token);
+        openNotificationWithIcon("success", "Copy TOKEN to clipboard!");
       }
     } finally {
       setIsLoading(false);
