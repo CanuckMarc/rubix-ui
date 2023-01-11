@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EyeOutlined, RedoOutlined } from "@ant-design/icons";
 import { externaltoken } from "../../../wailsjs/go/models";
 import { CommonTokenFactory } from "./factory";
-import { copyToClipboard } from "../../utils/utils";
+import { copyTextToClipboard } from "../../utils/utils";
 
 export const TokenView = (props: ITokenView) => {
   const { jwtToken, tokens = [], isLoading, factory, fetchToken, setIsLoading } = props;
@@ -21,7 +21,7 @@ export const TokenView = (props: ITokenView) => {
     try {
       const externalToken = await factory.Token(jwtToken, token.uuid);
       setDisplayToken(externalToken || ({} as externaltoken.ExternalToken));
-      if (externalToken && externalToken.token) copyToClipboard(externalToken.token, "Copy TOKEN to clipboard!");
+      if (externalToken && externalToken.token) copyTextToClipboard(externalToken.token, "Copy TOKEN to clipboard!");
     } finally {
       setIsLoading(false);
     }

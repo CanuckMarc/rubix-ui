@@ -75,30 +75,17 @@ export function pluginLogo(plugin: string): string {
   return image;
 }
 
-export const copyToClipboard = (text: string, successMessage?: string, failMessage?: string) => {
-  try {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else {
-      const textarea = document.createElement("textarea");
-      textarea.textContent = text;
-      textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
-      document.body.appendChild(textarea);
-      const selection = window.getSelection() as any;
-      selection.removeAllRanges();
-      const range = document.createRange();
-      range.selectNode(textarea);
-      selection.addRange(range);
-      document.execCommand("copy"); // Security exception may be thrown by some browsers.
-      selection.removeAllRanges();
-      document.body.removeChild(textarea);
-    }
-    const _successMessage = successMessage ? successMessage : "Copied to clipboard!";
-    return openNotificationWithIcon("success", _successMessage);
-  } catch (ex) {
-    const _failMessage = failMessage ? failMessage : "Failure on copying on clipboard!";
-    return openNotificationWithIcon("error", _failMessage);
-  }
+export const copyTextToClipboard = (text: string, successMessage?: string, failMessage?: string) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      const _successMessage = successMessage ? successMessage : "Copying to clipboard was successful!";
+      return openNotificationWithIcon("success", _successMessage);
+    })
+    .catch((err) => {
+      const _failMessage = failMessage ? failMessage : `Async: Could not copy text: ${err}`;
+      return openNotificationWithIcon("error", _failMessage);
+    });
 };
 
 export const downloadJSON = (fileName: string, data: any) => {
