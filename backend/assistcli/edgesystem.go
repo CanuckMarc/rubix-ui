@@ -9,8 +9,8 @@ import (
 func (inst *Client) EdgeHostReboot(hostIDName string) (*system.Message, error) {
 	url := fmt.Sprintf("proxy/api/system/reboot/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&system.Message{}).
 		Post(url))
 	if err != nil {

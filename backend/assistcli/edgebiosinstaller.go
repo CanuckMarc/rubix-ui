@@ -10,8 +10,8 @@ import (
 func (inst *Client) EdgeBiosRubixEdgeUpload(hostIDName string, upload amodel.FileUpload) (*amodel.Message, error) {
 	url := fmt.Sprintf("/api/eb/re/upload")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(upload).
 		SetResult(&amodel.Message{}).
 		Post(url))
@@ -24,8 +24,8 @@ func (inst *Client) EdgeBiosRubixEdgeUpload(hostIDName string, upload amodel.Fil
 func (inst *Client) EdgeBiosRubixEdgeInstall(hostIDName string, upload amodel.FileUpload) (*amodel.Message, error) {
 	url := fmt.Sprintf("/api/eb/re/install")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(upload).
 		SetResult(&amodel.Message{}).
 		Post(url))
@@ -38,8 +38,8 @@ func (inst *Client) EdgeBiosRubixEdgeInstall(hostIDName string, upload amodel.Fi
 func (inst *Client) EdgeBiosRubixEdgeVersion(hostIDName string) (*ebmodel.Version, error) {
 	url := fmt.Sprintf("/api/eb/re/version")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&ebmodel.Version{}).
 		Get(url))
 	if err != nil {

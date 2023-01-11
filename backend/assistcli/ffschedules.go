@@ -9,8 +9,8 @@ import (
 func (inst *Client) FFGetSchedules(hostIDName string) ([]model.Schedule, error) {
 	url := fmt.Sprintf("proxy/ff/api/schedules")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Schedule{}).
 		Get(url))
 	if err != nil {
@@ -24,8 +24,8 @@ func (inst *Client) FFGetSchedules(hostIDName string) ([]model.Schedule, error) 
 func (inst *Client) FFGetSchedule(hostIDName, uuid string) (*model.Schedule, error) {
 	url := fmt.Sprintf("proxy/ff/api/schedules/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Schedule{}).
 		Get(url))
 	if err != nil {
@@ -36,8 +36,8 @@ func (inst *Client) FFGetSchedule(hostIDName, uuid string) (*model.Schedule, err
 
 func (inst *Client) FFDeleteSchedule(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/schedules/{uuid}"))
 	if err != nil {
@@ -49,8 +49,8 @@ func (inst *Client) FFDeleteSchedule(hostIDName, uuid string) (bool, error) {
 func (inst *Client) FFAddSchedule(hostIDName string, body *model.Schedule) (*model.Schedule, error) {
 	url := fmt.Sprintf("proxy/ff/api/schedules")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Schedule{}).
 		SetBody(body).
 		Post(url))
@@ -63,8 +63,8 @@ func (inst *Client) FFAddSchedule(hostIDName string, body *model.Schedule) (*mod
 func (inst *Client) FFEditSchedule(hostIDName, uuid string, body *model.Schedule) (*model.Schedule, error) {
 	url := fmt.Sprintf("proxy/ff/api/schedules/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Schedules{}).
 		SetBody(body).
 		Patch(url))

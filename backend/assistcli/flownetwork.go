@@ -8,8 +8,8 @@ import (
 
 func (inst *Client) AddFlowNetwork(hostIDName string, body *model.FlowNetwork) (*model.FlowNetwork, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetwork{}).
 		SetBody(body).
 		Post("proxy/ff/api/flow_networks"))
@@ -22,8 +22,8 @@ func (inst *Client) AddFlowNetwork(hostIDName string, body *model.FlowNetwork) (
 func (inst *Client) EditFlowNetwork(hostIDName, uuid string, body *model.FlowNetwork) (*model.FlowNetwork, error) {
 	url := fmt.Sprintf("proxy/ff/api/flow_networks/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetwork{}).
 		SetBody(body).
 		Patch(url))
@@ -42,8 +42,8 @@ func (inst *Client) GetFlowNetwork(hostIDName, uuid string, withStreams bool, ov
 		url = buildUrl(overrideUrl...)
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetwork{}).
 		Get(url))
 	if err != nil {
@@ -61,8 +61,8 @@ func (inst *Client) GetFlowNetworks(hostIDName string, withStreams bool, overrid
 		url = buildUrl(overrideUrl...)
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.FlowNetwork{}).
 		Get(url))
 	if err != nil {
@@ -76,8 +76,8 @@ func (inst *Client) GetFlowNetworks(hostIDName string, withStreams bool, overrid
 func (inst *Client) GetFlowNetworksWithChild(hostIDName string) ([]model.FlowNetwork, error) {
 	url := fmt.Sprintf("proxy/ff/api/flow_networks?with_streams=true&with_producers=true&with_consumers=true&with_writers=true&with_tags=true")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.FlowNetwork{}).
 		Get(url))
 	if err != nil {
@@ -91,8 +91,8 @@ func (inst *Client) GetFlowNetworksWithChild(hostIDName string) ([]model.FlowNet
 func (inst *Client) GetFlowNetworkWithChild(hostIDName, uuid string) (*model.FlowNetwork, error) {
 	url := fmt.Sprintf("proxy/ff/api/flow_networks%s?with_streams=true&with_producers=true&with_consumers=true&with_writers=true&with_tags=true", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetwork{}).
 		Get(url))
 	if err != nil {
@@ -103,8 +103,8 @@ func (inst *Client) GetFlowNetworkWithChild(hostIDName, uuid string) (*model.Flo
 
 func (inst *Client) DeleteFlowNetwork(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/flow_networks/{uuid}"))
 	if err != nil {

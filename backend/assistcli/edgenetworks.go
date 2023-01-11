@@ -11,8 +11,8 @@ import (
 func (inst *Client) EdgeGetNetworks(hostIDName string) ([]networking.NetworkInterfaces, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]networking.NetworkInterfaces{}).
 		Get(url))
 	if err != nil {
@@ -26,8 +26,8 @@ func (inst *Client) EdgeGetNetworks(hostIDName string) ([]networking.NetworkInte
 func (inst *Client) EdgeDHCPPortExists(hostIDName string, body *system.NetworkingBody) (*system.DHCPPortExists, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/interfaces/exists")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&system.DHCPPortExists{}).
 		SetBody(body).
 		Post(url))
@@ -40,8 +40,8 @@ func (inst *Client) EdgeDHCPPortExists(hostIDName string, body *system.Networkin
 func (inst *Client) EdgeDHCPSetAsAuto(hostIDName string, body *system.NetworkingBody) (*system.Message, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/interfaces/auto")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&system.Message{}).
 		SetBody(body).
 		Post(url))
@@ -54,8 +54,8 @@ func (inst *Client) EdgeDHCPSetAsAuto(hostIDName string, body *system.Networking
 func (inst *Client) EdgeDHCPSetStaticIP(hostIDName string, body *dhcpd.SetStaticIP) (string, error) {
 	url := fmt.Sprintf("/proxy/edge/api/networking/interfaces/static")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		Post(url))
 	if err != nil {
@@ -67,8 +67,8 @@ func (inst *Client) EdgeDHCPSetStaticIP(hostIDName string, body *dhcpd.SetStatic
 func (inst *Client) EdgeRestartNetworking(hostIDName string) (*system.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/networks/restart/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(system.Message{}).
 		Post(url))
 	if err != nil {
@@ -80,8 +80,8 @@ func (inst *Client) EdgeRestartNetworking(hostIDName string) (*system.Message, e
 func (inst *Client) EdgeInterfaceUpDown(hostIDName string, port system.NetworkingBody) (*system.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/networks/interfaces/reset/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(port).
 		SetResult(system.Message{}).
 		Post(url))
@@ -94,8 +94,8 @@ func (inst *Client) EdgeInterfaceUpDown(hostIDName string, port system.Networkin
 func (inst *Client) EdgeInterfaceUp(hostIDName string, port system.NetworkingBody) (*system.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/networks/interfaces/up/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(port).
 		SetResult(system.Message{}).
 		Post(url))
@@ -108,8 +108,8 @@ func (inst *Client) EdgeInterfaceUp(hostIDName string, port system.NetworkingBod
 func (inst *Client) EdgeInterfaceDown(hostIDName string, port system.NetworkingBody) (*system.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/networks/interfaces/down/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(port).
 		SetResult(system.Message{}).
 		Post(url))

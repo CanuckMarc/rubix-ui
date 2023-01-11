@@ -17,8 +17,8 @@ type EdgeUploadResponse struct {
 func (inst *Client) EdgeListPlugins(hostIDName string) ([]amodel.Plugin, error, error) {
 	url := fmt.Sprintf("/api/edge/plugins")
 	resp, connectionErr, requestErr := nresty.FormatRestyV2Response(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]amodel.Plugin{}).
 		Get(url))
 	if connectionErr != nil || requestErr != nil {
@@ -31,8 +31,8 @@ func (inst *Client) EdgeListPlugins(hostIDName string) ([]amodel.Plugin, error, 
 func (inst *Client) EdgeGetPlugins(hostIDName string) ([]rumodel.Plugin, error) {
 	url := fmt.Sprintf("/proxy/edge/ff/api/plugins")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]rumodel.Plugin{}).
 		Get(url))
 	if err != nil {
@@ -45,8 +45,8 @@ func (inst *Client) EdgeGetPlugins(hostIDName string) ([]rumodel.Plugin, error) 
 func (inst *Client) EdgeGetPlugin(hostIDName, pluginName string) (*rumodel.Plugin, error) {
 	url := fmt.Sprintf("/proxy/edge/ff/api/plugins/path/%s", pluginName)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&rumodel.Plugin{}).
 		Get(url))
 	if err != nil {
@@ -58,8 +58,8 @@ func (inst *Client) EdgeGetPlugin(hostIDName, pluginName string) (*rumodel.Plugi
 func (inst *Client) EdgeUploadPlugin(hostIDName string, body *amodel.Plugin) (*amodel.Message, error) {
 	url := fmt.Sprintf("/api/edge/plugins/upload")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		SetBody(body).
 		Post(url))
@@ -72,8 +72,8 @@ func (inst *Client) EdgeUploadPlugin(hostIDName string, body *amodel.Plugin) (*a
 func (inst *Client) EdgeMoveFromDownloadToInstallPlugins(hostIDName string) (*amodel.Message, error) {
 	url := fmt.Sprintf("/api/edge/plugins/move-from-download-to-install")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		Post(url))
 	if err != nil {
@@ -85,8 +85,8 @@ func (inst *Client) EdgeMoveFromDownloadToInstallPlugins(hostIDName string) (*am
 func (inst *Client) EdgeDeletePlugin(hostIDName, pluginName, arch string) (*amodel.Message, error) {
 	url := fmt.Sprintf("/api/edge/plugins/name/%s?arch=%s", pluginName, arch)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		Delete(url))
 	if err != nil {
@@ -99,8 +99,8 @@ func (inst *Client) EdgeDeleteDownloadPlugins(hostIDName string) (*amodel.Messag
 	url := fmt.Sprintf("/api/edge/plugins/download-plugins")
 	// we use v2 here, coz it shows requestErr when there is no plugins' directory on download path
 	resp, connectionErr, requestErr := nresty.FormatRestyV2Response(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		Delete(url))
 	if connectionErr != nil || requestErr != nil {
@@ -112,8 +112,8 @@ func (inst *Client) EdgeDeleteDownloadPlugins(hostIDName string) (*amodel.Messag
 func (inst *Client) EdgeGetConfigPlugin(hostIDName, pluginName string) (*string, error) {
 	url := fmt.Sprintf("/proxy/edge/ff/api/plugins/config/%s?by_plugin_name=true", pluginName)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		Get(url))
 	if err != nil {
 		return nil, err
@@ -126,8 +126,8 @@ func (inst *Client) EdgeUpdateConfigPlugin(hostIDName, pluginName, config string
 	url := fmt.Sprintf("/proxy/edge/ff/api/plugins/config/%s?by_plugin_name=true", pluginName)
 	body := map[string]string{"data": config}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		Post(url))
 	if err != nil {
@@ -141,8 +141,8 @@ func (inst *Client) EdgeEnablePlugin(hostIDName, pluginName string, enable bool)
 	url := fmt.Sprintf("/proxy/edge/ff/api/plugins/enable/%s?by_plugin_name=true", pluginName)
 	body := map[string]bool{"enabled": enable}
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		Post(url))
 	if err != nil {
@@ -159,8 +159,8 @@ func (inst *Client) EdgeEnablePlugin(hostIDName, pluginName string, enable bool)
 func (inst *Client) EdgeRestartPlugin(hostIDName, pluginName string) (*string, error) {
 	url := fmt.Sprintf("proxy/ff/api/plugins/restart/%s?by_plugin_name=true", pluginName)
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		Post(url))
 	if err != nil {
 		return nil, err

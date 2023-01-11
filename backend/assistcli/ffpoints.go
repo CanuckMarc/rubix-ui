@@ -8,8 +8,8 @@ import (
 
 func (inst *Client) EdgeGetPoints(hostIDName string) ([]model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Point{}).
 		Get("ff/proxy/api/points/"))
 	if err != nil {
@@ -30,8 +30,8 @@ func (inst *Client) WritePointValue(hostIDName, uuid string, value *model.Priori
 	}
 	url := fmt.Sprintf("proxy/ff/api/points/write/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&model.Point{}).
 		Patch(url))
@@ -43,8 +43,8 @@ func (inst *Client) WritePointValue(hostIDName, uuid string, value *model.Priori
 
 func (inst *Client) AddPoint(hostIDName string, body *model.Point) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Point{}).
 		SetBody(body).
 		Post("proxy/ff/api/points"))
@@ -56,8 +56,8 @@ func (inst *Client) AddPoint(hostIDName string, body *model.Point) (*model.Point
 
 func (inst *Client) GetPoints(hostIDName string) ([]model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Point{}).
 		Get("proxy/ff/api/points"))
 	if err != nil {
@@ -70,8 +70,8 @@ func (inst *Client) GetPoints(hostIDName string) ([]model.Point, error) {
 
 func (inst *Client) GetPointPriority(hostIDName, uuid string) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Point{}).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Get("proxy/ff/api/points/{uuid}?with_priority=true"))
@@ -83,8 +83,8 @@ func (inst *Client) GetPointPriority(hostIDName, uuid string) (*model.Point, err
 
 func (inst *Client) GetPoint(hostIDName, uuid string) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Point{}).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Get("proxy/ff/api/points/{uuid}"))
@@ -96,8 +96,8 @@ func (inst *Client) GetPoint(hostIDName, uuid string) (*model.Point, error) {
 
 func (inst *Client) DeletePoint(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/points/{uuid}"))
 	if err != nil {
@@ -108,8 +108,8 @@ func (inst *Client) DeletePoint(hostIDName, uuid string) (bool, error) {
 
 func (inst *Client) EditPoint(hostIDName, uuid string, body *model.Point) (*model.Point, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&model.Point{}).
 		SetPathParams(map[string]string{"uuid": uuid}).

@@ -14,8 +14,8 @@ func (inst *Client) GetFlowNetworkClones(hostIDName string, withStreams ...bool)
 		}
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.FlowNetworkClone{}).
 		Get(url))
 	if err != nil {
@@ -34,8 +34,8 @@ func (inst *Client) GetFlowNetworkClone(hostIDName, uuid string, withStreams ...
 		}
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetworkClone{}).
 		Get(url))
 	if err != nil {
@@ -47,8 +47,8 @@ func (inst *Client) GetFlowNetworkClone(hostIDName, uuid string, withStreams ...
 func (inst *Client) GetFlowNetworkClonesWithChild(hostIDName string) ([]model.FlowNetworkClone, error) {
 	url := fmt.Sprintf("proxy/ff/api/flow_network_clones?with_streams=true&with_producers=true&with_consumers=true&with_writers=true&with_tags=true")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.FlowNetworkClone{}).
 		Get(url))
 	if err != nil {
@@ -62,8 +62,8 @@ func (inst *Client) GetFlowNetworkClonesWithChild(hostIDName string) ([]model.Fl
 func (inst *Client) GetFlowNetworkCloneWithChild(hostIDName, uuid string) (*model.FlowNetworkClone, error) {
 	url := fmt.Sprintf("proxy/ff/api/flow_network_clones/%s?with_streams=true&with_producers=true&with_consumers=true&with_writers=true&with_tags=true", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.FlowNetworkClone{}).
 		Get(url))
 	if err != nil {
@@ -74,8 +74,8 @@ func (inst *Client) GetFlowNetworkCloneWithChild(hostIDName, uuid string) (*mode
 
 func (inst *Client) DeleteFlowNetworkClone(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/flow_network_clones/{uuid}"))
 	if err != nil {
