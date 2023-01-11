@@ -79,3 +79,29 @@ func (inst *Client) EdgeUpdateSystemTime(hostIDName, timeString string) (*dateli
 	}
 	return resp.Result().(*datelib.Time), nil
 }
+
+func (inst *Client) EdgeNTPEnable(hostIDName string) (*system.Message, error) {
+	url := fmt.Sprintf("proxy/api/time/ntp/enable/")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host_uuid", hostIDName).
+		SetHeader("host_name", hostIDName).
+		SetResult(&system.Message{}).
+		Post(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*system.Message), nil
+}
+
+func (inst *Client) EdgeNTPDisable(hostIDName string) (*system.Message, error) {
+	url := fmt.Sprintf("proxy/api/time/ntp/disable/")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host_uuid", hostIDName).
+		SetHeader("host_name", hostIDName).
+		SetResult(&system.Message{}).
+		Post(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*system.Message), nil
+}

@@ -59,6 +59,7 @@ func (inst *App) EdgeUpdateTimezone(connUUID, hostUUID string, timeZone string) 
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	inst.uiSuccessMessage(fmt.Sprintf("%s", data.Message))
 	return data
 }
 
@@ -68,10 +69,47 @@ func (inst *App) EdgeUpdateSystemTime(connUUID, hostUUID string, timeString stri
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	disable, err := client.EdgeNTPDisable(hostUUID) // first disable the NTP service
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("disable ntp %s", err.Error()))
+		return nil
+	}
+	inst.uiSuccessMessage(fmt.Sprintf("disable ntp %s", disable.Message))
 	data, err := client.EdgeUpdateSystemTime(hostUUID, timeString)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	inst.uiSuccessMessage(fmt.Sprintf("zone: %s utc: %s local: %s", data.SystemTimeZone, data.TimeUTC, data.TimeLocal))
+	return data
+}
+
+func (inst *App) EdgeNTPEnable(connUUID, hostUUID string) *system.Message {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	data, err := client.EdgeNTPEnable(hostUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	inst.uiSuccessMessage(fmt.Sprintf("enabled ntp %s", data.Message))
+	return data
+}
+
+func (inst *App) EdgeNTPDisable(connUUID, hostUUID string) *system.Message {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	data, err := client.EdgeNTPDisable(hostUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	inst.uiSuccessMessage(fmt.Sprintf("disable ntp %s", data.Message))
 	return data
 }
