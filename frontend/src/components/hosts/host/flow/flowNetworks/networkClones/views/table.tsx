@@ -1,4 +1,4 @@
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
@@ -8,6 +8,7 @@ import { RbRefreshButton, RbDeleteButton } from "../../../../../../../common/rb-
 import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkCloneFactory } from "../factory";
+import { ArrowRightOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import FlowNetworkClone = model.FlowNetworkClone;
@@ -35,7 +36,11 @@ export const NetworkClonesTable = (props: any) => {
       fixed: "left",
       render: (_: any, network: FlowNetworkClone) => (
         <Space size="middle">
-          <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
+          <Link to={getNavigationLink(network.uuid)}>
+            <Tooltip title="View Streams">
+              <ArrowRightOutlined />
+            </Tooltip>
+          </Link>
         </Space>
       ),
     },

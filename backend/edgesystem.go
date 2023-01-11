@@ -8,18 +8,18 @@ import (
 )
 
 func (inst *App) EdgeHostReboot(connUUID, hostUUID string) *system.Message {
-	// client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	// if err != nil {
-	// 	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	// 	return nil
-	// }
-	// data, err := client.EdgeHostReboot(hostUUID)
-	// if err != nil {
-	// 	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-	// 	return nil
-	// }
-	// return data
-	return nil
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	inst.uiSuccessMessage("will try reboot, please check connection in around 30 seconds")
+	data, err := client.EdgeHostReboot(hostUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return data
 }
 
 func (inst *App) EdgeServiceStart(connUUID, hostUUID, appName string) *amodel.Message {

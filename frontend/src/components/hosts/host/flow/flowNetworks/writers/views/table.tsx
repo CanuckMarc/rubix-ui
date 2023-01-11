@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { WritersFactory } from "../factory";
 import { FlowConsumerFactory } from "../../consumers/factory";
@@ -8,6 +8,7 @@ import { WRITER_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import Writer = model.Writer;
@@ -41,7 +42,11 @@ export const WritersTable = () => {
       fixed: "left",
       render: (_: any, item: Writer) => (
         <Space size="middle">
-          <a onClick={() => showModal(item)}>Edit</a>
+          <a onClick={() => showModal(item)}>
+            <Tooltip title="Edit">
+              <FormOutlined />
+            </Tooltip>
+          </a>
         </Space>
       ),
     },
