@@ -85,12 +85,17 @@ export const UpdateTimeSetting = () => {
     console.log(res)
   }
 
+  const handleNPTDisable = async () => {
+    const res = await factory.EdgeNTPDisable(connUUID, hostUUID)
+    console.log(res)
+  }
+
   const content = (
     <div>
       <Button type="primary" className="mr-3" onClick={handleNPTEnable}>
         Enable
       </Button>
-      <Button type="primary" danger className="mr-3">
+      <Button type="primary" danger className="mr-3" onClick={handleNPTDisable}>
         Disable
       </Button>
     </div>
