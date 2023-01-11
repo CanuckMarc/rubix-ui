@@ -9,8 +9,8 @@ import (
 func (inst *Client) AddDevice(hostIDName string, device *model.Device) (*model.Device, error) {
 	url := fmt.Sprintf("proxy/ff/api/devices")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Device{}).
 		SetBody(device).
 		Post(url))
@@ -28,8 +28,8 @@ func (inst *Client) GetDevices(hostIDName string, withPoints ...bool) ([]model.D
 		}
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Device{}).
 		Get(url))
 	if err != nil {
@@ -48,8 +48,8 @@ func (inst *Client) GetDevice(hostIDName, uuid string, withPoints ...bool) (*mod
 		}
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Device{}).
 		Get(url))
 	if err != nil {
@@ -61,8 +61,8 @@ func (inst *Client) GetDevice(hostIDName, uuid string, withPoints ...bool) (*mod
 func (inst *Client) EditDevice(hostIDName, uuid string, device *model.Device) (*model.Device, error) {
 	url := fmt.Sprintf("proxy/ff/api/devices/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Device{}).
 		SetBody(device).
 		Patch(url))
@@ -74,8 +74,8 @@ func (inst *Client) EditDevice(hostIDName, uuid string, device *model.Device) (*
 
 func (inst *Client) DeleteDevice(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/devices/{uuid}"))
 	if err != nil {

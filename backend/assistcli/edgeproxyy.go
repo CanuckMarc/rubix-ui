@@ -11,8 +11,8 @@ import (
 func (inst *Client) GetEdgeDeviceInfo(hostIDName string) (*rubixregistry.DeviceInfo, error) {
 	url := fmt.Sprintf("/proxy/edge/api/system/device")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&rubixregistry.DeviceInfo{}).
 		Get(url))
 	if err != nil {
@@ -29,8 +29,8 @@ func (inst *Client) UpdateEdgeDeviceInfo(hostIDName string, body *rubixregistry.
 	error) {
 	url := fmt.Sprintf("/proxy/edge/api/system/device")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&rubixregistry.DeviceInfo{}).
 		Patch(url))
@@ -47,8 +47,8 @@ func (inst *Client) UpdateEdgeDeviceInfo(hostIDName string, body *rubixregistry.
 func (inst *Client) EdgeSystemCtlAction(hostIDName, serviceName string, action amodel.Action) (*amodel.Message, error) {
 	url := fmt.Sprintf("/proxy/edge/api/systemctl/%s?unit=%s", action, serviceName)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		Post(url))
 	if err != nil {
@@ -60,8 +60,8 @@ func (inst *Client) EdgeSystemCtlAction(hostIDName, serviceName string, action a
 func (inst *Client) EdgeSystemCtlState(hostIDName, serviceName string) (*amodel.AppSystemState, error) {
 	url := fmt.Sprintf("/proxy/edge/api/systemctl/state?unit=%s", serviceName)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.AppSystemState{}).
 		Post(url))
 	if err != nil {

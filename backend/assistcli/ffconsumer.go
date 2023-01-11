@@ -8,8 +8,8 @@ import (
 
 func (inst *Client) AddConsumer(hostIDName string, body *model.Consumer) (*model.Consumer, error) {
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Consumer{}).
 		SetBody(body).
 		Post("proxy/ff/api/consumers"))
@@ -22,8 +22,8 @@ func (inst *Client) AddConsumer(hostIDName string, body *model.Consumer) (*model
 func (inst *Client) EditConsumer(hostIDName, uuid string, body *model.Consumer) (*model.Consumer, error) {
 	url := fmt.Sprintf("proxy/ff/api/consumers/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Consumer{}).
 		SetBody(body).
 		Patch(url))
@@ -36,8 +36,8 @@ func (inst *Client) EditConsumer(hostIDName, uuid string, body *model.Consumer) 
 func (inst *Client) GetConsumers(hostIDName string) ([]model.Consumer, error) {
 	url := fmt.Sprintf("proxy/ff/api/consumers")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Consumer{}).
 		Get(url))
 	if err != nil {
@@ -51,8 +51,8 @@ func (inst *Client) GetConsumers(hostIDName string) ([]model.Consumer, error) {
 func (inst *Client) GetConsumer(hostIDName, uuid string) (*model.Consumer, error) {
 	url := fmt.Sprintf("proxy/ff/api/consumers/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Consumer{}).
 		Get(url))
 	if err != nil {
@@ -63,8 +63,8 @@ func (inst *Client) GetConsumer(hostIDName, uuid string) (*model.Consumer, error
 
 func (inst *Client) DeleteConsumer(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/consumers/{uuid}"))
 	if err != nil {

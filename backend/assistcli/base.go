@@ -17,7 +17,7 @@ type Client struct {
 	Rest          *resty.Client
 	Ip            string `json:"ip"`
 	Port          int    `json:"port"`
-	HTTPS         *bool  `json:"https"`
+	HTTPS         bool   `json:"https"`
 	ExternalToken string `json:"external_token"`
 }
 
@@ -81,7 +81,7 @@ func getBaseUrl(cli *Client) string {
 		cli.Port = 1661
 	}
 	var baseURL string
-	if cli.HTTPS != nil && *cli.HTTPS {
+	if cli.HTTPS {
 		baseURL = fmt.Sprintf("https://%s:%d", cli.Ip, cli.Port)
 	} else {
 		baseURL = fmt.Sprintf("http://%s:%d", cli.Ip, cli.Port)

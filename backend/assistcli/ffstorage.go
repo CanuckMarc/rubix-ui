@@ -11,8 +11,8 @@ import (
 func (inst *Client) GetLocalStorage(hostIDName string) (*model.LocalStorageFlowNetwork, error) {
 	url := fmt.Sprintf("proxy/ff/api/localstorage_flow_network")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.LocalStorageFlowNetwork{}).
 		Get(url))
 	if err != nil {
@@ -31,8 +31,8 @@ func (inst *Client) UpdateLocalStorage(hostIDName string, body *model.LocalStora
 	}
 	url := fmt.Sprintf("proxy/ff/api/localstorage_flow_network")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&model.LocalStorageFlowNetwork{}).
 		Patch(url))

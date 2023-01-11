@@ -10,8 +10,8 @@ import (
 func (inst *Client) EdgeBiosPing(hostIDName string) (*amodel.Message, error) {
 	url := fmt.Sprintf("/proxy/eb/api/system/ping")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&amodel.Message{}).
 		Get(url))
 	if err != nil {
@@ -23,8 +23,8 @@ func (inst *Client) EdgeBiosPing(hostIDName string) (*amodel.Message, error) {
 func (inst *Client) EdgeBiosArch(hostIDName string) (*rumodel.Arch, error) {
 	url := fmt.Sprintf("/proxy/eb/api/system/arch")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&rumodel.Arch{}).
 		Get(url))
 	if err != nil {

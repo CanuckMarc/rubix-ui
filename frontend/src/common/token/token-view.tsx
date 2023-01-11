@@ -23,7 +23,7 @@ export const TokenView = (props: ITokenView) => {
       setDisplayToken(externalToken || ({} as externaltoken.ExternalToken));
       if (externalToken && externalToken.token) {
         copy(externalToken.token);
-        openNotificationWithIcon("success", "Copy TOKEN to clipboard!");
+        openNotificationWithIcon("success", "Copied Token to Clipboard!");
       }
     } finally {
       setIsLoading(false);

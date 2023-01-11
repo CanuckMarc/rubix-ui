@@ -15,8 +15,8 @@ func (inst *Client) FFGetNetworks(hostIDName string, withDevices bool, overrideU
 		url = buildUrl(overrideUrl...)
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Network{}).
 		Get(url))
 	if err != nil {
@@ -30,8 +30,8 @@ func (inst *Client) FFGetNetworks(hostIDName string, withDevices bool, overrideU
 func (inst *Client) FFGetNetworksWithPoints(hostIDName string) ([]model.Network, error) {
 	url := fmt.Sprintf("proxy/ff/api/networks?with_points=true")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]model.Network{}).
 		Get(url))
 	if err != nil {
@@ -51,8 +51,8 @@ func (inst *Client) FFGetNetwork(hostIDName, uuid string, withDevices bool, over
 		url = buildUrl(overrideUrl...)
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Network{}).
 		Get(url))
 	if err != nil {
@@ -65,8 +65,8 @@ func (inst *Client) FFGetNetwork(hostIDName, uuid string, withDevices bool, over
 func (inst *Client) FFGetNetworkWithPoints(hostIDName, uuid string) (*model.Network, error) {
 	url := fmt.Sprintf("proxy/ff/api/networks/%s?with_devices=true&with_points=true", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Network{}).
 		Get(url))
 	if err != nil {
@@ -77,8 +77,8 @@ func (inst *Client) FFGetNetworkWithPoints(hostIDName, uuid string) (*model.Netw
 
 func (inst *Client) FFDeleteNetwork(hostIDName, uuid string) (bool, error) {
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetPathParams(map[string]string{"uuid": uuid}).
 		Delete("proxy/ff/api/networks/{uuid}"))
 	if err != nil {
@@ -93,8 +93,8 @@ func (inst *Client) FFGetNetworkByPluginName(hostIDName, pluginName string, with
 		url = fmt.Sprintf("proxy/ff/api/networks/plugin/%s?with_points=true", pluginName)
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Network{}).
 		Get(url))
 	if err != nil {
@@ -106,8 +106,8 @@ func (inst *Client) FFGetNetworkByPluginName(hostIDName, pluginName string, with
 func (inst *Client) FFAddNetwork(hostIDName string, body *model.Network, restartPlugin bool) (*model.Network, error) {
 	url := fmt.Sprintf("proxy/ff/api/networks?restart_plugin=%t", restartPlugin)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Network{}).
 		SetBody(body).
 		Post(url))
@@ -120,8 +120,8 @@ func (inst *Client) FFAddNetwork(hostIDName string, body *model.Network, restart
 func (inst *Client) FFEditNetwork(hostIDName, uuid string, body *model.Network) (*model.Network, error) {
 	url := fmt.Sprintf("proxy/ff/api/networks/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&model.Network{}).
 		SetBody(body).
 		Patch(url))

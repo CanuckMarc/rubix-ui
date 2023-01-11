@@ -11,8 +11,8 @@ import (
 func (inst *Client) EdgeBiosLogin(hostIDName string, externalToken string, body *user.User) (*model.TokenResponse, error) {
 	url := "/proxy/eb/api/users/login"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
 		SetBody(body).
 		SetResult(&model.TokenResponse{}).
@@ -26,10 +26,10 @@ func (inst *Client) EdgeBiosLogin(hostIDName string, externalToken string, body 
 func (inst *Client) EdgeBiosTokens(hostIDName, externalToken, jwtToken string) (*[]externaltoken.ExternalToken, error) {
 	url := "/proxy/eb/api/tokens"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		SetResult(&[]externaltoken.ExternalToken{}).
 		Get(url))
 	if err != nil {
@@ -42,10 +42,10 @@ func (inst *Client) EdgeBiosTokens(hostIDName, externalToken, jwtToken string) (
 func (inst *Client) EdgeBiosToken(hostIDName, externalToken, jwtToken string, uuid string) (*externaltoken.ExternalToken, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		SetResult(&externaltoken.ExternalToken{}).
 		Get(url))
 	if err != nil {
@@ -59,10 +59,10 @@ func (inst *Client) EdgeBiosTokenGenerate(hostIDName, externalToken, jwtToken st
 	url := "/proxy/eb/api/tokens/generate"
 	body := externaltoken.ExternalToken{Name: name, Blocked: false}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		SetBody(body).
 		SetResult(&externaltoken.ExternalToken{}).
 		Post(url))
@@ -77,10 +77,10 @@ func (inst *Client) EdgeBiosTokenBlock(hostIDName, externalToken, jwtToken strin
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s/block", uuid)
 	body := map[string]bool{"blocked": block}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		SetBody(body).
 		SetResult(&externaltoken.ExternalToken{}).
 		Put(url))
@@ -94,10 +94,10 @@ func (inst *Client) EdgeBiosTokenBlock(hostIDName, externalToken, jwtToken strin
 func (inst *Client) EdgeBiosTokenRegenerate(hostIDName, externalToken, jwtToken string, uuid string) (*externaltoken.ExternalToken, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s/regenerate", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		SetResult(&externaltoken.ExternalToken{}).
 		Put(url))
 	if err != nil {
@@ -110,10 +110,10 @@ func (inst *Client) EdgeBiosTokenRegenerate(hostIDName, externalToken, jwtToken 
 func (inst *Client) EdgeBiosTokenDelete(hostIDName, externalToken, jwtToken string, uuid string) (bool, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetHeader("Authorization", composeToken(externalToken)).
-		SetHeader("jwt_token", jwtToken).
+		SetHeader("jwt-token", jwtToken).
 		Delete(url))
 	if err != nil {
 		return false, err

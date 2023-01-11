@@ -11,8 +11,8 @@ import (
 func (inst *Client) EdgeFirewallList(hostIDName string) ([]ufw.UFWStatus, error) {
 	url := fmt.Sprintf("proxy/api/networking/firewall/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&[]ufw.UFWStatus{}).
 		Get(url))
 	if err != nil {
@@ -24,8 +24,8 @@ func (inst *Client) EdgeFirewallList(hostIDName string) ([]ufw.UFWStatus, error)
 func (inst *Client) EdgeFirewallStatus(hostIDName string) (*ufw.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/status/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&ufw.Message{}).
 		Post(url))
 	if err != nil {
@@ -37,8 +37,8 @@ func (inst *Client) EdgeFirewallStatus(hostIDName string) (*ufw.Message, error) 
 func (inst *Client) EdgeFirewallEnable(hostIDName string) (*ufw.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/enable/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&ufw.Message{}).
 		Post(url))
 	if err != nil {
@@ -50,8 +50,8 @@ func (inst *Client) EdgeFirewallEnable(hostIDName string) (*ufw.Message, error) 
 func (inst *Client) EdgeFirewallDisable(hostIDName string) (*ufw.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/disable/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetResult(&ufw.Message{}).
 		Post(url))
 	if err != nil {
@@ -63,8 +63,8 @@ func (inst *Client) EdgeFirewallDisable(hostIDName string) (*ufw.Message, error)
 func (inst *Client) EdgeFirewallPortOpen(hostIDName string, body system.UFWBody) (*ufw.Message, error) {
 	url := fmt.Sprintf("proxy/api/networking/port/open/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&ufw.Message{}).
 		Post(url))
@@ -83,8 +83,8 @@ func (inst *Client) EdgeFirewallPortClose(hostIDName string, body system.UFWBody
 		return nil, errors.New("port 22 can not be closed")
 	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host_uuid", hostIDName).
-		SetHeader("host_name", hostIDName).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
 		SetBody(body).
 		SetResult(&ufw.Message{}).
 		Post(url))
