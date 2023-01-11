@@ -13,6 +13,7 @@ export type InputSocketProps = {
   connected?: boolean;
   value: any | undefined;
   minWidth?: number;
+  autoFocus?: boolean;
   subName?: string;
   dataInput?: any;
   dataOutput?: OutputNodeValueType;
@@ -69,6 +70,7 @@ export const InputSocket = ({
   dataInput,
   dataOutput,
   isHideConnect,
+  autoFocus = false,
   classnames,
 }: InputSocketProps) => {
   const instance = useReactFlow();
@@ -168,6 +170,7 @@ export const InputSocket = ({
             {valueType === "string" && (
               <AutoSizeInput
                 type="text"
+                autoFocus={autoFocus}
                 className={cx(classnames ? classnames : "bg-gray-600 disabled:bg-gray-700 py-1 px-2 nodrag")}
                 value={getDataByConnected(value || "")}
                 onChangeInput={handleChangeInput}

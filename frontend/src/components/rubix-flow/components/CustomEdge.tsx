@@ -32,11 +32,25 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       })
       .map((n: NodeInterface) => n.id);
 
-    const show = parentNodeId
+    let show = parentNodeId
       ? nodeIdsShowing.includes(edge.target) && nodeIdsShowing.includes(edge.source)
       : nodeIdsShowing.includes(edge.target) || nodeIdsShowing.includes(edge.source);
+    let showParentNodeAsSourceOrTarget = false;
 
-    if (show) {
+    if (!show) {
+      const nodeTarget = nodes.find((n) => n.id === edge.target);
+      const nodeSource = nodes.find((n) => n.id === edge.source);
+      show =
+        nodeIdsShowing.includes(nodeTarget?.parentId as string) &&
+        nodeIdsShowing.includes(nodeSource?.parentId as string) &&
+        nodeTarget?.parentId !== nodeSource?.parentId;
+
+      if (show) {
+        showParentNodeAsSourceOrTarget = true;
+      }
+    }
+
+    if (show && !showParentNodeAsSourceOrTarget) {
       const targetNode = nodes.find((item: NodeInterface) => item.id === edge.target);
       const sourceNode = nodes.find((item: NodeInterface) => item.id === edge.source);
       const parentNode = nodes.find(
@@ -50,18 +64,15 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       const targetIndex = inputNodes.findIndex((n) => n.id === edge.target);
       const sourceIndex = outputNodes.findIndex((n) => n.id === edge.source);
       const isHaveSubName = !!parentNode?.info?.nodeName || !!parentNode?.status?.waringIcon;
+      const startPosition = isHaveSubName ? 70 : 48;
 
       const newSourceX = sourceIndex >= 0 && parentNode ? parentNode!!.position.x + parentNode.width!! + 7 : sourceX;
       const newSourceY =
-        sourceIndex >= 0 && parentNode
-          ? parentNode!!.position.y + ((isHaveSubName ? 70 : 48) + sourceIndex * 32)
-          : sourceY;
+        sourceIndex >= 0 && parentNode ? parentNode!!.position.y + (startPosition + sourceIndex * 32) : sourceY;
       const newSourcePosition = sourceIndex >= 0 ? Position.Right : sourcePosition;
       const newTargetX = targetIndex >= 0 && parentNode ? parentNode!!.position.x - 7 : targetX;
       const newTargetY =
-        targetIndex >= 0 && parentNode
-          ? parentNode!!.position.y + ((isHaveSubName ? 70 : 48) + targetIndex * 32)
-          : targetY;
+        targetIndex >= 0 && parentNode ? parentNode!!.position.y + (startPosition + targetIndex * 32) : targetY;
       const newTargetPosition = targetIndex >= 0 ? Position.Left : targetPosition;
 
       setPath(
@@ -72,6 +83,58 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
           targetX: parentNodeId ? targetX : newTargetX,
           targetY: parentNodeId ? targetY : newTargetY,
           targetPosition: parentNodeId ? targetPosition : newTargetPosition,
+        })
+      );
+    }
+
+    if (showParentNodeAsSourceOrTarget) {
+      const nodeTarget = nodes.find((item: NodeInterface) => item.id === edge.target);
+      const nodeSource = nodes.find((item: NodeInterface) => item.id === edge.source);
+      const parentNodeTarget = nodes.find((item: NodeInterface) => item.id === nodeTarget?.parentId);
+      const parentNodeSource = nodes.find((item: NodeInterface) => item.id === nodeSource?.parentId);
+
+      const parentSourceHaveName = !!parentNodeSource?.info?.nodeName || !!parentNodeSource?.status?.waringIcon;
+      const parentTargetHaveName = !!parentNodeTarget?.info?.nodeName || !!parentNodeTarget?.status?.waringIcon;
+      const startPosition = parentSourceHaveName ? 70 : 48;
+      const endPosition = parentTargetHaveName ? 70 : 48;
+
+      // handle parent node start position when showParentNodeAsSourceOrTarget = true
+      const outputNodesOfParentSource = nodes
+        .filter((item: NodeInterface) => item.parentId === parentNodeSource?.id)
+        .filter((n: NodeInterface) => isOutputFlow(n.type!!));
+
+      const sourceIndexOfParentSource = outputNodesOfParentSource.findIndex((n) => n.id === nodeSource?.id);
+      const newSourcePositionX = parentNodeSource
+        ? parentNodeSource.position.x + parentNodeSource.width!! + 7
+        : sourceX;
+      const newSourcePositionY = parentNodeSource
+        ? parentNodeSource.position.y + (startPosition + sourceIndexOfParentSource * 32)
+        : sourceX;
+      // --end of parent node start position
+
+      // handle parent node end position when showParentNodeAsSourceOrTarget = true
+      const inputNodesOfParentSource = nodes
+        .filter((item: NodeInterface) => item.parentId === parentNodeTarget?.id)
+        .filter((n: NodeInterface) => isInputFlow(n.type!!));
+
+      const targetIndexOfParentSource = inputNodesOfParentSource.findIndex((n) => n.id === nodeTarget?.id);
+      const newTargetPositionX = parentNodeTarget ? parentNodeTarget.position.x - 7 : sourceX;
+      const newTargetPositionY = parentNodeTarget
+        ? parentNodeTarget.position.y + (endPosition + targetIndexOfParentSource * 32)
+        : sourceX;
+      // --end of parent node end position
+
+      const newSourcePosition = sourceIndexOfParentSource >= 0 ? Position.Right : sourcePosition;
+      const newTargetPosition = targetIndexOfParentSource >= 0 ? Position.Left : targetPosition;
+
+      setPath(
+        getBezierPath({
+          sourceX: newSourcePositionX,
+          sourceY: newSourcePositionY,
+          sourcePosition: newSourcePosition,
+          targetX: newTargetPositionX,
+          targetY: newTargetPositionY,
+          targetPosition: newTargetPosition,
         })
       );
     }
