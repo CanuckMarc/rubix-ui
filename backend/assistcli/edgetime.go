@@ -2,10 +2,11 @@ package assistcli
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/NubeIO/lib-date/datelib"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-edge/service/system"
-	"time"
 )
 
 func (inst *Client) EdgeSystemTime(hostIDName string) (*datelib.Time, error) {

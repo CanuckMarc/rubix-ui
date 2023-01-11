@@ -2,9 +2,10 @@ package assistcli
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
-	"sync"
 )
 
 var (
