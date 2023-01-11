@@ -1,4 +1,4 @@
-import { Button, Descriptions, Modal, Spin, Space } from "antd";
+import { Button, Descriptions, Modal, Spin, Space, Switch } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { HostFirewallFactory } from "../factory";
@@ -29,6 +29,10 @@ export const Firewall = () => {
 //     }
 //   };
 
+const onToggleChange = () => {
+
+}
+
   return (
     <>
       <Space align="start" direction="vertical">
@@ -36,6 +40,7 @@ export const Firewall = () => {
         <Spin spinning={isFetching}>
          
         </Spin>
+        <Switch defaultChecked onChange={onToggleChange} />
       </Space>
     </>
   );
