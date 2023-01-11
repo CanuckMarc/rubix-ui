@@ -1,6 +1,7 @@
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { FlowStreamFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import RbTable from "../../../../../../../common/rb-table";
@@ -38,8 +39,16 @@ export const StreamsTable = (props: any) => {
       fixed: "left",
       render: (_: any, item: Stream) => (
         <Space size="middle">
-          <Link to={getNavigationLink(item.uuid)}>View Producers</Link>
-          <a onClick={() => showModal(item)}>Edit</a>
+          <Link to={getNavigationLink(item.uuid)}>
+            <Tooltip title="View Producers">
+              <ArrowRightOutlined />
+            </Tooltip>
+          </Link>
+          <Tooltip title="Edit">
+            <a onClick={() => showModal(item)}>
+              <FormOutlined />
+            </a>
+          </Tooltip>
         </Space>
       ),
     },

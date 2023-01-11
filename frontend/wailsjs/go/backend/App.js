@@ -50,6 +50,10 @@ export function AddProducer(arg1, arg2, arg3) {
   return window['go']['backend']['App']['AddProducer'](arg1, arg2, arg3);
 }
 
+export function AddSchedule(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['AddSchedule'](arg1, arg2, arg3);
+}
+
 export function AddStream(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['AddStream'](arg1, arg2, arg3, arg4);
 }
@@ -180,6 +184,10 @@ export function DeleteProducer(arg1, arg2, arg3) {
 
 export function DeleteProducerBulk(arg1, arg2, arg3) {
   return window['go']['backend']['App']['DeleteProducerBulk'](arg1, arg2, arg3);
+}
+
+export function DeleteSchedule(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['DeleteSchedule'](arg1, arg2, arg3);
 }
 
 export function DeleteStream(arg1, arg2, arg3) {
@@ -426,6 +434,10 @@ export function EditProducer(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EditProducer'](arg1, arg2, arg3, arg4);
 }
 
+export function EditSchedule(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['EditSchedule'](arg1, arg2, arg3, arg4);
+}
+
 export function EditStream(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EditStream'](arg1, arg2, arg3, arg4);
 }
@@ -658,6 +670,10 @@ export function GetPoint(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPoint'](arg1, arg2, arg3);
 }
 
+export function GetPointPriority(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetPointPriority'](arg1, arg2, arg3);
+}
+
 export function GetPoints(arg1, arg2) {
   return window['go']['backend']['App']['GetPoints'](arg1, arg2);
 }
@@ -692,6 +708,10 @@ export function GetReleases() {
 
 export function GetScannerSchema() {
   return window['go']['backend']['App']['GetScannerSchema']();
+}
+
+export function GetSchedule(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetSchedule'](arg1, arg2, arg3);
 }
 
 export function GetSchedules(arg1, arg2) {
@@ -796,6 +816,14 @@ export function NodeValue(arg1, arg2, arg3, arg4) {
 
 export function NodeValues(arg1, arg2, arg3) {
   return window['go']['backend']['App']['NodeValues'](arg1, arg2, arg3);
+}
+
+export function NodesValuesInsideParent(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['NodesValuesInsideParent'](arg1, arg2, arg3, arg4);
+}
+
+export function NodesValuesSubFlow(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['NodesValuesSubFlow'](arg1, arg2, arg3, arg4);
 }
 
 export function NubeHelp() {

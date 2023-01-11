@@ -1,4 +1,4 @@
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
@@ -9,6 +9,7 @@ import { FLOW_NETWORKS_HEADERS, FLOW_NETWORKS_SCHEMA } from "../../../../../../.
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { CreateEditModal } from "./create";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import FlowNetwork = model.FlowNetwork;
@@ -38,8 +39,16 @@ export const FlowNetworksTable = (props: any) => {
       fixed: "left",
       render: (_: any, network: FlowNetwork) => (
         <Space size="middle">
-          <Link to={getNavigationLink(network.uuid)}>View Streams</Link>
-          <a onClick={() => showModal(network)}>Edit</a>
+          <Link to={getNavigationLink(network.uuid)}>
+            <Tooltip title="View Streams">
+              <ArrowRightOutlined />
+            </Tooltip>
+          </Link>
+          <Tooltip title="Edit">
+            <a onClick={() => showModal(network)}>
+              <FormOutlined />
+            </a>
+          </Tooltip>
         </Space>
       ),
     },

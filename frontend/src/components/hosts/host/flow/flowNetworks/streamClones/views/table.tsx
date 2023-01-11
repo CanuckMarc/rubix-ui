@@ -1,4 +1,4 @@
-import { Space, Spin } from "antd";
+import { Space, Spin, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FlowStreamCloneFactory } from "../factory";
@@ -7,6 +7,7 @@ import { ROUTES } from "../../../../../../../constants/routes";
 import { STREAM_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import { ArrowRightOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import StreamClone = model.StreamClone;
@@ -35,7 +36,11 @@ export const StreamClonesTable = () => {
       fixed: "left",
       render: (_: any, item: StreamClone) => (
         <Space size="middle">
-          <Link to={getNavigationLink(item.uuid)}>View Consumers</Link>
+          <Link to={getNavigationLink(item.uuid)}>
+            <Tooltip title="View Consumers">
+              <ArrowRightOutlined />
+            </Tooltip>
+          </Link>
         </Space>
       ),
     },
