@@ -18,21 +18,19 @@ import { RubixAssistTokenFactory } from "./token-factory";
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;
 
-export const ConnectionsTable = () => {
+export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
-  const [connections, setConnections] = useState([] as RubixConnection[]);
   const [filteredData, setFilteredData] = useState<RubixConnection[]>([]);
   const [currentConnection, setCurrentConnection] = useState({} as RubixConnection);
   const [connectionSchema, setConnectionSchema] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
 
   const factory = new ConnectionFactory();
 
   const config = {
-    originData: connections,
+    originData: data,
     setFilteredData: setFilteredData,
   };
 
@@ -79,19 +77,6 @@ export const ConnectionsTable = () => {
     e.stopPropagation();
     setCurrentConnection(connection);
     setIsTokenModalVisible(true);
-  };
-
-  const fetch = async () => {
-    try {
-      setIsFetching(true);
-      const res = (await factory.GetAll()) || [];
-      setConnections(res);
-      setFilteredData(res);
-    } catch (error) {
-      setConnections([]);
-    } finally {
-      setIsFetching(false);
-    }
   };
 
   const getSchema = async () => {
@@ -144,15 +129,15 @@ export const ConnectionsTable = () => {
   }, [currentConnection]);
 
   useEffect(() => {
-    fetch().catch(console.error);
-  }, []);
+    setFilteredData(data);
+  }, [data]);
 
   return (
     <div>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as RubixConnection)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {connections.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
@@ -162,7 +147,6 @@ export const ConnectionsTable = () => {
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
       <CreateEditModal
-        connections={connections}
         currentConnection={currentConnection}
         connectionSchema={connectionSchema}
         isModalVisible={isModalVisible}

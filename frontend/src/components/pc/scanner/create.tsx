@@ -9,7 +9,7 @@ import { ConnectionFactory } from "../../connections/factory";
 const { Panel } = Collapse;
 
 export const CreateModal = (props: any) => {
-  const { selectedIpPorts, isModalVisible, setIsModalVisible } = props;
+  const { selectedIpPorts, isModalVisible, onclose, refreshConnections } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState([] as RubixConnection[]);
   const [schema, setSchema] = useState({});
@@ -59,7 +59,7 @@ export const CreateModal = (props: any) => {
 
   const handleClose = () => {
     setFormData([]);
-    setIsModalVisible(false);
+    onclose();
   };
 
   const handleSubmit = async (connections: RubixConnection[]) => {
@@ -77,11 +77,12 @@ export const CreateModal = (props: any) => {
           promises.push(addConnection(c));
         }
         await Promise.all(promises);
+        refreshConnections();
+        handleClose();
       } catch (error) {
         console.log(error);
       } finally {
         setConfirmLoading(false);
-        handleClose();
       }
     } else {
       openNotificationWithIcon("error", "Please check again 'name' inputs!");
@@ -128,11 +129,7 @@ export const AddButton = (props: any) => {
   const { showModal } = props;
 
   return (
-    <Button
-      type="primary"
-      onClick={() => showModal()}
-      style={{ margin: "0 6px 10px 0", float: "left" }}
-    >
+    <Button type="primary" onClick={() => showModal()} style={{ margin: "0 6px 10px 0", float: "left" }}>
       <PlusOutlined /> Supervisors
     </Button>
   );
