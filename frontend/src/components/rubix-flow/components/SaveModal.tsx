@@ -43,14 +43,18 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
 
   const handleNodeRender = () => {
     let selectedNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.selected);
+    let isExcludeParentNode =  false;
     const allNodes: NodeInterface[] = [];
 
     if (selectedNodes.length === 0 && window.selectedNodeForSubFlow) {
       selectedNodes = [window.selectedNodeForSubFlow];
+      isExcludeParentNode = true;
     }
 
     selectedNodes.forEach((item) => {
-      allNodes.push(item);
+      if (isExcludeParentNode && item.id !== window.selectedNodeForSubFlow!!.id) {
+        allNodes.push(item);
+      }
       if (item.isParent) {
         allNodes.push(...findAllNodes(item.id));
       }
