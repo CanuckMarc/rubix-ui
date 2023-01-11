@@ -119,6 +119,7 @@ const SearchableTree: React.FC = () => {
 
   useEffect(() => {
     const dataList = generateList(data);
+    console.log(dataList);
     const newExpandedKeys: any = dataList
       .map((item) => getParentKey(item.key, data))
       .filter((val) => val);
