@@ -196,6 +196,10 @@ export function EdgeInstallApp(arg1:string,arg2:string,arg3:string,arg4:string):
 
 export function EdgeInstallPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
+export function EdgeNTPDisable(arg1:string,arg2:string):Promise<system.Message>;
+
+export function EdgeNTPEnable(arg1:string,arg2:string):Promise<system.Message>;
+
 export function EdgeRestartPlugins(arg1:string,arg2:string,arg3:Array<string>):Promise<rumodel.Response>;
 
 export function EdgeRubixAppVersions(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<Array<string>>;

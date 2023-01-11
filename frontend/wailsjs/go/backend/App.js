@@ -354,6 +354,14 @@ export function EdgeInstallPlugin(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeInstallPlugin'](arg1, arg2, arg3);
 }
 
+export function EdgeNTPDisable(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeNTPDisable'](arg1, arg2);
+}
+
+export function EdgeNTPEnable(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeNTPEnable'](arg1, arg2);
+}
+
 export function EdgeRestartPlugins(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeRestartPlugins'](arg1, arg2, arg3);
 }
