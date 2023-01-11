@@ -10,27 +10,25 @@ export const Firewall = () => {
   const [isFetching, setIsFetching] = useState(false);
 
   const factory = new HostFirewallFactory();
-//   factory.connectionUUID = connUUID;
-//   factory.hostUUID = hostUUID;
 
-//   useEffect(() => {
-//     fetch();
-//   }, []);
+  useEffect(() => {
+    fetch();
+  }, []);
 
-//   const fetch = async () => {
-//     try {
-//       setIsFetching(true);
-//       const res = await factory.GetHostTime();
-//       setData(res);
-//     } catch (error) {
-//       console.log(error);
-//     } finally {
-//       setIsFetching(false);
-//     }
-//   };
+  const fetch = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.EdgeFirewallList(connUUID, hostUUID);
+      setData(res);
+      console.log(res)
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
 const onToggleChange = async(checked: boolean) => {
-    console.log(checked)
     if (checked) {
         await factory.EdgeFirewallEnable(connUUID, hostUUID)
     } else {
