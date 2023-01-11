@@ -29,8 +29,13 @@ export const Firewall = () => {
 //     }
 //   };
 
-const onToggleChange = () => {
-
+const onToggleChange = async(checked: boolean) => {
+    console.log(checked)
+    if (checked) {
+        await factory.EdgeFirewallEnable(connUUID, hostUUID)
+    } else {
+        await factory.EdgeFirewallDisable(connUUID, hostUUID)
+    }
 }
 
   return (
@@ -40,7 +45,7 @@ const onToggleChange = () => {
         <Spin spinning={isFetching}>
          
         </Spin>
-        <Switch defaultChecked onChange={onToggleChange} />
+        <Switch defaultChecked={false} onChange={onToggleChange} />
       </Space>
     </>
   );

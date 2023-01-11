@@ -9,7 +9,6 @@ import {
   import { system, ufw } from "../../../../../wailsjs/go/models";
   
   export class HostFirewallFactory {
-    
     public EdgeFirewallList(connUUID: string, hostUUID: string): Promise<ufw.UFWStatus[]> {
         return EdgeFirewallList(connUUID, hostUUID);
     }
