@@ -120,15 +120,8 @@ export const FlowDeviceTable = (props: any) => {
         title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
-        sorter: (a: any, b: any) => {
-          if (schema[key].type === "string") {
-            a[key] = a[key] ?? ""; //case item not have a[key] property
-            b[key] = b[key] ?? "";
-            return a[key].localeCompare(b[key]);
-          } else {
-            return a[key] - b[key];
-          }
-        },
+        sorter: (a: any, b: any) => ('' + a[key] ?? '').localeCompare('' + b[key] ?? ''),
+        render: (a: any) => '' + a, // boolean values doesn't display on the table
       };
     });
 
