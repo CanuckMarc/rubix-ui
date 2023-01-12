@@ -15,6 +15,7 @@ import { DEFAULT_NODE_SPEC_JSON } from "./NodeMenu";
 type NodeProps = FlowNodeProps & {
   spec: NodeSpecJSON;
   parentNodeId?: string;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
 
 const getTitle = (type: string) => {
@@ -138,10 +139,10 @@ export const isOutputFlow = (type: string) => {
 };
 
 export const Node = (props: NodeProps) => {
-  const { id, data, spec, selected, parentNodeId } = props;
+  const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
   const edges = useEdges();
   const nodes = useNodes();
-  const [nodesSpec] = useNodesSpec();
+  // const [nodesSpec] = useNodesSpec();
   const handleChange = useChangeNodeData(id);
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);

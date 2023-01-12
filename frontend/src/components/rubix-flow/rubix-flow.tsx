@@ -660,7 +660,7 @@ const Flow = (props: FlowProps) => {
   return (
     <div className="rubix-flow">
       <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} />
-      <NodeSideBar />
+      <NodeSideBar nodesSpec={nodesSpec}/>
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
@@ -732,6 +732,7 @@ const Flow = (props: FlowProps) => {
                 filters={getNodePickerFilters(nodes, lastConnectStart)}
                 onPickNode={handleAddNode}
                 onClose={closeNodePicker}
+                nodesSpec={nodesSpec}
               />
             )}
             {nodeMenuVisibility && (
@@ -742,6 +743,7 @@ const Flow = (props: FlowProps) => {
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
                 node={selectedNode}
+                nodesSpec={nodesSpec}
                 onClose={closeNodePicker}
                 isDoubleClick={isDoubleClick}
                 handleAddSubFlow={handleAddSubFlow}
@@ -783,7 +785,7 @@ export const RubixFlow = () => {
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec}/>
     );
     return nodes;
   }, {} as NodeTypes);

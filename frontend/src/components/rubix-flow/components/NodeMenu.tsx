@@ -12,6 +12,7 @@ import { HelpComponent } from "./NodeHelp";
 type NodeMenuProps = {
   position: XYPosition;
   node: NodeInterface;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
@@ -31,6 +32,7 @@ export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
 const NodeMenu = ({
   position,
   node,
+  nodesSpec,
   isDoubleClick,
   onClose,
   deleteNode,
@@ -46,7 +48,7 @@ const NodeMenu = ({
   const [isShowSetName, setIsShowSetName] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
-  const [nodesSpec] = useNodesSpec();
+  // const [nodesSpec] = useNodesSpec();
   const instance = useReactFlow();
 
   useOnPressKey("Escape", onClose);
