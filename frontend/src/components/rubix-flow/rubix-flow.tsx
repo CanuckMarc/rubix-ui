@@ -744,7 +744,6 @@ const Flow = (props: FlowProps) => {
                 filters={getNodePickerFilters(nodes, lastConnectStart)}
                 onPickNode={handleAddNode}
                 onClose={closeNodePicker}
-                nodesSpec={nodesSpec}
               />
             )}
             {nodeMenuVisibility && (
