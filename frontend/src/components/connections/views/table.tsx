@@ -159,6 +159,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         displayName={currentConnection.name}
         onCloseModal={onCloseTokenModal}
         factory={tokenFactory}
+        selectedItem={currentConnection}
       />
     </div>
   );
