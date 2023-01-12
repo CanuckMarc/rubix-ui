@@ -57,9 +57,11 @@ export const OutputSocket = memo(
 
     useEffect(() => {
       const val = valueType === "boolean" ? getValueOptions(getValueOutput(name)) : getValueOutput(name);
-
-      setOutValue(val);
-    }, [valueType, name]);
+      
+      if (val !== outValue) {
+        setOutValue(val);
+      }
+    }, [valueType, name, dataOut]);
 
     useEffect(() => {
       if (refName.current) {
