@@ -119,8 +119,9 @@ export class FlowDeviceFactory {
     hasUUID(connUUID);
     hasUUID(hostUUID);
     const resp = await GetFlowDeviceSchema(connUUID, hostUUID, setPluginName);
-    resp.plugin_name = setPluginName;
-    return resp;
+    const res = JSON.parse(resp || "{}");
+    res.plugin_name = setPluginName;
+    return res;
   }
 
   async BulkImport(

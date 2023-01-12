@@ -284,7 +284,7 @@ export function GetDevices(arg1:string,arg2:string,arg3:boolean):Promise<Array<m
 
 export function GetFlow(arg1:string,arg2:string,arg3:boolean):Promise<any>;
 
-export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<any>;
+export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function GetFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.FlowNetwork>;
 
@@ -292,11 +292,11 @@ export function GetFlowNetworkClone(arg1:string,arg2:string,arg3:string,arg4:boo
 
 export function GetFlowNetworkClones(arg1:string,arg2:string,arg3:boolean):Promise<Array<model.FlowNetworkClone>>;
 
-export function GetFlowNetworkSchema(arg1:string,arg2:string,arg3:string):Promise<any>;
+export function GetFlowNetworkSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function GetFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<Array<model.FlowNetwork>>;
 
-export function GetFlowPointSchema(arg1:string,arg2:string,arg3:string):Promise<any>;
+export function GetFlowPointSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function GetGitToken():Promise<rumodel.Response>;
 
