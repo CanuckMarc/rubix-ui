@@ -124,7 +124,7 @@ export const FlowDeviceTable = (props: any) => {
           if (schema[key].type === "string") {
             a[key] = a[key] ?? ""; //case item not have a[key] property
             b[key] = b[key] ?? "";
-            return a[key].localeCompare(a[key]);
+            return a[key].localeCompare(b[key]);
           } else {
             return a[key] - b[key];
           }
