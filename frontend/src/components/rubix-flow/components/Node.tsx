@@ -9,7 +9,6 @@ import { NodeContainer } from "./NodeContainer";
 import { InputSocket } from "./InputSocket";
 import { OutputSocket } from "./OutputSocket";
 import { SettingsModal } from "./SettingsModal";
-import { useNodesSpec } from "../use-nodes-spec";
 import { DEFAULT_NODE_SPEC_JSON } from "./NodeMenu";
 
 type NodeProps = FlowNodeProps & {
@@ -142,7 +141,6 @@ export const Node = (props: NodeProps) => {
   const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
   const edges = useEdges();
   const nodes = useNodes();
-  // const [nodesSpec] = useNodesSpec();
   const handleChange = useChangeNodeData(id);
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);

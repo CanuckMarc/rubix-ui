@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useReactFlow, XYPosition, Edge } from "react-flow-renderer/nocss";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
-import { useNodesSpec } from "../use-nodes-spec";
 import { SettingsModal } from "./SettingsModal";
 import { SetPayloadModal } from "./SetPayloadModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
@@ -48,7 +47,6 @@ const NodeMenu = ({
   const [isShowSetName, setIsShowSetName] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
-  // const [nodesSpec] = useNodesSpec();
   const instance = useReactFlow();
 
   useOnPressKey("Escape", onClose);
