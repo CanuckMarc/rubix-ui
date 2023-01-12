@@ -21,16 +21,7 @@ export const AddButton = (props: any) => {
 };
 
 export const CreateEditModal = (props: any) => {
-  const {
-    hosts,
-    hostSchema,
-    currentHost,
-    isModalVisible,
-    isLoadingForm,
-    refreshList,
-    onCloseModal,
-    connUUID,
-  } = props;
+  const { hosts, hostSchema, currentHost, isModalVisible, isLoadingForm, refreshList, onCloseModal, connUUID } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentHost);
 
@@ -40,7 +31,7 @@ export const CreateEditModal = (props: any) => {
 
   const addHost = async (host: amodel.Host) => {
     try {
-      const res = await AddHost(connUUID, host);
+      await AddHost(connUUID, host);
       openNotificationWithIcon("success", `added ${host.name} success`);
     } catch (error) {
       openNotificationWithIcon("error", `added ${host.name} fail`);
@@ -49,10 +40,7 @@ export const CreateEditModal = (props: any) => {
 
   const editHost = async (host: amodel.Host) => {
     try {
-      const res = await EditHost(connUUID, host.uuid, host);
-      const index = hosts.findIndex(
-        (n: amodel.Host) => n.uuid === host.uuid
-      );
+      await EditHost(connUUID, host.uuid, host);
       openNotificationWithIcon("success", `updated ${host.name} success`);
     } catch (error) {
       openNotificationWithIcon("error", `updated ${host.name} fail`);
@@ -81,8 +69,7 @@ export const CreateEditModal = (props: any) => {
     let result = false;
     result =
       !formData.name ||
-      (formData.name &&
-        (formData.name.length < 2 || formData.name.length > 50)) ||
+      (formData.name && (formData.name.length < 2 || formData.name.length > 50)) ||
       !formData.port ||
       (formData.port && (formData.port < 2 || formData.port > 65535)) ||
       !formData.ip ||
@@ -106,12 +93,7 @@ export const CreateEditModal = (props: any) => {
         style={{ textAlign: "start" }}
       >
         <Spin spinning={isLoadingForm}>
-          <JsonForm
-            formData={formData}
-            setFormData={setFormData}
-            handleSubmit={handleSubmit}
-            jsonSchema={hostSchema}
-          />
+          <JsonForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmit} jsonSchema={hostSchema} />
         </Spin>
       </Modal>
     </>

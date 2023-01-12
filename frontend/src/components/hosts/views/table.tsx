@@ -237,6 +237,7 @@ export const HostsTable = (props: any) => {
         displayName={currentHost.name}
         onCloseModal={onCloseTokenModal}
         factory={tokenFactory}
+        selectedItem={currentHost}
       />
     </div>
   );
