@@ -235,8 +235,13 @@ const Flow = (props: FlowProps) => {
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
     const isTarget = position === "left";
-    const targetNodeId = handleId?.includes("-") ? handleId.split("-")[1] : nodeId;
-    const targetHandleId = handleId?.includes("-") ? handleId.split("-")[0] : handleId;
+    let targetNodeId = handleId?.includes("-") ? handleId.split("-")[1] : nodeId;
+    let targetHandleId = handleId?.includes("-") ? handleId.split("-")[0] : handleId;
+    const isExistNode = nodes.some(n => n.id === targetNodeId);
+    if (!isExistNode) {
+      targetNodeId = nodeId;
+      targetHandleId = handleId;
+    }
 
     if (lastConnectStart) {
       const isDragSelected = edges.some((item) => {
@@ -258,7 +263,7 @@ const Flow = (props: FlowProps) => {
             if (item.selected && lastConnectStart.nodeId === item[lastConnectStart.handleType!!]) {
               const updateKey = isTarget ? "target" : "source";
               item[`${updateKey}Handle`] = targetHandleId;
-              item[updateKey] = targetNodeId;
+              item[`${updateKey}Handle`] = targetNodeId;
             }
             return item;
           });
