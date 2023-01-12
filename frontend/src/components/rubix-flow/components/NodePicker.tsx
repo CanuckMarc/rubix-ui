@@ -27,7 +27,7 @@ const NodePicker = ({
   onPickNode,
   onClose,
   filters,
-  nodeList,
+  nodeList
 }: NodePickerProps) => {
   const [search, setSearch] = useState("");
   const [nodesSpec] = useNodesSpec();

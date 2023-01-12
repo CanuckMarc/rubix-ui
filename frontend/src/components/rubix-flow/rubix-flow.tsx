@@ -92,6 +92,7 @@ const Flow = (props: FlowProps) => {
   const rubixFlowWrapper = useRef<null | any>(null);
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
   const isDragSelection = useRef<boolean>(false);
+  const changeSelectionRef = useRef<number | null>(null);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -337,17 +338,26 @@ const Flow = (props: FlowProps) => {
     nodes: NodeInterface[];
     edges: Edge[];
   }) => {
-    const newNodes = nodes.map((node) => {
-      node.selected = newNodesChange.some((i) => i.id === node.id);
-      return node;
-    });
-    const newEdges = edges.map((edge) => {
-      edge.selected = newEdgesChange.some((i) => i.id === edge.id);
-      return edge;
-    });
+    if (changeSelectionRef.current) {
+      clearTimeout(changeSelectionRef.current);
+      changeSelectionRef.current = null;
+    }
 
-    setNodes(newNodes);
-    setEdges(newEdges);
+    if (newNodesChange.length > 0 || newEdgesChange.length > 0) {
+      changeSelectionRef.current = setTimeout(() => {
+        const newNodes = nodes.map((node) => {
+          node.selected = newNodesChange.some((i) => i.id === node.id);
+          return node;
+        });
+        const newEdges = edges.map((edge) => {
+          edge.selected = newEdgesChange.some((i) => i.id === edge.id);
+          return edge;
+        });
+
+        setNodes(newNodes);
+        setEdges(newEdges);
+      }, 50);
+    }
   };
 
   const handlePaneContextMenu = (event: ReactMouseEvent) => {
@@ -660,7 +670,7 @@ const Flow = (props: FlowProps) => {
   return (
     <div className="rubix-flow">
       <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} />
-      <NodeSideBar />
+      <NodeSideBar nodesSpec={nodesSpec} />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
@@ -742,6 +752,7 @@ const Flow = (props: FlowProps) => {
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
                 node={selectedNode}
+                nodesSpec={nodesSpec}
                 onClose={closeNodePicker}
                 isDoubleClick={isDoubleClick}
                 handleAddSubFlow={handleAddSubFlow}
@@ -783,7 +794,7 @@ export const RubixFlow = () => {
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec} />
     );
     return nodes;
   }, {} as NodeTypes);
