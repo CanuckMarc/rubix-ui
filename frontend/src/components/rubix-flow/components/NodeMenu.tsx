@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useReactFlow, XYPosition, Edge } from "react-flow-renderer/nocss";
+import { useEffect, useRef, useState } from "react";
+import { Edge, useReactFlow, XYPosition } from "react-flow-renderer/nocss";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
 import { useNodesSpec } from "../use-nodes-spec";
@@ -12,6 +12,7 @@ import { HelpComponent } from "./NodeHelp";
 type NodeMenuProps = {
   position: XYPosition;
   node: NodeInterface;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
@@ -20,6 +21,7 @@ type NodeMenuProps = {
   deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
+  isOpenFromNodeTree: boolean;
 };
 
 export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
@@ -31,6 +33,7 @@ export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
 const NodeMenu = ({
   position,
   node,
+  nodesSpec,
   isDoubleClick,
   onClose,
   deleteNode,
@@ -39,6 +42,7 @@ const NodeMenu = ({
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
   selectedNodeForSubFlow,
+  isOpenFromNodeTree = false,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
   const [isShowSetting, setIsShowSetting] = useState(false);
@@ -46,8 +50,26 @@ const NodeMenu = ({
   const [isShowSetName, setIsShowSetName] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
-  const [nodesSpec] = useNodesSpec();
+  // const [nodesSpec] = useNodesSpec();
   const instance = useReactFlow();
+
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: any) {
+      if (ref.current && !(ref.current as HTMLDivElement).contains(event.target)) {
+        onClose();
+      }
+    }
+    if (isOpenFromNodeTree) {
+      document.addEventListener("click", handleClickOutside);
+    } else {
+      document.removeEventListener("click", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isOpenFromNodeTree]);
 
   useOnPressKey("Escape", onClose);
 
@@ -114,7 +136,10 @@ const NodeMenu = ({
     <>
       {!isDoubleClick && (
         <div
-          className="node-picker node-menu absolute z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark"
+          ref={ref}
+          className={`node-picker node-menu ${
+            isOpenFromNodeTree ? "fixed" : "absolute"
+          } z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark`}
           style={{
             top: position.y,
             left: position.x,

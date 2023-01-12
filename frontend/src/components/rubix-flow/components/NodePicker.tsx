@@ -20,6 +20,7 @@ type NodePickerProps = {
     position: XYPosition
   ) => void;
   onClose: () => void;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
 
 const NodePicker = ({
@@ -28,9 +29,10 @@ const NodePicker = ({
   onClose,
   filters,
   nodeList,
+  nodesSpec
 }: NodePickerProps) => {
   const [search, setSearch] = useState("");
-  const [nodesSpec] = useNodesSpec();
+  // const [nodesSpec] = useNodesSpec();
   const instance = useReactFlow();
 
   useOnPressKey("Escape", onClose);

@@ -82,6 +82,7 @@ const Flow = (props: FlowProps) => {
   const [selectedNode, setSelectedNode] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
+  const [isMenuOpenFromNodeTree, setMenuOpenFromNodeTree] = useState(false);
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
   const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] = useUndoable({ nodes: nodes, edges: edges });
   const [isDoubleClick, setIsDoubleClick] = useState(false);
@@ -589,6 +590,12 @@ const Flow = (props: FlowProps) => {
     }
   };
 
+  const openNodeMenu = (position: { x: number; y: number }, node: NodeInterface) => {
+    setNodeMenuVisibility(position);
+    setSelectedNode(node);
+    setMenuOpenFromNodeTree(true);
+  };
+
   const deleteAllInputOrOutputConnectionsOfNode = (isInputs: boolean, nodeId: string) => {
     const node: NodeInterface | undefined = nodes.find((n: NodeInterface) => n.id === nodeId);
 
@@ -659,11 +666,16 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} />
-      <NodeSideBar />
+      <NodesTree
+        nodes={nodes}
+        selectedSubFlowId={selectedNodeForSubFlow?.id}
+        openNodeMenu={openNodeMenu}
+      />
+      <NodeSideBar nodesSpec={nodesSpec}/>
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
+            onContextMenu={()=>setMenuOpenFromNodeTree(false)}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}
@@ -732,16 +744,19 @@ const Flow = (props: FlowProps) => {
                 filters={getNodePickerFilters(nodes, lastConnectStart)}
                 onPickNode={handleAddNode}
                 onClose={closeNodePicker}
+                nodesSpec={nodesSpec}
               />
             )}
             {nodeMenuVisibility && (
               <NodeMenu
+                isOpenFromNodeTree={isMenuOpenFromNodeTree}
                 deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
                 deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
                 deleteNode={deleteNodesAndEdges}
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
                 node={selectedNode}
+                nodesSpec={nodesSpec}
                 onClose={closeNodePicker}
                 isDoubleClick={isDoubleClick}
                 handleAddSubFlow={handleAddSubFlow}
@@ -783,7 +798,7 @@ export const RubixFlow = () => {
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec}/>
     );
     return nodes;
   }, {} as NodeTypes);
