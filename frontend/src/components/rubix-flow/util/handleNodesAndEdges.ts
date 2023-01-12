@@ -44,6 +44,7 @@ export const handleCopyNodesAndEdges = (
      */
     newEdges = newEdges.map((edge) => ({
       ...edge,
+      oldId: edge.id,
       id: generateUuid(),
       source: edge.source === item.id ? newNodeId : edge.source,
       target: edge.target === item.id ? newNodeId : edge.target,
@@ -52,6 +53,7 @@ export const handleCopyNodesAndEdges = (
 
     return {
       ...item,
+      oldId: item.id,
       id: newNodeId,
       position: { x: item.position.x + 10, y: item.position.y - 10 },
       selected: isAutoSelected,

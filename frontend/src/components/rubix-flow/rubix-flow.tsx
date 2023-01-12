@@ -43,6 +43,7 @@ import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
 import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
+import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -236,13 +237,8 @@ const Flow = (props: FlowProps) => {
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
     const isTarget = position === "left";
-    let targetNodeId = handleId?.includes("-") ? handleId.split("-")[1] : nodeId;
-    let targetHandleId = handleId?.includes("-") ? handleId.split("-")[0] : handleId;
-    const isExistNode = nodes.some(n => n.id === targetNodeId);
-    if (!isExistNode) {
-      targetNodeId = nodeId;
-      targetHandleId = handleId;
-    }
+    const targetNodeId = handleId?.includes(SPLIT_KEY) ? handleId.split(SPLIT_KEY)[1] : nodeId;
+    const targetHandleId = handleId?.includes(SPLIT_KEY) ? handleId.split(SPLIT_KEY)[0] : handleId;
 
     if (lastConnectStart) {
       const isDragSelected = edges.some((item) => {
@@ -260,11 +256,11 @@ const Flow = (props: FlowProps) => {
         let newEdges;
         if (targetNodeId) {
           // update selected lines to new node if start and end are same type
-          newEdges = edges.map((item) => {
+          newEdges = edges.map((item: Edge) => {
             if (item.selected && lastConnectStart.nodeId === item[lastConnectStart.handleType!!]) {
               const updateKey = isTarget ? "target" : "source";
               item[`${updateKey}Handle`] = targetHandleId;
-              item[`${updateKey}Handle`] = targetNodeId;
+              item[updateKey as keyof Edge] = targetNodeId;
             }
             return item;
           });
@@ -309,8 +305,8 @@ const Flow = (props: FlowProps) => {
               targetHandle: targetHandle,
             };
 
-            if (newEdge.sourceHandle.includes("-")) {
-              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split("-");
+            if (newEdge.sourceHandle.includes(SPLIT_KEY)) {
+              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split(SPLIT_KEY);
               newEdge.source = sourceNodeId;
               newEdge.sourceHandle = sourceName;
             }
@@ -509,10 +505,39 @@ const Flow = (props: FlowProps) => {
     const newFlow = handleCopyNodesAndEdges(_copied, nodes, edges);
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
-    const _nodes = [...nodes, ...newFlow.nodes];
-    const _edges = [...edges, ...newFlow.edges];
-    const nodesUniq = uniqArray(_nodes);
-    const edgesUniq = uniqArray(_edges);
+
+    // remove output connection if node at level 1
+    // get nodes level 1
+    const nodesL1: NodeInterface[] = _copied.nodes.filter((node: NodeInterface) => {
+      return !node.parentId || !_copied.nodes.some((node2) => node.parentId === node2.id);
+    });
+    // get nodes level 1 corresponding with new id
+    const newNodeL1: NodeInterface[] = newFlow.nodes.filter((node: NodeInterface) =>
+      nodesL1.some((node2: NodeInterface) => node2.id === node.oldId)
+    );
+
+    // save all node have output connection
+    // if node is parent then get connection of outputs
+    const allNodes: NodeInterface[] = [];
+    newNodeL1.forEach((node) => {
+      if (node.isParent) {
+        const outputs = newFlow.nodes
+          .filter((node2: NodeInterface) => node2.parentId === node.id)
+          .filter((n) => isOutputFlow(n.type!!));
+        allNodes.push(...outputs);
+      } else {
+        allNodes.push(node);
+      }
+    });
+
+    // remove connections have source id is belong allNodes
+    newFlow.edges = newFlow.edges.filter((edge: Edge) =>
+      allNodes.some((node: NodeInterface) => node.id !== edge.source)
+    );
+
+    // unique items and delete oldId field
+    const nodesUniq = uniqArray([...nodes, ...newFlow.nodes]).map(({ oldId, ...node }: NodeInterface) => node);
+    const edgesUniq = uniqArray([...edges, ...newFlow.edges]).map(({ oldId, ...edge }: any) => edge);
 
     setNodes(nodesUniq);
     setEdges(edgesUniq);
