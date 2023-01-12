@@ -11,7 +11,6 @@ import {
   RbAddButton,
   RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
-import RbTableFilterNameInput from "../../../../../../common/rb-table-filter-name-input";
 import { FLOW_DEVICE_HEADERS } from "../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../constants/routes";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
@@ -118,7 +117,7 @@ export const FlowDeviceTable = (props: any) => {
     const columnKeys = columns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
+        title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
         sorter: (a: any, b: any) => {
