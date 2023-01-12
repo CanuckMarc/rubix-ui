@@ -554,7 +554,7 @@ func (inst *App) NodePallet(connUUID, hostUUID, filterCategory string, isRemote 
 		resp, err := inst.nodePallet(connUUID, hostUUID, filterCategory)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-			return resp
+			return []nodes.PalletNode{}
 		}
 		return resp
 	}
@@ -562,7 +562,7 @@ func (inst *App) NodePallet(connUUID, hostUUID, filterCategory string, isRemote 
 	resp, err := client.NodePallet()
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return resp
+		return []nodes.PalletNode{}
 	}
 	var outFiltered []nodes.PalletNode
 	if filterCategory != "" {
