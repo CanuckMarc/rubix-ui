@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
 
-import { useChangeNodeData } from "../hooks/useChangeNodeData";
+import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { InputSocketSpecJSON, NodeSpecJSON, OutputSocketSpecJSON } from "../lib";
@@ -164,7 +164,7 @@ export const Node = (props: NodeProps) => {
             ...firstInput,
             valueType: firstInput.dataType,
             valueOfChild: firstInput.value,
-            pin: `${firstInput.pin}-${nodeId}`,
+            pin: `${firstInput.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstInput.pin,
             subName: `${firstInput.pin}${arr.length > 1 ? index + 1 : ""} ${
@@ -183,7 +183,7 @@ export const Node = (props: NodeProps) => {
           return {
             ...firstOut,
             valueOfChild: firstOut.value,
-            pin: `${firstOut.pin}-${nodeId}`,
+            pin: `${firstOut.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstOut.pin,
             subName: `${firstOut.pin}${arr.length > 1 ? index + 1 : ""} ${info?.nodeName ? `(${info.nodeName})` : ""}`,
@@ -191,8 +191,10 @@ export const Node = (props: NodeProps) => {
         })
     : node.data.out;
 
-  newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
-  newData.out = [...(nodeOutputs || []), ...(data.out || [])];
+  if (node.isParent) {
+    newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
+    newData.out = [...(nodeOutputs || []), ...(data.out || [])];
+  }
 
   const pairs = getPairs(
     getInputs(spec.inputs || [], nodeInputs, node),
