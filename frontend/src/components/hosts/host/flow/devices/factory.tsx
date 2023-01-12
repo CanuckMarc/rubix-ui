@@ -116,17 +116,10 @@ export class FlowDeviceFactory {
     hostUUID: string,
     setPluginName: string
   ): Promise<any> {
-    let resp: Promise<any> = {} as Promise<any>;
     hasUUID(connUUID);
     hasUUID(hostUUID);
-    await GetFlowDeviceSchema(connUUID, hostUUID, setPluginName)
-      .then((res) => {
-        res.plugin_name = setPluginName;
-        resp = res as unknown as Promise<any>;
-      })
-      .catch((err) => {
-        return resp;
-      });
+    const resp = await GetFlowDeviceSchema(connUUID, hostUUID, setPluginName);
+    resp.plugin_name = setPluginName;
     return resp;
   }
 

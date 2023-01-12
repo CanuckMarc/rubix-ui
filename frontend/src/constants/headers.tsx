@@ -355,6 +355,21 @@ export const FLOW_DEVICE_HEADERS = [
     },
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
+  {
+    title: "auto_mapping_enable",
+    key: "auto_mapping_enable",
+    dataIndex: "auto_mapping_enable",
+    render(enable: boolean) {
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
+  }
 ];
 
 export const FLOW_POINT_HEADERS = [

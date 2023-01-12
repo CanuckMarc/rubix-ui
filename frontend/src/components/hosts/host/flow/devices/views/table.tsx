@@ -11,7 +11,6 @@ import {
   RbAddButton,
   RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
-import RbTableFilterNameInput from "../../../../../../common/rb-table-filter-name-input";
 import { FLOW_DEVICE_HEADERS } from "../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../constants/routes";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
@@ -118,18 +117,11 @@ export const FlowDeviceTable = (props: any) => {
     const columnKeys = columns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
+        title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
-        sorter: (a: any, b: any) => {
-          if (schema[key].type === "string") {
-            a[key] = a[key] ?? ""; //case item not have a[key] property
-            b[key] = b[key] ?? "";
-            return a[key].localeCompare(a[key]);
-          } else {
-            return a[key] - b[key];
-          }
-        },
+        sorter: (a: any, b: any) => ('' + a[key] ?? '').localeCompare('' + b[key] ?? ''),
+        render: (a: any) => '' + a, // boolean values doesn't display on the table
       };
     });
 

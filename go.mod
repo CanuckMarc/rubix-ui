@@ -21,7 +21,7 @@ require (
 	github.com/NubeIO/lib-uuid v0.0.3
 	github.com/NubeIO/nubeio-rubix-lib-auth-go v1.1.0
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
-	github.com/NubeIO/nubeio-rubix-lib-models-go v1.3.7
+	github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.8
 	github.com/NubeIO/rubix-assist v0.8.0
 	github.com/NubeIO/rubix-edge v0.3.0
 	github.com/NubeIO/rubix-edge-wires v0.2.5

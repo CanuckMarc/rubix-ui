@@ -3,7 +3,6 @@ import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
-import RbTableFilterNameInput from "../../../../../../common/rb-table-filter-name-input";
 import RbTable from "../../../../../../common/rb-table";
 import {
   RbAddButton,

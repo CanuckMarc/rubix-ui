@@ -683,9 +683,9 @@ export namespace flowcli {
 export namespace model {
 	
 	export class StreamClone {
+	    name: string;
 	    uuid: string;
 	    sync_uuid: string;
-	    name: string;
 	    description?: string;
 	    enable?: boolean;
 	    // Go type: time.Time
@@ -705,9 +705,9 @@ export namespace model {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
 	        this.uuid = source["uuid"];
 	        this.sync_uuid = source["sync_uuid"];
-	        this.name = source["name"];
 	        this.description = source["description"];
 	        this.enable = source["enable"];
 	        this.created_on = this.convertValues(source["created_on"], null);
@@ -1064,9 +1064,9 @@ export namespace model {
 		}
 	}
 	export class Stream {
+	    name: string;
 	    uuid: string;
 	    sync_uuid: string;
-	    name: string;
 	    description?: string;
 	    enable?: boolean;
 	    // Go type: time.Time
@@ -1077,6 +1077,7 @@ export namespace model {
 	    producers: Producer[];
 	    command_groups: CommandGroup[];
 	    tags: Tag[];
+	    auto_mapping_uuid: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Stream(source);
@@ -1084,9 +1085,9 @@ export namespace model {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
 	        this.uuid = source["uuid"];
 	        this.sync_uuid = source["sync_uuid"];
-	        this.name = source["name"];
 	        this.description = source["description"];
 	        this.enable = source["enable"];
 	        this.created_on = this.convertValues(source["created_on"], null);
@@ -1095,6 +1096,7 @@ export namespace model {
 	        this.producers = this.convertValues(source["producers"], Producer);
 	        this.command_groups = this.convertValues(source["command_groups"], CommandGroup);
 	        this.tags = this.convertValues(source["tags"], Tag);
+	        this.auto_mapping_uuid = source["auto_mapping_uuid"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1114,6 +1116,54 @@ export namespace model {
 		    }
 		    return a;
 		}
+	}
+	export class NetworkMetaTag {
+	    network_uuid?: string;
+	    key?: string;
+	    value?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new NetworkMetaTag(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.network_uuid = source["network_uuid"];
+	        this.key = source["key"];
+	        this.value = source["value"];
+	    }
+	}
+	export class DeviceMetaTag {
+	    device_uuid?: string;
+	    key?: string;
+	    value?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DeviceMetaTag(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.device_uuid = source["device_uuid"];
+	        this.key = source["key"];
+	        this.value = source["value"];
+	    }
+	}
+	export class PointMetaTag {
+	    point_uuid?: string;
+	    key?: string;
+	    value?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PointMetaTag(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.point_uuid = source["point_uuid"];
+	        this.key = source["key"];
+	        this.value = source["value"];
+	    }
 	}
 	export class Priority {
 	    point_uuid?: string;
@@ -1197,6 +1247,8 @@ export namespace model {
 	    object_type?: string;
 	    object_id?: number;
 	    data_type?: string;
+	    is_bitwise?: boolean;
+	    bitwise_index?: number;
 	    object_encoding?: string;
 	    io_number?: string;
 	    io_type?: string;
@@ -1227,6 +1279,13 @@ export namespace model {
 	    poll_priority: string;
 	    poll_rate: string;
 	    bacnet_write_to_pv?: boolean;
+	    history_enable?: boolean;
+	    history_type?: string;
+	    history_interval?: number;
+	    history_cov_threshold?: number;
+	    meta_tags?: PointMetaTag[];
+	    auto_mapping_uuid: string;
+	    connection: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Point(source);
@@ -1267,6 +1326,8 @@ export namespace model {
 	        this.object_type = source["object_type"];
 	        this.object_id = source["object_id"];
 	        this.data_type = source["data_type"];
+	        this.is_bitwise = source["is_bitwise"];
+	        this.bitwise_index = source["bitwise_index"];
 	        this.object_encoding = source["object_encoding"];
 	        this.io_number = source["io_number"];
 	        this.io_type = source["io_type"];
@@ -1297,6 +1358,13 @@ export namespace model {
 	        this.poll_priority = source["poll_priority"];
 	        this.poll_rate = source["poll_rate"];
 	        this.bacnet_write_to_pv = source["bacnet_write_to_pv"];
+	        this.history_enable = source["history_enable"];
+	        this.history_type = source["history_type"];
+	        this.history_interval = source["history_interval"];
+	        this.history_cov_threshold = source["history_cov_threshold"];
+	        this.meta_tags = this.convertValues(source["meta_tags"], PointMetaTag);
+	        this.auto_mapping_uuid = source["auto_mapping_uuid"];
+	        this.connection = source["connection"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1362,6 +1430,12 @@ export namespace model {
 	    fast_poll_rate?: number;
 	    normal_poll_rate?: number;
 	    slow_poll_rate?: number;
+	    meta_tags?: DeviceMetaTag[];
+	    auto_mapping_uuid: string;
+	    connection: string;
+	    auto_mapping_enable?: boolean;
+	    auto_mapping_flow_network_uuid?: string;
+	    auto_mapping_flow_network_name?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Device(source);
@@ -1409,6 +1483,12 @@ export namespace model {
 	        this.fast_poll_rate = source["fast_poll_rate"];
 	        this.normal_poll_rate = source["normal_poll_rate"];
 	        this.slow_poll_rate = source["slow_poll_rate"];
+	        this.meta_tags = this.convertValues(source["meta_tags"], DeviceMetaTag);
+	        this.auto_mapping_uuid = source["auto_mapping_uuid"];
+	        this.connection = source["connection"];
+	        this.auto_mapping_enable = source["auto_mapping_enable"];
+	        this.auto_mapping_flow_network_uuid = source["auto_mapping_flow_network_uuid"];
+	        this.auto_mapping_flow_network_name = source["auto_mapping_flow_network_name"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1455,10 +1535,6 @@ export namespace model {
 	    transport_type?: string;
 	    plugin_conf_id?: string;
 	    plugin_name?: string;
-	    auto_mapping_networks_selection: string;
-	    auto_mapping_flow_network_uuid: string;
-	    auto_mapping_flow_network_name: string;
-	    auto_mapping_enable_histories?: boolean;
 	    number_of_networks_permitted?: number;
 	    network_interface: string;
 	    ip: string;
@@ -1477,6 +1553,11 @@ export namespace model {
 	    devices?: Device[];
 	    tags?: Tag[];
 	    max_poll_rate?: number;
+	    meta_tags?: NetworkMetaTag[];
+	    auto_mapping_enable?: boolean;
+	    auto_mapping_flow_network_uuid?: string;
+	    auto_mapping_flow_network_name?: string;
+	    auto_mapping_uuid: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Network(source);
@@ -1505,10 +1586,6 @@ export namespace model {
 	        this.transport_type = source["transport_type"];
 	        this.plugin_conf_id = source["plugin_conf_id"];
 	        this.plugin_name = source["plugin_name"];
-	        this.auto_mapping_networks_selection = source["auto_mapping_networks_selection"];
-	        this.auto_mapping_flow_network_uuid = source["auto_mapping_flow_network_uuid"];
-	        this.auto_mapping_flow_network_name = source["auto_mapping_flow_network_name"];
-	        this.auto_mapping_enable_histories = source["auto_mapping_enable_histories"];
 	        this.number_of_networks_permitted = source["number_of_networks_permitted"];
 	        this.network_interface = source["network_interface"];
 	        this.ip = source["ip"];
@@ -1527,6 +1604,11 @@ export namespace model {
 	        this.devices = this.convertValues(source["devices"], Device);
 	        this.tags = this.convertValues(source["tags"], Tag);
 	        this.max_poll_rate = source["max_poll_rate"];
+	        this.meta_tags = this.convertValues(source["meta_tags"], NetworkMetaTag);
+	        this.auto_mapping_enable = source["auto_mapping_enable"];
+	        this.auto_mapping_flow_network_uuid = source["auto_mapping_flow_network_uuid"];
+	        this.auto_mapping_flow_network_name = source["auto_mapping_flow_network_name"];
+	        this.auto_mapping_uuid = source["auto_mapping_uuid"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
