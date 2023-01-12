@@ -40,7 +40,6 @@ const NodeMenu = ({
   handleAddSubFlow,
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
-  selectedNodeForSubFlow,
   isOpenFromNodeTree = false,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
@@ -56,7 +55,9 @@ const NodeMenu = ({
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (ref.current && !(ref.current as HTMLDivElement).contains(event.target)) {
-        onClose();
+        if (!isShowSetting && !isShowSetName && !isShowPayload) {
+          onClose();
+        }
       }
     }
     if (isOpenFromNodeTree) {
@@ -67,7 +68,7 @@ const NodeMenu = ({
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isOpenFromNodeTree]);
+  }, [isOpenFromNodeTree, isShowSetting, isShowSetName, isShowPayload]);
 
   useOnPressKey("Escape", onClose);
 
@@ -96,12 +97,12 @@ const NodeMenu = ({
   const handleNodeDeletion = () => {
     deleteNode([node], []);
     onClose();
-  }
-  
+  };
+
   const handleNodeDuplication = () => {
     duplicateNode({ nodes: [node], edges: [] });
     onClose();
-  }
+  };
 
   const deleteAllInputs =
     (isInputs = false) =>
