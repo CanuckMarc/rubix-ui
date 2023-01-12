@@ -660,7 +660,7 @@ const Flow = (props: FlowProps) => {
   return (
     <div className="rubix-flow">
       <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} />
-      <NodeSideBar nodesSpec={nodesSpec}/>
+      <NodeSideBar/>
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow

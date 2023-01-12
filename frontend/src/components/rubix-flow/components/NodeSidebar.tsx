@@ -8,14 +8,12 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeHelpModal } from "./NodeHelpModal";
+import { useNodesSpec } from "../use-nodes-spec";
 const { Panel } = Collapse;
 const { Sider } = Layout;
 
-type NodeSiderBarProps = {
-  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
-};
-
-export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
+export const NodeSideBar = () => {
+  const [nodesSpec] = useNodesSpec();
   const [search, setSearch] = useState("");
   const [nodes, setNodes] = useState<{ [key: string]: NodeSpecJSON[] }>({});
   const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
