@@ -20,7 +20,6 @@ type NodePickerProps = {
     position: XYPosition
   ) => void;
   onClose: () => void;
-  // nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
 
 const NodePicker = ({
@@ -28,8 +27,7 @@ const NodePicker = ({
   onPickNode,
   onClose,
   filters,
-  nodeList,
-  // nodesSpec
+  nodeList
 }: NodePickerProps) => {
   const [search, setSearch] = useState("");
   const [nodesSpec] = useNodesSpec();

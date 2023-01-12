@@ -6,7 +6,6 @@ import {
 } from "@ant-design/icons";
 import { useState, ChangeEvent, useEffect } from "react";
 import { NodeSpecJSON } from "../lib";
-import { useNodesSpec } from "../use-nodes-spec";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeHelpModal } from "./NodeHelpModal";
 const { Panel } = Collapse;
@@ -17,7 +16,6 @@ type NodeSiderBarProps = {
 };
 
 export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
-  // const [nodesSpec] = useNodesSpec();
   const [search, setSearch] = useState("");
   const [nodes, setNodes] = useState<{ [key: string]: NodeSpecJSON[] }>({});
   const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
