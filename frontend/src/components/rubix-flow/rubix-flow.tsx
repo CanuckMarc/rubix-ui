@@ -505,10 +505,39 @@ const Flow = (props: FlowProps) => {
     const newFlow = handleCopyNodesAndEdges(_copied, nodes, edges);
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
-    const _nodes = [...nodes, ...newFlow.nodes];
-    const _edges = [...edges, ...newFlow.edges];
-    const nodesUniq = uniqArray(_nodes);
-    const edgesUniq = uniqArray(_edges);
+
+    // remove output connection if node at level 1
+    // get nodes level 1
+    const nodesL1: NodeInterface[] = _copied.nodes.filter((node: NodeInterface) => {
+      return !node.parentId || !_copied.nodes.some((node2) => node.parentId === node2.id);
+    });
+    // get nodes level 1 corresponding with new id
+    const newNodeL1: NodeInterface[] = newFlow.nodes.filter((node: NodeInterface) =>
+      nodesL1.some((node2: NodeInterface) => node2.id === node.oldId)
+    );
+
+    // save all node have output connection
+    // if node is parent then get connection of outputs
+    const allNodes: NodeInterface[] = [];
+    newNodeL1.forEach((node) => {
+      if (node.isParent) {
+        const outputs = newFlow.nodes
+          .filter((node2: NodeInterface) => node2.parentId === node.id)
+          .filter((n) => isOutputFlow(n.type!!));
+        allNodes.push(...outputs);
+      } else {
+        allNodes.push(node);
+      }
+    });
+
+    // remove connections have source id is belong allNodes
+    newFlow.edges = newFlow.edges.filter((edge: Edge) =>
+      allNodes.some((node: NodeInterface) => node.id !== edge.source)
+    );
+
+    // unique items and delete oldId field
+    const nodesUniq = uniqArray([...nodes, ...newFlow.nodes]).map(({ oldId, ...node }: NodeInterface) => node);
+    const edgesUniq = uniqArray([...edges, ...newFlow.edges]).map(({ oldId, ...edge }: any) => edge);
 
     setNodes(nodesUniq);
     setEdges(edgesUniq);
