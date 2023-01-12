@@ -261,7 +261,7 @@ export const MenuSidebar = () => {
     }
 
     if (name === "Supervisors" && routeData.length > 0) {
-      console.log({ ...routeData[0], icon: <Icon /> })
+      // console.log({ ...routeData[0], icon: <Icon /> })
       return { ...routeData[0], icon: <Icon /> } as any;
     }
 

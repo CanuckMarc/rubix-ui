@@ -782,6 +782,7 @@ export const RubixFlow = () => {
     default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
   };
 
+  console.log(nodesSpec)
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
       <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec}/>
