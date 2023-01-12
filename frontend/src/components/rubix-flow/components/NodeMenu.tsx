@@ -6,7 +6,7 @@ import { SettingsModal } from "./SettingsModal";
 import { SetPayloadModal } from "./SetPayloadModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { SetNameModal } from "./Modals";
-import { HelpComponent } from "./NodeHelp";
+import { NodeHelpModal } from "./NodeHelpModal";
 
 type NodeMenuProps = {
   position: XYPosition;
@@ -43,19 +43,18 @@ const NodeMenu = ({
   isOpenFromNodeTree = false,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
+  const [isModalVisibleHelp, setIsModalVisibleHelp] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowPayload, setIsShowPayload] = useState(false);
   const [isShowSetName, setIsShowSetName] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
-
-  const instance = useReactFlow();
 
   const ref = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (ref.current && !(ref.current as HTMLDivElement).contains(event.target)) {
-        if (!isShowSetting && !isShowSetName && !isShowPayload) {
+        if (!isShowSetting && !isShowSetName && !isShowPayload && !isModalVisibleHelp) {
           onClose();
         }
       }
@@ -68,9 +67,18 @@ const NodeMenu = ({
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [isOpenFromNodeTree, isShowSetting, isShowSetName, isShowPayload]);
+  }, [isOpenFromNodeTree, isShowSetting, isShowSetName, isShowPayload, isModalVisibleHelp]);
 
   useOnPressKey("Escape", onClose);
+
+  const openModal = () => {
+    setIsModalVisibleHelp(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisibleHelp(false);
+    onClose();
+  };
 
   const openSettingsModal = () => {
     setIsModalVisible(true);
@@ -232,9 +240,12 @@ const NodeMenu = ({
           >
             Duplicate node
           </div>
-          <HelpComponent node={node} onClose={onClose} />
+          <div key="help" className="cursor-pointer ant-menu-item" onClick={openModal}>
+          Help
+           </div>
         </div>
       )}
+      <NodeHelpModal node={node} open={isModalVisibleHelp} onClose={closeModal} />
       {isShowSetting && <SettingsModal node={node} isModalVisible={isModalVisible} onCloseModal={onClose} />}
 
       {nodeType.allowPayload && (
