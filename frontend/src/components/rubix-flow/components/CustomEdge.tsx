@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Position } from "react-flow-renderer";
 import { Edge, EdgeProps, getBezierPath, useEdges, useNodes } from "react-flow-renderer/nocss";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { isInputFlow, isOutputFlow } from "./Node";
 
-export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
+export const CustomEdge = memo((props: EdgeProps & { parentNodeId?: string }) => {
   const {
     id,
     sourceX,
@@ -16,10 +16,11 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
     style = {},
     parentNodeId = undefined,
   } = props;
-  const [path, setPath] = useState<any>(null);
   const nodes: NodeInterface[] = useNodes();
-  const edges = useEdges();
+  const edges: Edge[] = useEdges();
   const [shouldShow, setShouldShow] = useState(true);
+  const refPath1 = useRef<SVGPathElement>(null);
+  const refPath2 = useRef<SVGPathElement>(null);
 
   useEffect(() => {
     const edge = edges.find((item) => item.id === id) || ({} as Edge);
@@ -36,6 +37,7 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       ? nodeIdsShowing.includes(edge.target) && nodeIdsShowing.includes(edge.source)
       : nodeIdsShowing.includes(edge.target) || nodeIdsShowing.includes(edge.source);
     let showParentNodeAsSourceOrTarget = false;
+    let pathObj = null;
 
     if (!show) {
       const nodeTarget = nodes.find((n) => n.id === edge.target);
@@ -75,16 +77,14 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
         targetIndex >= 0 && parentNode ? parentNode!!.position.y + (startPosition + targetIndex * 32) : targetY;
       const newTargetPosition = targetIndex >= 0 ? Position.Left : targetPosition;
 
-      setPath(
-        getBezierPath({
-          sourceX: parentNodeId ? sourceX : newSourceX,
-          sourceY: parentNodeId ? sourceY : newSourceY,
-          sourcePosition: parentNodeId ? sourcePosition : newSourcePosition,
-          targetX: parentNodeId ? targetX : newTargetX,
-          targetY: parentNodeId ? targetY : newTargetY,
-          targetPosition: parentNodeId ? targetPosition : newTargetPosition,
-        })
-      );
+      pathObj = {
+        sourceX: parentNodeId ? sourceX : newSourceX,
+        sourceY: parentNodeId ? sourceY : newSourceY,
+        sourcePosition: parentNodeId ? sourcePosition : newSourcePosition,
+        targetX: parentNodeId ? targetX : newTargetX,
+        targetY: parentNodeId ? targetY : newTargetY,
+        targetPosition: parentNodeId ? targetPosition : newTargetPosition,
+      };
     }
 
     if (showParentNodeAsSourceOrTarget) {
@@ -127,29 +127,35 @@ export const CustomEdge = (props: EdgeProps & { parentNodeId?: string }) => {
       const newSourcePosition = sourceIndexOfParentSource >= 0 ? Position.Right : sourcePosition;
       const newTargetPosition = targetIndexOfParentSource >= 0 ? Position.Left : targetPosition;
 
-      setPath(
-        getBezierPath({
-          sourceX: newSourcePositionX,
-          sourceY: newSourcePositionY,
-          sourcePosition: newSourcePosition,
-          targetX: newTargetPositionX,
-          targetY: newTargetPositionY,
-          targetPosition: newTargetPosition,
-        })
-      );
+      pathObj = {
+        sourceX: newSourcePositionX,
+        sourceY: newSourcePositionY,
+        sourcePosition: newSourcePosition,
+        targetX: newTargetPositionX,
+        targetY: newTargetPositionY,
+        targetPosition: newTargetPosition,
+      };
     }
 
-    setShouldShow(show);
+    if (show !== shouldShow) {
+      setShouldShow(show);
+    }
+
+    if (show && pathObj && refPath1.current && refPath2.current) {
+      const path = getBezierPath(pathObj);
+      refPath1.current.setAttribute("d", path);
+      refPath2.current.setAttribute("d", path);
+    }
   }, [parentNodeId, edges, nodes]);
 
-  if (!shouldShow || !path) {
+  if (!shouldShow) {
     return null;
   }
 
   return (
     <>
-      <path id={id} style={style} className="react-flow__edge-path edge-path-bg" d={path} />
-      <path id={id} style={style} className="react-flow__edge-path" d={path} />
+      <path id={id} style={style} className="react-flow__edge-path edge-path-bg" ref={refPath1} />
+      <path id={id} style={style} className="react-flow__edge-path" ref={refPath2} />
     </>
   );
-};
+});
