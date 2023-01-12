@@ -288,7 +288,7 @@ func (inst *App) NodeValues(connUUID, hostUUID string, isRemote bool) []node.Val
 	if isRemote {
 		resp, err := inst.nodeValues(connUUID, hostUUID)
 		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			// inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
 		return resp
@@ -324,7 +324,7 @@ func (inst *App) NodesValuesInsideParent(connUUID, hostUUID, parentID string, is
 	if isRemote {
 		resp, err := inst.nodesValuesInsideParent(connUUID, hostUUID, parentID)
 		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			// inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
 		return resp
@@ -360,7 +360,7 @@ func (inst *App) NodesValuesSubFlow(connUUID, hostUUID, parentID string, isRemot
 	if isRemote {
 		resp, err := inst.nodesValuesSubFlow(connUUID, hostUUID, parentID)
 		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			// inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
 		return resp
