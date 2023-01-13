@@ -93,7 +93,7 @@ export const NodesTree = ({ nodes, selectedSubFlowId, openNodeMenu }: NodeProps)
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
         <div className="p-2">
-          Nodes Tree
+          Nodes Tree {`(${nodes.length})`}
           <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
             {isExpandedAll ? (
               <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
