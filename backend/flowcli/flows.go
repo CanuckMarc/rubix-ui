@@ -1,6 +1,7 @@
 package flowcli
 
 import (
+	"fmt"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-edge-wires/flow"
@@ -10,6 +11,16 @@ func (inst *FlowClient) GetFlow() (*nodes.NodesList, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&nodes.NodesList{}).
 		Get("/api/flows"))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*nodes.NodesList), nil
+}
+
+func (inst *FlowClient) GetSubFlow(subFlowID string) (*nodes.NodesList, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&nodes.NodesList{}).
+		Get(fmt.Sprintf("/api/flows/export/parent/%s", subFlowID)))
 	if err != nil {
 		return nil, err
 	}
