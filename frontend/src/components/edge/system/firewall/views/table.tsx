@@ -48,20 +48,19 @@ export const Firewall = () => {
       title: 'Port',
       dataIndex: 'port',
       key: 'port',
-      // width: '20vw',
       fixed: "left"
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      // width: '20vw'
+      width: '30%'
     },
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
-      // width: '20vw',
+      width: '30%',
       render: () => (
         <Space size="middle">
           <Switch defaultChecked={false} onChange={onTogglePort}/>
@@ -80,7 +79,7 @@ export const Firewall = () => {
       const status = await factory.EdgeFirewallStatus(connUUID, hostUUID);
       
       if (status != null) {
-        // TODO: just guessing the message content
+        // TODO: guessing the returned status is either 'open' or 'close' 
         setFirewallStatus(status.message == "open" ? true : false);
       }
       
@@ -123,6 +122,14 @@ export const Firewall = () => {
       res = await factory.EdgeFirewallPortClose(connUUID, hostUUID, body)
     }
     console.log(res);
+    // TODO: guessing the success message to open or close a port is 'success'
+    if (res != null && res.message == 'success') {
+      for (let i = 0; i < firewallList.length; i++) {
+        if (firewallList[i].key == selectedRow.key) {
+          setFirewallList([...firewallList.slice(0, i), {...firewallList[i], status: 'open'}, ...firewallList.slice(i+1, firewallList.length)])
+        }
+      }
+    }
   }
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -160,7 +167,7 @@ export const Firewall = () => {
 
   return (
     <>
-      <Space align="start" direction="vertical" style={{ width: "100%" }}>
+      <div id="firewall-table-container">
         <Space align="center" direction="horizontal">
           <Button type="primary" icon={<ReloadOutlined />} size={"middle"}>Refresh</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={addPort} loading={loading}>
@@ -170,8 +177,10 @@ export const Firewall = () => {
             Delete port
           </Button>
         </Space>
-        <Spin spinning={isFetching}>
-          <Table columns={columns} dataSource={firewallList} rowSelection={rowSelection} style={{ tableLayout: "auto", width: "76.5vw" }}
+        
+        <Spin spinning={isFetching} style={{ width: '100%' }}>
+          <Table id={"firewall-table"} columns={columns} dataSource={firewallList} rowSelection={rowSelection} 
+            style={{ width: '100%' }}
             onRow={(row) => {
               return {
                 onClick: () => {setSelectedRow(row)} // click row
@@ -185,11 +194,12 @@ export const Firewall = () => {
             }}
             scroll={{ x: "max-content" }}/>
         </Spin>
+
         <Space align="center" direction="horizontal">
           <span>Enable firewall: </span>
           <Switch defaultChecked={firewallStatus} onChange={onFirewallEnableToggle} />
         </Space>
-      </Space>
+      </div>
 
       <Modal title="Add Port" visible={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
         <Space align="center" direction="horizontal">
