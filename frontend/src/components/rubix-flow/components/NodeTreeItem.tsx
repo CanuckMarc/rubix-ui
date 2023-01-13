@@ -52,7 +52,7 @@ export const NodeTreeItem = ({
       {node.isParent ? (
         <Panel
           key={node.id}
-          header={type}
+          header={`${type} - ${childNodes.length}`}
           className={`panel-no-padding border-gray-600 border-t border-b-0  relative ${
             node.id === selectedSubFlowId ? "tree-active" : ""
           }`}

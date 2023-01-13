@@ -5,26 +5,29 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { flowToBehave } from "../transformers/flowToBehave";
 import { Modal } from "./Modal";
 
-export type SaveModalProps = { open?: boolean; onClose: () => void };
+export type SaveModalProps = {
+  open?: boolean;
+  selectedNodeForSubFlow?: NodeInterface;
+  onClose: () => void;
+};
 
-export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
+export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSubFlow, onClose }) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
-
   const edges = useEdges();
   const nodes = useNodes();
 
-  const flow = useMemo(() => flowToBehave(nodes, edges), [nodes, edges]);
-
   const handleCopy = () => {
-    ref.current?.select();
-    document.execCommand("copy");
-    ref.current?.blur();
-    setCopied(true);
-    setInterval(() => {
-      setCopied(false);
-    }, 1000);
+    if (ref.current) {
+      ref.current.select();
+      document.execCommand("copy");
+      ref.current.blur();
+      setCopied(true);
+      setInterval(() => {
+        setCopied(false);
+      }, 1000);
+    }
   };
 
   const findAllNodes = (id: string) => {
@@ -43,16 +46,19 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
 
   const handleNodeRender = () => {
     let selectedNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.selected);
-    let isExcludeParentNode =  false;
+    let isInSubFlow = false;
     const allNodes: NodeInterface[] = [];
 
-    if (selectedNodes.length === 0 && window.selectedNodeForSubFlow) {
-      selectedNodes = [window.selectedNodeForSubFlow];
-      isExcludeParentNode = true;
+    if (selectedNodes.length === 0 && selectedNodeForSubFlow) {
+      selectedNodes = [selectedNodeForSubFlow];
+      isInSubFlow = true;
     }
 
     selectedNodes.forEach((item) => {
-      if (isExcludeParentNode && item.id !== window.selectedNodeForSubFlow!!.id) {
+      if (isInSubFlow && item.id !== selectedNodeForSubFlow!!.id) {
+        allNodes.push(item);
+      }
+      if (!isInSubFlow) {
         allNodes.push(item);
       }
       if (item.isParent) {
@@ -60,13 +66,18 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
       }
     });
 
-    const newNodes: NodeJSON[] = allNodes.length > 0 ? flowToBehave(allNodes, edges).nodes : flow.nodes;
+    const finalNodes: NodeInterface[] = isInSubFlow ? allNodes : allNodes.length > 0 ? allNodes : nodes;
+    const newNodes: NodeJSON[] = flowToBehave(finalNodes, edges).nodes;
     setNodeRender(JSON.stringify({ nodes: newNodes }, null, 2));
   };
 
   useEffect(() => {
-    handleNodeRender();
-  }, [flow]);
+    if (open) {
+      handleNodeRender();
+    } else {
+      setNodeRender("");
+    }
+  }, [open, selectedNodeForSubFlow]);
 
   return (
     <Modal
@@ -80,8 +91,9 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
     >
       <textarea
         ref={ref}
+        value={nodeRender}
+        readOnly
         className="border border-gray-300 p-2"
-        defaultValue={nodeRender}
         style={{ height: "50vh", width: "500px" }}
       />
     </Modal>
