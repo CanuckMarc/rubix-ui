@@ -1,5 +1,4 @@
 import { Collapse } from "antd";
-import { MouseEventHandler } from "react";
 import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
@@ -61,7 +60,7 @@ export const NodeTreeItem = ({
             paddingLeft: !node.parentId ? undefined : 10,
           }}
           extra={
-            <div className="w-full h-full absolute left-0 top-0" onClick={onClickNode} onContextMenu={doubleClick}>
+            <div className="w-4/5 h-full absolute left-0 top-0" onClick={onClickNode} onContextMenu={doubleClick}>
               {!!spec?.info?.icon && <span className="pr-3 pt-1">{spec?.info?.icon}</span>}
             </div>
           }

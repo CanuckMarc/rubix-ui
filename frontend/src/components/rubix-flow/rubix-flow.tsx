@@ -665,7 +665,17 @@ const Flow = (props: FlowProps) => {
   };
 
   const gotoNode = (node: NodeInterface) => {
-    console.log("gotoNode", node);
+    if (node.parentId) {
+      node.isParent
+        ? handleAddSubFlow(node)
+        : handleAddSubFlow(nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
+    } else {
+      setSelectedNodeForSubFlow([]);
+    }
+    const nodeSelected = nodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id }));
+    setNodes(nodeSelected);
+
+    rubixFlowInstance.fitView(node.position);
   };
 
   useEffect(() => {
