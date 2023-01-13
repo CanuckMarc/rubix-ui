@@ -215,10 +215,16 @@ const Flow = (props: FlowProps) => {
   };
 
   const onHandelSaveFlow = async () => {
-    const graphJson = flowToBehave(nodes, edges);
+    const newNodesFiltered = nodes.filter((node: NodeInterface) => {
+      if (node.parentId) {
+        return nodes.some(n => n.id === node.parentId);
+      }
+      return true;
+    });
+    const graphJson = flowToBehave(newNodesFiltered, edges);
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
-    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, nodes);
+    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newNodesFiltered);
     setNodes(newNodes);
     setEdges(edges);
   };
