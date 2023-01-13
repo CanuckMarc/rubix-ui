@@ -4,16 +4,19 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeTreeItem } from "./NodeTreeItem";
+import { NodeSpecJSON } from '../lib';
 
 const { Sider } = Layout;
 
 type NodeProps = {
   nodes: NodeInterface[];
+  gotoNode: (node: NodeInterface) => void;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
 };
 
-export const NodesTree = ({ nodes, selectedSubFlowId, openNodeMenu }: NodeProps) => {
+export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu }: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -117,6 +120,8 @@ export const NodesTree = ({ nodes, selectedSubFlowId, openNodeMenu }: NodeProps)
             <NodeTreeItem
               key={node.id}
               node={node}
+              nodesSpec={nodesSpec}
+              gotoNode={gotoNode}
               nodeIndex={index}
               panelKeys={panelKeys}
               onChangeKey={changeKeys}

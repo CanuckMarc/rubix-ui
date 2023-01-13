@@ -664,6 +664,10 @@ const Flow = (props: FlowProps) => {
     }
   };
 
+  const gotoNode = (node: NodeInterface) => {
+    console.log("gotoNode", node);
+  };
+
   useEffect(() => {
     closeNodePicker();
     factory
@@ -710,12 +714,14 @@ const Flow = (props: FlowProps) => {
         nodes={nodes}
         selectedSubFlowId={selectedNodeForSubFlow?.id}
         openNodeMenu={openNodeMenu}
+        nodesSpec={nodesSpec}
+        gotoNode={gotoNode}
       />
-      <NodeSideBar nodesSpec={nodesSpec}/>
+      <NodeSideBar nodesSpec={nodesSpec} />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
-            onContextMenu={()=>setMenuOpenFromNodeTree(false)}
+            onContextMenu={() => setMenuOpenFromNodeTree(false)}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}

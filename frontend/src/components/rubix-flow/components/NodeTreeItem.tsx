@@ -1,5 +1,6 @@
 import { Collapse } from "antd";
 import { MouseEventHandler } from "react";
+import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 const { Panel } = Collapse;
@@ -9,7 +10,9 @@ type NodeProps = {
   node: NodeInterface;
   panelKeys: string[];
   nodeIndex: number;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   onChangeKey: (key: string) => void;
+  gotoNode: (node: NodeInterface) => void;
   selectedSubFlowId?: string;
   handleNodeContextMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
 };
@@ -20,6 +23,8 @@ export const NodeTreeItem = ({
   panelKeys,
   nodeIndex,
   onChangeKey,
+  nodesSpec,
+  gotoNode,
   selectedSubFlowId,
   handleNodeContextMenu,
 }: NodeProps) => {
@@ -30,6 +35,13 @@ export const NodeTreeItem = ({
     e.preventDefault();
     handleNodeContextMenu({ x: e.clientX, y: e.clientY }, node);
   };
+
+  const onClickNode = (e: unknown) => {
+    (e as MouseEvent).preventDefault();
+    gotoNode(node);
+  };
+
+  const spec = Array.isArray(nodesSpec) ? nodesSpec.find((sp) => sp.type === node.type) : undefined;
 
   return (
     <Collapse
@@ -48,7 +60,11 @@ export const NodeTreeItem = ({
           style={{
             paddingLeft: !node.parentId ? undefined : 10,
           }}
-          extra={<div className="w-full h-full absolute left-0 top-0" onContextMenu={doubleClick} />}
+          extra={
+            <div className="w-full h-full absolute left-0 top-0" onClick={onClickNode} onContextMenu={doubleClick}>
+              {!!spec?.info?.icon && <span className="pr-3 pt-1">{spec?.info?.icon}</span>}
+            </div>
+          }
         >
           <div className="bg-gray-800">
             {childNodes?.map((node, index) => (
@@ -56,10 +72,12 @@ export const NodeTreeItem = ({
                 node={node}
                 panelKeys={panelKeys}
                 nodeIndex={index}
+                gotoNode={gotoNode}
                 onChangeKey={onChangeKey}
                 key={node.id}
                 allNodes={allNodes}
                 selectedSubFlowId={selectedSubFlowId}
+                nodesSpec={nodesSpec}
                 handleNodeContextMenu={handleNodeContextMenu}
               />
             ))}
@@ -67,13 +85,15 @@ export const NodeTreeItem = ({
         </Panel>
       ) : (
         <div
+          onClick={onClickNode}
           onContextMenu={doubleClick}
-          className={`py-2 cursor-po inter flex flex-row justify-between text-left ant-menu-item border-gray-600 ${
+          className={`py-2 cursor-po inter flex flex-row flex-start gap-2 items-center text-left ant-menu-item border-gray-600 ${
             nodeIndex === 0 ? "" : "border-t"
           }`}
           style={{ paddingLeft: !node.parentId ? undefined : 26 }}
         >
-          <div>{type}</div>
+          {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
+          {type}
         </div>
       )}
     </Collapse>
