@@ -672,6 +672,20 @@ const Flow = (props: FlowProps) => {
     }
   };
 
+  const gotoNode = (node: NodeInterface) => {
+    if (node.parentId) {
+      node.isParent
+        ? handleAddSubFlow(node)
+        : handleAddSubFlow(nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
+    } else {
+      setSelectedNodeForSubFlow([]);
+    }
+    const nodeSelected = nodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id }));
+    setNodes(nodeSelected);
+
+    rubixFlowInstance.fitView(node.position);
+  };
+
   useEffect(() => {
     closeNodePicker();
     factory
@@ -714,7 +728,13 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} openNodeMenu={openNodeMenu} />
+      <NodesTree
+        nodes={nodes}
+        selectedSubFlowId={selectedNodeForSubFlow?.id}
+        openNodeMenu={openNodeMenu}
+        nodesSpec={nodesSpec}
+        gotoNode={gotoNode}
+      />
       <NodeSideBar nodesSpec={nodesSpec} />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
