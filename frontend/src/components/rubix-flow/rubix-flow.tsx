@@ -181,6 +181,8 @@ const Flow = (props: FlowProps) => {
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
+    setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
+    setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
     handlePushSelectedNodeForSubFlow(node);
   };
 
@@ -706,16 +708,12 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <NodesTree
-        nodes={nodes}
-        selectedSubFlowId={selectedNodeForSubFlow?.id}
-        openNodeMenu={openNodeMenu}
-      />
-      <NodeSideBar nodesSpec={nodesSpec}/>
+      <NodesTree nodes={nodes} selectedSubFlowId={selectedNodeForSubFlow?.id} openNodeMenu={openNodeMenu} />
+      <NodeSideBar nodesSpec={nodesSpec} />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
-            onContextMenu={()=>setMenuOpenFromNodeTree(false)}
+            onContextMenu={() => setMenuOpenFromNodeTree(false)}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}
