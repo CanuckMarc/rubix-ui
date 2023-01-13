@@ -18,13 +18,15 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const flow = useMemo(() => flowToBehave(nodes, edges), [nodes, edges]);
 
   const handleCopy = () => {
-    ref.current?.select();
-    document.execCommand("copy");
-    ref.current?.blur();
-    setCopied(true);
-    setInterval(() => {
-      setCopied(false);
-    }, 1000);
+    if (ref.current) {
+      ref.current.select();
+      document.execCommand("copy");
+      ref.current.blur();
+      setCopied(true);
+      setInterval(() => {
+        setCopied(false);
+      }, 1000);
+    }
   };
 
   const findAllNodes = (id: string) => {
@@ -43,7 +45,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
 
   const handleNodeRender = () => {
     let selectedNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.selected);
-    let isExcludeParentNode =  false;
+    let isExcludeParentNode = false;
     const allNodes: NodeInterface[] = [];
 
     if (selectedNodes.length === 0 && window.selectedNodeForSubFlow) {
@@ -53,6 +55,9 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
 
     selectedNodes.forEach((item) => {
       if (isExcludeParentNode && item.id !== window.selectedNodeForSubFlow!!.id) {
+        allNodes.push(item);
+      }
+      if (!isExcludeParentNode) {
         allNodes.push(item);
       }
       if (item.isParent) {
@@ -65,8 +70,12 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   };
 
   useEffect(() => {
-    handleNodeRender();
-  }, [flow]);
+    if (open) {
+      handleNodeRender();
+    } else {
+      setNodeRender("");
+    }
+  }, [flow, open]);
 
   return (
     <Modal
@@ -80,8 +89,9 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
     >
       <textarea
         ref={ref}
+        value={nodeRender}
+        readOnly
         className="border border-gray-300 p-2"
-        defaultValue={nodeRender}
         style={{ height: "50vh", width: "500px" }}
       />
     </Modal>
