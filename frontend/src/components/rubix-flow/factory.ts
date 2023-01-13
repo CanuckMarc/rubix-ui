@@ -2,7 +2,7 @@ import {
   AddWiresConnection,
   BulkDeleteWiresConnection,
   DownloadFlow,
-  GetFlow,
+  GetFlow, GetFlowList, GetSubFlow,
   GetWiresConnection,
   GetWiresConnections,
   NodeHelp,
@@ -14,7 +14,7 @@ import {
   NodeValues,
   UpdateWiresConnection,
 } from "../../../wailsjs/go/backend/App";
-import {db, node} from "../../../wailsjs/go/models";
+import {db, flowcli, node} from "../../../wailsjs/go/models";
 
 export class FlowFactory {
   // arg1 is the connectionUUID
@@ -144,6 +144,24 @@ export class FlowFactory {
     isRemote: boolean
   ): Promise<any> {
     return await GetFlow(connUUID, hostUUID, isRemote);
+  }
+
+  async GetSubFlow(
+    connUUID: string,
+    hostUUID: string,
+    subFlowID: string,
+    isRemote: boolean
+  ): Promise<any> {
+    return await GetSubFlow(connUUID, hostUUID, subFlowID, isRemote);
+  }
+
+  async GetFlowList(
+    connUUID: string,
+    hostUUID: string,
+    nodeIDs: flowcli.NodesList,
+    isRemote: boolean
+  ): Promise<any> {
+    return await GetFlowList(connUUID, hostUUID, nodeIDs, isRemote);
   }
 
   async NodePallet(
