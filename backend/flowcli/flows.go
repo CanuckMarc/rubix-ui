@@ -27,6 +27,21 @@ func (inst *FlowClient) GetSubFlow(subFlowID string) (*nodes.NodesList, error) {
 	return resp.Result().(*nodes.NodesList), nil
 }
 
+type NodesList struct {
+	Nodes []string `json:"nodes"`
+}
+
+func (inst *FlowClient) GetFlowList(nodesIds *NodesList) (*nodes.NodesList, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&nodes.NodesList{}).
+		SetBody(nodesIds).
+		Post("/api/flows/export/nodes"))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*nodes.NodesList), nil
+}
+
 func (inst *FlowClient) DownloadFlow(encodedNodes interface{}, restartFlow bool) (*flow.Message, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&flow.Message{}).

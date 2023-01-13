@@ -526,6 +526,46 @@ func (inst *App) GetSubFlow(connUUID, hostUUID, subFlowID string, isRemote bool)
 	return resp
 }
 
+func (inst *App) getFlowList(connUUID, hostUUID string, nodeIds *flowcli.NodesList) (interface{}, error) {
+	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	path := fmt.Sprintf("/wires/api/flows/export/nodes/")
+	resp, err := c.ProxyPOST(hostUUID, path, nodeIds)
+	if err != nil {
+		return nil, err
+	}
+	if resp.IsSuccess() {
+		var out interface{}
+		err := json.Unmarshal(resp.Body(), &out)
+		return out, err
+	}
+	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
+}
+
+func (inst *App) GetFlowList(connUUID, hostUUID string, nodeIds *flowcli.NodesList, isRemote bool) interface{} {
+	if isRemote {
+		resp, err := inst.getFlowList(connUUID, hostUUID, nodeIds)
+		nodeList := &nodes.NodesList{}
+		mapstructure.Decode(resp, &nodeList)
+		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return resp
+		}
+		return resp
+	}
+	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
+	resp, err := client.GetFlowList(nodeIds)
+	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return resp
+	}
+	return resp
+}
+
 func (inst *App) nodeSchema(connUUID, hostUUID, nodeName string) (*flowcli.Schema, error) {
 	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
