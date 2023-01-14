@@ -236,6 +236,21 @@ export const CONNECTION_HEADERS = [
     sorter: (a: any, b: any) => a.port - b.port,
   },
   {
+    title: "enable",
+    key: "enable",
+    dataIndex: "enable",
+    render(enable: boolean) {
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
+  },
+  {
     title: "uuid",
     dataIndex: "uuid",
     key: "uuid",
@@ -369,7 +384,7 @@ export const FLOW_DEVICE_HEADERS = [
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.enable - b.enable,
-  }
+  },
 ];
 
 export const FLOW_POINT_HEADERS = [
@@ -734,20 +749,20 @@ export const SCHEDULES_HEADERS = [
     title: "name",
     dataIndex: "name",
     key: "name",
-    sorter: (a: any, b: any) => a.name.localeCompare(b.name)
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
     title: "name",
     dataIndex: "name",
     key: "name",
-    sorter: (a: any, b: any) => a.name.localeCompare(b.name)
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
     title: "uuid",
     dataIndex: "uuid",
     key: "uuid",
-    sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid)
-  }
+    sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid),
+  },
 ];
 
 //--------------schema-------------//
@@ -862,5 +877,5 @@ export const SCHEDULES_SCHEMA = [
     readOnly: true,
     title: "uuid",
     type: "string",
-  }
+  },
 ];
