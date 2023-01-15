@@ -22,7 +22,7 @@ func (inst *Client) EdgeFirewallList(hostIDName string) ([]ufw.UFWStatus, error)
 }
 
 func (inst *Client) EdgeFirewallStatus(hostIDName string) (*ufw.Message, error) {
-	url := fmt.Sprintf("proxy/api/networking/status/")
+	url := fmt.Sprintf("proxy/api/networking/firewall/status/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
@@ -35,7 +35,7 @@ func (inst *Client) EdgeFirewallStatus(hostIDName string) (*ufw.Message, error) 
 }
 
 func (inst *Client) EdgeFirewallEnable(hostIDName string) (*ufw.Message, error) {
-	url := fmt.Sprintf("proxy/api/networking/enable/")
+	url := fmt.Sprintf("proxy/api/networking/firewall/enable/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
@@ -48,7 +48,7 @@ func (inst *Client) EdgeFirewallEnable(hostIDName string) (*ufw.Message, error) 
 }
 
 func (inst *Client) EdgeFirewallDisable(hostIDName string) (*ufw.Message, error) {
-	url := fmt.Sprintf("proxy/api/networking/disable/")
+	url := fmt.Sprintf("proxy/api/networking/firewall/disable/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
@@ -61,7 +61,7 @@ func (inst *Client) EdgeFirewallDisable(hostIDName string) (*ufw.Message, error)
 }
 
 func (inst *Client) EdgeFirewallPortOpen(hostIDName string, body system.UFWBody) (*ufw.Message, error) {
-	url := fmt.Sprintf("proxy/api/networking/port/open/")
+	url := fmt.Sprintf("proxy/api/networking/firewall/port/open/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
@@ -75,7 +75,7 @@ func (inst *Client) EdgeFirewallPortOpen(hostIDName string, body system.UFWBody)
 }
 
 func (inst *Client) EdgeFirewallPortClose(hostIDName string, body system.UFWBody) (*ufw.Message, error) {
-	url := fmt.Sprintf("proxy/api/networking/port/close/")
+	url := fmt.Sprintf("proxy/api/networking/firewall/port/close/")
 	if body.Port == 1662 {
 		return nil, errors.New("port 1662 can not be closed")
 	}

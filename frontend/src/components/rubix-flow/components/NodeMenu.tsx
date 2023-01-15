@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { useReactFlow, XYPosition, Edge } from "react-flow-renderer/nocss";
+import { useEffect, useRef, useState } from "react";
+import { Edge, useReactFlow, XYPosition } from "react-flow-renderer/nocss";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
-import { useNodesSpec } from "../use-nodes-spec";
 import { SettingsModal } from "./SettingsModal";
 import { SetPayloadModal } from "./SetPayloadModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { SetNameModal } from "./Modals";
-import { HelpComponent } from "./NodeHelp";
+import { NodeHelpModal } from "./NodeHelpModal";
 
 type NodeMenuProps = {
   position: XYPosition;
   node: NodeInterface;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   isDoubleClick: boolean;
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
@@ -20,6 +20,7 @@ type NodeMenuProps = {
   deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
+  isOpenFromNodeTree: boolean;
 };
 
 export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
@@ -31,6 +32,7 @@ export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
 const NodeMenu = ({
   position,
   node,
+  nodesSpec,
   isDoubleClick,
   onClose,
   deleteNode,
@@ -38,18 +40,45 @@ const NodeMenu = ({
   handleAddSubFlow,
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
-  selectedNodeForSubFlow,
+  isOpenFromNodeTree = false,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
+  const [isModalVisibleHelp, setIsModalVisibleHelp] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowPayload, setIsShowPayload] = useState(false);
   const [isShowSetName, setIsShowSetName] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
-  const [nodesSpec] = useNodesSpec();
-  const instance = useReactFlow();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: any) {
+      if (ref.current && !(ref.current as HTMLDivElement).contains(event.target)) {
+        if (!isShowSetting && !isShowSetName && !isShowPayload && !isModalVisibleHelp) {
+          onClose();
+        }
+      }
+    }
+    if (isOpenFromNodeTree) {
+      document.addEventListener("click", handleClickOutside);
+    } else {
+      document.removeEventListener("click", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isOpenFromNodeTree, isShowSetting, isShowSetName, isShowPayload, isModalVisibleHelp]);
 
   useOnPressKey("Escape", onClose);
+
+  const openModal = () => {
+    setIsModalVisibleHelp(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisibleHelp(false);
+    onClose();
+  };
 
   const openSettingsModal = () => {
     setIsModalVisible(true);
@@ -76,12 +105,12 @@ const NodeMenu = ({
   const handleNodeDeletion = () => {
     deleteNode([node], []);
     onClose();
-  }
-  
+  };
+
   const handleNodeDuplication = () => {
     duplicateNode({ nodes: [node], edges: [] });
     onClose();
-  }
+  };
 
   const deleteAllInputs =
     (isInputs = false) =>
@@ -114,7 +143,10 @@ const NodeMenu = ({
     <>
       {!isDoubleClick && (
         <div
-          className="node-picker node-menu absolute z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark"
+          ref={ref}
+          className={`node-picker node-menu ${
+            isOpenFromNodeTree ? "fixed" : "absolute"
+          } z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark`}
           style={{
             top: position.y,
             left: position.x,
@@ -208,9 +240,12 @@ const NodeMenu = ({
           >
             Duplicate node
           </div>
-          <HelpComponent node={node} onClose={onClose} />
+          <div key="help" className="cursor-pointer ant-menu-item" onClick={openModal}>
+          Help
+           </div>
         </div>
       )}
+      <NodeHelpModal node={node} open={isModalVisibleHelp} onClose={closeModal} />
       {isShowSetting && <SettingsModal node={node} isModalVisible={isModalVisible} onCloseModal={onClose} />}
 
       {nodeType.allowPayload && (

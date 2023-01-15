@@ -136,18 +136,12 @@ export class FlowPointFactory {
     hostUUID: string,
     setPluginName: string
   ): Promise<any> {
-    let resp: Promise<any> = {} as Promise<any>;
     hasUUID(connUUID);
     hasUUID(hostUUID);
-    await GetFlowPointSchema(connUUID, hostUUID, setPluginName)
-      .then((res) => {
-        res.plugin_name = setPluginName;
-        resp = res as unknown as Promise<any>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    const resp = await GetFlowPointSchema(connUUID, hostUUID, setPluginName);
+    const res = JSON.parse(resp || "{}");
+    res.plugin_name = setPluginName;
+    return res;
   }
 
   async BulkImport(

@@ -1,17 +1,27 @@
 import { Button, Card, Form, FormInstance, Input, Modal } from "antd";
 import { createRef, useEffect, useState } from "react";
 import TokenView from "./token-view";
-import { externaltoken } from "../../../wailsjs/go/models";
+import { amodel, externaltoken, storage } from "../../../wailsjs/go/models";
 import { PlusOutlined } from "@ant-design/icons";
 import TokenGeneratorModal from "./token-generator-modal";
 import { useSettings } from "../../components/settings/use-settings";
 import { LIGHT_THEME } from "../../themes/use-theme";
 import { CommonTokenFactory } from "./factory";
-import ExternalToken = externaltoken.ExternalToken;
 
+import ExternalToken = externaltoken.ExternalToken;
+import RubixConnection = storage.RubixConnection;
+import Host = amodel.Host;
+
+interface ITokenModel {
+  isModalVisible: boolean;
+  displayName: string;
+  onCloseModal: any;
+  factory: CommonTokenFactory;
+  selectedItem: RubixConnection | Host;
+}
 
 export const TokenModal = (props: ITokenModel) => {
-  const { isModalVisible, displayName, onCloseModal, factory } = props;
+  const { isModalVisible, displayName, onCloseModal, factory, selectedItem } = props;
   const [settings] = useSettings();
 
   const [jwtToken, setJwtToken] = useState("");
@@ -20,7 +30,6 @@ export const TokenModal = (props: ITokenModel) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTokenGenerateModalVisible, setIsTokenGenerateModalVisible] = useState(false);
   const loginFormRef = createRef<FormInstance>();
-
 
   const handleClose = () => {
     setJwtToken("");
@@ -81,12 +90,13 @@ export const TokenModal = (props: ITokenModel) => {
       style={{ textAlign: "start" }}
       width="50%"
     >
-      <Card title="Tokens"
-            style={{ backgroundColor: settings.theme == LIGHT_THEME ? "fff" : "" }}
-            extra={jwtToken && <Button type="primary" icon={<PlusOutlined />}
-                                       size="small"
-                                       onClick={showTokenGenerateModal}
-            />}>
+      <Card
+        title="Tokens"
+        style={{ backgroundColor: settings.theme == LIGHT_THEME ? "fff" : "" }}
+        extra={
+          jwtToken && <Button type="primary" icon={<PlusOutlined />} size="small" onClick={showTokenGenerateModal} />
+        }
+      >
         <Form
           name="basic"
           labelCol={{ span: 6 }}
@@ -99,10 +109,12 @@ export const TokenModal = (props: ITokenModel) => {
           <Form.Item
             label="Username"
             name="username"
-            rules={[{
-              required: true,
-              message: "Please input your username!"
-            }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your username!",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -110,10 +122,12 @@ export const TokenModal = (props: ITokenModel) => {
           <Form.Item
             label="Password"
             name="password"
-            rules={[{
-              required: true,
-              message: "Please input your password!"
-            }]}
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
           >
             <Input.Password />
           </Form.Item>
@@ -124,24 +138,25 @@ export const TokenModal = (props: ITokenModel) => {
           </Form.Item>
         </Form>
 
-        <TokenView jwtToken={jwtToken}
-                   tokens={tokens}
-                   isLoading={isLoading}
-                   factory={factory}
-                   fetchToken={fetchToken}
-                   setIsLoading={setIsLoading} />
-        {isTokenGenerateModalVisible &&
-          <TokenGeneratorModal isModalVisible={true} jwtToken={jwtToken}
-                               onCloseModal={onCloseTokenGeneratorModal}
-                               factory={factory} fetchToken={fetchToken} />}
+        <TokenView
+          jwtToken={jwtToken}
+          tokens={tokens}
+          isLoading={isLoading}
+          factory={factory}
+          selectedItem={selectedItem}
+          fetchToken={fetchToken}
+          setIsLoading={setIsLoading}
+        />
+        {isTokenGenerateModalVisible && (
+          <TokenGeneratorModal
+            isModalVisible={true}
+            jwtToken={jwtToken}
+            onCloseModal={onCloseTokenGeneratorModal}
+            factory={factory}
+            fetchToken={fetchToken}
+          />
+        )}
       </Card>
     </Modal>
   );
 };
-
-interface ITokenModel {
-  isModalVisible: boolean;
-  displayName: string;
-  onCloseModal: any;
-  factory: CommonTokenFactory;
-}

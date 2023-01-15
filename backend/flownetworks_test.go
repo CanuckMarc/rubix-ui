@@ -12,9 +12,6 @@ func TestApp_addFlowNetwork(t *testing.T) {
 	app := MockNewApp()
 	body := &model.FlowNetwork{
 		CommonFlowNetwork: model.CommonFlowNetwork{
-			CommonName: model.CommonName{
-				Name: "test",
-			},
 			IsRemote:    nils.NewTrue(),
 			FlowHTTPS:   nil,
 			FlowToken:   nils.NewString("$2a$10$PtoJ.0jSD90NgTy/t20nK.NkEMF1oPBeo4p1CL9fFy7hdTdF1jjcW"),

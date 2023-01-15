@@ -105,3 +105,54 @@ export function uniqArray<T>(arr: T[]) {
   }
   return result;
 }
+
+const removeTrailingLeadingCommaWithInvalidString = (str: string) => {
+  if (typeof str === "string") {
+    str.replace(/(^,)|(,$)/g, "");
+    if (str.includes("#REF!")) {
+      return "";
+    }
+    return str;
+  }
+  return str;
+};
+
+const convertToExcelCSVContent = (data: any[], isExcel: boolean) => {
+  let content = "data:text/csv;charset=utf-8,";
+  let header = {} as any;
+  data.forEach((item: any, index: number) => {
+    for (const key in item) {
+      header = { ...header, key };
+      if (!header[key]) {
+        header[key] = Array(data.length).fill("");
+      }
+      if (item[key] || item[key] === false || item[key] === 0) {
+        header[key][index] = item[key];
+      }
+    }
+  });
+  delete header.key;
+  const _join = isExcel ? "\t" : ",";
+  content += Object.keys(header).join(_join) + "\n";
+  const totalKeys = Object.keys(header).length;
+  data.forEach((item: any, index: number) => {
+    let count = 0;
+    for (const key in header) {
+      count++;
+      const sysbol = count === totalKeys ? "" : _join;
+      content += removeTrailingLeadingCommaWithInvalidString(header[key][index]) + sysbol;
+    }
+    content += "\n";
+  });
+  return content;
+};
+
+export const exportExcelCSV = (fileName: string, data: any[], isExcel: boolean) => {
+  const csv = convertToExcelCSVContent(data, isExcel);
+  const _data = encodeURI(csv);
+  const link = document.createElement("a");
+  link.setAttribute("href", _data);
+  const type = isExcel ? "xlsx" : "csv";
+  link.setAttribute("download", `${fileName}.${type}`);
+  link.click();
+};

@@ -108,8 +108,13 @@ func (inst *FlowClient) NodePallet() ([]nodes.PalletNode, error) {
 		return nil, err
 	}
 	var out []nodes.PalletNode
-	out = *resp.Result().(*[]nodes.PalletNode)
-	return out, nil
+	if resp.IsSuccess() {
+		out = *resp.Result().(*[]nodes.PalletNode)
+		return out, nil
+	} else {
+		return out, nil
+	}
+
 }
 
 func (inst *FlowClient) GetBaseNodesList() ([]node.Spec, error) {
@@ -120,6 +125,11 @@ func (inst *FlowClient) GetBaseNodesList() ([]node.Spec, error) {
 		return nil, err
 	}
 	var out []node.Spec
-	out = *resp.Result().(*[]node.Spec)
-	return out, nil
+	if resp.IsSuccess() {
+		out = *resp.Result().(*[]node.Spec)
+		return out, nil
+	} else {
+		return out, nil
+	}
+
 }

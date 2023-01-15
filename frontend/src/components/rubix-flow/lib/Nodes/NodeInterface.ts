@@ -14,6 +14,7 @@ export type NodeInterfaceInfo = {
 export interface NodeInterface<T = any> {
   id: string;
   position: XYPosition;
+  oldId?: string;
   data: T;
   type?: string;
   style?: CSSProperties;

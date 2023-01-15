@@ -1,16 +1,18 @@
 import { useCallback } from "react";
 import { useReactFlow } from "react-flow-renderer/nocss";
 
+export const SPLIT_KEY = '__';
+
 export const useChangeNodeData = (id: string) => {
   const instance = useReactFlow();
 
   return useCallback(
     (key: string, value: any) => {
       // this is applied when change input at parent node
-      // key = name-id => split('-') at 1 will be node id of input node
-      const isForChild = key.includes('-');
-      const childId = isForChild ? key.split('-')[1] : undefined;
-      const childKeyName = isForChild ? key.split('-')[0] : undefined;
+      // key = name-id => split(SPLIT_KEY) at 1 will be node id of input node
+      const isForChild = key.includes(SPLIT_KEY);
+      const childId = isForChild ? key.split(SPLIT_KEY)[1] : undefined;
+      const childKeyName = isForChild ? key.split(SPLIT_KEY)[0] : undefined;
 
       instance.setNodes((nodes) =>
         nodes.map((n) => {

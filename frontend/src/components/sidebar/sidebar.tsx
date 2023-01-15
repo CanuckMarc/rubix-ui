@@ -205,28 +205,48 @@ export const MenuSidebar = () => {
       return {
         key: name,
         icon: <Icon />,
-        label: <Tooltip title={name}>{name}</Tooltip>,
+        label: (
+          <Tooltip placement="right" title={name}>
+            {name}
+          </Tooltip>
+        ),
         name: name,
         children: [
           {
             key: ROUTES.NETWORKING,
             name: ROUTES.NETWORKING,
-            label: <Tooltip title={"Networking"}><NavLink to={ROUTES.NETWORKING}>Networking</NavLink></Tooltip>,
+            label: (
+              <Tooltip placement="right" title={"Networking"}>
+                <NavLink to={ROUTES.NETWORKING}>Networking</NavLink>
+              </Tooltip>
+            ),
           },
           {
             key: "Utils",
             name: "utils",
-            label: <Tooltip title={"Utils"}>Utils</Tooltip>,
+            label: (
+              <Tooltip placement="right" title={"Utils"}>
+                Utils
+              </Tooltip>
+            ),
             children: [
               {
                 key: ROUTES.LOGS,
                 name: ROUTES.LOGS,
-                label: <Tooltip title={"Logs"}><NavLink to={ROUTES.LOGS}>Logs</NavLink></Tooltip>,
+                label: (
+                  <Tooltip placement="right" title={"Logs"}>
+                    <NavLink to={ROUTES.LOGS}>Logs</NavLink>
+                  </Tooltip>
+                ),
               },
               {
                 key: ROUTES.BACKUPS,
                 name: ROUTES.BACKUPS,
-                label: <Tooltip title={"Backups"}><NavLink to={ROUTES.BACKUPS}>Backups</NavLink></Tooltip>,
+                label: (
+                  <Tooltip placement="right" title={"Backups"}>
+                    <NavLink to={ROUTES.BACKUPS}>Backups</NavLink>
+                  </Tooltip>
+                ),
               },
             ],
           },
@@ -238,23 +258,39 @@ export const MenuSidebar = () => {
       return {
         key: name,
         icon: <Icon />,
-        label: <Tooltip title={name}>{name}</Tooltip>,
+        label: (
+          <Tooltip placement="right" title={name}>
+            {name}
+          </Tooltip>
+        ),
         name: name,
         children: [
           {
             key: ROUTES.RUBIX_FLOW,
             name: ROUTES.RUBIX_FLOW,
-            label: <Tooltip title={"Rubix-Wires Editor"}><NavLink to={ROUTES.RUBIX_FLOW}>Rubix-Wires Editor</NavLink></Tooltip>,
+            label: (
+              <Tooltip placement="right" title={"Rubix-Wires Editor"}>
+                <NavLink to={ROUTES.RUBIX_FLOW}>Rubix-Wires Editor</NavLink>
+              </Tooltip>
+            ),
           },
           {
             key: ROUTES.WIRES_CONNECTIONS,
             name: ROUTES.WIRES_CONNECTIONS,
-            label: <Tooltip title={"Rubix-Wires Connections"}><NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink></Tooltip>,
+            label: (
+              <Tooltip placement="right" title={"Rubix-Wires Connections"}>
+                <NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink>
+              </Tooltip>
+            ),
           },
           {
             key: ROUTES.USER_GUIDE,
             name: ROUTES.USER_GUIDE,
-            label: <Tooltip title={"Rubix-Wires User Guide"}><NavLink to={ROUTES.USER_GUIDE}>Rubix-Wires User Guide</NavLink></Tooltip>,
+            label: (
+              <Tooltip placement="right" title={"Rubix-Wires User Guide"}>
+                <NavLink to={ROUTES.USER_GUIDE}>Rubix-Wires User Guide</NavLink>
+              </Tooltip>
+            ),
           },
         ],
       };

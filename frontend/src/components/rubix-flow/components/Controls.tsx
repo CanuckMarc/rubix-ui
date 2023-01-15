@@ -151,22 +151,22 @@ const Controls = ({
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
         {!!selectedNodeForSubFlow && (
-         <>
-          <div
-            className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-            title="Back to Main"
-            onClick={ onBackToMain }
-          >
-            Back to Main
-          </div>
-          <div
-            className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-            title="Close sub flow"
-            onClick={ onCloseSubFlow }
-          >
-            Close Sub Flow
-          </div>
-         </>
+          <>
+            <div
+              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+              title="Back to Main"
+              onClick={onBackToMain}
+            >
+              Back to Main
+            </div>
+            <div
+              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+              title="Close sub flow"
+              onClick={onCloseSubFlow}
+            >
+              Close Sub Flow
+            </div>
+          </>
         )}
         <div
           className="cursor-pointer border-r bg-white hover:bg-gray-100"
@@ -208,7 +208,11 @@ const Controls = ({
         </div>
       </div>
       <LoadModal open={loadModalOpen} onClose={() => setLoadModalOpen(false)} />
-      <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
+      <SaveModal
+        selectedNodeForSubFlow={selectedNodeForSubFlow}
+        open={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
+      />
       <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
       <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
       <FlowSettingsModal

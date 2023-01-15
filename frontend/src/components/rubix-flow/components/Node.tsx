@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
 
-import { useChangeNodeData } from "../hooks/useChangeNodeData";
+import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { InputSocketSpecJSON, NodeSpecJSON, OutputSocketSpecJSON } from "../lib";
@@ -9,12 +9,12 @@ import { NodeContainer } from "./NodeContainer";
 import { InputSocket } from "./InputSocket";
 import { OutputSocket } from "./OutputSocket";
 import { SettingsModal } from "./SettingsModal";
-import { useNodesSpec } from "../use-nodes-spec";
 import { DEFAULT_NODE_SPEC_JSON } from "./NodeMenu";
 
 type NodeProps = FlowNodeProps & {
   spec: NodeSpecJSON;
   parentNodeId?: string;
+  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
 
 const getTitle = (type: string) => {
@@ -138,10 +138,9 @@ export const isOutputFlow = (type: string) => {
 };
 
 export const Node = (props: NodeProps) => {
-  const { id, data, spec, selected, parentNodeId } = props;
+  const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
   const edges = useEdges();
   const nodes = useNodes();
-  const [nodesSpec] = useNodesSpec();
   const handleChange = useChangeNodeData(id);
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);
@@ -165,7 +164,7 @@ export const Node = (props: NodeProps) => {
             ...firstInput,
             valueType: firstInput.dataType,
             valueOfChild: firstInput.value,
-            pin: `${firstInput.pin}-${nodeId}`,
+            pin: `${firstInput.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstInput.pin,
             subName: `${firstInput.pin}${arr.length > 1 ? index + 1 : ""} ${
@@ -184,7 +183,7 @@ export const Node = (props: NodeProps) => {
           return {
             ...firstOut,
             valueOfChild: firstOut.value,
-            pin: `${firstOut.pin}-${nodeId}`,
+            pin: `${firstOut.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstOut.pin,
             subName: `${firstOut.pin}${arr.length > 1 ? index + 1 : ""} ${info?.nodeName ? `(${info.nodeName})` : ""}`,
@@ -192,8 +191,10 @@ export const Node = (props: NodeProps) => {
         })
     : node.data.out;
 
-  newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
-  newData.out = [...(nodeOutputs || []), ...(data.out || [])];
+  if (node.isParent) {
+    newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
+    newData.out = [...(nodeOutputs || []), ...(data.out || [])];
+  }
 
   const pairs = getPairs(
     getInputs(spec.inputs || [], nodeInputs, node),

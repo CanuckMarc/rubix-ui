@@ -6,10 +6,10 @@ import { JsonForm } from "../../../common/json-schema-form";
 import { amodel, storage } from "../../../../wailsjs/go/models";
 import { ConnectionFactory } from "../../connections/factory";
 import { HostsFactory } from "../../hosts/factory";
+import { useParams } from "react-router-dom";
 
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
-import { useParams } from "react-router-dom";
 
 const { Panel } = Collapse;
 

@@ -31,6 +31,7 @@ func main() {
 	FileMenu.AddText("Quit", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
 		app.OnQuit()
 	})
+	// go cmd.Execute()
 	err = wails.Run(&options.App{
 		Title:  "rubix",
 		Width:  1300,

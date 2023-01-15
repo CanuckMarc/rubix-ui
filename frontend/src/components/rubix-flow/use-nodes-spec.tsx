@@ -59,7 +59,7 @@ export const useNodesSpec = () => {
   };
 
   useEffect(() => {
-    fetch();
+    fetch()
   }, [nodesSpec.length, connUUID, hostUUID]);
 
   return [nodesSpec, setNodesSpec, isFetchingNodeSpec];
