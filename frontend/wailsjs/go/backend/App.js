@@ -534,6 +534,10 @@ export function GetFlowDeviceSchema(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetFlowDeviceSchema'](arg1, arg2, arg3);
 }
 
+export function GetFlowList(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetFlowList'](arg1, arg2, arg3, arg4);
+}
+
 export function GetFlowNetwork(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['GetFlowNetwork'](arg1, arg2, arg3, arg4);
 }
@@ -752,6 +756,10 @@ export function GetStreams(arg1, arg2) {
 
 export function GetStreamsByFlowNetwork(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetStreamsByFlowNetwork'](arg1, arg2, arg3);
+}
+
+export function GetSubFlow(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetSubFlow'](arg1, arg2, arg3, arg4);
 }
 
 export function GetWiresConnection(arg1, arg2, arg3, arg4) {

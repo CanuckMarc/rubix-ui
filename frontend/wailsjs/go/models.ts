@@ -631,6 +631,18 @@ export namespace externaltoken {
 
 export namespace flowcli {
 	
+	export class NodesList {
+	    nodes: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NodesList(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nodes = source["nodes"];
+	    }
+	}
 	export class SchemaBody {
 	    title: string;
 	    properties: any;
