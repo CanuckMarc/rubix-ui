@@ -203,7 +203,7 @@ export const ImportExcelModal = (props: any) => {
       setConfirmLoading(true);
       if (typeof handleSubmit === "function") {
         // add connections bulk
-        handleSubmit(items);
+        await handleSubmit(items);
       } else {
         //add points bulk
         const data = [];
