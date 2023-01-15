@@ -123,11 +123,14 @@ export const EdgeAppInfo = (props: any) => {
         header={<strong>Available Apps</strong>}
         renderItem={(item) => (
           <List.Item style={{ padding: "0 16px" }}>
+            <DownloadOutlined
+              onClick={() => setIsInstallRubixAppModalVisible(item)}
+              style={{ marginLeft: "4rem", marginRight: "2.5rem" }}
+            />
             <List.Item.Meta
               title={<span>{item.app_name}</span>}
               description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
             />
-            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} />
           </List.Item>
         )}
       />
@@ -139,9 +142,13 @@ export const EdgeAppInfo = (props: any) => {
         header={<strong>Installed Apps</strong>}
         renderItem={(item) => (
           <List.Item style={{ padding: "8px 16px" }}>
-            <span style={{ width: "250px" }}>
-              <span>{item.app_name}</span>
+            <span className="mr-6">
+              <Dropdown.Button
+                loading={isActionLoading[item.app_name || ""] || false}
+                overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
+              />
             </span>
+            <span style={{ width: "250px" }}>{item.app_name}</span>
             <span style={{ width: 100, float: "right" }}>
               <RbVersion
                 state={
@@ -152,7 +159,7 @@ export const EdgeAppInfo = (props: any) => {
                     : VERSION_STATES.NONE
                 }
                 version={item.version}
-              ></RbVersion>
+              />
             </span>
             <span
               className="flex-1"
@@ -173,12 +180,6 @@ export const EdgeAppInfo = (props: any) => {
               <Text style={{ paddingTop: 5 }} type="secondary" italic>
                 {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
               </Text>
-            </span>
-            <span className="flex-1" style={{ textAlign: "right" }}>
-              <Dropdown.Button
-                loading={isActionLoading[item.app_name || ""] || false}
-                overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
-              />
             </span>
           </List.Item>
         )}
