@@ -169,7 +169,7 @@ export const Firewall = () => {
     <>
       <div id="firewall-table-container">
         <Space align="center" direction="horizontal">
-          <Button type="primary" icon={<ReloadOutlined />} size={"middle"}>Refresh</Button>
+          <Button type="primary" icon={<ReloadOutlined />} size={"middle"} onClick={fetch}>Refresh</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={addPort} loading={loading}>
             Add port
           </Button>
@@ -177,7 +177,7 @@ export const Firewall = () => {
             Delete port
           </Button>
         </Space>
-        
+
         <Spin spinning={isFetching} style={{ width: '100%' }}>
           <Table id={"firewall-table"} columns={columns} dataSource={firewallList} rowSelection={rowSelection} 
             style={{ width: '100%' }}
