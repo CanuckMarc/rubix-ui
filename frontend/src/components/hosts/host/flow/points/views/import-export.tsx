@@ -141,8 +141,8 @@ export const ImportJsonModal = (props: any) => {
 };
 
 export const ImportExcelModal = (props: any) => {
+  const { isModalVisible, onClose, refreshList, schema, handleSubmit } = props;
   const { deviceUUID = "", connUUID = "", hostUUID = "" } = useParams();
-  const { isModalVisible, onClose, refreshList, schema } = props;
   const [file, setFile] = useState<UploadFile | undefined>(undefined);
   const [items, setItems] = useState<any[]>([]);
   const [columns, setColumns] = useState<any[] | undefined>([]);
@@ -201,12 +201,19 @@ export const ImportExcelModal = (props: any) => {
   const handleOk = async () => {
     try {
       setConfirmLoading(true);
-      const data = [];
-      for (let item of items) {
-        item = { ...item, device_uuid: deviceUUID };
-        data.push(item);
+      if (typeof handleSubmit === "function") {
+        // add connections bulk
+        handleSubmit(items);
+      } else {
+        //add points bulk
+        const data = [];
+        for (let item of items) {
+          item = { ...item, device_uuid: deviceUUID };
+          data.push(item);
+        }
+        await factory.AddBulk(data);
       }
-      await factory.AddBulk(data);
+
       refreshList();
       handleClose();
     } finally {
