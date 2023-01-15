@@ -207,12 +207,12 @@ const ImportDropdownButton = (props: any) => {
   const style: React.CSSProperties = { lineHeight: "3rem" };
 
   const items: MenuProps["items"] = [
-    {
-      label: "json",
-      key: "json",
-      onClick: () => setIsJsonModalVisible(true),
-      style,
-    },
+    // {
+    //   label: "json",
+    //   key: "json",
+    //   onClick: () => setIsJsonModalVisible(true),
+    //   style,
+    // },
     {
       label: "excel",
       key: "excel",
