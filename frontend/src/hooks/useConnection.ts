@@ -1,33 +1,27 @@
 import { DataNode } from "antd/lib/tree";
 import { useEffect, useState } from "react";
+import { storage } from "../../wailsjs/go/models";
 import { ConnectionFactory } from "../components/connections/factory";
 import { LocationFactory } from "../components/locations/factory";
 import { getTreeDataIterative } from "../components/searchable-tree/searchable-tree.ui-service";
 
+import RubixConnection = storage.RubixConnection;
+
 interface TDataNode extends DataNode {
   name?: string;
 }
-
-interface DataNodeListItem {
-  key: React.Key;
-  title: string;
-}
-
-let locationFactory = new LocationFactory();
-let connectionFactory = new ConnectionFactory();
 
 export const useConnections = () => {
   const [connections, setConnections] = useState([] as any[]);
   const [routeData, updateRouteData] = useState([] as TDataNode[]);
   const [isFetching, setIsFetching] = useState(false);
 
-  useEffect(() => {
-    fetchConnections();
-  }, []);
+  const locationFactory = new LocationFactory();
+  const connectionFactory = new ConnectionFactory();
 
   const getLocations = async (connUUID: string) => {
-    locationFactory.connectionUUID = connUUID;
     try {
+      locationFactory.connectionUUID = connUUID;
       return await locationFactory.GetAll();
     } catch (err) {
       return [];
@@ -37,21 +31,27 @@ export const useConnections = () => {
   const fetchConnections = async () => {
     try {
       setIsFetching(true);
-      let connections = (await connectionFactory.GetAll()) as any;
-      if (!connections) return setConnections([]);
-      for (const c of connections) {
+      const connections = ((await connectionFactory.GetAll()) || []) as any[];
+      const enabledConnections = connections.filter(
+        (c: RubixConnection) => c.enable
+      );
+      for (const c of enabledConnections) {
         let locations = [];
         locations = await getLocations(c.uuid);
         c.locations = locations;
       }
-      setConnections(connections);
-      updateRouteData(getTreeDataIterative(connections));
+      setConnections(enabledConnections);
+      updateRouteData(getTreeDataIterative(enabledConnections));
     } catch (error) {
       setConnections([]);
     } finally {
       setIsFetching(false);
     }
   };
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
 
   return { connections, routeData, isFetching };
 };

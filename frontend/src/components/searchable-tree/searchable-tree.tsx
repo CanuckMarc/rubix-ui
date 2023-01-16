@@ -4,10 +4,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { LocationFactory } from "../locations/factory";
 import { ConnectionFactory } from "../connections/factory";
 import { getTreeDataIterative } from "./searchable-tree.ui-service";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-let locationFactory = new LocationFactory();
-let connectionFactory = new ConnectionFactory();
+const locationFactory = new LocationFactory();
+const connectionFactory = new ConnectionFactory();
 
 const { Search } = Input;
 
@@ -36,11 +36,8 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 };
 
 const SearchableTree: React.FC = () => {
-  const [connections, setConnections] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
   const [data, updateData] = useState([] as TDataNode[]);
   const [dataList, updateDataList] = useState([] as DataNodeListItem[]);
-
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -52,20 +49,15 @@ const SearchableTree: React.FC = () => {
 
   const fetchConnections = async () => {
     try {
-      setIsFetching(true);
       let connections = (await connectionFactory.GetAll()) as any;
-      if (!connections) return setConnections([]);
       for (const c of connections) {
         let locations = [];
         locations = await getLocations(c.uuid);
         c.locations = locations;
       }
-      setConnections(connections);
       updateData(getTreeDataIterative(connections));
     } catch (error) {
-      setConnections([]);
-    } finally {
-      setIsFetching(false);
+      console.log(error);
     }
   };
 
@@ -113,19 +105,6 @@ const SearchableTree: React.FC = () => {
     setAutoExpandParent(true);
   };
 
-  useEffect(() => {
-    fetchConnections();
-  }, []);
-
-  useEffect(() => {
-    const dataList = generateList(data);
-    console.log(dataList);
-    const newExpandedKeys: any = dataList
-      .map((item) => getParentKey(item.key, data))
-      .filter((val) => val);
-    setExpandedKeys(newExpandedKeys);
-  }, [data]);
-
   const treeData = useMemo(() => {
     const loop = (data: TDataNode[]): TDataNode[] =>
       data.map((item: any) => {
@@ -139,10 +118,7 @@ const SearchableTree: React.FC = () => {
           index > -1 ? (
             <NavLink to={next}>
               {beforeStr}
-              <span
-                style={{ background: "#dfdfdf" }}
-                className="site-tree-search-value"
-              >
+              <span style={{ background: "#dfdfdf" }} className="site-tree-search-value">
                 {searchValue}
               </span>
               {afterStr}
@@ -170,19 +146,20 @@ const SearchableTree: React.FC = () => {
     return loop(data);
   }, [searchValue, data]);
 
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  useEffect(() => {
+    const dataList = generateList(data);
+    const newExpandedKeys: any = dataList.map((item) => getParentKey(item.key, data)).filter((val) => val);
+    setExpandedKeys(newExpandedKeys);
+  }, [data]);
+
   return (
     <div>
-      <Search
-        style={{ marginBottom: 8 }}
-        placeholder="Search"
-        onChange={onChange}
-      />
-      <Tree
-        onExpand={onExpand}
-        expandedKeys={expandedKeys}
-        autoExpandParent={autoExpandParent}
-        treeData={treeData}
-      />
+      <Search style={{ marginBottom: 8 }} placeholder="Search" onChange={onChange} />
+      <Tree onExpand={onExpand} expandedKeys={expandedKeys} autoExpandParent={autoExpandParent} treeData={treeData} />
     </div>
   );
 };

@@ -9,11 +9,7 @@ import (
 func TestApp_AddStream(t *testing.T) {
 	app := MockNewApp()
 	body := &model.Stream{
-		CommonStream: model.CommonStream{
-			CommonName: model.CommonName{
-				Name: "test111",
-			},
-		},
+		CommonStream: model.CommonStream{},
 	}
 	bulk := app.AddStream("cloud", "hos_DABC722D420A", "flw_DABC722D420A", body)
 	pprint.PrintJOSN(bulk)
