@@ -22,6 +22,7 @@ import UUIDs = backend.UUIDs;
 
 export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [filteredData, setFilteredData] = useState<RubixConnection[]>([]);
   const [currentConnection, setCurrentConnection] = useState({} as RubixConnection);
   const [connectionSchema, setConnectionSchema] = useState<any>({});
@@ -72,6 +73,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
+      setSelectedKeys(selectedRowKeys);
       setSelectedUUIDs(selectedRows);
     },
   };
@@ -149,7 +151,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     if (selectedUUIDs.length === 0) {
       return openNotificationWithIcon("warning", `please select at least one`);
     }
-    exportExcelCSV("connections", selectedUUIDs, true);
+    factory.ExportConnection(selectedKeys);
   };
 
   useEffect(() => {
