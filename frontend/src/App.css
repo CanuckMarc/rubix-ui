@@ -165,3 +165,14 @@ svg {
 .ant-menu-submenu-popup {
     display: none;
 }
+
+.ant-spin-nested-loading {
+    width: 100%;
+}
+
+#firewall-table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}

@@ -15,10 +15,10 @@ import {dhcpd} from '../models';
 import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
+import {flowcli} from '../models';
 import {store} from '../models';
 import {node} from '../models';
 import {nodes} from '../models';
-import {flowcli} from '../models';
 
 export function AddConnection(arg1:storage.RubixConnection):Promise<storage.RubixConnection>;
 
@@ -286,6 +286,8 @@ export function GetFlow(arg1:string,arg2:string,arg3:boolean):Promise<any>;
 
 export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function GetFlowList(arg1:string,arg2:string,arg3:flowcli.NodesList,arg4:boolean):Promise<any>;
+
 export function GetFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.FlowNetwork>;
 
 export function GetFlowNetworkClone(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.FlowNetworkClone>;
@@ -395,6 +397,8 @@ export function GetStreamClones(arg1:string,arg2:string):Promise<Array<model.Str
 export function GetStreams(arg1:string,arg2:string):Promise<Array<model.Stream>>;
 
 export function GetStreamsByFlowNetwork(arg1:string,arg2:string,arg3:string):Promise<Array<model.Stream>>;
+
+export function GetSubFlow(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<db.Connection>;
 
