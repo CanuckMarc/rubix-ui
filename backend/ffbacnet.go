@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 )
@@ -58,6 +59,48 @@ func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 		return nil, errors.New("bacnet device uuid cant not be empty")
 	}
 	return client.BacnetDevicePoints(hostUUID, deviceUUID, addPoints, makeWriteable)
+}
+
+func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) ([]model.Device, error) {
+	var err error
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Stop)
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil, err
+	}
+	err = inst.bacnetChecks(connUUID, hostUUID, bacnetMasterPlg)
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil, err
+	}
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	devices, err := client.BacnetMasterWhoIs(hostUUID, opts)
+	if err != nil {
+		return nil, err
+	}
+	var devicesUpdated []model.Device
+	for _, device := range devices {
+		device.NetworkUUID = networkUUID
+		devicesUpdated = append(devicesUpdated, device)
+	}
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Start)
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil, err
+	}
+	return devicesUpdated, nil
+}
+
+func (inst *App) BacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) []model.Device {
+	devices, err := inst.bacnetMasterWhois(connUUID, hostUUID, networkUUID, opts)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
 }
 
 func (inst *App) bacnetWhois(connUUID, hostUUID string, networkUUID, pluginName string) ([]model.Device, error) {
