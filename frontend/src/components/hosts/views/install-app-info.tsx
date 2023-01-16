@@ -203,6 +203,7 @@ const ConfirmActionMenu = (props: any) => {
     Modal.confirm({
       title: `App ${actionType}`,
       content: "Are you sure?",
+      className: "text-start",
       onOk() {
         return onMenuClick(actionType, item);
       },
