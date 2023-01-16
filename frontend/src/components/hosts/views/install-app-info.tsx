@@ -1,6 +1,6 @@
-import { Typography, List, Dropdown, Menu, Button, Popconfirm } from "antd";
-import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
-import { useState, useEffect, useRef } from "react";
+import { Typography, List, Dropdown, Menu, Button, Modal } from "antd";
+import { DownloadOutlined, EllipsisOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
 import { RbRefreshButton } from "../../../common/rb-table-actions";
@@ -13,6 +13,8 @@ import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-moda
 import { tagMessageStateResolver } from "./utils";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
+
+const { confirm } = Modal;
 const { Text, Title } = Typography;
 const releaseFactory = new ReleasesFactory();
 const installAppFactory = new InstallAppFactory();
@@ -69,13 +71,13 @@ export const EdgeAppInfo = (props: any) => {
     );
   }
 
-  const onMenuClick = (value: any, item: any) => {
+  const onMenuClick = (actionType: string, item: any) => {
     updateActionLoading((prevState: any) => ({
       ...prevState,
       [item.app_name]: true,
     }));
     return releaseFactory
-      .EdgeServiceAction(value.key, {
+      .EdgeServiceAction(actionType, {
         connUUID: connUUID,
         hostUUID: host.uuid,
         appName: item.app_name,
@@ -196,35 +198,28 @@ export const EdgeAppInfo = (props: any) => {
 
 const ConfirmActionMenu = (props: any) => {
   const { item, onMenuClick } = props;
-  const [selectedAction, updateSelectedAction] = useState("" as string);
-  const [isOpenConfirm, updateIsOpenConfirm] = useState(false);
 
-  const handleOnMenuClick = (v: any) => {
-    updateSelectedAction(v);
-    updateIsOpenConfirm(true);
+  const showConfirm = (actionType: string) => {
+    Modal.confirm({
+      title: `App ${actionType}`,
+      content: "Are you sure?",
+      onOk() {
+        return onMenuClick(actionType, item);
+      },
+    });
   };
 
-  const confirm = async () => {
-    await onMenuClick(selectedAction, item);
-    updateIsOpenConfirm(false);
-  };
-
-  const cancel = () => {
-    updateIsOpenConfirm(false);
-  };
-
-  const MenuItemLabel = (label: string) => {
+  const MenuItemLabel = (actionType: string) => {
     return (
-      <Popconfirm title={`App ${label}, Are you sure?`} onConfirm={confirm} onCancel={cancel}>
-        {label}
-      </Popconfirm>
+      <Button type="text" onClick={() => showConfirm(actionType.toLowerCase())}>
+        {actionType}
+      </Button>
     );
   };
 
   return (
     <Menu
       key={1}
-      onClick={(v) => handleOnMenuClick(v)}
       items={[
         {
           key: "start",
