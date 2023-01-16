@@ -1,5 +1,5 @@
-import { Typography, List, Dropdown, Menu, Card, Button } from "antd";
-import { DownloadOutlined, LeftOutlined } from "@ant-design/icons";
+import { Typography, List, Dropdown, Menu, Button, Modal } from "antd";
+import { DownloadOutlined, EllipsisOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
@@ -13,15 +13,15 @@ import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-moda
 import { tagMessageStateResolver } from "./utils";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
-const releaseFactory = new ReleasesFactory();
+
+const { confirm } = Modal;
 const { Text, Title } = Typography;
-let installAppFactory = new InstallAppFactory();
+const releaseFactory = new ReleasesFactory();
+const installAppFactory = new InstallAppFactory();
 
 export const EdgeAppInfo = (props: any) => {
-  let timeout;
-  let { connUUID = "" } = useParams();
-  installAppFactory.connectionUUID = connUUID;
-
+  const { host } = props;
+  const { connUUID = "" } = useParams();
   const [isLoading, updateIsLoading] = useState(false);
   const [isActionLoading, updateActionLoading] = useState({} as any);
   const [installedApps, updateInstalledApps] = useState([] as InstalledApps[]);
@@ -30,7 +30,10 @@ export const EdgeAppInfo = (props: any) => {
   const [selectedApp, updateSelectedApp] = useState({} as InstalledApps);
   const [installedVersion, updateInstalledVersion] = useState("");
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
-  const { host } = props;
+
+  let timeout;
+
+  installAppFactory.connectionUUID = connUUID;
 
   useEffect(() => {
     fetchAppInfo().catch(console.error);
@@ -61,21 +64,20 @@ export const EdgeAppInfo = (props: any) => {
     return (
       <span>
         {appInfoMsg}
-        <span>
-          {" "}
+        <span className="ml-3">
           <a onClick={() => fetchAppInfo()}>Click here to refresh</a>
         </span>
       </span>
     );
   }
 
-  const onMenuClick = (value: any, item: any) => {
+  const onMenuClick = (actionType: string, item: any) => {
     updateActionLoading((prevState: any) => ({
       ...prevState,
       [item.app_name]: true,
     }));
     return releaseFactory
-      .EdgeServiceAction(value.key, {
+      .EdgeServiceAction(actionType, {
         connUUID: connUUID,
         hostUUID: host.uuid,
         appName: item.app_name,
@@ -123,11 +125,11 @@ export const EdgeAppInfo = (props: any) => {
         header={<strong>Available Apps</strong>}
         renderItem={(item) => (
           <List.Item style={{ padding: "0 16px" }}>
+            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
             <List.Item.Meta
               title={<span>{item.app_name}</span>}
               description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
             />
-            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} />
           </List.Item>
         )}
       />
@@ -139,9 +141,13 @@ export const EdgeAppInfo = (props: any) => {
         header={<strong>Installed Apps</strong>}
         renderItem={(item) => (
           <List.Item style={{ padding: "8px 16px" }}>
-            <span style={{ width: "250px" }}>
-              <span>{item.app_name}</span>
+            <span className="mr-6">
+              <Dropdown trigger={["click"]} overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}>
+                <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.app_name || ""] || false} />
+              </Dropdown>
             </span>
+
+            <span style={{ width: "250px" }}>{item.app_name}</span>
             <span style={{ width: 100, float: "right" }}>
               <RbVersion
                 state={
@@ -152,7 +158,7 @@ export const EdgeAppInfo = (props: any) => {
                     : VERSION_STATES.NONE
                 }
                 version={item.version}
-              ></RbVersion>
+              />
             </span>
             <span
               className="flex-1"
@@ -174,12 +180,6 @@ export const EdgeAppInfo = (props: any) => {
                 {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
               </Text>
             </span>
-            <span className="flex-1" style={{ textAlign: "right" }}>
-              <Dropdown.Button
-                loading={isActionLoading[item.app_name || ""] || false}
-                overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
-              />
-            </span>
           </List.Item>
         )}
       />
@@ -198,65 +198,47 @@ export const EdgeAppInfo = (props: any) => {
 
 const ConfirmActionMenu = (props: any) => {
   const { item, onMenuClick } = props;
-  const [selectedAction, updateSelectedAction] = useState("" as string);
-  const [isOpenConfirm, updateIsOpenConfirm] = useState(false);
 
-  const handleOnMenuClick = (v: any) => {
-    updateSelectedAction(v);
-    updateIsOpenConfirm(true);
+  const showConfirm = (actionType: string) => {
+    Modal.confirm({
+      title: `App ${actionType}`,
+      content: "Are you sure?",
+      className: "text-start",
+      onOk() {
+        return onMenuClick(actionType, item);
+      },
+    });
+  };
+
+  const MenuItemLabel = (actionType: string) => {
+    return (
+      <Button type="text" onClick={() => showConfirm(actionType.toLowerCase())}>
+        {actionType}
+      </Button>
+    );
   };
 
   return (
-    <div>
-      {!isOpenConfirm ? (
-        <Menu
-          key={1}
-          onClick={(v) => handleOnMenuClick(v)}
-          items={[
-            {
-              key: "start",
-              label: "Start",
-            },
-            {
-              key: "restart",
-              label: "Restart",
-            },
-            {
-              key: "stop",
-              label: "Stop",
-            },
-            {
-              key: "uninstall",
-              label: "Uninstall",
-            },
-          ]}
-        />
-      ) : (
-        <Card>
-          <div style={{ paddingBottom: 16 }}>
-            <Button
-              style={{ marginRight: "8px" }}
-              shape="circle"
-              icon={<LeftOutlined />}
-              size="small"
-              onClick={() => updateIsOpenConfirm(false)}
-            />
-            <strong>Are you sure?</strong>
-          </div>
-          <div>
-            <Button
-              onClick={() => {
-                updateIsOpenConfirm(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button className="nube-primary white--text" onClick={() => onMenuClick(selectedAction, item)}>
-              OK
-            </Button>
-          </div>
-        </Card>
-      )}
-    </div>
+    <Menu
+      key={1}
+      items={[
+        {
+          key: "start",
+          label: MenuItemLabel("Start"),
+        },
+        {
+          key: "restart",
+          label: MenuItemLabel("Restart"),
+        },
+        {
+          key: "stop",
+          label: MenuItemLabel("Stop"),
+        },
+        {
+          key: "uninstall",
+          label: MenuItemLabel("Uninstall"),
+        },
+      ]}
+    />
   );
 };

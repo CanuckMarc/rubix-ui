@@ -51,7 +51,9 @@ func (inst *App) EdgeServiceStop(connUUID, hostUUID, appName string) *amodel.Mes
 }
 
 func (inst *App) EdgeServiceRestart(connUUID, hostUUID, appName string) *amodel.Message {
-	ctl, err := inst.edgeSystemCtlAction(connUUID, hostUUID, appName, amodel.Restart)
+	ctl, err := inst.edgeSystemCtlAction(connUUID, hostUUID, appName, amodel.Enable)
+	err = inst.errMsg(err)
+	ctl, err = inst.edgeSystemCtlAction(connUUID, hostUUID, appName, amodel.Restart)
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil
