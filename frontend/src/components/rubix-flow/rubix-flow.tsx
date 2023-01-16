@@ -217,7 +217,7 @@ const Flow = (props: FlowProps) => {
   const onHandelSaveFlow = async () => {
     const newNodesFiltered = nodes.filter((node: NodeInterface) => {
       if (node.parentId) {
-        return nodes.some(n => n.id === node.parentId);
+        return nodes.some((n) => n.id === node.parentId);
       }
       return true;
     });
@@ -245,27 +245,35 @@ const Flow = (props: FlowProps) => {
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
     const isTarget = position === "left";
-    const targetNodeId = handleId?.includes(SPLIT_KEY) ? handleId.split(SPLIT_KEY)[1] : nodeId;
-    const targetHandleId = handleId?.includes(SPLIT_KEY) ? handleId.split(SPLIT_KEY)[0] : handleId;
+    const [targetHandleId, targetNodeId] = handleId?.includes(SPLIT_KEY)
+      ? handleId.split(SPLIT_KEY)
+      : [handleId, nodeId];
 
     if (lastConnectStart) {
-      const isDragSelected = edges.some((item) => {
-        const isChangeTarget =
-          lastConnectStart.handleType === "target" && item.targetHandle === lastConnectStart.handleId;
-        const isChangeSource = lastConnectStart.handleId === "out" && item.source === lastConnectStart.nodeId;
+      const [lastConnectStartHandleId, lastConnectStartNodeId] = lastConnectStart.handleId?.includes(SPLIT_KEY)
+        ? lastConnectStart.handleId.split(SPLIT_KEY)
+        : [lastConnectStart.handleId, lastConnectStart.nodeId];
 
-        return item.selected && (isChangeTarget || isChangeSource);
+      const isDragSelected = edges.some((item) => {
+        if (item.selected) {
+          const isChangeTarget =
+            lastConnectStart.handleType === "target" && item.targetHandle === lastConnectStartHandleId;
+          const isChangeSource = lastConnectStartHandleId && item.source === lastConnectStartNodeId;
+
+          return isChangeTarget || isChangeSource;
+        }
+
+        return false;
       });
 
-      const lastHandleId = lastConnectStart.handleId;
-      const isTrueHandleId = targetHandleId && lastHandleId;
+      const isTrueHandleId = targetHandleId && lastConnectStartHandleId;
 
       if (isDragSelected && isTrueHandleId) {
-        let newEdges;
+        let newEdges = [];
         if (targetNodeId) {
           // update selected lines to new node if start and end are same type
           newEdges = edges.map((item: Edge) => {
-            if (item.selected && lastConnectStart.nodeId === item[lastConnectStart.handleType!!]) {
+            if (item.selected && lastConnectStartNodeId === item[lastConnectStart.handleType!!]) {
               const updateKey = isTarget ? "target" : "source";
               item[`${updateKey}Handle`] = targetHandleId;
               item[updateKey as keyof Edge] = targetNodeId;
@@ -539,8 +547,8 @@ const Flow = (props: FlowProps) => {
     });
 
     // remove connections have source id is belong allNodes
-    newFlow.edges = newFlow.edges.filter((edge: Edge) =>
-      !allNodes.some((node: NodeInterface) => node.id === edge.source)
+    newFlow.edges = newFlow.edges.filter(
+      (edge: Edge) => !allNodes.some((node: NodeInterface) => node.id === edge.source)
     );
 
     // unique items and delete oldId field
