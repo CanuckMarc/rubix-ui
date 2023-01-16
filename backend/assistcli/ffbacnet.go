@@ -7,6 +7,10 @@ import (
 )
 
 type WhoIsOpts struct {
+	InterfacePort   string `json:"interface_port"`
+	LocalDeviceIP   string `json:"local_device_ip"`
+	LocalDevicePort int    `json:"local_device_port"`
+	LocalDeviceId   int    `json:"local_device_id"`
 	Low             int    `json:"low"`
 	High            int    `json:"high"`
 	GlobalBroadcast bool   `json:"global_broadcast"`
@@ -14,6 +18,22 @@ type WhoIsOpts struct {
 }
 
 const bacnetMaster = "bacnetmaster"
+
+// BacnetMasterWhoIs do a whois on an existing network
+func (inst *Client) BacnetMasterWhoIs(hostIDName string, body *WhoIsOpts) ([]model.Device, error) {
+	url := "proxy/ff/api/plugins/api/bacnetmaster/master/whois"
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetBody(body).
+		SetResult(&[]model.Device{}).
+		Post(url))
+	if err != nil {
+		return nil, err
+	}
+	out := *resp.Result().(*[]model.Device)
+	return out, nil
+}
 
 // BacnetWhoIs do a whois on an existing network
 func (inst *Client) BacnetWhoIs(hostIDName string, body *WhoIsOpts, networkUUID string, addDevices bool) ([]model.Device, error) {

@@ -2,7 +2,7 @@ import { Tabs, Typography, Card, Button } from "antd";
 import { RedoOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { model } from "../../../../../../wailsjs/go/models";
+import {assistcli, model} from "../../../../../../wailsjs/go/models";
 import { RbRefreshButton } from "../../../../../common/rb-table-actions";
 import { BACNET_HEADERS } from "../../../../../constants/headers";
 import { PLUGINS } from "../../../../../constants/plugins";
@@ -17,6 +17,7 @@ import { FlowDeviceTable } from "./views/table";
 import useTitlePrefix from "../../../../../hooks/usePrefixedTitle";
 import { setDataLocalStorage } from "../flow-service";
 import Device = model.Device;
+import {BacnetMasterWhois} from "../../../../../../wailsjs/go/backend/App";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -99,7 +100,8 @@ export const FlowDevices = () => {
   const runWhois = async () => {
     try {
       setIsFetchingWhoIs(true);
-      const res = await bacnetFactory.Whois(networkUUID, pluginName);
+      let opts = new assistcli.WhoIsOpts
+      const res = await bacnetFactory.BacnetMasterWhois(networkUUID, opts);
       if (res) {
         openNotificationWithIcon("success", `device count found: ${res.length}`);
       }
