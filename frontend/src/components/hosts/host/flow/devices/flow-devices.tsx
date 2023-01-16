@@ -100,7 +100,7 @@ export const FlowDevices = () => {
   const runWhois = async () => {
     try {
       setIsFetchingWhoIs(true);
-      let opts = new assistcli.WhoIsOpts
+      let opts = new assistcli.WhoIsOpts // give user the options
       const res = await bacnetFactory.BacnetMasterWhois(networkUUID, opts);
       if (res) {
         openNotificationWithIcon("success", `device count found: ${res.length}`);
