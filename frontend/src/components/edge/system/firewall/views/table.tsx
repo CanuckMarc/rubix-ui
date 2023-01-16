@@ -24,8 +24,7 @@ export const Firewall = () => {
     const body: system.UFWBody = {
       port: parseInt(newPort),
     }
-    const msg = await factory.EdgeFirewallPortOpen(connUUID, hostUUID, body);
-    console.log(msg);
+    await factory.EdgeFirewallPortOpen(connUUID, hostUUID, body);
 
     fetch();
     setNewPort("");
@@ -75,13 +74,9 @@ export const Firewall = () => {
     try {
       setIsFetching(true);
       const status = await factory.EdgeFirewallStatus(connUUID, hostUUID);
-      console.log(status.message)
       setFirewallStatus(status?.message == "firewall is enabled" ? true : false);
-      console.log(firewallStatus)
-
-      
+    
       const list = await factory.EdgeFirewallList(connUUID, hostUUID);
-      console.log(list)
       let mappedList: PortTableType[] = []
       if (list != null) {
         mappedList = list.map( item => {
