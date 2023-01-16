@@ -1,6 +1,6 @@
-import { Typography, List, Dropdown, Menu, Card, Button } from "antd";
-import { DownloadOutlined, LeftOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { Typography, List, Dropdown, Menu, Button, Popconfirm } from "antd";
+import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
 import { RbRefreshButton } from "../../../common/rb-table-actions";
@@ -13,15 +13,13 @@ import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-moda
 import { tagMessageStateResolver } from "./utils";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
-const releaseFactory = new ReleasesFactory();
 const { Text, Title } = Typography;
-let installAppFactory = new InstallAppFactory();
+const releaseFactory = new ReleasesFactory();
+const installAppFactory = new InstallAppFactory();
 
 export const EdgeAppInfo = (props: any) => {
-  let timeout;
-  let { connUUID = "" } = useParams();
-  installAppFactory.connectionUUID = connUUID;
-
+  const { host } = props;
+  const { connUUID = "" } = useParams();
   const [isLoading, updateIsLoading] = useState(false);
   const [isActionLoading, updateActionLoading] = useState({} as any);
   const [installedApps, updateInstalledApps] = useState([] as InstalledApps[]);
@@ -30,7 +28,10 @@ export const EdgeAppInfo = (props: any) => {
   const [selectedApp, updateSelectedApp] = useState({} as InstalledApps);
   const [installedVersion, updateInstalledVersion] = useState("");
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
-  const { host } = props;
+
+  let timeout;
+
+  installAppFactory.connectionUUID = connUUID;
 
   useEffect(() => {
     fetchAppInfo().catch(console.error);
@@ -122,10 +123,7 @@ export const EdgeAppInfo = (props: any) => {
         header={<strong>Available Apps</strong>}
         renderItem={(item) => (
           <List.Item style={{ padding: "0 16px" }}>
-            <DownloadOutlined
-              onClick={() => setIsInstallRubixAppModalVisible(item)}
-              style={{ marginLeft: "4rem", marginRight: "2.5rem" }}
-            />
+            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
             <List.Item.Meta
               title={<span>{item.app_name}</span>}
               description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
@@ -142,12 +140,11 @@ export const EdgeAppInfo = (props: any) => {
         renderItem={(item) => (
           <List.Item style={{ padding: "8px 16px" }}>
             <span className="mr-6">
-              <Dropdown.Button
-                trigger={["click"]}
-                loading={isActionLoading[item.app_name || ""] || false}
-                overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
-              />
+              <Dropdown trigger={["click"]} overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}>
+                <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.app_name || ""] || false} />
+              </Dropdown>
             </span>
+
             <span style={{ width: "250px" }}>{item.app_name}</span>
             <span style={{ width: 100, float: "right" }}>
               <RbVersion
@@ -201,73 +198,51 @@ const ConfirmActionMenu = (props: any) => {
   const { item, onMenuClick } = props;
   const [selectedAction, updateSelectedAction] = useState("" as string);
   const [isOpenConfirm, updateIsOpenConfirm] = useState(false);
-  const [closeAll, setCloseAll] = useState(false);
 
   const handleOnMenuClick = (v: any) => {
     updateSelectedAction(v);
     updateIsOpenConfirm(true);
   };
 
-  const handleOk = async (selectedAction: any, item: InstalledApps) => {
+  const confirm = async () => {
     await onMenuClick(selectedAction, item);
-    setCloseAll(true);
+    updateIsOpenConfirm(false);
+  };
+
+  const cancel = () => {
+    updateIsOpenConfirm(false);
+  };
+
+  const MenuItemLabel = (label: string) => {
+    return (
+      <Popconfirm title={`App ${label}, Are you sure?`} onConfirm={confirm} onCancel={cancel}>
+        {label}
+      </Popconfirm>
+    );
   };
 
   return (
-    <>
-      {!closeAll && (
-        <div>
-          {!isOpenConfirm ? (
-            <Menu
-              key={1}
-              onClick={(v) => handleOnMenuClick(v)}
-              items={[
-                {
-                  key: "start",
-                  label: "Start",
-                },
-                {
-                  key: "restart",
-                  label: "Restart",
-                },
-                {
-                  key: "stop",
-                  label: "Stop",
-                },
-                {
-                  key: "uninstall",
-                  label: "Uninstall",
-                },
-              ]}
-            />
-          ) : (
-            <Card>
-              <div style={{ paddingBottom: 16 }}>
-                <Button
-                  style={{ marginRight: "8px" }}
-                  shape="circle"
-                  icon={<LeftOutlined />}
-                  size="small"
-                  onClick={() => updateIsOpenConfirm(false)}
-                />
-                <strong>Are you sure?</strong>
-              </div>
-              <div>
-                <Button
-                  onClick={() => {
-                    updateIsOpenConfirm(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button className="nube-primary white--text" onClick={() => handleOk(selectedAction, item)}>
-                  OK
-                </Button>
-              </div>
-            </Card>
-          )}
-        </div>
-      )}
-    </>
+    <Menu
+      key={1}
+      onClick={(v) => handleOnMenuClick(v)}
+      items={[
+        {
+          key: "start",
+          label: MenuItemLabel("Start"),
+        },
+        {
+          key: "restart",
+          label: MenuItemLabel("Restart"),
+        },
+        {
+          key: "stop",
+          label: MenuItemLabel("Stop"),
+        },
+        {
+          key: "uninstall",
+          label: MenuItemLabel("Uninstall"),
+        },
+      ]}
+    />
   );
 };
