@@ -61,8 +61,7 @@ export const EdgeAppInfo = (props: any) => {
     return (
       <span>
         {appInfoMsg}
-        <span>
-          {" "}
+        <span className="ml-3">
           <a onClick={() => fetchAppInfo()}>Click here to refresh</a>
         </span>
       </span>
@@ -144,6 +143,7 @@ export const EdgeAppInfo = (props: any) => {
           <List.Item style={{ padding: "8px 16px" }}>
             <span className="mr-6">
               <Dropdown.Button
+                trigger={["click"]}
                 loading={isActionLoading[item.app_name || ""] || false}
                 overlay={() => <ConfirmActionMenu item={item} onMenuClick={onMenuClick} />}
               />
@@ -201,63 +201,73 @@ const ConfirmActionMenu = (props: any) => {
   const { item, onMenuClick } = props;
   const [selectedAction, updateSelectedAction] = useState("" as string);
   const [isOpenConfirm, updateIsOpenConfirm] = useState(false);
+  const [closeAll, setCloseAll] = useState(false);
 
   const handleOnMenuClick = (v: any) => {
     updateSelectedAction(v);
     updateIsOpenConfirm(true);
   };
 
+  const handleOk = async (selectedAction: any, item: InstalledApps) => {
+    await onMenuClick(selectedAction, item);
+    setCloseAll(true);
+  };
+
   return (
-    <div>
-      {!isOpenConfirm ? (
-        <Menu
-          key={1}
-          onClick={(v) => handleOnMenuClick(v)}
-          items={[
-            {
-              key: "start",
-              label: "Start",
-            },
-            {
-              key: "restart",
-              label: "Restart",
-            },
-            {
-              key: "stop",
-              label: "Stop",
-            },
-            {
-              key: "uninstall",
-              label: "Uninstall",
-            },
-          ]}
-        />
-      ) : (
-        <Card>
-          <div style={{ paddingBottom: 16 }}>
-            <Button
-              style={{ marginRight: "8px" }}
-              shape="circle"
-              icon={<LeftOutlined />}
-              size="small"
-              onClick={() => updateIsOpenConfirm(false)}
+    <>
+      {!closeAll && (
+        <div>
+          {!isOpenConfirm ? (
+            <Menu
+              key={1}
+              onClick={(v) => handleOnMenuClick(v)}
+              items={[
+                {
+                  key: "start",
+                  label: "Start",
+                },
+                {
+                  key: "restart",
+                  label: "Restart",
+                },
+                {
+                  key: "stop",
+                  label: "Stop",
+                },
+                {
+                  key: "uninstall",
+                  label: "Uninstall",
+                },
+              ]}
             />
-            <strong>Are you sure?</strong>
-          </div>
-          <div>
-            <Button
-              onClick={() => {
-                updateIsOpenConfirm(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button className="nube-primary white--text" onClick={() => onMenuClick(selectedAction, item)}>
-              OK
-            </Button>
-          </div>
-        </Card>
+          ) : (
+            <Card>
+              <div style={{ paddingBottom: 16 }}>
+                <Button
+                  style={{ marginRight: "8px" }}
+                  shape="circle"
+                  icon={<LeftOutlined />}
+                  size="small"
+                  onClick={() => updateIsOpenConfirm(false)}
+                />
+                <strong>Are you sure?</strong>
+              </div>
+              <div>
+                <Button
+                  onClick={() => {
+                    updateIsOpenConfirm(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button className="nube-primary white--text" onClick={() => handleOk(selectedAction, item)}>
+                  OK
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
