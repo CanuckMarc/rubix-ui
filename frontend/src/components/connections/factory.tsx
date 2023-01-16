@@ -31,6 +31,7 @@ export class ConnectionFactory {
     return this.count;
   }
 
+  // pass in the connection UUIDs to do a backup to users PC
   async ExportConnection(uuids: Array<string>): Promise<any> {
     return await ExportConnection(uuids);
   }
