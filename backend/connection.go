@@ -1,12 +1,55 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/NubeIO/lib-uuid/uuid"
+	"github.com/NubeIO/rubix-ui/backend/helpers/json2csv"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
+	log "github.com/sirupsen/logrus"
+	"time"
 )
+
+func (inst *App) exportConnection(uuid []string) error {
+	var connections []storage.RubixConnection
+	conn, err := inst.DB.SelectAll()
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return err
+	}
+	if len(uuid) == 0 { // export all
+		connections = conn
+	} else {
+		for _, connection := range conn {
+			for _, c := range uuid {
+				if connection.UUID == c {
+					connections = append(connections, connection)
+				}
+			}
+		}
+	}
+	connectionCount := 0
+	for _, connection := range connections {
+		log.Infof("found connection to backup: %s", connection.Name)
+		connectionCount++
+	}
+
+	log.Infof("connection count to backup: %d", connectionCount)
+
+	b, err := json.Marshal(connections)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return err
+	}
+	headers := []string{"name", "description", "enable", "ip", "port", "https", "external_token", "uuid"}
+	path := inst.appStore.GetBackupPath()
+	t := time.Now().Format("2006-01-02_15-04-05")
+	fullPath := fmt.Sprintf("%s/connections_%s.xlsx", path, t)
+	json2csv.JsonToExcel(b, fullPath, "Sheet1", headers, true, false)
+	return nil
+}
 
 type Ip struct {
 	Type    string `json:"type" default:"string"`

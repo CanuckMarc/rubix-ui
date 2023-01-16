@@ -9,6 +9,7 @@ type IAppStore interface {
 	GitDownloadZip(token string, app App, doNotValidateArch, isZipball bool) (*App, error)
 	DownloadFlowPlugin(token string, app App) (*App, error)
 	GetAppStoreAppPath(app App) string
+	GetBackupPath() string
 	SaveBackup(fileName string, data interface{}) error
 	StoreCheckAppAndVersionExists(app App) error
 }
