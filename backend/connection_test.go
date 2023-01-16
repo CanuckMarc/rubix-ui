@@ -7,7 +7,7 @@ import (
 
 func TestApp_getConnection(t *testing.T) {
 	app := MockNewApp()
-	c := app.GetConnections()
+	c := app.ExportConnection(nil)
 	pprint.PrintJOSN(c)
 
 }
