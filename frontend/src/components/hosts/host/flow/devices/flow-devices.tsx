@@ -100,6 +100,10 @@ export const FlowDevices = () => {
   const runWhois = async () => {
     try {
       setIsFetchingWhoIs(true);
+      // interface_port = "" or let user select by calling this import { HostNetworkingFactory } from "./factory"; GetNetworks()
+      // low = 0
+      // high = 0
+      // global_broadcast = false
       let opts = new assistcli.WhoIsOpts // give user the options
       const res = await bacnetFactory.BacnetMasterWhois(networkUUID, opts);
       if (res) {
