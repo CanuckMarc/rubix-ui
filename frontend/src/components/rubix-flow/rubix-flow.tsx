@@ -540,7 +540,7 @@ const Flow = (props: FlowProps) => {
 
     // remove connections have source id is belong allNodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) =>
-      allNodes.some((node: NodeInterface) => node.id !== edge.source)
+      !allNodes.some((node: NodeInterface) => node.id === edge.source)
     );
 
     // unique items and delete oldId field
