@@ -2,7 +2,7 @@ import { Helpers } from "../../helpers/checks";
 import { backend, storage } from "../../../wailsjs/go/models";
 import {
   AddConnection,
-  DeleteConnectionBulk,
+  DeleteConnectionBulk, DeleteHostBulk, ExportConnection,
   GetConnection,
   GetConnections,
   GetConnectionSchema,
@@ -29,6 +29,10 @@ export class ConnectionFactory {
 
   public GetTotalCount(): number {
     return this.count;
+  }
+
+  async ExportConnection(uuids: Array<string>): Promise<any> {
+    return await ExportConnection(uuids);
   }
 
   // will try and ping the remote server

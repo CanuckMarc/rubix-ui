@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func (inst *App) exportConnection(uuid []string) error {
+func (inst *App) ExportConnection(uuid []string) error {
 	var connections []storage.RubixConnection
 	conn, err := inst.DB.SelectAll()
 	if err != nil {
@@ -47,7 +47,13 @@ func (inst *App) exportConnection(uuid []string) error {
 	path := inst.appStore.GetBackupPath()
 	t := time.Now().Format("2006-01-02_15-04-05")
 	fullPath := fmt.Sprintf("%s/connections_%s.xlsx", path, t)
-	json2csv.JsonToExcel(b, fullPath, "Sheet1", headers, true, false)
+	err = json2csv.JsonToExcel(b, fullPath, "Sheet1", headers, true, false)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return err
+	} else {
+		inst.uiSuccessMessage(fmt.Sprintf("connection count to backup: %d", connectionCount))
+	}
 	return nil
 }
 
