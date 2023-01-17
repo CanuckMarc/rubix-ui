@@ -315,6 +315,32 @@ export namespace assistcli {
 	        this.message = source["message"];
 	    }
 	}
+	export class WhoIsOpts {
+	    interface_port: string;
+	    local_device_ip: string;
+	    local_device_port: number;
+	    local_device_id: number;
+	    low: number;
+	    high: number;
+	    global_broadcast: boolean;
+	    network_number: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new WhoIsOpts(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.interface_port = source["interface_port"];
+	        this.local_device_ip = source["local_device_ip"];
+	        this.local_device_port = source["local_device_port"];
+	        this.local_device_id = source["local_device_id"];
+	        this.low = source["low"];
+	        this.high = source["high"];
+	        this.global_broadcast = source["global_broadcast"];
+	        this.network_number = source["network_number"];
+	    }
+	}
 
 }
 
