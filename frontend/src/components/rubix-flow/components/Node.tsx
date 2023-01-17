@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
+import { Edge, NodeProps as FlowNodeProps, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
 
 import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
@@ -10,9 +10,14 @@ import { InputSocket } from "./InputSocket";
 import { OutputSocket } from "./OutputSocket";
 import { SettingsModal } from "./SettingsModal";
 import { DEFAULT_NODE_SPEC_JSON } from "./NodeMenu";
+import { generateUuid } from "../lib/generateUuid";
+import { useParams } from "react-router-dom";
+import { handleGetSettingType } from "../util/handleSettings";
+import { convertDataSpec, getNodeSpecDetail } from "../use-nodes-spec";
 
 type NodeProps = FlowNodeProps & {
   spec: NodeSpecJSON;
+  isConnectionBuilder: boolean;
   parentNodeId?: string;
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
@@ -138,14 +143,18 @@ export const isOutputFlow = (type: string) => {
 };
 
 export const Node = (props: NodeProps) => {
-  const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
-  const edges = useEdges();
+  const { id, data, spec, selected, parentNodeId, nodesSpec, isConnectionBuilder } = props;
+  const flowInstance = useReactFlow();
+  const { connUUID = "", hostUUID = "" } = useParams();
+  const isRemote = !!connUUID && !!hostUUID;
   const nodes = useNodes();
+  const edges = useEdges();
   const handleChange = useChangeNodeData(id);
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);
   const [isSettingModal, setIsSettingModal] = useState(false);
   const newData = { ...data };
+  const isExistConnection = edges.some((edge) => edge.target === id || edge.source === id);
 
   const node: NodeInterface | any = nodes.find((item) => item.id === id);
   const isHidden = parentNodeId ? node.parentId !== parentNodeId : node.parentId;
@@ -216,6 +225,79 @@ export const Node = (props: NodeProps) => {
     if (isAllowSetting) setIsSettingModal(true);
   };
 
+  const generateNode = (item: NodeSpecJSON, index: number, isOut = false) => {
+    const nodeSettings = handleGetSettingType(connUUID, hostUUID, isRemote, item.type);
+    const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
+
+    return {
+      id: generateUuid(),
+      isParent: false,
+      style: null,
+      type: item.type,
+      position: {
+        x: isOut ? node.position.x + node.width + 50 : node.position.x - node.width - 50,
+        y: node.position.y + (index - 1) * node.height + 100,
+      },
+      data: {
+        inputs: convertDataSpec(spec.inputs || []),
+        out: convertDataSpec(spec.outputs || []),
+      },
+      parentId: parentNodeId,
+      settings: nodeSettings,
+      selected: false,
+    };
+  };
+
+  const onChangeExposeBuilder = () => {
+    const inputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputFlow(n.type));
+    const outputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputFlow(n.type));
+
+    let newNodesInput = node.data.inputs.map((int: any) => {
+      return inputsFlow.find((n: NodeSpecJSON) =>
+        n.type.includes(int.dataType === "number" ? "float" : int.dataType === "boolean" ? "bool" : int.dataType)
+      );
+    });
+
+    let newNodesOutput = node.data.out.map((int: any) => {
+      return outputsFlow.find((n: NodeSpecJSON) =>
+        n.type.includes(int.dataType === "number" ? "float" : int.dataType === "boolean" ? "bool" : int.dataType)
+      );
+    });
+
+    newNodesInput = newNodesInput.map((item: NodeSpecJSON, idx: number) => generateNode(item, idx));
+    newNodesOutput = newNodesOutput.map((item: NodeSpecJSON, idx: number) => generateNode(item, idx, true));
+
+    const allNodes = [...newNodesInput, ...newNodesOutput];
+    const allEdges: Edge[] = [];
+
+    newNodesInput.forEach((nodeItem: NodeInterface, index: number) => {
+      const newEdge = {
+        id: generateUuid(),
+        source: nodeItem.id,
+        sourceHandle: "out",
+        target: node.id,
+        targetHandle: node.data.inputs[index].pin,
+      };
+      allEdges.push(newEdge);
+    });
+
+    newNodesOutput.forEach((nodeItem: NodeInterface, index: number) => {
+      const newEdge = {
+        id: generateUuid(),
+        source: node.id,
+        sourceHandle: node.data.out[index].pin,
+        target: nodeItem.id,
+        targetHandle: "in",
+      };
+      allEdges.push(newEdge);
+    });
+
+    setTimeout(() => {
+      flowInstance.addNodes(allNodes);
+      flowInstance.addEdges(allEdges);
+    }, 50);
+  };
+
   const handleCloseModalSetting = () => {
     setIsSettingModal(false);
   };
@@ -236,6 +318,14 @@ export const Node = (props: NodeProps) => {
 
   return (
     <NodeContainer
+      isConnectionBuilder={
+        isConnectionBuilder &&
+        !node.isParent &&
+        !isInputFlow(node.type) &&
+        !isOutputFlow(node.type) &&
+        !isExistConnection
+      }
+      onChangeExposeBuilder={onChangeExposeBuilder}
       isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}

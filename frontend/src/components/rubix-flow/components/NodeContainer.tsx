@@ -2,7 +2,7 @@ import { PropsWithChildren, useEffect, useState } from "react";
 import cx from "classnames";
 import { categoryColorMap, colors } from "../util/colors";
 import { NodeSpecJSON } from "../lib";
-import { Tooltip } from "antd";
+import { Checkbox, Tooltip } from "antd";
 
 type NodeProps = {
   title: string;
@@ -14,6 +14,8 @@ type NodeProps = {
   hasChild: boolean;
   status?: any;
   isHidden?: boolean;
+  isConnectionBuilder: boolean;
+  onChangeExposeBuilder: () => void;
   onDbClickTitle: () => void;
 };
 
@@ -28,6 +30,8 @@ export const NodeContainer = ({
   hasChild,
   status,
   isHidden,
+  isConnectionBuilder,
+  onChangeExposeBuilder,
   onDbClickTitle,
 }: PropsWithChildren<NodeProps>) => {
   const [displayStyle, setDisplayStyle] = useState({ display: "block" });
@@ -86,6 +90,11 @@ export const NodeContainer = ({
         <div style={{ width: "100%" }}>
           {renderFirstRow()}
           <div>
+            {isConnectionBuilder && (
+              <Tooltip title="Generate node and connection">
+                <Checkbox onChange={onChangeExposeBuilder} style={{ marginRight: 8 }} />
+              </Tooltip>
+            )}
             <span>{title}</span> {" | "}
             {category}
           </div>

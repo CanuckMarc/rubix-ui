@@ -59,9 +59,11 @@ declare global {
 }
 
 type FlowProps = {
+  isConnectionBuilder: boolean;
   customEdgeTypes: any;
   customNodeTypes: any;
   selectedNodeForSubFlow: NodeInterface | undefined;
+  setIsConnectionBuilder: (value: boolean) => void;
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
   handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
   handleRemoveSelectedNodeForSubFlow: () => void;
@@ -73,6 +75,8 @@ const Flow = (props: FlowProps) => {
     customNodeTypes,
     customEdgeTypes,
     selectedNodeForSubFlow,
+    isConnectionBuilder,
+    setIsConnectionBuilder,
     setSelectedNodeForSubFlow,
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
@@ -186,6 +190,15 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow(node);
   };
 
+  const handleConnectionBuilderFlow = (node: NodeInterface) => {
+    setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
+    setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
+    if (node.id !== selectedNodeForSubFlow?.id) {
+      handlePushSelectedNodeForSubFlow(node);
+    }
+    setIsConnectionBuilder(!isConnectionBuilder);
+  };
+
   const onClearAllNodes = () => {
     if (selectedNodeForSubFlow) {
       const nodeIdsCleared = nodes
@@ -207,11 +220,13 @@ const Flow = (props: FlowProps) => {
   // exit each subflow
   const onCloseSubFlow = () => {
     handleRemoveSelectedNodeForSubFlow();
+    setIsConnectionBuilder(false);
   };
 
   // close sub flow
   const onBackToMain = () => {
     setSelectedNodeForSubFlow([]);
+    setIsConnectionBuilder(false);
   };
 
   const onHandelSaveFlow = async () => {
@@ -821,6 +836,8 @@ const Flow = (props: FlowProps) => {
               onCloseSubFlow={onCloseSubFlow}
               onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
+              isConnectionBuilder={isConnectionBuilder}
+              handleConnectionBuilderFlow={handleConnectionBuilderFlow}
             />
             {nodePickerVisibility && (
               <NodePicker
@@ -855,6 +872,7 @@ const Flow = (props: FlowProps) => {
 
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
@@ -881,7 +899,14 @@ export const RubixFlow = () => {
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec} />
+      <NodePanel
+        {...props}
+        spec={node}
+        key={node.id}
+        parentNodeId={nodeForSubFlowEnd?.id}
+        nodesSpec={nodesSpec}
+        isConnectionBuilder={isConnectionBuilder}
+      />
     );
     return nodes;
   }, {} as NodeTypes);
@@ -890,6 +915,8 @@ export const RubixFlow = () => {
     <>
       {isFetchingNodeSpec ? (
         <Flow
+          isConnectionBuilder={isConnectionBuilder}
+          setIsConnectionBuilder={setIsConnectionBuilder}
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
           selectedNodeForSubFlow={nodeForSubFlowEnd}
