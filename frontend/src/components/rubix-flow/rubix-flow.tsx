@@ -243,16 +243,37 @@ const Flow = (props: FlowProps) => {
   );
 
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
-    const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
-    const isTarget = position === "left";
-    const [targetHandleId, targetNodeId] = handleId?.includes(SPLIT_KEY)
-      ? handleId.split(SPLIT_KEY)
-      : [handleId, nodeId];
-
     if (lastConnectStart) {
+      const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
+      const isTarget = position === "left";
+
+      const [targetHandleId, targetNodeId] = handleId?.includes(SPLIT_KEY)
+        ? handleId.split(SPLIT_KEY)
+        : [handleId, nodeId];
+
       const [lastConnectStartHandleId, lastConnectStartNodeId] = lastConnectStart.handleId?.includes(SPLIT_KEY)
         ? lastConnectStart.handleId.split(SPLIT_KEY)
         : [lastConnectStart.handleId, lastConnectStart.nodeId];
+
+      const edgeByTarget: Edge | undefined = edges.find((e) =>
+        isTarget ? e.target === targetNodeId : e.target === lastConnectStartNodeId
+      );
+
+      if (edgeByTarget && lastConnectStartHandleId !== targetHandleId) {
+        const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
+
+        if (newSourceId !== edgeByTarget.target) {
+          edgeByTarget.source = newSourceId;
+
+          const newEdges = edges.map((item) => (item.id === edgeByTarget.id ? edgeByTarget : item));
+          setEdges(newEdges);
+          setUndoable({
+            edges: newEdges,
+            nodes,
+          });
+        }
+        return;
+      }
 
       const isDragSelected = edges.some((item) => {
         if (item.selected) {
@@ -266,10 +287,8 @@ const Flow = (props: FlowProps) => {
         return false;
       });
 
-      const isTrueHandleId = targetHandleId && lastConnectStartHandleId;
-
-      if (isDragSelected && isTrueHandleId) {
-        let newEdges = [];
+      if (isDragSelected) {
+        let newEdges: Edge[] = [];
         if (targetNodeId) {
           // update selected lines to new node if start and end are same type
           newEdges = edges.map((item: Edge) => {
@@ -280,6 +299,10 @@ const Flow = (props: FlowProps) => {
             }
             return item;
           });
+          // remove edges have same target
+          newEdges = newEdges.filter(
+            (edge, index) => index === newEdges.findIndex((edge2) => edge2.target === edge.target)
+          );
         } else {
           // remove selected lines
           newEdges = edges.filter((item) => !item.selected);
@@ -300,32 +323,21 @@ const Flow = (props: FlowProps) => {
         }
         /* Add connect for input added by InputCount setting */
         if (
-          lastConnectStart &&
           targetNodeId &&
           targetHandleId &&
-          isTrueHandleId &&
           isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
         ) {
-          const isSource = lastConnectStart.handleType === "source" || false;
-          const conNodeId = lastConnectStart.nodeId || "";
-          const conHandleId = lastConnectStart.handleId || "";
-          const target = !isSource ? conNodeId : targetNodeId;
-          const targetHandle = !isSource ? conHandleId : targetHandleId;
-
-          if (!isInputExistConnection(edges, target, targetHandle)) {
+          if (
+            !isInputExistConnection(edges, targetNodeId, targetHandleId) &&
+            lastConnectStartHandleId !== targetHandleId
+          ) {
             const newEdge = {
               id: generateUuid(),
-              source: isSource ? conNodeId : targetNodeId,
-              sourceHandle: isSource ? conHandleId : targetHandleId,
-              target: target,
-              targetHandle: targetHandle,
+              source: lastConnectStartNodeId!!,
+              sourceHandle: lastConnectStartHandleId,
+              target: targetNodeId,
+              targetHandle: targetHandleId,
             };
-
-            if (newEdge.sourceHandle.includes(SPLIT_KEY)) {
-              const [sourceName, sourceNodeId] = newEdge.sourceHandle.split(SPLIT_KEY);
-              newEdge.source = sourceNodeId;
-              newEdge.sourceHandle = sourceName;
-            }
 
             onEdgesChange([{ type: "add", item: newEdge }]);
           }
