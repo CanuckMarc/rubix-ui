@@ -18,29 +18,33 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
+  settings: FlowSettings;
+  selectedNodeForSubFlow?: NodeInterface;
+  isConnectionBuilder: boolean;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
   onRefreshValues: () => void;
-  settings: FlowSettings;
-  selectedNodeForSubFlow?: NodeInterface;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onBackToMain: () => void;
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
+  handleConnectionBuilderFlow: (node: NodeInterface) => void;
 };
 
 const Controls = ({
+  settings,
+  isConnectionBuilder,
+  selectedNodeForSubFlow,
   deleteNodesAndEdges,
   onCopyNodes,
   onUndo,
   onRedo,
   onRefreshValues,
-  settings,
   onSaveSettings,
-  selectedNodeForSubFlow,
+  handleConnectionBuilderFlow,
   onClearAllNodes,
   onCloseSubFlow,
   onBackToMain,
@@ -147,11 +151,22 @@ const Controls = ({
     onRefreshValues();
   });
 
+  const onConnectionBuilder = () => {
+    handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
+  };
+
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
         {!!selectedNodeForSubFlow && (
           <>
+            <div
+              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+              title="Connection Builder"
+              onClick={onConnectionBuilder}
+            >
+              {isConnectionBuilder ? "Close Connection Builder" : "Connection Builder"}
+            </div>
             <div
               className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
               title="Back to Main"
