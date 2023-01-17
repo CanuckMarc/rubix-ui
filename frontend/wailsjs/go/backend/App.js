@@ -70,6 +70,10 @@ export function BACnetWriteConfig(arg1, arg2, arg3) {
   return window['go']['backend']['App']['BACnetWriteConfig'](arg1, arg2, arg3);
 }
 
+export function BacnetMasterWhois(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['BacnetMasterWhois'](arg1, arg2, arg3, arg4);
+}
+
 export function BacnetWhois(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['BacnetWhois'](arg1, arg2, arg3, arg4);
 }
@@ -456,6 +460,10 @@ export function EditWriter(arg1, arg2, arg3, arg4, arg5) {
 
 export function ExportBackup(arg1) {
   return window['go']['backend']['App']['ExportBackup'](arg1);
+}
+
+export function ExportConnection(arg1) {
+  return window['go']['backend']['App']['ExportConnection'](arg1);
 }
 
 export function ExportDevicesBulk(arg1, arg2, arg3, arg4, arg5) {

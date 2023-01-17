@@ -54,6 +54,8 @@ export function BACnetReadConfig(arg1:string,arg2:string):Promise<void>;
 
 export function BACnetWriteConfig(arg1:string,arg2:string,arg3:assistcli.ConfigBACnetServer):Promise<void>;
 
+export function BacnetMasterWhois(arg1:string,arg2:string,arg3:string,arg4:assistcli.WhoIsOpts):Promise<Array<model.Device>>;
+
 export function BacnetWhois(arg1:string,arg2:string,arg3:string,arg4:string):Promise<Array<model.Device>>;
 
 export function BulkDeleteWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:Array<string>):Promise<any>;
@@ -247,6 +249,8 @@ export function EditStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream
 export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer,arg5:boolean):Promise<model.Writer>;
 
 export function ExportBackup(arg1:string):Promise<void>;
+
+export function ExportConnection(arg1:Array<string>):Promise<void>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
