@@ -7,6 +7,7 @@ import (
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
+	"gopkg.in/yaml.v3"
 )
 
 const bacnetMasterPlg = "bacnetmaster"
@@ -145,26 +146,40 @@ func (inst *App) BacnetWhois(connUUID, hostUUID, networkUUID, pluginName string)
 func (inst *App) BACnetWriteConfig(connUUID, hostUUID string, config assistcli.ConfigBACnetServer) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return
 	}
 	writeConfig, err := client.BACnetWriteConfig(hostUUID, "bacnet-server-driver", config)
 	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return
 	}
+	inst.uiSuccessMessage(fmt.Sprintf("updated config ok %v", writeConfig.Message))
 	pprint.PrintJOSN(writeConfig)
 
 }
 
-func (inst *App) BACnetReadConfig(connUUID, hostUUID string) {
+func (inst *App) BACnetReadConfig(connUUID, hostUUID string) assistcli.ConfigBACnetServer {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	data := assistcli.ConfigBACnetServer{}
 	if err != nil {
-
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return data
 	}
-	writeConfig, connectionError, requestErr := client.EdgeReadConfig(hostUUID, "bacnet-server-driver", "config.yml")
-	fmt.Println(connectionError, requestErr)
+	config, connectionError, requestErr := client.EdgeReadConfig(hostUUID, "bacnet-server-driver", "config.yml")
+	if connectionError != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return data
+	}
+	if requestErr != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return data
+	}
+	err = yaml.Unmarshal(config.Data, &data)
 	if err != nil {
-		return
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return data
 	}
-	pprint.PrintJOSN(writeConfig)
+	return data
 
 }
