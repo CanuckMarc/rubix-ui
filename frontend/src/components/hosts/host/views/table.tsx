@@ -6,6 +6,7 @@ import { HostSystemFactory } from "../../../edge/system/factory-system";
 import { HostNetworking } from "../../../edge/system/networking/host-networking";
 import { HostTime } from "../../../edge/system/time/host-time";
 import { Firewall } from "../../../edge/system/firewall/views/table";
+import { Bacnet } from "../../../edge/system/bacnet/views/modal";
 import { HostsFactory } from "../../factory";
 import Host = amodel.Host;
 
@@ -14,7 +15,8 @@ const { TabPane } = Tabs;
 const info = "INFO";
 const networking = "NETWORKING";
 const time = "DATE/TIME";
-const firewall = "FIREWALL"
+const firewall = "FIREWALL";
+const bacnet = "BACNET";
 
 const HostInfoSetting = () => {
   let { connUUID = "", hostUUID = "" } = useParams();
@@ -90,6 +92,9 @@ export const HostTable = () => {
       </TabPane>
       <TabPane tab={firewall} key={firewall}>
         <Firewall />
+      </TabPane>
+      <TabPane tab={bacnet} key={bacnet}>
+        <Bacnet />
       </TabPane>
     </Tabs>
   );
