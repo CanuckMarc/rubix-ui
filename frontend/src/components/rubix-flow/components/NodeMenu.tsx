@@ -165,7 +165,7 @@ const NodeMenu = ({
           {nodeType.allowPayload && (
             <div
               key="Set Payload"
-              className="cursor-pointer border-b border-gray-600  ant-menu-item"
+              className="cursor-pointer border-b border-gray-600 ant-menu-item"
               onClick={handleTogglePayload}
             >
               Set Payload
@@ -174,7 +174,7 @@ const NodeMenu = ({
           {isShowSetting && (
             <div
               key="settings"
-              className="cursor-pointer border-b border-gray-600  ant-menu-item"
+              className="cursor-pointer border-b border-gray-600 ant-menu-item"
               onClick={openSettingsModal}
             >
               Settings
@@ -191,21 +191,21 @@ const NodeMenu = ({
             <>
               <div
                 key="Sub flow"
-                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                className="cursor-pointer border-b border-gray-600 ant-menu-item"
                 onClick={onSubFlowClick}
               >
                 Open Sub Flow
               </div>
               <div
                 key="Delete all input"
-                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                className="cursor-pointer border-b border-gray-600 ant-menu-item"
                 onClick={deleteAllInputs(true)}
               >
                 Delete all folder inputs
               </div>
               <div
                 key="Delete all output"
-                className="cursor-pointer border-b border-gray-600  ant-menu-item"
+                className="cursor-pointer border-b border-gray-600 ant-menu-item"
                 onClick={deleteAllInputs(false)}
               >
                 Delete all folder outputs
@@ -214,35 +214,35 @@ const NodeMenu = ({
           )}
           <div
             key="Delete all input connection"
-            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
             onClick={deleteAllInputConnection(true)}
           >
             Delete all input connections
           </div>
           <div
             key="Delete all output connection"
-            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
             onClick={deleteAllInputConnection(false)}
           >
             Delete all output connections
           </div>
           <div
             key="Delete node"
-            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
             onClick={handleNodeDeletion}
           >
             Delete node
           </div>
           <div
             key="Duplicate node"
-            className="cursor-pointer border-b border-gray-600  ant-menu-item"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
             onClick={handleNodeDuplication}
           >
             Duplicate node
           </div>
           <div key="help" className="cursor-pointer ant-menu-item" onClick={openModal}>
-          Help
-           </div>
+            Help
+          </div>
         </div>
       )}
       <NodeHelpModal node={node} open={isModalVisibleHelp} onClose={closeModal} />
