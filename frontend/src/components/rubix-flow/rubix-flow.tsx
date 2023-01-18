@@ -270,15 +270,27 @@ const Flow = (props: FlowProps) => {
         ? lastConnectStart.handleId.split(SPLIT_KEY)
         : [lastConnectStart.handleId, lastConnectStart.nodeId];
 
+      if (
+        targetNodeId &&
+        targetHandleId &&
+        !isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
+      ) {
+        return;
+      }
+
       const edgeByTarget: Edge | undefined = edges.find((e) =>
-        isTarget ? e.target === targetNodeId : e.target === lastConnectStartNodeId
+        isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === lastConnectStartNodeId
       );
 
-      if (edgeByTarget && lastConnectStartHandleId !== targetHandleId) {
+      const isSameTarget = lastConnectStart.handleType === "target" && isTarget;
+
+      if (edgeByTarget && !isSameTarget) {
         const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
+        const newSourceHandle = isTarget ? lastConnectStartHandleId!! : targetHandleId!!;
 
         if (newSourceId !== edgeByTarget.target) {
           edgeByTarget.source = newSourceId;
+          edgeByTarget.sourceHandle = newSourceHandle;
 
           const newEdges = edges.map((item) => (item.id === edgeByTarget.id ? edgeByTarget : item));
           setEdges(newEdges);
@@ -336,26 +348,16 @@ const Flow = (props: FlowProps) => {
           const { x, y } = setMousePosition(evt);
           setNodePickerVisibility({ x, y });
         }
-        /* Add connect for input added by InputCount setting */
-        if (
-          targetNodeId &&
-          targetHandleId &&
-          isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
-        ) {
-          if (
-            !isInputExistConnection(edges, targetNodeId, targetHandleId) &&
-            lastConnectStartHandleId !== targetHandleId
-          ) {
-            const newEdge = {
-              id: generateUuid(),
-              source: lastConnectStartNodeId!!,
-              sourceHandle: lastConnectStartHandleId,
-              target: targetNodeId,
-              targetHandle: targetHandleId,
-            };
+        if (!isSameTarget && targetNodeId && lastConnectStartNodeId) {
+          const newEdge = {
+            id: generateUuid(),
+            source: lastConnectStartNodeId,
+            sourceHandle: lastConnectStartHandleId,
+            target: targetNodeId,
+            targetHandle: targetHandleId,
+          };
 
-            onEdgesChange([{ type: "add", item: newEdge }]);
-          }
+          onEdgesChange([{ type: "add", item: newEdge }]);
         }
       }
     }
