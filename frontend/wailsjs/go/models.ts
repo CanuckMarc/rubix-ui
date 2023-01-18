@@ -2137,6 +2137,8 @@ export namespace node {
 	    connections?: OutputConnection[];
 	    help: string;
 	    folderExport: boolean;
+	    position: number;
+	    overridePosition: boolean;
 	    hideOutput: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -2150,6 +2152,8 @@ export namespace node {
 	        this.connections = this.convertValues(source["connections"], OutputConnection);
 	        this.help = source["help"];
 	        this.folderExport = source["folderExport"];
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
 	        this.hideOutput = source["hideOutput"];
 	    }
 	
@@ -2177,6 +2181,7 @@ export namespace node {
 	    overrideValue?: any;
 	    currentValue?: any;
 	    fallbackValue?: any;
+	    hide: boolean;
 	    disable?: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -2190,6 +2195,7 @@ export namespace node {
 	        this.overrideValue = source["overrideValue"];
 	        this.currentValue = source["currentValue"];
 	        this.fallbackValue = source["fallbackValue"];
+	        this.hide = source["hide"];
 	        this.disable = source["disable"];
 	    }
 	}
@@ -2201,6 +2207,9 @@ export namespace node {
 	    help: string;
 	    folderExport: boolean;
 	    hideInput: boolean;
+	    position: number;
+	    overridePosition: boolean;
+	    settingName?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Input(source);
@@ -2214,6 +2223,9 @@ export namespace node {
 	        this.help = source["help"];
 	        this.folderExport = source["folderExport"];
 	        this.hideInput = source["hideInput"];
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
+	        this.settingName = source["settingName"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
