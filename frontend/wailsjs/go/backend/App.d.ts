@@ -50,7 +50,7 @@ export function AddStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream)
 
 export function AddWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:db.Connection):Promise<db.Connection>;
 
-export function BACnetReadConfig(arg1:string,arg2:string):Promise<void>;
+export function BACnetReadConfig(arg1:string,arg2:string):Promise<assistcli.ConfigBACnetServer>;
 
 export function BACnetWriteConfig(arg1:string,arg2:string,arg3:assistcli.ConfigBACnetServer):Promise<void>;
 

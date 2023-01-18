@@ -19,7 +19,7 @@ func TestApp_bacnetWhois(t *testing.T) {
 func TestApp_BACnetWriteConfig(t *testing.T) {
 	app := MockNewApp()
 	bac := assistcli.ConfigBACnetServer{
-		ServerName: "test",
+		ServerName: "test-4",
 		DeviceId:   1234,
 		Port:       47809,
 		Mqtt: assistcli.Mqtt{
@@ -31,5 +31,6 @@ func TestApp_BACnetWriteConfig(t *testing.T) {
 
 func TestApp_BACnetReadConfig(t *testing.T) {
 	app := MockNewApp()
-	app.BACnetReadConfig("cloud", "rc")
+	c := app.BACnetReadConfig("cloud", "rc")
+	fmt.Println(c)
 }

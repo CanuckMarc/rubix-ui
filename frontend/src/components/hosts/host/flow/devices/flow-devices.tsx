@@ -210,7 +210,12 @@ export const FlowDevices = () => {
       <Modal title="Select net interface" visible={isModalOpen} onOk={handleModalOk} onCancel={handleModalCancel}>
         <Form
           name="basic"
-          labelAlign="left"
+          labelCol={{
+            span: 10
+          }}
+          wrapperCol={{
+              span: 18
+          }}
           autoComplete="off"
         >
           <Form.Item

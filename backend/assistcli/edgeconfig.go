@@ -1,6 +1,7 @@
 package assistcli
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
@@ -101,40 +102,27 @@ func (inst *Client) EdgeReadConfig(hostIDName, appName, configName string) (*amo
 }
 
 func (inst *Client) BACnetWriteConfig(hostIDName, appName string, config ConfigBACnetServer) (*Message, error) {
-	pushConfig := false
 	var writeConfig amodel.EdgeConfig
 	if appName == constants.BacnetServerDriver {
-		pushConfig = true
-		resp, connectionErr, _ := inst.EdgeReadConfig(hostIDName, appName, constants.ConfigYml)
-		if connectionErr != nil {
-			return nil, connectionErr
-		}
-		if resp != nil {
-			err := yaml.Unmarshal(resp.Data, &config)
-			if err != nil {
-				return nil, err
-			}
-		}
 		writeConfig = amodel.EdgeConfig{
 			AppName:    constants.BacnetServerDriver,
 			Body:       inst.defaultWrapperBACnetConfig(config),
 			ConfigName: constants.ConfigYml,
 		}
+	} else {
+		return nil, errors.New(fmt.Sprintf("app name must be bacnet: %s", appName))
 	}
-	if pushConfig {
-		url := fmt.Sprintf("/api/edge/config")
-		resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-			SetHeader("host-uuid", hostIDName).
-			SetHeader("host-name", hostIDName).
-			SetResult(&Message{}).
-			SetBody(writeConfig).
-			Post(url))
-		if err != nil {
-			return nil, err
-		}
-		return resp.Result().(*Message), nil
+	url := fmt.Sprintf("/api/edge/config")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&Message{}).
+		SetBody(writeConfig).
+		Post(url))
+	if err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return resp.Result().(*Message), nil
 }
 
 func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) ConfigBACnetServer {
