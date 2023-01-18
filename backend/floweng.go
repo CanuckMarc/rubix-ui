@@ -690,7 +690,8 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		} else {
-			inst.uiSuccessMessage(fmt.Sprintf(resp.Message))                                           // download ok
+			inst.uiSuccessMessage(fmt.Sprintf(resp.Message)) // download ok
+			time.Sleep(1500 * time.Millisecond)
 			_, err := inst.edgeSystemCtlAction(connUUID, hostUUID, "rubix-edge-wires", amodel.Restart) // restart edge-wires
 			if err != nil {
 				inst.uiErrorMessage("failed to restart rubix-edge-wires")
