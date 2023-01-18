@@ -58,7 +58,7 @@ export const Locations = () => {
     try {
       const res = await GetConnection(locationFactory.connectionUUID);
       setConnection(res);
-      addPrefix(res.name);
+      addPrefix(res?.name);
     } catch (error) {
       console.log(error);
     }
