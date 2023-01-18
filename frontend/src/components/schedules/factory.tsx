@@ -10,8 +10,8 @@ export class SchedulesFactory {
     return await GetSchedule(connUUID, hostUUID, uuid);
   }
 
-  async AddSchedules(connUUID: string, hostUUID: string, body: assistcli.Schedule): Promise<any> {
-    return await AddSchedule(connUUID, hostUUID, body);
+  async AddSchedules(connUUID: string, hostUUID: string, name:string): Promise<any> {
+    return await AddSchedule(connUUID, hostUUID, name);
   }
 
   async EditSchedule(connUUID: string, hostUUID: string, uuid: string, body: assistcli.Schedule): Promise<any> {
