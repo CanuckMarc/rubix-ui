@@ -176,3 +176,9 @@ svg {
     align-items: flex-start;
     gap: 15px;
 }
+
+#flow-setting-modal-labels {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+}
