@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, useState } from "react";
-import { Radio, RadioChangeEvent, Switch } from "antd";
+import { Radio, RadioChangeEvent, Space, Switch } from "antd";
 
 import { Modal } from "./Modal";
 
@@ -10,7 +10,8 @@ export const getFlowSettings = () => {
   return {
     refreshTimeout: config?.refreshTimeout || 5,
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
-    hideNodesTree: config?.hideNodesTree === undefined ? true : config?.hideNodesTree,
+    showNodesTree: config?.showNodesTree === undefined ? true : config?.showNodesTree,
+    showNodesPallet: config?.showNodesPallet === undefined ? true : config?.showNodesPallet,
     positionMiniMap:
       config?.positionMiniMap === undefined
         ? "bottom"
@@ -21,7 +22,8 @@ export const getFlowSettings = () => {
 export type FlowSettings = {
   refreshTimeout: number | string;
   showMiniMap: boolean;
-  hideNodesTree: boolean;
+  showNodesTree: boolean;
+  showNodesPallet: boolean;
   positionMiniMap: string;
 };
 
@@ -60,8 +62,14 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
     onSaveSettings(newConfig);
   };
 
-  const onChangeHideNodesTree = () => {
-    const newConfig = { ...configs, hideNodesTree: !configs.hideNodesTree };
+  const onChangeShowNodesTree = () => {
+    const newConfig = { ...configs, showNodesTree: !configs.showNodesTree };
+    setConfigs(newConfig);
+    onSaveSettings(newConfig);
+  }
+
+  const onChangeShowNodesPallet = () => {
+    const newConfig = { ...configs, showNodesPallet: !configs.showNodesPallet };
     setConfigs(newConfig);
     onSaveSettings(newConfig);
   }
@@ -87,48 +95,60 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
       open={open}
       onClose={onClose}
     >
-      <div className="py-4 px-2">
-        <div className="mb-2">
-          <label className="pr-6 mb-0 mr-9 pt-1">Mini Map Position: </label>
-          <Radio.Group
-            onChange={handleChangePosition}
-            value={configs.positionMiniMap}
-          >
-            <Radio value="top" className="text-black">
-              Top
-            </Radio>
-            <Radio value="bottom" className="text-black">
-              Bottom
-            </Radio>
-          </Radio.Group>
-        </div>
-        <div className="mb-2">
-          <label className="pr-6 mb-0 mr-16 pt-1">Show Mini Map: </label>
-          <Switch
-            checked={configs.showMiniMap}
-            size="small"
-            onChange={onChangeShowMiniMap}
-          />
-        </div>
-        <div className="mb-2">
-          <label className="pr-6 mb-0 mr-16 pt-1">Hide Nodes Tree: </label>
-          <Switch
-            checked={configs.hideNodesTree}
-            size="small"
-            onChange={onChangeHideNodesTree}
-          />
-        </div>
-        <div>
-          <label className="pr-2">Refresh time (second):</label>
-          <input
-            type="number"
-            className="border border-gray-300 p-2"
-            value={configs.refreshTimeout}
-            onChange={onChangeTimeout}
-            onBlur={handleBlurValue}
-          />
-        </div>
-      </div>
+      <Space direction="vertical" align="start">
+          <Space direction='horizontal'>
+            <label id="flow-setting-modal-labels">Show Mini Map: </label>
+            <Switch
+              checked={configs.showMiniMap}
+              size="small"
+              onChange={onChangeShowMiniMap}
+            />
+          </Space>
+
+          <Space direction='horizontal'>
+            <label id="flow-setting-modal-labels">Show Nodes Tree: </label>
+            <Switch
+              checked={configs.showNodesTree}
+              size="small"
+              onChange={onChangeShowNodesTree}
+            />
+          </Space>
+
+          <Space direction='horizontal'>
+            <label id="flow-setting-modal-labels">Show Nodes Pallet: </label>
+            <Switch
+              checked={configs.showNodesPallet}
+              size="small"
+              onChange={onChangeShowNodesPallet}
+            />
+          </Space>
+
+          <Space direction='horizontal'>
+            <label id="flow-setting-modal-labels">Mini Map Position: </label>
+            <Radio.Group
+              onChange={handleChangePosition}
+              value={configs.positionMiniMap}
+            >
+              <Radio value="top" className="text-black">
+                Top
+              </Radio>
+              <Radio value="bottom" className="text-black">
+                Bottom
+              </Radio>
+            </Radio.Group>
+          </Space>
+
+          <Space direction='horizontal'>
+            <label id="flow-setting-modal-labels">Refresh time (second): </label>
+            <input
+              type="number"
+              className="border border-gray-300 p-2"
+              value={configs.refreshTimeout}
+              onChange={onChangeTimeout}
+              onBlur={handleBlurValue}
+            />
+          </Space>
+      </Space>
     </Modal>
   );
 };
