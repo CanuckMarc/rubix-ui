@@ -2,10 +2,23 @@ package flowcli
 
 import (
 	"fmt"
+	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-edge-wires/flow"
 )
+
+func (inst *FlowClient) NodePayload(nodeId string, payload *node.Payload) (*flow.Message, error) {
+	path := fmt.Sprintf("/api/nodes/payload/%s", nodeId)
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&flow.Message{}).
+		SetBody(payload).
+		Post(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*flow.Message), nil
+}
 
 func (inst *FlowClient) GetFlow() (*nodes.NodesList, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().

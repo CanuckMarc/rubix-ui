@@ -712,7 +712,43 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 	return downloadFlow
 }
 
-func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload interface{}, nodeUUID string) *flow.Message {
+func (inst *App) nodePayload(connUUID, hostUUID string, payload interface{}, nodeId string) (*flow.Message, error) {
+	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	// /api/nodes/payload/78C2708D74DC4D9995B881CA9870E1F0
+	path := fmt.Sprintf("/wires/api/nodes/payload/%s", nodeId)
+	resp, err := c.ProxyPOST(hostUUID, path, payload)
+	if err != nil {
+		return nil, err
+	}
+	if resp.IsSuccess() {
+		var out *flow.Message
+		err := json.Unmarshal(resp.Body(), &out)
+		return out, err
+	}
+	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
+}
 
-	return nil
+func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload interface{}, nodeId string) *flow.Message {
+	if isRemote {
+		resp, err := inst.nodePayload(connUUID, hostUUID, payload, nodeId)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return nil
+		}
+		return resp
+	} else {
+		var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
+		p := &node.Payload{
+			Any: payload,
+		}
+		resp, err := client.NodePayload(nodeId, p)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return resp
+		}
+		return resp
+	}
 }
