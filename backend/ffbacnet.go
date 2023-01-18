@@ -63,11 +63,7 @@ func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 
 func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) ([]model.Device, error) {
 	var err error
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Stop)
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil, err
-	}
+	inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Stop)
 	err = inst.bacnetChecks(connUUID, hostUUID, bacnetMasterPlg)
 	err = inst.errMsg(err)
 	if err != nil {
@@ -88,9 +84,6 @@ func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts 
 	}
 	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Start)
 	err = inst.errMsg(err)
-	if err != nil {
-		return nil, err
-	}
 	return devicesUpdated, nil
 }
 
