@@ -6,7 +6,6 @@ import (
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
-	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 	"gopkg.in/yaml.v3"
 )
 
@@ -155,8 +154,6 @@ func (inst *App) BACnetWriteConfig(connUUID, hostUUID string, config assistcli.C
 		return
 	}
 	inst.uiSuccessMessage(fmt.Sprintf("updated config ok %v", writeConfig.Message))
-	pprint.PrintJOSN(writeConfig)
-
 }
 
 func (inst *App) BACnetReadConfig(connUUID, hostUUID string) assistcli.ConfigBACnetServer {
