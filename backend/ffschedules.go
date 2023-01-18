@@ -2,6 +2,7 @@ package backend
 
 import (
 	"fmt"
+	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/bools"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 )
 
@@ -32,11 +33,17 @@ func (inst *App) GetSchedule(connUUID, hostUUID, uuid string) interface{} {
 	return sch
 }
 
-func (inst *App) AddSchedule(connUUID, hostUUID string, body *assistcli.Schedule) interface{} {
+func (inst *App) AddSchedule(connUUID, hostUUID, name string) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil
+	}
+	body := &assistcli.Schedule{
+		Name:       name,
+		Enable:     bools.NewTrue(),
+		ThingClass: "schedule",
+		ThingType:  "schedule",
 	}
 	sch, err := client.FFAddSchedule(hostUUID, body)
 	if err != nil {
