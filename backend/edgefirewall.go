@@ -86,7 +86,7 @@ func (inst *App) EdgeFirewallPortClose(connUUID, hostUUID string, body system.UF
 		inst.uiErrorMessage(fmt.Sprintf("port %d can not be closed", body.Port))
 		return nil
 	}
-	if body.Port == 1414 { // shh
+	if body.Port == 1414 { // wires-plat
 		inst.uiErrorMessage(fmt.Sprintf("port %d can not be closed", body.Port))
 		return nil
 	}
