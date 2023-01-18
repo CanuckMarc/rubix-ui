@@ -16,7 +16,7 @@ const info = "INFO";
 const networking = "NETWORKING";
 const time = "DATE/TIME";
 const firewall = "FIREWALL";
-const bacnet = "BACNET";
+const bacnet = "BACNET CONFIG";
 
 const HostInfoSetting = () => {
   let { connUUID = "", hostUUID = "" } = useParams();

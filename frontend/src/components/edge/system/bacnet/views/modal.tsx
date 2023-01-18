@@ -1,10 +1,9 @@
-import { Button, Modal, Table, Spin, Space, Switch, Input, Descriptions, Empty } from "antd";
+import { Button, Modal, Spin, Space, Input, Descriptions, Empty, Form, Select, Divider, InputNumber } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { BACnetFactory } from "../factory";
-import { ReloadOutlined, EditOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import { system } from "../../../../../../wailsjs/go/models";
-import type { ColumnsType } from 'antd/es/table';
+import { assistcli } from "../../../../../../wailsjs/go/models";
+import { ReloadOutlined, EditOutlined } from '@ant-design/icons';
 
 interface BACnetConfig {
   server_name: string;
@@ -36,6 +35,8 @@ export const Bacnet = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [configData, setConfigData] = useState({} as BACnetConfig)
+    const [flatConfigData, setFlatConfigData] = useState({})
+    const [form] = Form.useForm();
 
 
     const factory = new BACnetFactory()
@@ -49,8 +50,10 @@ export const Bacnet = () => {
             setIsFetching(true)
             const res = await factory.BACnetReadConfig(connUUID, hostUUID)
             if (res) {
-                console.log(res)
                 setConfigData(res)
+                const clone = structuredClone(res)
+                delete clone.mqtt
+                setFlatConfigData({...clone, ...res.mqtt})
             }
 
         } catch (err) {
@@ -67,12 +70,30 @@ export const Bacnet = () => {
     const handleReloadClick = () => {
         fetch()
     }
-
-    const handleOk = () => {
-        setModalOpen(false)
-    }
     
     const handleCancel = () => {
+        setModalOpen(false)
+    }
+
+    const handleFormFinish = async(values: any) => {        
+        const mqtt: MqttConfig = {
+            broker_ip: values.broker_ip,
+            broker_port: values.broker_port,
+            debug: values.debug,
+            enable: values.enable,
+            retry_enable: values.retry_enable,
+            retry_interval: values.retry_interval,
+            retry_limit: values.retry_limit,
+            write_via_subscribe: values.write_via_subscribe
+        }
+        for (const prop in mqtt) {
+            delete values[prop]
+        }
+
+        const config: assistcli.ConfigBACnetServer = {...values, mqtt}
+        await factory.BACnetWriteConfig(connUUID, hostUUID, config)
+        fetch()
+
         setModalOpen(false)
     }
 
@@ -123,8 +144,215 @@ export const Bacnet = () => {
             </div>
 
 
-            <Modal title="Edit BACnet Configurations" visible={modalOpen} onOk={handleOk} onCancel={handleCancel}>
-             
+            <Modal title="Edit BACnet Configurations" visible={modalOpen} onOk={form.submit} onCancel={handleCancel} bodyStyle={{maxHeight: '50vh'}} width='25vw'>
+                <Form
+                form={form}
+                name="basic"
+                autoComplete="off"
+                initialValues={flatConfigData}
+                style={{maxHeight: '40vh', overflowX: 'auto'}}
+                labelCol={{
+                    span: 10
+                }}
+                wrapperCol={{
+                    span: 18
+                }}
+                onFinish={handleFormFinish}
+                >
+                    <Form.Item
+                        label="server_name:"
+                        name="server_name"
+                        rules={[{ required: true, message: 'Please input server_name!' }]}
+                    >
+                        <Input style={{width: '10vw'}}/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="port:"
+                        name="port"
+                        rules={[{ required: true, message: 'Please input port number!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="iface:"
+                        name="iface"
+                        rules={[{ required: true, message: 'Please input net interface!' }]}
+                    >
+                        <Input style={{width: '10vw'}}/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="device_id:"
+                        name="device_id"
+                        rules={[{ required: true, message: 'Please input device_id!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="ai_max:"
+                        name="ai_max"
+                        rules={[{ required: true, message: 'Please input ai_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="ao_max:"
+                        name="ao_max"
+                        rules={[{ required: true, message: 'Please input ao_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="av_max:"
+                        name="av_max"
+                        rules={[{ required: true, message: 'Please input av_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="bi_max:"
+                        name="bi_max"
+                        rules={[{ required: true, message: 'Please input bi_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="bo_max:"
+                        name="bo_max"
+                        rules={[{ required: true, message: 'Please input bo_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="bv_max:"
+                        name="bv_max"
+                        rules={[{ required: true, message: 'Please input bv_max!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Divider orientation="left">Mqtt settings:</Divider>
+
+                    <Form.Item
+                        label="broker_ip:"
+                        name="broker_ip"
+                        rules={[{ required: true, message: 'Please input broker_ip!' }]}
+                    >
+                        <Input style={{width: '10vw'}}/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="broker_port:"
+                        name="broker_port"
+                        rules={[{ required: true, message: 'Please input broker_port!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="debug:"
+                        name="debug"
+                        rules={[{ required: true, message: 'Please select debug option!' }]}
+                    >
+                        <Select
+                            style={{width: '10vw'}}
+                            options={[
+                                {
+                                value: true,
+                                label: 'true'
+                                },
+                                {
+                                value: false,
+                                label: 'false'
+                                },
+                            ]}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="enable:"
+                        name="enable"
+                        rules={[{ required: true, message: 'Please select enable option!' }]}
+                    >
+                        <Select
+                            style={{width: '10vw'}}
+                            options={[
+                                {
+                                value: true,
+                                label: 'true'
+                                },
+                                {
+                                value: false,
+                                label: 'false'
+                                },
+                            ]}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="retry_enable:"
+                        name="retry_enable"
+                        rules={[{ required: true, message: 'Please select retry_enable option!' }]}
+                    >
+                        <Select
+                            style={{width: '10vw'}}
+                            options={[
+                                {
+                                value: true,
+                                label: 'true'
+                                },
+                                {
+                                value: false,
+                                label: 'false'
+                                },
+                            ]}
+                        />
+                    </Form.Item>
+                    
+                    <Form.Item
+                        label="retry_interval:"
+                        name="retry_interval"
+                        rules={[{ required: true, message: 'Please input retry_interval!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+                    
+                    <Form.Item
+                        label="retry_limit:"
+                        name="retry_limit"
+                        rules={[{ required: true, message: 'Please input retry_limit!' }]}
+                    >
+                        <InputNumber style={{width: '10vw'}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="write_via_subscribe:"
+                        name="write_via_subscribe"
+                        rules={[{ required: true, message: 'Please select write_via_subscribe option!' }]}
+                    >
+                        <Select
+                            style={{width: '10vw'}}
+                            options={[
+                                {
+                                value: true,
+                                label: 'true'
+                                },
+                                {
+                                value: false,
+                                label: 'false'
+                                },
+                            ]}
+                        />
+                    </Form.Item>
+                </Form>
             </Modal>
         </>
     );
