@@ -8,23 +8,36 @@ import {
   LockTwoTone,
   ToolOutlined,
   UserOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/nube-frog-green.png";
 import { ROUTES } from "../../constants/routes";
-import { useConnections } from "../../hooks/useConnection";
 import { DARK_THEME, LIGHT_THEME, useTheme } from "../../themes/use-theme";
 import { SettingsFactory } from "../settings/factory";
 import { useSettings } from "../settings/use-settings";
 import { TokenModal } from "../settings/views/token-modal";
 import { openNotificationWithIcon } from "../../utils/utils";
+import { LocationFactory } from "../locations/factory";
+import { ConnectionFactory } from "../connections/factory";
+import { DataNode } from "antd/es/tree";
+import { storage } from "../../../wailsjs/go/models";
+import { getTreeDataIterative } from "../searchable-tree/searchable-tree.ui-service";
+
+import RubixConnection = storage.RubixConnection;
 
 const { Sider } = Layout;
 const { Option } = Select;
 
+const locationFactory = new LocationFactory();
+const connectionFactory = new ConnectionFactory();
+interface TDataNode extends DataNode {
+  name?: string;
+}
+
 const DividerLock = (props: any) => {
-  const { collapsed, collapseDisabled, setCollapseDisabled } = props;
+  const { collapsed, collapseDisabled, setCollapseDisabled, refresh } = props;
 
   const handleLockSider = (e: Event) => {
     e.stopPropagation();
@@ -40,6 +53,7 @@ const DividerLock = (props: any) => {
         borderColor: "rgba(255, 255, 255, 0.12)",
       }}
     >
+      {!collapsed && <ReloadOutlined onClick={refresh} style={{ fontSize: "18px", marginRight: "2rem" }} />}
       {collapseDisabled ? (
         <LockTwoTone onClick={(e: any) => handleLockSider(e)} style={{ fontSize: "18px" }} />
       ) : (
@@ -181,11 +195,13 @@ const AutoRefreshPointsMenuItem = () => {
 
 export const MenuSidebar = () => {
   const location = useLocation();
-  const { routeData, isFetching } = useConnections();
   const [isBlockMenu, setIsBlockMenu, isMiniMenu, setIsMiniMenu] = useTheme();
   const [collapsed, setCollapsed] = useState(isMiniMenu);
   const [collapseDisabled, setCollapseDisabled] = useState(isBlockMenu);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [routeData, updateRouteData] = useState([] as TDataNode[]);
+  const [menu, setMenu] = useState<MenuProps["items"]>([]);
 
   const sidebarItems = [
     {
@@ -296,10 +312,6 @@ export const MenuSidebar = () => {
       };
     }
 
-    if (name === "Supervisors" && routeData.length > 0) {
-      return { ...routeData[0], icon: <Icon /> } as any;
-    }
-
     return {
       name: name,
       key: link,
@@ -307,6 +319,42 @@ export const MenuSidebar = () => {
       label: <NavLink to={link}>{name}</NavLink>,
     };
   });
+
+  const getLocations = async (connUUID: string) => {
+    try {
+      locationFactory.connectionUUID = connUUID;
+      return await locationFactory.GetAll();
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const fetchConnections = async () => {
+    try {
+      setIsFetching(true);
+      const connections = ((await connectionFactory.GetAll()) || []) as any[];
+      const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
+      for (const c of enabledConnections) {
+        let locations = [];
+        locations = await getLocations(c.uuid);
+        c.locations = locations;
+      }
+      const route = getTreeDataIterative(enabledConnections);
+      updateRouteData(route);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const getSupervisorsMenu = () => {
+    let menu = menuItems as any;
+    if (routeData.length > 0) {
+      let supervisorsMenu = sidebarItems.find((item) => item.name === "Supervisors");
+      const Icon = supervisorsMenu?.icon as any;
+      menu[0] = { ...routeData[0], icon: <Icon /> };
+    }
+    setMenu(menu);
+  };
 
   const handleCollapse = (value: boolean) => {
     setCollapsed(value);
@@ -317,6 +365,14 @@ export const MenuSidebar = () => {
     setCollapseDisabled(value);
     setIsBlockMenu(value);
   };
+
+  useEffect(() => {
+    fetchConnections();
+  }, []);
+
+  useEffect(() => {
+    getSupervisorsMenu();
+  }, [routeData]);
 
   return (
     <Sider
@@ -332,11 +388,16 @@ export const MenuSidebar = () => {
       ) : (
         <>
           <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
-          <DividerLock collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapseDisabled={handleBlock} />
+          <DividerLock
+            collapsed={collapsed}
+            collapseDisabled={collapseDisabled}
+            setCollapseDisabled={handleBlock}
+            refresh={fetchConnections}
+          />
           <Menu
             mode="inline"
             theme="dark"
-            items={menuItems}
+            items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
           />

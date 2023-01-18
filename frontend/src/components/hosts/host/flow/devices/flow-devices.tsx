@@ -2,7 +2,7 @@ import { Tabs, Typography, Card, Button, Modal, Space, Select, Form, Input } fro
 import { RedoOutlined } from "@ant-design/icons";
 import { useState, useEffect, ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
-import {assistcli, model} from "../../../../../../wailsjs/go/models";
+import { assistcli, model } from "../../../../../../wailsjs/go/models";
 import { RbRefreshButton } from "../../../../../common/rb-table-actions";
 import { BACNET_HEADERS } from "../../../../../constants/headers";
 import { PLUGINS } from "../../../../../constants/plugins";
@@ -45,9 +45,16 @@ export const FlowDevices = () => {
   const flowDeviceFactory = new FlowDeviceFactory();
   const flowNetworkFactory = new FlowNetworkFactory();
   const hostNetworkingFactory = new HostNetworkingFactory();
-  flowDeviceFactory.connectionUUID = bacnetFactory.connectionUUID = flowNetworkFactory.connectionUUID = hostNetworkingFactory.connectionUUID = connUUID;
-  flowDeviceFactory.hostUUID = bacnetFactory.hostUUID = flowNetworkFactory.hostUUID = hostNetworkingFactory.hostUUID = hostUUID;
-
+  flowDeviceFactory.connectionUUID =
+    bacnetFactory.connectionUUID =
+    flowNetworkFactory.connectionUUID =
+    hostNetworkingFactory.connectionUUID =
+      connUUID;
+  flowDeviceFactory.hostUUID =
+    bacnetFactory.hostUUID =
+    flowNetworkFactory.hostUUID =
+    hostNetworkingFactory.hostUUID =
+      hostUUID;
 
   const routes = [
     {
@@ -97,7 +104,7 @@ export const FlowDevices = () => {
       const devices = (res.devices || []) as Device[];
       setData(devices);
       setPluginUUID(res.plugin_conf_id);
-      addPrefix(res.name);
+      addPrefix(res?.name);
       setDataLocalStorage(devices); //handle mass edit
     } catch (error) {
       console.log(error);
@@ -107,34 +114,34 @@ export const FlowDevices = () => {
   };
 
   const runWhois = async () => {
-    setIsModalOpen(true)
+    setIsModalOpen(true);
     try {
-      const res = await hostNetworkingFactory.GetNetworks()
-      
+      const res = await hostNetworkingFactory.GetNetworks();
+
       const mappedList: String[] = res.map((item: any) => {
         return {
           value: item.interface,
-          label: item.interface
-        }
-      })
-      setSelectOptions(mappedList)
+          label: item.interface,
+        };
+      });
+      setSelectOptions(mappedList);
     } catch (err) {
       console.log(err);
       openNotificationWithIcon("error", `discovery error: ${err}`);
     }
   };
 
-  const handleModalOk = async() => {
-    let opts = new assistcli.WhoIsOpts
-    opts.interface_port = selected
-    opts.low = low
-    opts.high = high
-    opts.global_broadcast = broadcast
-    opts.network_number = netNum
+  const handleModalOk = async () => {
+    let opts = new assistcli.WhoIsOpts();
+    opts.interface_port = selected;
+    opts.low = low;
+    opts.high = high;
+    opts.global_broadcast = broadcast;
+    opts.network_number = netNum;
 
-    setIsModalOpen(false)
+    setIsModalOpen(false);
     try {
-      setIsFetchingWhoIs(true)
+      setIsFetchingWhoIs(true);
       const res = await bacnetFactory.BacnetMasterWhois(networkUUID, opts);
       if (res) {
         openNotificationWithIcon("success", `device count found: ${res.length}`);
@@ -146,19 +153,19 @@ export const FlowDevices = () => {
     } finally {
       setIsFetchingWhoIs(false);
     }
-  }
+  };
 
   const handleModalCancel = () => {
-    setIsModalOpen(false)
-  }
+    setIsModalOpen(false);
+  };
 
   const handleSelectChange = (value: string) => {
-    setSelected(value)
-  }
+    setSelected(value);
+  };
 
   const handleBroadcastSelectChange = (value: boolean) => {
-    setBroadcast(value)
-  }
+    setBroadcast(value);
+  };
 
   const addDevices = async (selectedUUIDs: Array<Device>) => {
     await flowDeviceFactory.AddBulk(selectedUUIDs);
@@ -166,16 +173,16 @@ export const FlowDevices = () => {
   };
 
   const handleLowChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLow(parseInt(event.target.value))
-  }
+    setLow(parseInt(event.target.value));
+  };
 
   const handleHighChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setHigh(parseInt(event.target.value))
-  }
+    setHigh(parseInt(event.target.value));
+  };
 
   const handleNetNumChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNetNum(parseInt(event.target.value))
-  }
+    setNetNum(parseInt(event.target.value));
+  };
 
   return (
     <>
@@ -211,63 +218,52 @@ export const FlowDevices = () => {
         <Form
           name="basic"
           labelCol={{
-            span: 10
+            span: 10,
           }}
           wrapperCol={{
-              span: 18
+            span: 18,
           }}
           autoComplete="off"
         >
           <Form.Item
             label="Interface ports:"
             name="interfacePorts"
-            rules={[{ required: true, message: 'Please select an interface port!' }]}
+            rules={[{ required: true, message: "Please select an interface port!" }]}
           >
-            <Select
-              onChange={handleSelectChange}
-              options={selectOptions}
-            />
+            <Select onChange={handleSelectChange} options={selectOptions} />
           </Form.Item>
 
-          <Form.Item
-            label="Low:"
-            name="low"
-            rules={[{ required: true, message: 'Please input a low value!' }]}
-          >
+          <Form.Item label="Low:" name="low" rules={[{ required: true, message: "Please input a low value!" }]}>
             <Input value={low} onChange={handleLowChange} />
           </Form.Item>
 
-          <Form.Item
-            label="High:"
-            name="high"
-            rules={[{ required: true, message: 'Please input a high value!' }]}
-          >
-            <Input value={high} onChange={handleHighChange}/>
+          <Form.Item label="High:" name="high" rules={[{ required: true, message: "Please input a high value!" }]}>
+            <Input value={high} onChange={handleHighChange} />
           </Form.Item>
 
           <Form.Item
             label="Network number:"
             name="networkNumber"
-            rules={[{ required: true, message: 'Please input network number!' }]}
+            rules={[{ required: true, message: "Please input network number!" }]}
           >
-            <Input value={netNum} onChange={handleNetNumChange}/>
+            <Input value={netNum} onChange={handleNetNumChange} />
           </Form.Item>
 
           <Form.Item
             label="Global broadcast:"
             name="globalBroadcast"
-            rules={[{ required: true, message: 'Please select broadcase option!' }]}
+            rules={[{ required: true, message: "Please select broadcase option!" }]}
           >
             <Select
               onChange={handleBroadcastSelectChange}
               options={[
                 {
                   value: true,
-                  label: 'True'
+                  label: "True",
                 },
                 {
                   value: false,
-                  label: 'False'
+                  label: "False",
                 },
               ]}
             />
