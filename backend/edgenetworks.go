@@ -7,6 +7,7 @@ import (
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/NubeIO/rubix-edge/service/system"
 	"github.com/NubeIO/rubix-ui/backend/constants"
+	"strings"
 )
 
 func (inst *App) EdgeGetNetworks(connUUID, hostUUID string) []networking.NetworkInterfaces {
@@ -19,7 +20,16 @@ func (inst *App) EdgeGetNetworks(connUUID, hostUUID string) []networking.Network
 	if err != nil {
 		return nil
 	}
-	return data
+	var networks []networking.NetworkInterfaces
+	for _, net := range data {
+		docker := strings.Contains(net.Interface, "docker")
+		br := strings.Contains(net.Interface, "br-")
+		if docker || br { // don't show the user these networks
+		} else {
+			networks = append(networks, net)
+		}
+	}
+	return networks
 }
 
 type IpSettings struct {
