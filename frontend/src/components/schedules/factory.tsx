@@ -1,5 +1,5 @@
 import {AddSchedule, DeleteSchedule, EditSchedule, GetSchedule, GetSchedules} from "../../../wailsjs/go/backend/App";
-import {model} from "../../../wailsjs/go/models";
+import {assistcli, model} from "../../../wailsjs/go/models";
 
 export class SchedulesFactory {
   async GetSchedules(connUUID: string, hostUUID: string): Promise<any> {
@@ -10,11 +10,11 @@ export class SchedulesFactory {
     return await GetSchedule(connUUID, hostUUID, uuid);
   }
 
-  async AddSchedules(connUUID: string, hostUUID: string, body: model.Schedule): Promise<any> {
+  async AddSchedules(connUUID: string, hostUUID: string, body: assistcli.Schedule): Promise<any> {
     return await AddSchedule(connUUID, hostUUID, body);
   }
 
-  async EditSchedule(connUUID: string, hostUUID: string, uuid: string, body: model.Schedule): Promise<any> {
+  async EditSchedule(connUUID: string, hostUUID: string, uuid: string, body: assistcli.Schedule): Promise<any> {
     return await EditSchedule(connUUID, hostUUID, uuid, body);
   }
 

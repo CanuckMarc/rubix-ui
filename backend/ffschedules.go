@@ -2,7 +2,7 @@ package backend
 
 import (
 	"fmt"
-	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/assistcli"
 )
 
 func (inst *App) GetSchedules(connUUID, hostUUID string) interface{} {
@@ -32,7 +32,7 @@ func (inst *App) GetSchedule(connUUID, hostUUID, uuid string) interface{} {
 	return sch
 }
 
-func (inst *App) AddSchedule(connUUID, hostUUID string, body *model.Schedule) interface{} {
+func (inst *App) AddSchedule(connUUID, hostUUID string, body *assistcli.Schedule) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
@@ -46,7 +46,7 @@ func (inst *App) AddSchedule(connUUID, hostUUID string, body *model.Schedule) in
 	return sch
 }
 
-func (inst *App) EditSchedule(connUUID, hostUUID, uuid string, body *model.Schedule) interface{} {
+func (inst *App) EditSchedule(connUUID, hostUUID, uuid string, body *assistcli.Schedule) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
