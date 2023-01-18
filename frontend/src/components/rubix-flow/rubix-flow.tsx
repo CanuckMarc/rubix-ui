@@ -763,13 +763,15 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <NodesTree
-        nodes={nodes}
-        selectedSubFlowId={selectedNodeForSubFlow?.id}
-        openNodeMenu={openNodeMenu}
-        nodesSpec={nodesSpec}
-        gotoNode={gotoNode}
-      />
+      {!flowSettings.hideNodesTree && (
+        <NodesTree
+          nodes={nodes}
+          selectedSubFlowId={selectedNodeForSubFlow?.id}
+          openNodeMenu={openNodeMenu}
+          nodesSpec={nodesSpec}
+          gotoNode={gotoNode}
+        />
+      )}
       <NodeSideBar nodesSpec={nodesSpec} />
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>

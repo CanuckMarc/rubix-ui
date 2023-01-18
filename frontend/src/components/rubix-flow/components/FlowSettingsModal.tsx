@@ -10,6 +10,7 @@ export const getFlowSettings = () => {
   return {
     refreshTimeout: config?.refreshTimeout || 5,
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
+    hideNodesTree: config?.hideNodesTree === undefined ? true : config?.hideNodesTree,
     positionMiniMap:
       config?.positionMiniMap === undefined
         ? "bottom"
@@ -20,6 +21,7 @@ export const getFlowSettings = () => {
 export type FlowSettings = {
   refreshTimeout: number | string;
   showMiniMap: boolean;
+  hideNodesTree: boolean;
   positionMiniMap: string;
 };
 
@@ -57,6 +59,12 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
     setConfigs(newConfig);
     onSaveSettings(newConfig);
   };
+
+  const onChangeHideNodesTree = () => {
+    const newConfig = { ...configs, hideNodesTree: !configs.hideNodesTree };
+    setConfigs(newConfig);
+    onSaveSettings(newConfig);
+  }
 
   const handleSave = () => {
     onSaveSettings(configs);
@@ -100,6 +108,14 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
             checked={configs.showMiniMap}
             size="small"
             onChange={onChangeShowMiniMap}
+          />
+        </div>
+        <div className="mb-2">
+          <label className="pr-6 mb-0 mr-16 pt-1">Hide Nodes Tree: </label>
+          <Switch
+            checked={configs.hideNodesTree}
+            size="small"
+            onChange={onChangeHideNodesTree}
           />
         </div>
         <div>
