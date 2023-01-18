@@ -44,6 +44,7 @@ import { isValidConnection, isInputExistConnection } from "./util/isCanConnectio
 import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
+import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -59,11 +60,9 @@ declare global {
 }
 
 type FlowProps = {
-  isConnectionBuilder: boolean;
   customEdgeTypes: any;
   customNodeTypes: any;
   selectedNodeForSubFlow: NodeInterface | undefined;
-  setIsConnectionBuilder: (value: boolean) => void;
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
   handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
   handleRemoveSelectedNodeForSubFlow: () => void;
@@ -75,8 +74,6 @@ const Flow = (props: FlowProps) => {
     customNodeTypes,
     customEdgeTypes,
     selectedNodeForSubFlow,
-    isConnectionBuilder,
-    setIsConnectionBuilder,
     setSelectedNodeForSubFlow,
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
@@ -99,6 +96,7 @@ const Flow = (props: FlowProps) => {
   const selectableBoxes = useRef<SelectableBoxType[]>([]);
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
+  const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -196,7 +194,11 @@ const Flow = (props: FlowProps) => {
     if (node.id !== selectedNodeForSubFlow?.id) {
       handlePushSelectedNodeForSubFlow(node);
     }
-    setIsConnectionBuilder(!isConnectionBuilder);
+    setIsConnectionBuilder(true);
+  };
+
+  const onCloseBuilderModal = () => {
+    setIsConnectionBuilder(false);
   };
 
   const onClearAllNodes = () => {
@@ -867,6 +869,14 @@ const Flow = (props: FlowProps) => {
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
+            {!!selectedNodeForSubFlow && (
+              <ConnectionBuilderModal
+                parentNode={selectedNodeForSubFlow}
+                open={isConnectionBuilder}
+                onClose={onCloseBuilderModal}
+                nodesSpec={nodesSpec}
+              />
+            )}
           </ReactFlow>
         </ReactFlowProvider>
       </div>
@@ -903,14 +913,7 @@ export const RubixFlow = () => {
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
     nodes[node.type] = (props: any) => (
-      <NodePanel
-        {...props}
-        spec={node}
-        key={node.id}
-        parentNodeId={nodeForSubFlowEnd?.id}
-        nodesSpec={nodesSpec}
-        isConnectionBuilder={isConnectionBuilder}
-      />
+      <NodePanel {...props} spec={node} key={node.id} parentNodeId={nodeForSubFlowEnd?.id} nodesSpec={nodesSpec} />
     );
     return nodes;
   }, {} as NodeTypes);
@@ -919,8 +922,6 @@ export const RubixFlow = () => {
     <>
       {isFetchingNodeSpec ? (
         <Flow
-          isConnectionBuilder={isConnectionBuilder}
-          setIsConnectionBuilder={setIsConnectionBuilder}
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
           selectedNodeForSubFlow={nodeForSubFlowEnd}
