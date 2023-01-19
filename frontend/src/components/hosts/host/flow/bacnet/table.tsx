@@ -38,7 +38,7 @@ export const BacnetWhoIsTable = (props: any) => {
   return (
     <>
       <RbAddButton handleClick={Add} text={addBtnText} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data && data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
