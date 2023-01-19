@@ -7,6 +7,7 @@ import RbxBreadcrumb from "../breadcrumbs/breadcrumbs";
 import { PcScanner } from "../pc/scanner/table";
 import { ConnectionFactory } from "./factory";
 import { ConnectionsTable } from "./views/table";
+import "./connections.css";
 
 import RubixConnection = storage.RubixConnection;
 
