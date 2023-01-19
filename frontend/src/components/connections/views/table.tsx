@@ -181,6 +181,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         rowSelection={rowSelection}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
+        rowClassName={(record: RubixConnection) => (record.enable ? "" : "opacity-05")}
       />
       <CreateEditModal
         currentConnection={currentConnection}

@@ -142,13 +142,12 @@ export const FlowDevices = () => {
     setIsModalOpen(false);
     try {
       setIsFetchingWhoIs(true);
-      const res = await bacnetFactory.BacnetMasterWhois(networkUUID, opts);
+      const res = (await bacnetFactory.BacnetMasterWhois(networkUUID, opts)) || [];
       if (res) {
         openNotificationWithIcon("success", `device count found: ${res.length}`);
       }
       setWhoIs(res);
     } catch (err) {
-      console.log(err);
       openNotificationWithIcon("error", `discovery error: ${err}`);
     } finally {
       setIsFetchingWhoIs(false);

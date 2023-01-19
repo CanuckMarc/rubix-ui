@@ -113,7 +113,7 @@ export const FlowPoints = () => {
   const runDiscover = async () => {
     try {
       setIsFetchingDiscoveries(true);
-      const res = await bacnetFactory.DiscoverDevicePoints(deviceUUID, false, false);
+      const res = (await bacnetFactory.DiscoverDevicePoints(deviceUUID, false, false)) || [];
       if (res) {
         openNotificationWithIcon("success", `discoveries: ${res.length}`);
       }
