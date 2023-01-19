@@ -135,12 +135,14 @@ export const SchedulesTable = (props: any) => {
     let exception: any = {}
 
     if (value.event_name != undefined && value.event_range != undefined) {
+      const startTemp = value.event_range[0]._d.toISOString().split(':')
+      const endTemp = value.event_range[1]._d.toISOString().split(':')
       event[crypto.randomUUID()] = {
         name: value.event_name,
         dates: [
           {
-            start: value.event_range[0]._d.toISOString(),
-            end: value.event_range[1]._d.toISOString()
+            start: `${startTemp[0]}:${startTemp[1]}`,
+            end: `${endTemp[0]}:${endTemp[1]}`
           }
         ]
       }
@@ -161,21 +163,23 @@ export const SchedulesTable = (props: any) => {
     }
     
     if (value.exception_name != undefined && value.exception_range != undefined) {
+      const startTemp = value.exception_range[0]._d.toISOString().split(':')
+      const endTemp = value.exception_range[1]._d.toISOString().split(':')
       exception[crypto.randomUUID()] = {
         name: value.exception_name,
         dates: [
           {
-            start: value.exception_range[0]._d.toISOString(),
-            end: value.exception_range[1]._d.toISOString()
+            start: `${startTemp[0]}:${startTemp[1]}`,
+            end: `${endTemp[0]}:${endTemp[1]}`
           }
         ]
       }
     }
     
     const opts = {
-      ...currentItem,
-      schedule: {
-        event: event,
+      name: currentItem.name,
+      schedules: {
+        events: event,
         weekly: weekly,
         exception: exception
       }
