@@ -129,6 +129,7 @@ export const SchedulesTable = (props: any) => {
 
 
   const handleFormFinish = async(value: any) => {
+    // console.log(value)
     let event: any = {}
     let weekly: any = {}
     let exception: any = {}
@@ -138,8 +139,8 @@ export const SchedulesTable = (props: any) => {
         name: value.event_name,
         dates: [
           {
-            start: value.event_range[0]._d.toString(),
-            end: value.event_range[1]._d.toString()
+            start: value.event_range[0]._d.toISOString(),
+            end: value.event_range[1]._d.toISOString()
           }
         ]
       }
@@ -154,8 +155,8 @@ export const SchedulesTable = (props: any) => {
       weekly[crypto.randomUUID()] = {
         name: value.weekly_schedule_name,
         days: value.schedule_days,
-        start: value.schedule_start._d.toString(),
-        end: value.schedule_end._d.toString()
+        start: value.schedule_start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        end: value.schedule_end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
       }
     }
     
@@ -164,8 +165,8 @@ export const SchedulesTable = (props: any) => {
         name: value.exception_name,
         dates: [
           {
-            start: value.exception_range[0]._d.toString(),
-            end: value.exception_range[1]._d.toString()
+            start: value.exception_range[0]._d.toISOString(),
+            end: value.exception_range[1]._d.toISOString()
           }
         ]
       }
@@ -179,7 +180,7 @@ export const SchedulesTable = (props: any) => {
         exception: exception
       }
     }
-    
+    console.log(opts);
     setScheduleModalVisible(false);
     const res = await props.factory.EditSchedule(props.connUUID, props.hostUUID, currentItem.uuid, opts)
     if (res) {
