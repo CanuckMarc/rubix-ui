@@ -40,6 +40,10 @@ func (inst *App) EdgeFirewallEnable(connUUID, hostUUID string) *ufw.Message {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	body := system.UFWBody{
+		Port: 1662, // make sure port assist is open
+	}
+	inst.EdgeFirewallPortOpen(connUUID, hostUUID, body)
 	data, err := client.EdgeFirewallEnable(hostUUID)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -66,6 +70,14 @@ func (inst *App) EdgeFirewallPortOpen(connUUID, hostUUID string, body system.UFW
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	if body.Port == 1883 { // mqtt
+		inst.uiErrorMessage(fmt.Sprintf("port %d can not be opened", body.Port))
+		return nil
+	}
+	if body.Port == 1665 { // edge-wires
+		inst.uiErrorMessage(fmt.Sprintf("port %d can not be opened", body.Port))
 		return nil
 	}
 	data, err := client.EdgeFirewallPortOpen(hostUUID, body)
@@ -95,6 +107,14 @@ func (inst *App) EdgeFirewallPortClose(connUUID, hostUUID string, body system.UF
 		return nil
 	}
 	if body.Port == 1660 { // ff
+		inst.uiErrorMessage(fmt.Sprintf("port %d can not be closed", body.Port))
+		return nil
+	}
+	if body.Port == 47808 { // bacnet
+		inst.uiErrorMessage(fmt.Sprintf("port %d can not be closed", body.Port))
+		return nil
+	}
+	if body.Port == 47809 { // bacnet
 		inst.uiErrorMessage(fmt.Sprintf("port %d can not be closed", body.Port))
 		return nil
 	}
