@@ -66,7 +66,10 @@ func (inst *App) EdgeInstallApp(connUUID, hostUUID, appName, appVersion string) 
 	var lastStep = "5"
 	release, err := inst.DB.GetReleaseByVersion(releaseVersion)
 	if release == nil {
-		return inst.fail(fmt.Sprintf("failed to find release version %s on database", releaseVersion))
+		if appName == constants.FlowFramework {
+			return inst.fail(fmt.Sprintf("%s release version %s has not been made public yet, please contact nube-support", constants.FlowFramework, releaseVersion))
+		}
+		return inst.fail(fmt.Sprintf("release version %s has not been made public yet, please contact nube-support", releaseVersion))
 	}
 	inst.uiSuccessMessage(fmt.Sprintf("(step 1 of %s) selected release version: %s", lastStep, releaseVersion))
 

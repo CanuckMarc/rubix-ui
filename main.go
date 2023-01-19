@@ -9,6 +9,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/linux"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed frontend/dist
@@ -42,6 +44,9 @@ func main() {
 		StartHidden: false,
 		Menu:        AppMenu,
 		OnStartup:   app.OnStartup,
+		Windows:     &windows.Options{},
+		Linux:       &linux.Options{},
+		Debug:       options.Debug{},
 		Bind: []interface{}{
 			app,
 		},
