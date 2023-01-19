@@ -147,6 +147,12 @@ func (inst *App) BACnetWriteConfig(connUUID, hostUUID string, config assistcli.C
 		return
 	}
 	inst.uiSuccessMessage(fmt.Sprintf("updated config ok %v", writeConfig.Message))
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Restart)
+	if err != nil {
+		inst.uiErrorMessage("failed to restart bacnet-server")
+		return
+	}
+	inst.uiSuccessMessage("restarted bacnet-server")
 }
 
 func (inst *App) BACnetReadConfig(connUUID, hostUUID string) assistcli.ConfigBACnetServer {
