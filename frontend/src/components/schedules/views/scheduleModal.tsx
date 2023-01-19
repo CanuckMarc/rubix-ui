@@ -20,8 +20,6 @@ for (let i=0; i<7; i++) {
 export const ScheduleModal = (props: any) => {
   const [form] = Form.useForm();
 
-
-
   return (
     <Modal title="Create schedules" visible={props.visible} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='40vw'>
         <Form

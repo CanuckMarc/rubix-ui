@@ -4,11 +4,8 @@ import { SchedulesFactory } from "./factory";
 import { useParams } from "react-router-dom";
 import { SchedulesTable } from "./views/table";
 import { EditModal } from "./views/editModal";
-import {assistcli, model} from "../../../wailsjs/go/models";
+import { ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
-import { ReloadOutlined, PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-
-const { Search } = Input;
 const { Title } = Typography;
 
 export const Schedules = () => {
@@ -16,7 +13,6 @@ export const Schedules = () => {
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [createModal, showCreateModal] = useState(false);
-  const [form] = Form.useForm();
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([]);
 
@@ -26,6 +22,7 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
+      console.log(res)
       setData(res);
     } catch (error) {
       setData([]);
@@ -57,7 +54,8 @@ export const Schedules = () => {
 
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
-    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
+    const res = await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
+    console.log(res)
     
     fetch();
   }
@@ -77,8 +75,6 @@ export const Schedules = () => {
             <Button type="primary" icon={<ReloadOutlined />} size={'middle'} onClick={handleRefreshClick}>Refresh</Button>
             <Button type="primary" icon={<PlusOutlined />} size={'middle'} onClick={handleCreateClick}>Create</Button>
             <Button type="primary" icon={<DeleteOutlined />} danger={true} size={'middle'} disabled={!hasSelected} onClick={handleDeleteClick}>Delete</Button>
-            {/* <Search placeholder="input search text" allowClear onSearch={onSearch} size={'middle'} style={{ width: '20vw' }} /> */}
-      
           </Space>
 
           <SchedulesTable 

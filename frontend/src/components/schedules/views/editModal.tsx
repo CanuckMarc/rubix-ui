@@ -3,7 +3,6 @@ import { Input, Modal, Form, Select } from "antd";
 export const EditModal = (props: any) => {
   const [form] = Form.useForm();
 
-
   return (
     <Modal title="Create schedules" visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='30vw'>
         <Form
@@ -33,26 +32,6 @@ export const EditModal = (props: any) => {
                     label="Enable:"
                     name="enable"
                     rules={[{ required: true, message: 'Please select enable option!' }]}
-                    >
-                        <Select
-                            style={{width: '20vw'}}
-                            options={[
-                                {
-                                value: true,
-                                label: 'true'
-                                },
-                                {
-                                value: false,
-                                label: 'false'
-                                },
-                            ]}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                    label="Active:"
-                    name="is_active"
-                    rules={[{ required: true, message: 'Please select active option!' }]}
                     >
                         <Select
                             style={{width: '20vw'}}

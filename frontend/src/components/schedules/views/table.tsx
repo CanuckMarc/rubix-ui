@@ -5,18 +5,13 @@ import {
   SCHEDULES_HEADERS,
   SCHEDULES_SCHEMA,
 } from "../../../constants/headers";
-import { db } from "../../../../wailsjs/go/models";
 import { EditModal } from "./editModal"; 
 import { ScheduleModal } from "./scheduleModal"; 
-import { ReloadOutlined, PlusOutlined, DeleteOutlined, EditOutlined, ScheduleOutlined } from '@ant-design/icons';
-
-import {assistcli, model} from "../../../../wailsjs/go/models";
-
-import Connection = db.Connection;
+import { DeleteOutlined, EditOutlined, ScheduleOutlined } from '@ant-design/icons';
+import { assistcli } from "../../../../wailsjs/go/models";
 
 export const SchedulesTable = (props: any) => {
   const { data, isFetching, refreshList } = props;
-  const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<string>);
   const [currentItem, setCurrentItem] = useState({} as assistcli.Schedule);
   const [schema, setSchema] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -127,7 +122,6 @@ export const SchedulesTable = (props: any) => {
     setEditModalVisible(false)
   }
 
-
   const handleFormFinish = async(value: any) => {
     // console.log(value)
     let event: any = {}
@@ -177,11 +171,13 @@ export const SchedulesTable = (props: any) => {
     }
     
     const opts = {
-      name: currentItem.name,
-      schedules: {
-        events: event,
-        weekly: weekly,
-        exception: exception
+      ...currentItem,
+      schedule: {
+        schedules: {
+          events: event,
+          weekly: weekly,
+          exception: exception
+        }
       }
     }
     console.log(opts);

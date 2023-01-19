@@ -752,16 +752,28 @@ export const SCHEDULES_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "name",
-    dataIndex: "name",
-    key: "name",
-    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-  },
-  {
     title: "uuid",
     dataIndex: "uuid",
     key: "uuid",
     sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid),
+  },
+  {
+    title: "enable",
+    dataIndex: "enable",
+    key: "enable",
+    render : (text: any) => String(text)
+  },
+  {
+    title: "is_active",
+    dataIndex: "is_active",
+    key: "is_active",
+    render : (text: any) => String(text)
+  },
+  {
+    title: "is_global",
+    dataIndex: "is_global",
+    key: "is_global",
+    render : (text: any) => String(text)
   },
 ];
 
@@ -868,14 +880,23 @@ export const SCHEDULES_SCHEMA = [
     type: "string",
   },
   {
-    maxLength: 50,
-    minLength: 2,
-    title: "name",
+    readOnly: true,
+    title: "uuid",
     type: "string",
   },
   {
     readOnly: true,
-    title: "uuid",
-    type: "string",
+    title: "enable",
+    type: "boolean",
+  },
+  {
+    readOnly: true,
+    title: "active",
+    type: "boolean",
+  },
+  {
+    readOnly: true,
+    title: "global",
+    type: "boolean",
   },
 ];
