@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/nube-frog-green.png";
 import { ROUTES } from "../../constants/routes";
-import { DARK_THEME, LIGHT_THEME, useTheme } from "../../themes/use-theme";
+import { DARK_THEME, getShowWires, LIGHT_THEME, SHOW_WIRES, useTheme } from "../../themes/use-theme";
 import { SettingsFactory } from "../settings/factory";
 import { useSettings } from "../settings/use-settings";
 import { TokenModal } from "../settings/views/token-modal";
@@ -32,6 +32,8 @@ const { Option } = Select;
 
 const locationFactory = new LocationFactory();
 const connectionFactory = new ConnectionFactory();
+const settingsFactory = new SettingsFactory();
+
 interface TDataNode extends DataNode {
   name?: string;
 }
@@ -100,6 +102,10 @@ const AvatarDropdown = (props: any) => {
           key: "3",
           label: AutoRefreshPointsMenuItem(),
         },
+        {
+          key: "4",
+          label: ShowWiresMenuItem(),
+        },
       ]}
     />
   );
@@ -126,7 +132,6 @@ const TokenMenuItem = (props: any) => {
 const SwitchThemeMenuItem = () => {
   const [settings] = useSettings();
   const [darkMode, setDarkMode] = useState(true);
-  const settingsFactory = new SettingsFactory();
 
   useEffect(() => {
     setDarkMode(settings.theme === DARK_THEME);
@@ -147,8 +152,6 @@ const AutoRefreshPointsMenuItem = () => {
   const [settings] = useSettings();
   const [time, setTime] = useState("");
   const [isEnable, setIsEnable] = useState(false);
-
-  const settingsFactory = new SettingsFactory();
 
   useEffect(() => {
     setTime("" + settings.auto_refresh_rate);
@@ -189,6 +192,29 @@ const AutoRefreshPointsMenuItem = () => {
         <Option value="15000">15 sec</Option>
         <Option value="30000">30 sec</Option>
       </Select>
+    </div>
+  );
+};
+
+const ShowWiresMenuItem = () => {
+  const [settings] = useSettings();
+  const [isEnable, setIsEnable] = useState(true);
+
+  const handleChangeEnable = async (checked: boolean) => {
+    setIsEnable(checked);
+    localStorage.setItem(SHOW_WIRES, checked.toString());
+    await settingsFactory.Update({ ...settings, showWires: checked });
+    openNotificationWithIcon("info", "Please refresh page to apply");
+  };
+
+  useEffect(() => {
+    setIsEnable(getShowWires());
+  }, []);
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Switch style={{ marginRight: "10px" }} checked={isEnable} onChange={handleChangeEnable} />
+      Show Wires
     </div>
   );
 };
@@ -271,45 +297,49 @@ export const MenuSidebar = () => {
     }
 
     if (name === "Local-Rubix-Wires") {
-      return {
-        key: name,
-        icon: <Icon />,
-        label: (
-          <Tooltip placement="right" title={name}>
-            {name}
-          </Tooltip>
-        ),
-        name: name,
-        children: [
-          {
-            key: ROUTES.RUBIX_FLOW,
-            name: ROUTES.RUBIX_FLOW,
-            label: (
-              <Tooltip placement="right" title={"Rubix-Wires Editor"}>
-                <NavLink to={ROUTES.RUBIX_FLOW}>Rubix-Wires Editor</NavLink>
-              </Tooltip>
-            ),
-          },
-          {
-            key: ROUTES.WIRES_CONNECTIONS,
-            name: ROUTES.WIRES_CONNECTIONS,
-            label: (
-              <Tooltip placement="right" title={"Rubix-Wires Connections"}>
-                <NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink>
-              </Tooltip>
-            ),
-          },
-          {
-            key: ROUTES.USER_GUIDE,
-            name: ROUTES.USER_GUIDE,
-            label: (
-              <Tooltip placement="right" title={"Rubix-Wires User Guide"}>
-                <NavLink to={ROUTES.USER_GUIDE}>Rubix-Wires User Guide</NavLink>
-              </Tooltip>
-            ),
-          },
-        ],
-      };
+      if (!!getShowWires()) {
+        return {
+          key: name,
+          icon: <Icon />,
+          label: (
+            <Tooltip placement="right" title={name}>
+              {name}
+            </Tooltip>
+          ),
+          name: name,
+          children: [
+            {
+              key: ROUTES.RUBIX_FLOW,
+              name: ROUTES.RUBIX_FLOW,
+              label: (
+                <Tooltip placement="right" title={"Rubix-Wires Editor"}>
+                  <NavLink to={ROUTES.RUBIX_FLOW}>Rubix-Wires Editor</NavLink>
+                </Tooltip>
+              ),
+            },
+            {
+              key: ROUTES.WIRES_CONNECTIONS,
+              name: ROUTES.WIRES_CONNECTIONS,
+              label: (
+                <Tooltip placement="right" title={"Rubix-Wires Connections"}>
+                  <NavLink to={ROUTES.WIRES_CONNECTIONS}>Rubix-Wires Connections</NavLink>
+                </Tooltip>
+              ),
+            },
+            {
+              key: ROUTES.USER_GUIDE,
+              name: ROUTES.USER_GUIDE,
+              label: (
+                <Tooltip placement="right" title={"Rubix-Wires User Guide"}>
+                  <NavLink to={ROUTES.USER_GUIDE}>Rubix-Wires User Guide</NavLink>
+                </Tooltip>
+              ),
+            },
+          ],
+        };
+      } else {
+        return null;
+      }
     }
 
     return {
@@ -366,6 +396,10 @@ export const MenuSidebar = () => {
     setIsBlockMenu(value);
   };
 
+  const onOpenChange = (openKeys: string[]) => {
+    console.log("openKeys", openKeys);
+  };
+
   useEffect(() => {
     fetchConnections();
   }, []);
@@ -400,6 +434,7 @@ export const MenuSidebar = () => {
             items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
+            onOpenChange={onOpenChange}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
 
