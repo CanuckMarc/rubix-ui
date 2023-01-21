@@ -180,6 +180,7 @@ export const SchedulesTable = (props: any) => {
         }
       }
     }
+
     console.log(opts);
     setScheduleModalVisible(false);
     const res = await props.factory.EditSchedule(props.connUUID, props.hostUUID, currentItem.uuid, opts)
@@ -212,8 +213,15 @@ export const SchedulesTable = (props: any) => {
 
       <ScheduleModal
         visible={scheduleModalVisible} 
-        handleFormFinish={handleFormFinish}
+        currentItem={currentItem}
+        setCurrentItem={setCurrentItem}
+        setScheduleModalVisible={setScheduleModalVisible}
+        refreshList={refreshList}
+        // handleFormFinish={handleFormFinish}
         handleCancel={handleScheduleCancel}
+        factory={props.factory}
+        connUUID={props.connUUID}
+        hostUUID={props.hostUUID}
       />
     </>
   );
