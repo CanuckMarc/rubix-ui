@@ -92,6 +92,7 @@ export const Schedules = () => {
       </Card>
 
       <EditModal 
+        title={'Create schedule'}
         createModal={createModal} 
         moreOptions={false}
         handleFormFinish={handleFormFinish} 

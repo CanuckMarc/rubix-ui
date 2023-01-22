@@ -144,7 +144,7 @@ export const Bacnet = () => {
             </div>
 
 
-            <Modal title="Edit BACnet Configurations" visible={modalOpen} onOk={form.submit} onCancel={handleCancel} bodyStyle={{maxHeight: '50vh'}} width='25vw'>
+            <Modal forceRender title="Edit BACnet Configurations" visible={modalOpen} onOk={form.submit} onCancel={handleCancel} bodyStyle={{maxHeight: '50vh'}} width='25vw'>
                 <Form
                 form={form}
                 name="basic"

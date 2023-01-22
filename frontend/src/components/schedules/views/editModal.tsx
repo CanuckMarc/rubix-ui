@@ -1,15 +1,31 @@
 import { Input, Modal, Form, Select } from "antd";
+import { useEffect, useState } from "react";
 
 export const EditModal = (props: any) => {
+  const { currentItem, moreOptions } = props;
   const [form] = Form.useForm();
+  const [initData, setInitData] = useState({})
+
+  useEffect(() => {
+      if (currentItem) {
+        setInitData({
+            schedule_name: currentItem.name,
+            enable: currentItem.enable,
+            is_global: currentItem.is_global
+        })
+      }
+  }, [currentItem])
+
+  useEffect(() => form.resetFields(), [initData]);
 
   return (
-    <Modal title="Create schedules" visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='30vw'>
+    <Modal forceRender title={props.title} visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='30vw'>
         <Form
             form={form}
             name="basic"
             autoComplete="off"
             style={{maxHeight: '40vh', overflowX: 'auto'}}
+            initialValues={initData}
             labelCol={{
                 span: 4
             }}
@@ -26,7 +42,7 @@ export const EditModal = (props: any) => {
             <Input style={{width: '20vw'}}/>
             </Form.Item>
 
-            {props.moreOptions && (
+            {moreOptions && (
                 <>
                     <Form.Item
                     label="Enable:"
@@ -37,12 +53,16 @@ export const EditModal = (props: any) => {
                             style={{width: '20vw'}}
                             options={[
                                 {
-                                value: true,
-                                label: 'true'
+                                    value: true,
+                                    label: 'true'
                                 },
                                 {
-                                value: false,
-                                label: 'false'
+                                    value: false,
+                                    label: 'false'
+                                },
+                                {
+                                    value: null,
+                                    label: 'null'
                                 },
                             ]}
                         />
@@ -57,12 +77,16 @@ export const EditModal = (props: any) => {
                             style={{width: '20vw'}}
                             options={[
                                 {
-                                value: true,
-                                label: 'true'
+                                    value: true,
+                                    label: 'true'
                                 },
                                 {
-                                value: false,
-                                label: 'false'
+                                    value: false,
+                                    label: 'false'
+                                },
+                                {
+                                    value: null,
+                                    label: 'null'
                                 },
                             ]}
                         />

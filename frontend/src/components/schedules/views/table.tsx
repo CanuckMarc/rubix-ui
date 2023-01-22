@@ -137,6 +137,9 @@ export const SchedulesTable = (props: any) => {
       />
 
       <EditModal 
+        data={data}
+        currentItem={currentItem}
+        title={'Edit schedule'}
         createModal={editModalVisible} 
         moreOptions={true}
         handleFormFinish={handleEditFormFinish} 

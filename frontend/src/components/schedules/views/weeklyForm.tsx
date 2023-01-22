@@ -3,7 +3,7 @@ import { Input, Form, Select, TimePicker } from "antd";
 import type { SelectProps } from 'antd';
 import moment from 'moment';
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 const dayOptions: SelectProps['options'] = [];
 for (let i=0; i<7; i++) {
     dayOptions.push({
