@@ -122,74 +122,6 @@ export const SchedulesTable = (props: any) => {
     setEditModalVisible(false)
   }
 
-  // const handleFormFinish = async(value: any) => {
-  //   // console.log(value)
-  //   let event: any = {}
-  //   let weekly: any = {}
-  //   let exception: any = {}
-
-  //   if (value.event_name != undefined && value.event_range != undefined) {
-  //     const startTemp = value.event_range[0]._d.toISOString().split(':')
-  //     const endTemp = value.event_range[1]._d.toISOString().split(':')
-  //     event[crypto.randomUUID()] = {
-  //       name: value.event_name,
-  //       dates: [
-  //         {
-  //           start: `${startTemp[0]}:${startTemp[1]}`,
-  //           end: `${endTemp[0]}:${endTemp[1]}`
-  //         }
-  //       ]
-  //     }
-  //   }
-    
-  //   if (
-  //     value.weekly_schedule_name != undefined &&
-  //     value.schedule_days != undefined && 
-  //     value.schedule_start != undefined && 
-  //     value.schedule_end != undefined
-  //   ) {
-  //     weekly[crypto.randomUUID()] = {
-  //       name: value.weekly_schedule_name,
-  //       days: value.schedule_days,
-  //       start: value.schedule_start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-  //       end: value.schedule_end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-  //     }
-  //   }
-    
-  //   if (value.exception_name != undefined && value.exception_range != undefined) {
-  //     const startTemp = value.exception_range[0]._d.toISOString().split(':')
-  //     const endTemp = value.exception_range[1]._d.toISOString().split(':')
-  //     exception[crypto.randomUUID()] = {
-  //       name: value.exception_name,
-  //       dates: [
-  //         {
-  //           start: `${startTemp[0]}:${startTemp[1]}`,
-  //           end: `${endTemp[0]}:${endTemp[1]}`
-  //         }
-  //       ]
-  //     }
-  //   }
-    
-  //   const opts = {
-  //     ...currentItem,
-  //     schedule: {
-  //       schedules: {
-  //         events: event,
-  //         weekly: weekly,
-  //         exception: exception
-  //       }
-  //     }
-  //   }
-
-  //   console.log(opts);
-  //   setScheduleModalVisible(false);
-  //   const res = await props.factory.EditSchedule(props.connUUID, props.hostUUID, currentItem.uuid, opts)
-  //   if (res) {
-  //     console.log(res)
-  //   }
-  //   refreshList();
-  // }
-
   const handleScheduleCancel = () => {
     setScheduleModalVisible(false)
   }
@@ -217,7 +149,6 @@ export const SchedulesTable = (props: any) => {
         setCurrentItem={setCurrentItem}
         setScheduleModalVisible={setScheduleModalVisible}
         refreshList={refreshList}
-        // handleFormFinish={handleFormFinish}
         handleCancel={handleScheduleCancel}
         factory={props.factory}
         connUUID={props.connUUID}

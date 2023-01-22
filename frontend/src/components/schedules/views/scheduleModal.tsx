@@ -1,16 +1,17 @@
 import { useRef, useEffect, useState } from "react";
-import { Input, Modal, Form, Select, Tabs, Divider, Button, Space } from "antd";
+import { Modal, Tabs } from "antd";
 import { EventExceptionForm } from './eventExceptionForm';
 import { WeeklyForm } from './weeklyForm';
 import { TableEntry } from './tableEntry';
-import { PlusOutlined } from '@ant-design/icons';
+import { TabContent } from './tab';
+import { assistcli } from "../../../../wailsjs/go/models";
 const { TabPane } = Tabs;
 
 const eventsTag = 'EVENT'
 const weeklyTag = 'WEEKLY'
 const exceptionTag = 'EXCEPTION'
 
-enum CreateType {
+export enum CreateType {
     EVENT = "event",
     WEEKLY = "weekly",
     EXCEPTION = "exception",
@@ -23,6 +24,32 @@ const checkNull = (obj: any, key: any) => {
     }, obj);
 }
 
+const generateExistingItems = (
+    currentItem: assistcli.Schedule,
+    objString: string,
+    form: React.FC,
+    setCurrentItem: Function,
+    eventException: Boolean
+) => {
+    let existingElementJSX: JSX.Element[] = []
+    const res = checkNull(currentItem, objString)
+    if (res != null || res != undefined) {
+        Object.keys(res).forEach( function(key,index) {
+            existingElementJSX.push(
+                <TableEntry 
+                    key={key} 
+                    EditForm={form} 
+                    data={res[key]} itemUUID={key} 
+                    currentItem={structuredClone(currentItem)} 
+                    setCurrentItem={setCurrentItem}
+                    eventException={eventException}
+                /> 
+            )
+        });
+    }
+    return existingElementJSX
+}
+
 export const ScheduleModal = (props: any) => {
   const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
   const formRef = useRef<any>();
@@ -32,67 +59,21 @@ export const ScheduleModal = (props: any) => {
   const [createCat, setCreateCat] = useState<CreateType>(CreateType.UNSPECIFIED)
 
   useEffect(() => {
-    console.log(currentItem.schedule)
+    // map existing items to tableEntry for display if not empty
     if (currentItem.schedule && currentItem.schedule.schedules) {
-        let eventsJSX: JSX.Element[] = []
-        const eventCheckRes = checkNull(currentItem, 'schedule.schedules.events')
-        if (eventCheckRes != null || eventCheckRes != undefined) {
-            const events = currentItem.schedule.schedules.events
-            Object.keys(events).forEach( function(key,index) {
-                eventsJSX.push(
-                    <TableEntry 
-                        key={key} 
-                        EditForm={EventExceptionForm} 
-                        data={events[key]} itemUUID={key} 
-                        currentItem={structuredClone(currentItem)} 
-                        setCurrentItem={setCurrentItem}
-                        eventException={true}
-                    /> 
-                )
-            });
-        }
+        const eventsJSX = generateExistingItems(currentItem, 'schedule.schedules.events', EventExceptionForm, setCurrentItem, true);
         setEvents(eventsJSX)
 
-        let exceptionJSX: JSX.Element[] = []
-        const exceptionCheckRes = checkNull(currentItem, 'schedule.schedules.exception')
-        if (exceptionCheckRes != null || exceptionCheckRes != undefined) {
-            const exceptions = currentItem.schedule.schedules.exception
-            Object.keys(exceptions).forEach( function(key,index) {
-                exceptionJSX.push(
-                    <TableEntry 
-                        key={key} 
-                        EditForm={EventExceptionForm} 
-                        data={exceptions[key]} 
-                        itemUUID={key} 
-                        currentItem={structuredClone(currentItem)} 
-                        setCurrentItem={setCurrentItem}
-                        eventException={true}
-                    /> 
-                )
-            });
-        }
+        const exceptionJSX = generateExistingItems(currentItem, 'schedule.schedules.exception', EventExceptionForm, setCurrentItem, true);
         setExceptions(exceptionJSX)
 
-        let weeklyJSX: JSX.Element[] = []
-        const weeklyCheckRes = checkNull(currentItem, 'schedule.schedules.weekly')
-        if (weeklyCheckRes != null || weeklyCheckRes != undefined) {
-            const weeklys = currentItem.schedule.schedules.weekly
-            Object.keys(weeklys).forEach( function(key,index) {
-                weeklyJSX.push(
-                    <TableEntry 
-                        key={key} 
-                        EditForm={WeeklyForm} 
-                        data={weeklys[key]} 
-                        itemUUID={key} 
-                        currentItem={structuredClone(currentItem)} 
-                        setCurrentItem={setCurrentItem}
-                        eventException={false}
-                    /> 
-                )
-            });
-        }
+        const weeklyJSX = generateExistingItems(currentItem, 'schedule.schedules.weekly', WeeklyForm, setCurrentItem, false);
         setWeeklys(weeklyJSX)
-
+    // reset existing items when current schedule item is empty
+    } else {
+        setEvents([])
+        setExceptions([])
+        setWeeklys([])
     }
   }, [currentItem])
 
@@ -200,14 +181,9 @@ export const ScheduleModal = (props: any) => {
             opts = clonedItem;
         }
     }
-    // setCurrentItem(currentItem)
-    // console.log(currentItem)
 
     setScheduleModalVisible(false);
-    const res = await factory.EditSchedule(connUUID, hostUUID, clonedItem.uuid, opts)
-    if (res) {
-      console.log(res)
-    }
+    await factory.EditSchedule(connUUID, hostUUID, clonedItem.uuid, opts)
     refreshList();
   }
 
@@ -231,59 +207,53 @@ export const ScheduleModal = (props: any) => {
       formRef.current.click();
       setCreateCat(CreateType.UNSPECIFIED)
   }
-  //bodyStyle={{maxHeight: '50vh'}}
+
   return (
-    <Modal title="Create schedules" visible={props.visible} onOk={handleOk} onCancel={props.handleCancel} bodyStyle={{overflowX: 'scroll', maxHeight: '50vh'}} width='50vw'>
+    <Modal 
+        title="Create schedules" 
+        visible={props.visible} 
+        onOk={handleOk} 
+        onCancel={props.handleCancel} 
+        bodyStyle={{overflowX: 'scroll', maxHeight: '50vh'}} 
+        width='50vw'
+        okButtonProps={{ disabled: createCat != CreateType.UNSPECIFIED  }}
+    >
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.EVENT)} onClick={eventCreate} style={{width: '5vw'}}>Create</Button>
-                        {(createCat == CreateType.EVENT) && (
-                            <>
-                                <EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
-                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
-                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
-                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
-                                </div>
-                            </>
-                        )}
-                    <Divider/>
-                    {events}
-                </div>
+                <TabContent 
+                    createCat={createCat}
+                    type={CreateType.EVENT}
+                    handleOnClick={eventCreate}
+                    exisitingElements={events}
+                    handleCancel={handleCancel}
+                    handleCreate={handleCreate}
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
+                />
             </TabPane>
 
             <TabPane tab={weeklyTag} key={weeklyTag}>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.WEEKLY)} onClick={weeklyCreate} style={{width: '5vw'}}>Create</Button>
-                        {(createCat == CreateType.WEEKLY) && (
-                            <>
-                                <WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
-                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
-                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
-                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
-                                </div>
-                            </>
-                        )}
-                    <Divider/>
-                    {weeklys}
-                </div>
+                <TabContent 
+                    createCat={createCat}
+                    type={CreateType.WEEKLY}
+                    handleOnClick={weeklyCreate}
+                    exisitingElements={weeklys}
+                    handleCancel={handleCancel}
+                    handleCreate={handleCreate}
+                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
+                />
             </TabPane>
 
             <TabPane tab={exceptionTag} key={exceptionTag}>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.EXCEPTION)} onClick={exceptionCreate} style={{width: '5vw'}}>Create</Button>
-                        {(createCat == CreateType.EXCEPTION) && (
-                            <>
-                                <EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
-                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
-                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
-                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
-                                </div>
-                            </>
-                        )}
-                    <Divider/>
-                    {exceptions}
-                </div>
+                <TabContent 
+                    createCat={createCat}
+                    type={CreateType.EXCEPTION}
+                    handleOnClick={exceptionCreate}
+                    exisitingElements={exceptions}
+                    handleCancel={handleCancel}
+                    handleCreate={handleCreate}
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
+                }
+                />
             </TabPane>
         </Tabs>
         

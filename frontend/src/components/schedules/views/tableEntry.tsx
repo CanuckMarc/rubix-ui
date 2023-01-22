@@ -31,7 +31,6 @@ export const TableEntry = (props: any) => {
     }
 
     setCurrentItem(currentItem)
-    // console.log(currentItem)
   }
 
   const handleFormFinish = (values: any) => {
@@ -66,7 +65,6 @@ export const TableEntry = (props: any) => {
         }
     }
     setCurrentItem(currentItem)
-    // console.log(currentItem)
   }
 
   return (
