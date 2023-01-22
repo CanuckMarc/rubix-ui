@@ -79,11 +79,11 @@ export const ScheduleModal = (props: any) => {
 
   const handleOk = async () => {
     props.setScheduleModalVisible(false);
-    console.log(currentItem)
-    const res = await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)
-    if (res) {
-      console.log(res)
-    }
+    // console.log(currentItem)
+    await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)
+    // if (res) {
+    //   console.log(res)
+    // }
     props.refreshList();
   }
 
@@ -102,29 +102,46 @@ export const ScheduleModal = (props: any) => {
   }
 
   const handleFormFinish = async(values: any) => {
+      const clonedItem = structuredClone(currentItem)
+      const scheduleRes = checkNull(clonedItem, 'schedule')
+      const schedulesRes = checkNull(clonedItem, 'schedule.schedules')
+    
     let events: any = {}
     let weekly: any = {}
     let exception: any = {}
-
-    const clonedItem = structuredClone(currentItem)
-
     let opts: any = {}
-    if (createCat == CreateType.EVENT) {
-        const newEvent = parseEvExDateTime(values)
-        // when events is null
-        const res = checkNull(clonedItem, 'schedule.schedules.events')
-        if (res == null || res == undefined) {
-            events[crypto.randomUUID()] = newEvent
-            opts = {
-                ...clonedItem,
-                schedule: {
-                    schedules: {
-                        ...clonedItem.schedule.schedules,
-                        events: events
-                    }
+    
+    // initialise the opts object if schedule obj is null
+    // once submit, this will init all properties on the server side as well
+    if (scheduleRes == null || schedulesRes == null) {
+        opts = {
+            ...clonedItem,
+            schedule: {
+                schedules: {
+                    events: {},
+                    weekly: {},
+                    exception: {}
                 }
             }
-        // when events object has content, just add new event to the events object
+        }
+    }
+
+    if (createCat == CreateType.EVENT) {
+        const newEvent = parseEvExDateTime(values)
+        events[crypto.randomUUID()] = newEvent
+        const eventsRes = checkNull(clonedItem, 'schedule.schedules.events')
+        // when schedule or schedules obj is null, use the initialised opts obj 
+        if (scheduleRes == null || schedulesRes == null) {
+            opts.schedule.schedules.events[crypto.randomUUID()] = newEvent
+        // when schedules property on schedule obj is not null but events is null, spread existing item into the new schedules obj
+        // in this case, the opts obj is not initialised, but clonedItem will have the correct schedule obj structure
+        } else if (schedulesRes != null && eventsRes == null) {
+            clonedItem.schedule.schedules = {
+                ...clonedItem.schedule.schedules,
+                events: events
+            }
+            opts = clonedItem;
+        // clonedItem has the correct schedule obj structure, events object has content, add new event to the opts object
         } else {
             clonedItem.schedule.schedules.events[crypto.randomUUID()] = newEvent;
             opts = clonedItem;
@@ -133,20 +150,17 @@ export const ScheduleModal = (props: any) => {
     
     if (createCat == CreateType.EXCEPTION) {
         const newException = parseEvExDateTime(values)
-        // when events is null
-        const res = checkNull(clonedItem, 'schedule.schedules.exception')
-        if (res == null || res == undefined) {
-            exception[crypto.randomUUID()] = newException
-            opts = {
-                ...clonedItem,
-                schedule: {
-                    schedules: {
-                        ...clonedItem.schedule.schedules,
-                        exception: exception
-                    }
-                }
+        exception[crypto.randomUUID()] = newException
+        const exceptionRes = checkNull(clonedItem, 'schedule.schedules.exception')
+        
+        if (scheduleRes == null || schedulesRes == null) {
+            opts.schedule.schedules.exception[crypto.randomUUID()] = newException
+        } else if (schedulesRes != null && exceptionRes == null) {
+            clonedItem.schedule.schedules = {
+                ...clonedItem.schedule.schedules,
+                exception: exception
             }
-        // when events object has content, just add new event to the events object
+            opts = clonedItem;
         } else {
             clonedItem.schedule.schedules.exception[crypto.randomUUID()] = newException;
             opts = clonedItem;
@@ -160,20 +174,17 @@ export const ScheduleModal = (props: any) => {
             start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
             end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})     
         }
-        // when events is null
-        const res = checkNull(clonedItem, 'schedule.schedules.weekly')
-        if (res == null || res == undefined) {
-            weekly[crypto.randomUUID()] = newWeekly
-            opts = {
-                ...clonedItem,
-                schedule: {
-                    schedules: {
-                        ...clonedItem.schedule.schedules,
-                        weekly: weekly
-                    }
-                }
+        weekly[crypto.randomUUID()] = newWeekly
+        const weeklyRes = checkNull(clonedItem, 'schedule.schedules.weekly')
+        
+        if (scheduleRes == null || schedulesRes == null) {
+            opts.schedule.schedules.weekly[crypto.randomUUID()] = newWeekly
+        } else if (schedulesRes != null && weeklyRes == null) {
+            clonedItem.schedule.schedules = {
+                ...clonedItem.schedule.schedules,
+                weekly: weekly
             }
-        // when events object has content, just add new event to the events object
+            opts = clonedItem;
         } else {
             clonedItem.schedule.schedules.weekly[crypto.randomUUID()] = newWeekly;
             opts = clonedItem;
@@ -207,7 +218,7 @@ export const ScheduleModal = (props: any) => {
   }
 
   return (
-    <Modal 
+    <Modal
         title="Create schedules" 
         visible={props.visible} 
         onOk={handleOk} 

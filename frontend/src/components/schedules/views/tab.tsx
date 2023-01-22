@@ -5,7 +5,7 @@ export const TabContent = (props: any) => {
     const { createCat, type, form, handleOnClick, handleCancel, handleCreate, exisitingElements, buttonName } = props;
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-            <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == type)} onClick={handleOnClick} style={{width: '7.5vw'}}>{buttonName}</Button>
+            <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == type)} onClick={handleOnClick} style={{width: '8vw'}}>{buttonName}</Button>
                 {(createCat == type) && (
                     <>
                         {form}

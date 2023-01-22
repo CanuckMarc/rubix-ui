@@ -22,7 +22,7 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
-      console.log(res)
+      // console.log(res)
       setData(res);
     } catch (error) {
       setData([]);
@@ -54,8 +54,8 @@ export const Schedules = () => {
 
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
-    const res = await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
-    console.log(res)
+    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
+    // console.log(res)
     
     fetch();
   }
