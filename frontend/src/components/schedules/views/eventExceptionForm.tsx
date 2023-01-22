@@ -1,28 +1,29 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Input, Modal, Form, Select, Tabs, TimePicker, DatePicker } from "antd";
-import type { SelectProps, RadioChangeEvent } from 'antd';
+import { useEffect, useState } from "react";
+import { Input, Form, DatePicker } from "antd";
 import moment from 'moment';
-const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
 
 export const EventExceptionForm = (props: any) => {
-  const { eventData, innerRef, setScheduleObject } = props;
+  const { eventExceptionData, innerRef, handleFinish } = props;
   const [form] = Form.useForm();
   const [initData, setInitData] = useState<any>({})
 
 
   useEffect(() => {
-    const startDateTime = eventData.dates[0].start.split('T');
-    const endDateTime = eventData.dates[0].end.split('T');
-    const init = {
-        name: eventData.name,
-        range: [
-            moment(`${startDateTime[0]} ${startDateTime[1]}`),
-            moment(`${endDateTime[0]} ${endDateTime[1]}`)
-        ]
+    let init = {}
+    if (Object.keys(eventExceptionData).length != 0) {
+        const startDateTime = eventExceptionData.dates[0].start.split('T');
+        const endDateTime = eventExceptionData.dates[0].end.split('T');
+        init = {
+            name: eventExceptionData.name,
+            range: [
+                moment(`${startDateTime[0]} ${startDateTime[1]}`),
+                moment(`${endDateTime[0]} ${endDateTime[1]}`)
+            ]
+        }
     }
     setInitData(init)
-  }, [eventData])
+  }, [])
 
   useEffect(() => form.resetFields(), [initData]);
 
@@ -39,11 +40,12 @@ export const EventExceptionForm = (props: any) => {
         wrapperCol={{
             span: 4
         }}
-        onFinish={props.handleFinish}
+        onFinish={handleFinish}
     >
         <Form.Item
             label="Name:"
             name="name"
+            rules={[{ required: true, message: 'Please input name!' }]}
         >
             <Input style={{width: '20vw'}}/>
         </Form.Item>
@@ -51,6 +53,7 @@ export const EventExceptionForm = (props: any) => {
         <Form.Item
             label="Start and end date:"
             name="range"
+            rules={[{ required: true, message: 'Please input date and time!' }]}
         >
             <RangePicker showTime style={{ width: '20vw' }} />
         </Form.Item>

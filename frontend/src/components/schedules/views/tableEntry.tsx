@@ -1,66 +1,72 @@
-import { useEffect, useRef, useState } from "react";
-import { Input, Modal, Form, Select, Tabs, TimePicker, DatePicker, Descriptions, Button, Space, Divider } from "antd";
-import type { SelectProps, RadioChangeEvent } from 'antd';
-import { EditOutlined, EnterOutlined } from '@ant-design/icons';
-import moment from 'moment';
-const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
+import { useRef, useState } from "react";
+import { Descriptions, Button } from "antd";
+import { EditOutlined, EnterOutlined, DeleteOutlined } from '@ant-design/icons';
 
 
 export const TableEntry = (props: any) => {
   const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException } = props;
   const formRef = useRef<any>();
   const [editButton, setEditButton] = useState(false);
-//   const [changed, setChanged] = useState(false)
-//   const [form] = Form.useForm();
-//   const [initData, setInitData] = useState({})
 
-//   useEffect(() => {
-//     const startDateTime = data.dates[0].start.split('T');
-//     const endDateTime = data.dates[0].end.split('T');
-//     setInitData({
-//         event_name: data.name,
-//         event_range: [
-//             moment(`${startDateTime[0]} ${startDateTime[1]}`),
-//             moment(`${endDateTime[0]} ${endDateTime[1]}`)
-//         ]
-//     })
-//   }, [])
-
-  
-
-  const handleEditClicked = (values: any) => {
+  const handleEditClicked = () => {
     setEditButton(true)
   }
 
-  const handleCommitClicked = (values: any) => {
+  const handleCommitClicked = () => {
     formRef.current.click();
     setEditButton(false)
   }
 
-  const handleFormFinish = (values: any) => {
-    // console.log(data)
-    // console.log('event form submitted with values: ', values)
-
-    const startTemp = values.range[0]._d.toISOString().split(':')
-    const endTemp = values.range[1]._d.toISOString().split(':')
-    const updatedEvent = {
-        ...data,
-        name: values.name,
-        dates: [{
-            start:`${startTemp[0]}:${startTemp[1]}`,
-            end: `${endTemp[0]}:${endTemp[1]}`
-        }]
-    }
-
-    if (itemUUID in currentItem.schedule.schedules.events) {
-        currentItem.schedule.schedules.events[itemUUID] = updatedEvent
-    } else if (itemUUID in currentItem.schedule.schedules.exception) {
-        currentItem.schedule.schedules.exception[itemUUID] = updatedEvent
+  const handleDeleteClicked = () => {
+    if (eventException) {
+        if (itemUUID in currentItem.schedule.schedules.events) {
+            delete currentItem.schedule.schedules.events[itemUUID]
+        } else if (itemUUID in currentItem.schedule.schedules.exception) {
+            delete currentItem.schedule.schedules.exception[itemUUID]
+        }
+    } else {
+        if (itemUUID in currentItem.schedule.schedules.weekly) {
+            delete currentItem.schedule.schedules.weekly[itemUUID]
+        }
     }
 
     setCurrentItem(currentItem)
-    console.log(currentItem)
+    // console.log(currentItem)
+  }
+
+  const handleFormFinish = (values: any) => {
+    if (eventException) {
+        const startTemp = values.range[0]._d.toISOString().split(':')
+        const endTemp = values.range[1]._d.toISOString().split(':')
+        const updatedEventException = {
+            ...data,
+            name: values.name,
+            dates: [{
+                start:`${startTemp[0]}:${startTemp[1]}`,
+                end: `${endTemp[0]}:${endTemp[1]}`
+            }]
+        }
+    
+        if (itemUUID in currentItem.schedule.schedules.events) {
+            currentItem.schedule.schedules.events[itemUUID] = updatedEventException
+        } else if (itemUUID in currentItem.schedule.schedules.exception) {
+            currentItem.schedule.schedules.exception[itemUUID] = updatedEventException
+        }
+    } else {
+        const updatedWeekly = {
+            ...data,
+            name: values.name,
+            days: values.days,
+            start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      
+        }
+        if (itemUUID in currentItem.schedule.schedules.weekly) {
+            currentItem.schedule.schedules.weekly[itemUUID] = updatedWeekly
+        }
+    }
+    setCurrentItem(currentItem)
+    // console.log(currentItem)
   }
 
   return (
@@ -74,7 +80,7 @@ export const TableEntry = (props: any) => {
             </Descriptions>
         )}
         {(editButton && eventException) && (
-            <EditForm eventData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
+            <EditForm eventExceptionData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
         )}
         {/* if rendering weekly */}
         {(!editButton && !eventException) && (
@@ -86,9 +92,10 @@ export const TableEntry = (props: any) => {
             </Descriptions>
         )}
         {(editButton && !eventException) && (
-            <EditForm eventData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
+            <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
         )}
         <Button type="primary" icon={<EditOutlined />} size={'small'} disabled={editButton} onClick={handleEditClicked}>Edit</Button>
+        <Button type="primary" icon={<DeleteOutlined />} size={'small'} danger={true} disabled={editButton} onClick={handleDeleteClicked}>Delete</Button>
         <Button type="primary" icon={<EnterOutlined />} size={'small'} disabled={!editButton} onClick={handleCommitClicked}>Commit</Button>
     </div>
   );

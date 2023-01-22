@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
-import { Input, Modal, Form, Select, Tabs, TimePicker, DatePicker } from "antd";
+import { useRef, useEffect, useState } from "react";
+import { Input, Modal, Form, Select, Tabs, Divider, Button, Space } from "antd";
 import { EventExceptionForm } from './eventExceptionForm';
+import { WeeklyForm } from './weeklyForm';
 import { TableEntry } from './tableEntry';
-import type { SelectProps, RadioChangeEvent } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
 
-const event = 'EVENT'
-const weekly = 'WEEKLY'
-const exception = 'EXCEPTION'
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const eventsTag = 'EVENT'
+const weeklyTag = 'WEEKLY'
+const exceptionTag = 'EXCEPTION'
 
-const dayOptions: SelectProps['options'] = [];
-for (let i=0; i<7; i++) {
-    dayOptions.push({
-        value: days[i],
-        label: days[i]
-    })
-}
+enum CreateType {
+    EVENT = "event",
+    WEEKLY = "weekly",
+    EXCEPTION = "exception",
+    UNSPECIFIED = "unspecified"
+  }
+
 const checkNull = (obj: any, key: any) => {
     return key.split(".").reduce(function(o: any, x: any) {
         return (typeof o == "undefined" || o === null) ? o : o[x];
@@ -25,12 +24,12 @@ const checkNull = (obj: any, key: any) => {
 }
 
 export const ScheduleModal = (props: any) => {
-  const { connUUID, hostUUID, currentItem, setCurrentItem } = props;
-  const [form] = Form.useForm();
-  const [editedData, setEditedData] = useState<any>({})
+  const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
+  const formRef = useRef<any>();
   const [events, setEvents] = useState<JSX.Element[]>([])
   const [weeklys, setWeeklys] = useState<JSX.Element[]>([])
   const [exceptions, setExceptions] = useState<JSX.Element[]>([])
+  const [createCat, setCreateCat] = useState<CreateType>(CreateType.UNSPECIFIED)
 
   useEffect(() => {
     console.log(currentItem.schedule)
@@ -53,7 +52,6 @@ export const ScheduleModal = (props: any) => {
             });
         }
         setEvents(eventsJSX)
-        // console.log(events)
 
         let exceptionJSX: JSX.Element[] = []
         const exceptionCheckRes = checkNull(currentItem, 'schedule.schedules.exception')
@@ -74,7 +72,6 @@ export const ScheduleModal = (props: any) => {
             });
         }
         setExceptions(exceptionJSX)
-        // console.log(exceptions)
 
         let weeklyJSX: JSX.Element[] = []
         const weeklyCheckRes = checkNull(currentItem, 'schedule.schedules.weekly')
@@ -84,30 +81,19 @@ export const ScheduleModal = (props: any) => {
                 weeklyJSX.push(
                     <TableEntry 
                         key={key} 
-                        EditForm={EventExceptionForm} 
+                        EditForm={WeeklyForm} 
                         data={weeklys[key]} 
                         itemUUID={key} 
                         currentItem={structuredClone(currentItem)} 
                         setCurrentItem={setCurrentItem}
+                        eventException={false}
                     /> 
                 )
             });
         }
         setWeeklys(weeklyJSX)
-        console.log(weeklys)
 
-        // let weeklyJSX: JSX.Element[] = []
-        // const weeklys = currentItem.schedule.schedules?.weekly
-        // Object.keys(events).forEach( function(key,index) {
-        //     weeklyJSX.push(
-        //         <TableEntry key={key} EditForm={EventForm} data={events[key]} itemKey={key} currentItem={structuredClone(currentItem)} setCurrentItem={setCurrentItem}/> 
-        //     )
-        // });
-        // setEvents(eventsJSX)
-        // console.log(events)
     }
-    // const exceptions = currentItem.schedule?.schedules?.exception
-    // const weeklys = currentItem.schedule?.schedules?.weekly
   }, [currentItem])
 
   const handleOk = async () => {
@@ -122,96 +108,184 @@ export const ScheduleModal = (props: any) => {
     props.refreshList();
   }
 
+  const parseEvExDateTime = (values: any) => {
+    const startTemp = values.range[0]._d.toISOString().split(':')
+    const endTemp = values.range[1]._d.toISOString().split(':')
+    const newEvEx = {
+        name: values.name,
+        dates: [{
+            start:`${startTemp[0]}:${startTemp[1]}`,
+            end: `${endTemp[0]}:${endTemp[1]}`
+        }]
+    }
+
+    return newEvEx
+  }
+
+  const handleFormFinish = async(values: any) => {
+    let events: any = {}
+    let weekly: any = {}
+    let exception: any = {}
+
+    const clonedItem = structuredClone(currentItem)
+
+    let opts: any = {}
+    if (createCat == CreateType.EVENT) {
+        const newEvent = parseEvExDateTime(values)
+        // when events is null
+        const res = checkNull(clonedItem, 'schedule.schedules.events')
+        if (res == null || res == undefined) {
+            events[crypto.randomUUID()] = newEvent
+            opts = {
+                ...clonedItem,
+                schedule: {
+                    schedules: {
+                        ...clonedItem.schedule.schedules,
+                        events: events
+                    }
+                }
+            }
+        // when events object has content, just add new event to the events object
+        } else {
+            clonedItem.schedule.schedules.events[crypto.randomUUID()] = newEvent;
+            opts = clonedItem;
+        }
+    } 
+    
+    if (createCat == CreateType.EXCEPTION) {
+        const newException = parseEvExDateTime(values)
+        // when events is null
+        const res = checkNull(clonedItem, 'schedule.schedules.exception')
+        if (res == null || res == undefined) {
+            exception[crypto.randomUUID()] = newException
+            opts = {
+                ...clonedItem,
+                schedule: {
+                    schedules: {
+                        ...clonedItem.schedule.schedules,
+                        exception: exception
+                    }
+                }
+            }
+        // when events object has content, just add new event to the events object
+        } else {
+            clonedItem.schedule.schedules.exception[crypto.randomUUID()] = newException;
+            opts = clonedItem;
+        }
+    }
+
+    if (createCat == CreateType.WEEKLY) {
+        const newWeekly = {
+            name: values.name,
+            days: values.days,
+            start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})     
+        }
+        // when events is null
+        const res = checkNull(clonedItem, 'schedule.schedules.weekly')
+        if (res == null || res == undefined) {
+            weekly[crypto.randomUUID()] = newWeekly
+            opts = {
+                ...clonedItem,
+                schedule: {
+                    schedules: {
+                        ...clonedItem.schedule.schedules,
+                        weekly: weekly
+                    }
+                }
+            }
+        // when events object has content, just add new event to the events object
+        } else {
+            clonedItem.schedule.schedules.weekly[crypto.randomUUID()] = newWeekly;
+            opts = clonedItem;
+        }
+    }
+    // setCurrentItem(currentItem)
+    // console.log(currentItem)
+
+    setScheduleModalVisible(false);
+    const res = await factory.EditSchedule(connUUID, hostUUID, clonedItem.uuid, opts)
+    if (res) {
+      console.log(res)
+    }
+    refreshList();
+  }
+
+  const eventCreate = () => {
+    setCreateCat(CreateType.EVENT)
+  }
+
+  const weeklyCreate = () => {
+    setCreateCat(CreateType.WEEKLY)
+  }
+
+  const exceptionCreate = () => {
+    setCreateCat(CreateType.EXCEPTION)
+  }
+  
+  const handleCancel = () => {
+      setCreateCat(CreateType.UNSPECIFIED)
+  }
+    
+  const handleCreate = () => {
+      formRef.current.click();
+      setCreateCat(CreateType.UNSPECIFIED)
+  }
+  //bodyStyle={{maxHeight: '50vh'}}
   return (
-    <Modal title="Create schedules" visible={props.visible} onOk={handleOk} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='50vw'>
-        {/* <Form
-                form={form}
-                name="basic"
-                autoComplete="off"
-                style={{maxHeight: '40vh', overflowX: 'auto'}}
-                labelCol={{
-                    span: 8
-                }}
-                wrapperCol={{
-                    span: 4
-                }}
-                onFinish={props.handleFormFinish}
-        > */}
-            <Tabs defaultActiveKey="1">
-                <TabPane tab={event} key={event}>
+    <Modal title="Create schedules" visible={props.visible} onOk={handleOk} onCancel={props.handleCancel} bodyStyle={{overflowX: 'scroll', maxHeight: '50vh'}} width='50vw'>
+        <Tabs defaultActiveKey="1">
+            <TabPane tab={eventsTag} key={eventsTag}>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
+                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.EVENT)} onClick={eventCreate} style={{width: '5vw'}}>Create</Button>
+                        {(createCat == CreateType.EVENT) && (
+                            <>
+                                <EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
+                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
+                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
+                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
+                                </div>
+                            </>
+                        )}
+                    <Divider/>
                     {events}
-                    {/* <Form.Item
-                        label="Name:"
-                        name="event_name"
-                        >
-                        <Input style={{width: '20vw'}}/>
-                    </Form.Item>
+                </div>
+            </TabPane>
 
-                    <Form.Item
-                        label="Start and end date:"
-                        name="event_range"
-                    >
-                        <RangePicker showTime style={{ width: '20vw' }} />
-                    </Form.Item> */}
-
-                </TabPane>
-
-                <TabPane tab={weekly} key={weekly}>
+            <TabPane tab={weeklyTag} key={weeklyTag}>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
+                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.WEEKLY)} onClick={weeklyCreate} style={{width: '5vw'}}>Create</Button>
+                        {(createCat == CreateType.WEEKLY) && (
+                            <>
+                                <WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
+                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
+                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
+                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
+                                </div>
+                            </>
+                        )}
+                    <Divider/>
                     {weeklys}
-                    {/* <Form.Item
-                    label="Name:"
-                    name="weekly_schedule_name"
-                    >
-                        <Input style={{width: '20vw'}}/>
-                    </Form.Item>
+                </div>
+            </TabPane>
 
-                    <Form.Item
-                    label="Days:"
-                    name="schedule_days"
-                    >
-                        <Select
-                            mode="multiple"
-                            size={'middle'}
-                            placeholder="Please select schedule days"
-                            style={{ width: '20vw' }}
-                            options={dayOptions}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                    label="Start time:"
-                    name="schedule_start"
-                    >
-                        <TimePicker style={{ width: '20vw' }} />
-                    </Form.Item>
-                    
-                    <Form.Item
-                    label="End time:"
-                    name="schedule_end"
-                    >
-                        <TimePicker style={{ width: '20vw' }} />
-                    </Form.Item> */}
-                    
-                </TabPane>
-
-                <TabPane tab={exception} key={exception}>
+            <TabPane tab={exceptionTag} key={exceptionTag}>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
+                    <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == CreateType.EXCEPTION)} onClick={exceptionCreate} style={{width: '5vw'}}>Create</Button>
+                        {(createCat == CreateType.EXCEPTION) && (
+                            <>
+                                <EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
+                                <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
+                                    <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
+                                    <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
+                                </div>
+                            </>
+                        )}
+                    <Divider/>
                     {exceptions}
-                    {/* <Form.Item
-                        label="Name:"
-                        name="exception_name"
-                    >
-                        <Input style={{width: '20vw'}}/>
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Start and end date:"
-                        name="exception_range"
-                    >
-                        <RangePicker showTime style={{ width: '20vw' }} />
-                    </Form.Item> */}
-                </TabPane>
-            </Tabs>
-        {/* </Form> */}
+                </div>
+            </TabPane>
+        </Tabs>
         
     </Modal>
   );
