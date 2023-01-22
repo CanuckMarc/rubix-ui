@@ -225,6 +225,7 @@ export const ScheduleModal = (props: any) => {
                     exisitingElements={events}
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
+                    buttonName={'Add event'}
                     form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
                 />
             </TabPane>
@@ -237,6 +238,7 @@ export const ScheduleModal = (props: any) => {
                     exisitingElements={weeklys}
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
+                    buttonName={'Add weekly'}
                     form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
                 />
             </TabPane>
@@ -249,6 +251,7 @@ export const ScheduleModal = (props: any) => {
                     exisitingElements={exceptions}
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
+                    buttonName={'Add exception'}
                     form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
                 }
                 />

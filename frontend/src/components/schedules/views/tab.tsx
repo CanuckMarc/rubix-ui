@@ -2,10 +2,10 @@ import { Button } from "antd";
 import { PlusOutlined } from '@ant-design/icons';
 
 export const TabContent = (props: any) => {
-    const { createCat, type, form, handleOnClick, handleCancel, handleCreate, exisitingElements } = props;
+    const { createCat, type, form, handleOnClick, handleCancel, handleCreate, exisitingElements, buttonName } = props;
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-            <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == type)} onClick={handleOnClick} style={{width: '5vw'}}>Create</Button>
+            <Button type="primary" icon={<PlusOutlined />} size={'middle'} disabled={(createCat == type)} onClick={handleOnClick} style={{width: '7.5vw'}}>{buttonName}</Button>
                 {(createCat == type) && (
                     <>
                         {form}
