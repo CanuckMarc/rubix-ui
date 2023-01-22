@@ -39,7 +39,7 @@ const generateExistingItems = (
                 <TableEntry 
                     key={key} 
                     EditForm={form} 
-                    data={res[key]} itemUUID={key} 
+                    data={res[key]} itemUUID={key}
                     currentItem={structuredClone(currentItem)} 
                     setCurrentItem={setCurrentItem}
                     eventException={eventException}
@@ -53,10 +53,10 @@ const generateExistingItems = (
 export const ScheduleModal = (props: any) => {
   const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
   const formRef = useRef<any>();
-  const [events, setEvents] = useState<JSX.Element[]>([])
-  const [weeklys, setWeeklys] = useState<JSX.Element[]>([])
-  const [exceptions, setExceptions] = useState<JSX.Element[]>([])
-  const [createCat, setCreateCat] = useState<CreateType>(CreateType.UNSPECIFIED)
+  const [events, setEvents] = useState<JSX.Element[]>([]);
+  const [weeklys, setWeeklys] = useState<JSX.Element[]>([]);
+  const [exceptions, setExceptions] = useState<JSX.Element[]>([]);
+  const [createCat, setCreateCat] = useState<CreateType>(CreateType.UNSPECIFIED);
 
   useEffect(() => {
     // map existing items to tableEntry for display if not empty
@@ -78,8 +78,6 @@ export const ScheduleModal = (props: any) => {
   }, [currentItem])
 
   const handleOk = async () => {
-    // props.setTableItem(currentItem)
-
     props.setScheduleModalVisible(false);
     console.log(currentItem)
     const res = await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)

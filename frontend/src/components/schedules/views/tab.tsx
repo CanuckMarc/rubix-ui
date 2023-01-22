@@ -11,7 +11,7 @@ export const TabContent = (props: any) => {
                         {form}
                         <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
                             <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
-                            <Button type="primary" size={'middle'} onClick={handleCreate}>Commit</Button>
+                            <Button type="primary" size={'middle'} onClick={handleCreate}>Ok</Button>
                         </div>
                     </>
                 )}
