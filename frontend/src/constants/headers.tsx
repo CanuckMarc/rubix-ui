@@ -324,6 +324,23 @@ export const HOST_HEADERS = [
     dataIndex: "uuid",
     key: "uuid",
   },
+  {
+    title: "global_uuid",
+    dataIndex: "global_uuid",
+    key: "global_uuid",
+  },
+  {
+    title: "is_online",
+    dataIndex: "is_online",
+    key: "is_online",
+    render: (a: any) => '' + (a ?? ''),
+  },
+  {
+    title: "is_valid_token",
+    dataIndex: "is_valid_token",
+    key: "is_valid_token",
+    render: (a: any) => '' + (a ?? ''),
+  },
 ];
 
 export const NETWORK_HEADERS = [

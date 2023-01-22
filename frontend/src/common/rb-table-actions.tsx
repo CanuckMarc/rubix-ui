@@ -3,6 +3,7 @@ import {
   DeleteOutlined,
   ExportOutlined,
   ImportOutlined,
+  MonitorOutlined,
   PlayCircleOutlined,
   PlusOutlined,
   ReloadOutlined,
@@ -92,6 +93,22 @@ export const RbRestartButton = (props: any) => {
       icon={<PlayCircleOutlined />}
     >
       {text ?? "Restart"}
+    </Button>
+  );
+};
+
+export const RbMonitorButton = (props: any) => {
+  const { onClick, disabled, loading, style = {}, text } = props;
+  return (
+    <Button
+      className="rb-btn restart-color white--text"
+      onClick={onClick}
+      disabled={disabled}
+      icon={<MonitorOutlined />}
+      style={{ ...style }}
+      loading={loading}
+    >
+      {text ?? "Monitor"}
     </Button>
   );
 };

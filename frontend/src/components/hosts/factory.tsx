@@ -7,7 +7,7 @@ import {
   GetHost,
   GetHosts,
   GetHostSchema,
-  PingHost,
+  PingHost, UpdateStatus,
 } from "../../../wailsjs/go/backend/App";
 import { Helpers } from "../../helpers/checks";
 import Host = amodel.Host;
@@ -64,7 +64,7 @@ export class HostsFactory {
     return await DeleteHostBulk(this.connectionUUID, uuids);
   }
 
-  async Ping(hostUUID: string): Promise<boolean> {
-    return true;
+  async UpdateStatus(): Promise<Array<Host>> {
+    return await UpdateStatus(this.connectionUUID);
   }
 }

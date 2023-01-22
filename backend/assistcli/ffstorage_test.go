@@ -8,12 +8,11 @@ import (
 )
 
 func TestClient_GetLocalStorage(t *testing.T) {
-	https := false
 	cli := New(&Client{
 		Rest:  nil,
 		Ip:    "",
 		Port:  0,
-		HTTPS: &https,
+		HTTPS: false,
 	})
 
 	storage, err := cli.GetLocalStorage("rc")
@@ -24,12 +23,11 @@ func TestClient_GetLocalStorage(t *testing.T) {
 }
 
 func TestClient_UpdateLocalStorage(t *testing.T) {
-	https := false
 	cli := New(&Client{
 		Rest:  nil,
 		Ip:    "",
 		Port:  0,
-		HTTPS: &https,
+		HTTPS: false,
 	})
 
 	storage, err := cli.UpdateLocalStorage("rc", &model.LocalStorageFlowNetwork{

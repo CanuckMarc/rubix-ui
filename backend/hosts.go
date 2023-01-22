@@ -128,3 +128,14 @@ func (inst *App) GetHosts(connUUID string) (resp []amodel.Host) {
 	data, _ := client.GetHosts()
 	return data
 }
+
+func (inst *App) UpdateStatus(connUUID string) (resp []amodel.Host) {
+	resp = []amodel.Host{}
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	data, _ := client.UpdateStatus()
+	return data
+}

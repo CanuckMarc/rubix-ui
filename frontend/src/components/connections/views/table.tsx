@@ -1,4 +1,4 @@
-import { ArrowRightOutlined, FormOutlined, LinkOutlined, ScanOutlined, ImportOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined, ImportOutlined, PhoneOutlined, ScanOutlined } from "@ant-design/icons";
 import { Space, Tooltip, Spin, Menu, Button, Dropdown, MenuProps } from "antd";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -47,7 +47,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         <Space size="middle">
           <Tooltip title="Ping">
             <a onClick={() => pingConnection(conn.uuid)}>
-              <LinkOutlined />
+              <PhoneOutlined />
             </a>
           </Tooltip>
           <Tooltip title="Edit">
