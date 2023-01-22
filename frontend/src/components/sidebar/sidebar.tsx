@@ -203,7 +203,7 @@ const ShowWiresMenuItem = () => {
   const handleChangeEnable = async (checked: boolean) => {
     setIsEnable(checked);
     localStorage.setItem(SHOW_WIRES, checked.toString());
-    await settingsFactory.Update({ ...settings, showWires: checked });
+    // await settingsFactory.Update({ ...settings, showWires: checked });
     openNotificationWithIcon("info", "Please refresh page to apply");
   };
 
