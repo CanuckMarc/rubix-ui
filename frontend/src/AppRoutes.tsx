@@ -21,6 +21,7 @@ import RubixFlow from "./components/rubix-flow/rubix-flow";
 import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
+import WiresMap from "./components/wires-map/map";
 
 function AppRoutes() {
   return (
@@ -108,6 +109,11 @@ function AppRoutes() {
         key={routes.WIRES_CONNECTIONS}
         path={routes.WIRES_CONNECTIONS_REMOTE}
         element={<WiresConnections />}
+      />
+      <Route 
+        key={routes.WIRES_MAP}
+        path={routes.WIRES_MAP_REMOTE}
+        element={<WiresMap />}
       />
       <Route
         key={routes.SCHEDULES}

@@ -326,6 +326,15 @@ export const MenuSidebar = () => {
                 </Tooltip>
               ),
             },
+            // {
+            //   key: ROUTES.WIRES_MAP,
+            //   name: ROUTES.WIRES_MAP,
+            //   label: (
+            //     <Tooltip placement="right" title={"Rubix-Wires Map"}>
+            //       <NavLink to={ROUTES.WIRES_MAP_REMOTE}>Rubix-Wires Map</NavLink>
+            //     </Tooltip>
+            //   ),
+            // },
             {
               key: ROUTES.USER_GUIDE,
               name: ROUTES.USER_GUIDE,
@@ -397,7 +406,7 @@ export const MenuSidebar = () => {
   };
 
   const onOpenChange = (openKeys: string[]) => {
-    console.log("openKeys", openKeys);
+    // console.log("openKeys", openKeys);
   };
 
   useEffect(() => {

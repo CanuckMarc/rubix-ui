@@ -5,6 +5,7 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
+  RadarChartOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
@@ -18,6 +19,7 @@ let ObjectType = {
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
+  WIRES_MAP_REMOTE: "wires-map"
 };
 
 interface ObjectTypeRoute {
@@ -43,6 +45,8 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
     ROUTES.WIRES_CONNECTIONS_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.SCHEDULES_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.WIRES_MAP_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.WIRES_MAP_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
 function getItemValue(item: any, type: string) {
@@ -59,6 +63,7 @@ function getItemValue(item: any, type: string) {
     case ObjectType.RUBIX_FLOW_REMOTE:
     case ObjectType.WIRES_CONNECTIONS_REMOTE:
     case ObjectType.SCHEDULES_REMOTE:
+    case ObjectType.WIRES_MAP_REMOTE:
     default:
       deleteProp = "";
       break;
@@ -214,6 +219,19 @@ export const getTreeDataIterative = (connections: any) => {
                   ),
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
+                  children: null,
+                },
+                {
+                  ...objectMap(
+                    getTreeObject(
+                      { name: "wires_map", uuid: "wires_map_" + host.uuid },
+                      ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
+                      "",
+                      <RadarChartOutlined />
+                    )
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
+                  value: getItemValue(host, ObjectType.WIRES_MAP_REMOTE),
                   children: null,
                 },
               ],

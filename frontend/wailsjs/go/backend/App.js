@@ -670,6 +670,22 @@ export function GetNetworksWithPointsDisplay(arg1, arg2) {
   return window['go']['backend']['App']['GetNetworksWithPointsDisplay'](arg1, arg2);
 }
 
+export function GetNodesAllFlowNetworks(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetNodesAllFlowNetworks'](arg1, arg2, arg3);
+}
+
+export function GetNodesAllFlowNetworksChildren(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesAllFlowNetworksChildren'](arg1, arg2, arg3, arg4);
+}
+
+export function GetNodesByCategory(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesByCategory'](arg1, arg2, arg3, arg4);
+}
+
+export function GetNodesByType(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesByType'](arg1, arg2, arg3, arg4);
+}
+
 export function GetPcGetNetworks() {
   return window['go']['backend']['App']['GetPcGetNetworks']();
 }
