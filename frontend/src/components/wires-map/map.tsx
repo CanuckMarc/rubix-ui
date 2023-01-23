@@ -2,16 +2,25 @@ import { Typography, Card, Select, Spin } from "antd";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { model } from "../../../wailsjs/go/models";
-import { PointsPane } from "./views/pointsPane";
+import { PointsPaneOne } from "./views/pointsPaneOne";
+import { PointsPaneTwo } from "./views/pointsPaneTwo";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
 
 const { Title } = Typography;
 
+export interface PointTableType {
+    key: string;
+    name: string;
+    uuid: string;
+}
+
 export const WiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
     const [isFetching, setIsFetching] = useState(false);
     const [data, setData] = useState<model.Point[]>([]);
+    const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType[]>([]);
+    const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType[]>([]);
 
     // const mappingFactory = new MappingFactory();
     const pointFactory = new FlowPointFactory();
@@ -59,8 +68,8 @@ export const WiresMap = () => {
                     </div>
                     <Spin spinning={isFetching} style={{ width: '100%' }}>
                         <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center', justifyContent: 'space-around'}}>
-                            <PointsPane title={'Point 1 name'} pointList={data}/>
-                            {/* <PointsPane title={'Point 2 name'} pointList={data}/> */}
+                            <PointsPaneOne pointList={data} selectedPoints={selectedPointsTwo} setSelectedPoints={setSelectedPointsOne}/>
+                            <PointsPaneTwo pointList={data} selectedPoints={selectedPointsOne} setSelectedPoints={setSelectedPointsTwo}/>
                         </div>
                     </Spin>
                 </div>
