@@ -733,8 +733,11 @@ func (inst *App) nodePayload(connUUID, hostUUID string, payload interface{}, nod
 }
 
 func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload interface{}, nodeId string) *flow.Message {
+	p := &node.Payload{
+		Any: payload,
+	}
 	if isRemote {
-		resp, err := inst.nodePayload(connUUID, hostUUID, payload, nodeId)
+		resp, err := inst.nodePayload(connUUID, hostUUID, p, nodeId)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return nil
@@ -742,9 +745,7 @@ func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload i
 		return resp
 	} else {
 		var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
-		p := &node.Payload{
-			Any: payload,
-		}
+
 		resp, err := client.NodePayload(nodeId, p)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
