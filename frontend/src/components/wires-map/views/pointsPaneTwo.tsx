@@ -49,9 +49,7 @@ export const PointsPaneTwo = (props: any) => {
                 }
             })
         })
-        if (selectedItems.length > 0) {
-            setSelectedPoints(selectedItems)
-        }
+        setSelectedPoints(selectedItems)
     };
 
     const rowSelection = {
@@ -59,16 +57,19 @@ export const PointsPaneTwo = (props: any) => {
         selectedRowKeys,
         onChange: onSelectChange,
         getCheckboxProps: (record: PointTableType) => {
-            // console.log(record)
             let flag = false;
-            selectedPoints.forEach((item: PointTableType) => {
-                if (record.uuid === item.uuid) {
-                    flag = true
-                }
-            });
-            return {
-                disabled: flag
-            };
+            if (selectedPoints.length > 0) {
+                selectedPoints.forEach((item: PointTableType) => {
+                    if (record.uuid === item.uuid) {
+                        flag = true
+                    }
+                });
+                return {
+                    disabled: flag
+                };
+            } else {
+                return {disabled: flag}
+            }
         }
     };
 
