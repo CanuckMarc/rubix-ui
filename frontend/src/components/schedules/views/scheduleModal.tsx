@@ -36,14 +36,14 @@ const generateExistingItems = (
     if (res != null || res != undefined) {
         Object.keys(res).forEach( function(key,index) {
             existingElementJSX.push(
-                <TableEntry 
-                    key={key} 
-                    EditForm={form} 
+                <TableEntry
+                    key={key}
+                    EditForm={form}
                     data={res[key]} itemUUID={key}
-                    currentItem={structuredClone(currentItem)} 
+                    currentItem={structuredClone(currentItem)}
                     setCurrentItem={setCurrentItem}
                     eventException={eventException}
-                /> 
+                />
             )
         });
     }
@@ -105,12 +105,12 @@ export const ScheduleModal = (props: any) => {
       const clonedItem = structuredClone(currentItem)
       const scheduleRes = checkNull(clonedItem, 'schedule')
       const schedulesRes = checkNull(clonedItem, 'schedule.schedules')
-    
+
     let events: any = {}
     let weekly: any = {}
     let exception: any = {}
     let opts: any = {}
-    
+
     // initialise the opts object if schedule obj is null
     // once submit, this will init all properties on the server side as well
     if (scheduleRes == null || schedulesRes == null) {
@@ -130,7 +130,7 @@ export const ScheduleModal = (props: any) => {
         const newEvent = parseEvExDateTime(values)
         events[crypto.randomUUID()] = newEvent
         const eventsRes = checkNull(clonedItem, 'schedule.schedules.events')
-        // when schedule or schedules obj is null, use the initialised opts obj 
+        // when schedule or schedules obj is null, use the initialised opts obj
         if (scheduleRes == null || schedulesRes == null) {
             opts.schedule.schedules.events[crypto.randomUUID()] = newEvent
         // when schedules property on schedule obj is not null but events is null, spread existing item into the new schedules obj
@@ -146,13 +146,13 @@ export const ScheduleModal = (props: any) => {
             clonedItem.schedule.schedules.events[crypto.randomUUID()] = newEvent;
             opts = clonedItem;
         }
-    } 
-    
+    }
+
     if (createCat == CreateType.EXCEPTION) {
         const newException = parseEvExDateTime(values)
         exception[crypto.randomUUID()] = newException
         const exceptionRes = checkNull(clonedItem, 'schedule.schedules.exception')
-        
+
         if (scheduleRes == null || schedulesRes == null) {
             opts.schedule.schedules.exception[crypto.randomUUID()] = newException
         } else if (schedulesRes != null && exceptionRes == null) {
@@ -172,11 +172,11 @@ export const ScheduleModal = (props: any) => {
             name: values.name,
             days: values.days,
             start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})     
+            end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         }
         weekly[crypto.randomUUID()] = newWeekly
         const weeklyRes = checkNull(clonedItem, 'schedule.schedules.weekly')
-        
+
         if (scheduleRes == null || schedulesRes == null) {
             opts.schedule.schedules.weekly[crypto.randomUUID()] = newWeekly
         } else if (schedulesRes != null && weeklyRes == null) {
@@ -207,11 +207,11 @@ export const ScheduleModal = (props: any) => {
   const exceptionCreate = () => {
     setCreateCat(CreateType.EXCEPTION)
   }
-  
+
   const handleCancel = () => {
       setCreateCat(CreateType.UNSPECIFIED)
   }
-    
+
   const handleCreate = () => {
       formRef.current.click();
       setCreateCat(CreateType.UNSPECIFIED)
@@ -219,17 +219,17 @@ export const ScheduleModal = (props: any) => {
 
   return (
     <Modal
-        title="Create schedules" 
-        visible={props.visible} 
-        onOk={handleOk} 
-        onCancel={props.handleCancel} 
-        bodyStyle={{overflowX: 'scroll', maxHeight: '50vh'}} 
+        title="Create schedules"
+        visible={props.visible}
+        onOk={handleOk}
+        onCancel={props.handleCancel}
+        bodyStyle={{overflowX: 'auto', maxHeight: '50vh'}}
         width='50vw'
         okButtonProps={{ disabled: createCat != CreateType.UNSPECIFIED  }}
     >
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
-                <TabContent 
+                <TabContent
                     createCat={createCat}
                     type={CreateType.EVENT}
                     handleOnClick={eventCreate}
@@ -242,7 +242,7 @@ export const ScheduleModal = (props: any) => {
             </TabPane>
 
             <TabPane tab={weeklyTag} key={weeklyTag}>
-                <TabContent 
+                <TabContent
                     createCat={createCat}
                     type={CreateType.WEEKLY}
                     handleOnClick={weeklyCreate}
@@ -255,7 +255,7 @@ export const ScheduleModal = (props: any) => {
             </TabPane>
 
             <TabPane tab={exceptionTag} key={exceptionTag}>
-                <TabContent 
+                <TabContent
                     createCat={createCat}
                     type={CreateType.EXCEPTION}
                     handleOnClick={exceptionCreate}
@@ -268,7 +268,7 @@ export const ScheduleModal = (props: any) => {
                 />
             </TabPane>
         </Tabs>
-        
+
     </Modal>
   );
 };
