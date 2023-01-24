@@ -1,19 +1,19 @@
 import { Tooltip } from "antd";
 import { amodel } from "../../../../../wailsjs/go/models";
-import { LoadingOutlined, PhoneOutlined } from "@ant-design/icons";
+import { LoadingOutlined, PhoneOutlined, SubnodeOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
-export const Ping = (props: IPing) => {
+export const ConfigureOpenVpn = (props: IConfigureOpenVpn) => {
   const { host, factory } = props;
 
   const [loading, setLoading] = useState(false);
 
-  const handlePing = async (e: any) => {
+  const configureOpenVPN = async (e: any) => {
     setLoading(true);
     e.stopPropagation();
     factory.uuid = host.uuid;
     try {
-      await factory.PingHost();
+      await factory.ConfigureOpenVPN();
     } catch (err) {
       console.error(err);
     } finally {
@@ -22,14 +22,14 @@ export const Ping = (props: IPing) => {
   };
 
   return loading ? <LoadingOutlined /> :
-    <Tooltip title="Ping">
-      <a onClick={(e) => handlePing(e)}>
-        <PhoneOutlined />
+    <Tooltip title="Configure OpenVPN">
+      <a onClick={(e) => configureOpenVPN(e)}>
+        <SubnodeOutlined />
       </a>
     </Tooltip>;
 };
 
-interface IPing {
+interface IConfigureOpenVpn {
   host: amodel.Host;
   factory: any;
 }

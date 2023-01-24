@@ -1,12 +1,5 @@
 import { Space, Spin, Tooltip } from "antd";
-import {
-  ArrowRightOutlined,
-  DiffOutlined,
-  DownloadOutlined,
-  FormOutlined,
-  ScanOutlined,
-  SubnodeOutlined
-} from "@ant-design/icons";
+import { ArrowRightOutlined, DiffOutlined, DownloadOutlined, FormOutlined, ScanOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";
@@ -32,8 +25,10 @@ import { EdgeAppInfo } from "./install-app-info";
 import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import { RbSearchInput } from "../../../common/rb-search-input";
 import { Ping } from "./ping/ping";
+import { ConfigureOpenVpn } from "./configure-open-vpn/configure-open-vpn";
 import Host = amodel.Host;
 import UUIDs = backend.UUIDs;
+import { AttachVirtualIP } from "./attach-virtual-ip/attach-virtual-ip";
 
 const ExpandedRow = (props: any) => {
   return (
@@ -94,16 +89,14 @@ export const HostsTable = (props: any) => {
               <ScanOutlined />
             </a>
           </Tooltip>
-          <Tooltip title="Configure OpenVPN">
-            <a onClick={(e) => configureOpenVPN(host, e)}>
-              <SubnodeOutlined />
-            </a>
-          </Tooltip>
-          <Tooltip title="Attach Virtual IP">
-            <a onClick={(e) => attachVirtualIP(host, e)}>
-              <DiffOutlined />
-            </a>
-          </Tooltip>
+          <ConfigureOpenVpn
+            host={host}
+            factory={factory}
+          />
+          <AttachVirtualIP
+            host={host}
+            factory={factory}
+          />
           <Link
             to={ROUTES.HOST.replace(":connUUID", connUUID)
               .replace(":locUUID", locUUID)
@@ -177,24 +170,6 @@ export const HostsTable = (props: any) => {
   const onCloseTokenModal = () => {
     setIsTokenModalVisible(false);
     setCurrentHost({} as Host);
-  };
-
-  const configureOpenVPN = (host: Host, e: any) => {
-    e.stopPropagation();
-    factory.uuid = host.uuid;
-    factory.ConfigureOpenVPN().catch(console.error);
-  };
-
-  const attachVirtualIP = (host: Host, e: any) => {
-    e.stopPropagation();
-    factory.uuid = host.uuid;
-    if (host.virtual_ip == "") {
-      openNotificationWithIcon("error", "There is no configured Virtual IP");
-    }
-    host.ip = host.virtual_ip;
-    factory.this = host;
-    factory.Update().catch(console.error);
-    openNotificationWithIcon("success", "Configured Virtual IP successfully!");
   };
 
   useEffect(() => {
