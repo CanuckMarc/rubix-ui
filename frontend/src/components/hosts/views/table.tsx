@@ -1,5 +1,13 @@
 import { Space, Spin, Tooltip } from "antd";
-import { ArrowRightOutlined, DownloadOutlined, FormOutlined, PhoneOutlined, ScanOutlined, SubnodeOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  DiffOutlined,
+  DownloadOutlined,
+  FormOutlined,
+  PhoneOutlined,
+  ScanOutlined,
+  SubnodeOutlined
+} from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";
@@ -22,9 +30,8 @@ import { EdgeBiosTokenFactory } from "../../edgebios/token-factory";
 import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-modal";
 import { InstallFactory } from "./install-rubix-edge/factory";
 import { EdgeAppInfo } from "./install-app-info";
-import {GitDownloadReleases, UpdateStatus} from "../../../../wailsjs/go/backend/App";
+import {GitDownloadReleases} from "../../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
-import Location = amodel.Location;
 import UUIDs = backend.UUIDs;
 import { RbSearchInput } from "../../../common/rb-search-input";
 
@@ -91,6 +98,11 @@ export const HostsTable = (props: any) => {
           <Tooltip title="Configure OpenVPN">
             <a onClick={(e) => configureOpenVPN(host, e)}>
               <SubnodeOutlined />
+            </a>
+          </Tooltip>
+          <Tooltip title="Attach Virtual IP">
+            <a onClick={(e) => attachVirtualIP(host, e)}>
+              <DiffOutlined />
             </a>
           </Tooltip>
           <Link
@@ -178,6 +190,18 @@ export const HostsTable = (props: any) => {
     e.stopPropagation();
     factory.uuid = host.uuid;
     factory.ConfigureOpenVPN().catch(console.error);
+  };
+
+  const attachVirtualIP = (host: Host, e: any) => {
+    e.stopPropagation();
+    factory.uuid = host.uuid;
+    if (host.virtual_ip == "") {
+      openNotificationWithIcon("error", "There is no configured Virtual IP");
+    }
+    host.ip = host.virtual_ip
+    factory.this = host;
+    factory.Update().catch(console.error);
+    openNotificationWithIcon("success", "Configured Virtual IP successfully!");
   };
 
   useEffect(() => {
