@@ -353,13 +353,13 @@ export const HOST_HEADERS = [
     title: "received_bytes",
     dataIndex: "received_bytes",
     key: "received_bytes",
-    sorter: (a: any, b: any) => a.received_bytes ?? 0 - b.received_bytes ?? 0,
+    sorter: (a: any, b: any) => (a.received_bytes ?? 0) - (b.received_bytes ?? 0),
   },
   {
     title: "sent_bytes",
     dataIndex: "sent_bytes",
     key: "sent_bytes",
-    sorter: (a: any, b: any) => a.sent_bytes ?? 0 - b.sent_bytes ?? 0,
+    sorter: (a: any, b: any) => (a.received_bytes ?? 0) - (b.received_bytes ?? 0),
   },
   {
     title: "connected_since",
