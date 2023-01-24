@@ -4,7 +4,6 @@ import {
   DiffOutlined,
   DownloadOutlined,
   FormOutlined,
-  PhoneOutlined,
   ScanOutlined,
   SubnodeOutlined
 } from "@ant-design/icons";
@@ -30,10 +29,11 @@ import { EdgeBiosTokenFactory } from "../../edgebios/token-factory";
 import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-modal";
 import { InstallFactory } from "./install-rubix-edge/factory";
 import { EdgeAppInfo } from "./install-app-info";
-import {GitDownloadReleases} from "../../../../wailsjs/go/backend/App";
+import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
+import { RbSearchInput } from "../../../common/rb-search-input";
+import { Ping } from "./ping/ping";
 import Host = amodel.Host;
 import UUIDs = backend.UUIDs;
-import { RbSearchInput } from "../../../common/rb-search-input";
 
 const ExpandedRow = (props: any) => {
   return (
@@ -75,11 +75,10 @@ export const HostsTable = (props: any) => {
       fixed: "left",
       render: (_: any, host: Host) => (
         <Space size="middle">
-          <Tooltip title="Ping">
-            <a onClick={(e) => handlePing(host.uuid, e)}>
-              <PhoneOutlined />
-            </a>
-          </Tooltip>
+          <Ping
+            host={host}
+            factory={factory}
+          />
           <Tooltip title="Edit">
             <a onClick={(e) => showModal(host, e)}>
               <FormOutlined />
@@ -145,12 +144,6 @@ export const HostsTable = (props: any) => {
     refreshList();
   };
 
-  const handlePing = (uuid: string, e: any) => {
-    e.stopPropagation();
-    factory.uuid = uuid;
-    factory.PingHost().catch(console.error);
-  };
-
   const showModal = (host: Host, e: any) => {
     e.stopPropagation();
     setCurrentHost(host);
@@ -198,7 +191,7 @@ export const HostsTable = (props: any) => {
     if (host.virtual_ip == "") {
       openNotificationWithIcon("error", "There is no configured Virtual IP");
     }
-    host.ip = host.virtual_ip
+    host.ip = host.virtual_ip;
     factory.this = host;
     factory.Update().catch(console.error);
     openNotificationWithIcon("success", "Configured Virtual IP successfully!");
@@ -225,7 +218,7 @@ export const HostsTable = (props: any) => {
     setLoadingUpdateStatus(true);
     try {
       await factory.UpdateStatus();
-      await refreshList()
+      await refreshList();
     } catch (error) {
       openNotificationWithIcon("error", error);
     } finally {
