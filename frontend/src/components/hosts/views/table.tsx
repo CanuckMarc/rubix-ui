@@ -88,8 +88,8 @@ export const HostsTable = (props: any) => {
               <ScanOutlined />
             </a>
           </Tooltip>
-          <Tooltip title="Configure VPN">
-            <a onClick={(e) => showRubixEdgeInstallModal(host, e)}>
+          <Tooltip title="Configure OpenVPN">
+            <a onClick={(e) => configureOpenVPN(host, e)}>
               <SubnodeOutlined />
             </a>
           </Tooltip>
@@ -172,6 +172,12 @@ export const HostsTable = (props: any) => {
   const onCloseTokenModal = () => {
     setIsTokenModalVisible(false);
     setCurrentHost({} as Host);
+  };
+
+  const configureOpenVPN = (host: Host, e: any) => {
+    e.stopPropagation();
+    factory.uuid = host.uuid;
+    factory.ConfigureOpenVPN().catch(console.error);
   };
 
   useEffect(() => {

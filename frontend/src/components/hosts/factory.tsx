@@ -7,17 +7,14 @@ import {
   GetHost,
   GetHosts,
   GetHostSchema,
-  PingHost, UpdateStatus,
+  ConfigureOpenVPN,
+  PingHost,
+  UpdateStatus,
 } from "../../../wailsjs/go/backend/App";
-import { Helpers } from "../../helpers/checks";
 import Host = amodel.Host;
 import HostSchema = amodel.HostSchema;
 import Response = assistcli.Response;
 import UUIDs = backend.UUIDs;
-
-function hasUUID(uuid: string): Error {
-  return Helpers.IsUndefined(uuid, "host or connection uuid") as Error;
-}
 
 export class HostsFactory {
   uuid!: string;
@@ -66,5 +63,9 @@ export class HostsFactory {
 
   async UpdateStatus(): Promise<Array<Host>> {
     return await UpdateStatus(this.connectionUUID);
+  }
+
+  async ConfigureOpenVPN(): Promise<boolean> {
+    return await ConfigureOpenVPN(this.connectionUUID, this.uuid);
   }
 }
