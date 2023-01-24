@@ -213,7 +213,7 @@ export const HostsTable = (props: any) => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={hosts.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
         expandable={{
