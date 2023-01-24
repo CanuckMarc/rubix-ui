@@ -312,7 +312,7 @@ export const HOST_HEADERS = [
     title: "ip",
     dataIndex: "ip",
     key: "ip",
-    sorter: (a: any, b: any) => a.ip - b.ip,
+    sorter: (a: any, b: any) => sortIps(a.ip ?? '', b.ip ?? ''),
   },
   {
     title: "description",
@@ -334,14 +334,46 @@ export const HOST_HEADERS = [
     dataIndex: "is_online",
     key: "is_online",
     render: (a: any) => '' + (a ?? ''),
+    sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
     title: "is_valid_token",
     dataIndex: "is_valid_token",
     key: "is_valid_token",
     render: (a: any) => '' + (a ?? ''),
+    sorter: (a: any, b: any) => a.is_valid_token - b.is_valid_token,
+  },
+  {
+    title: "virtual_ip",
+    dataIndex: "virtual_ip",
+    key: "virtual_ip",
+    sorter: (a: any, b: any) => sortIps(a.virtual_ip ?? '', b.virtual_ip ?? ''),
+  },
+  {
+    title: "received_bytes",
+    dataIndex: "received_bytes",
+    key: "received_bytes",
+    sorter: (a: any, b: any) => a.received_bytes ?? 0 - b.received_bytes ?? 0,
+  },
+  {
+    title: "sent_bytes",
+    dataIndex: "sent_bytes",
+    key: "sent_bytes",
+    sorter: (a: any, b: any) => a.sent_bytes ?? 0 - b.sent_bytes ?? 0,
+  },
+  {
+    title: "connected_since",
+    dataIndex: "connected_since",
+    key: "connected_since",
+    sorter: (a: any, b: any) => (a.connected_since ?? '').localeCompare(b.connected_since ?? ''),
   },
 ];
+
+const sortIps = (a: string, b: string) => {
+  const num1 = Number(a.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
+  const num2 = Number(b.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
+  return ('' + num1).localeCompare('' + num2);
+}
 
 export const NETWORK_HEADERS = [
   {
@@ -350,7 +382,7 @@ export const NETWORK_HEADERS = [
     dataIndex: "plugin_name",
     render(name: string) {
       let image = pluginLogo(name);
-      return <Image width={70} preview={false} src={image} />;
+      return <Image width={70} preview={false} src={image}/>;
     },
   },
   {
