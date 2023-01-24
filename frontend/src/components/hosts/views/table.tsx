@@ -1,5 +1,5 @@
 import { Space, Spin, Tooltip } from "antd";
-import { ArrowRightOutlined, DiffOutlined, DownloadOutlined, FormOutlined, ScanOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, DownloadOutlined, FormOutlined, ScanOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";

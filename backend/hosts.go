@@ -27,7 +27,12 @@ func (inst *App) AddHost(connUUID string, host *amodel.Host) *amodel.Host {
 	if host.Name == "" {
 		host.Name = fmt.Sprintf("host-%s", uuid.ShortUUID("")[5:10])
 	}
-	host.Port = 1661
+	if host.BiosPort == 0 {
+		host.BiosPort = 1659
+	}
+	if host.Port == 0 {
+		host.Port = 1661
+	}
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
