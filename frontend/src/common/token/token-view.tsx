@@ -5,7 +5,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
   RedoOutlined,
-  PlusOutlined,
+  PlusOutlined, DiffOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import copy from "copy-to-clipboard";
@@ -144,9 +144,9 @@ export const TokenView = (props: ITokenView) => {
           renderItem={(item) => (
             <List.Item
               actions={[
-                <Tooltip title={`Add token to ${!!connUUID ? "Host" : "Connection"}`}>
+                <Tooltip title={`Attach token to ${!!connUUID ? "Host" : "Connection"}`}>
                   <a key="list-block" onClick={() => setToken(item)}>
-                    <PlusOutlined />
+                    <DiffOutlined />
                   </a>
                 </Tooltip>,
                 <Tooltip title="View">
