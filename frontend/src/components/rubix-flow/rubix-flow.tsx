@@ -235,10 +235,6 @@ const Flow = (props: FlowProps) => {
 
   // close sub flow
   const onBackToMain = () => {
-    // console.log(allSubFlowNodes)
-    // console.log(parentChild)
-    // console.log('all nodes before deletion are: ', nodes);
-    // console.log('all edges before deletion are: ', edges);
     allSubFlowNodes?.reverse().forEach((nodeToRemove: NodeInterface, index: Number, array: NodeInterface[]) => {
       const tempNodes:{[key:string]:[]} = parentChild
       // const tempEdges:{[key:string]:[]} = parentChildEdge
@@ -258,9 +254,6 @@ const Flow = (props: FlowProps) => {
         deleteNodesAndEdges([...tempNodes[nodeToRemove.id]], [])
       }
     })
-    
-    // console.log('all nodes after deletion are: ', nodes);
-    // console.log('all edges after deletion are: ', edges);
   
     setSelectedNodeForSubFlow([]);
     setIsConnectionBuilder(false);

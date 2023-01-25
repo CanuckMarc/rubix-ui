@@ -114,8 +114,6 @@ const NodeMenu = ({
   };
 
   const onSubFlowClick = () => {
-    // console.log(node);
-    // console.log('parentChild obj is: ', parentChild)
     const tempNodes:{[key:string]:[]} = parentChild
     console.log('child nodes in this subflow are: ', tempNodes[node.id])
     
@@ -133,25 +131,11 @@ const NodeMenu = ({
       }
     })
     
-    
     setAllNodes([...allNodes, ...nodesInSubFlow, ...tempInOutNodes])
-    // const tempEdges:{[key:string]:[]} = parentChildEdge
-    // console.log('child edges in this subflow are: ', tempEdges[node.id])
     setAllEdges(parentChildEdge)
-
-
-
-
 
     handleAddSubFlow(node);
     onClose();
-
-    // const res = allNodes.filter((node: NodeInterface) => {
-    //   if (node.info?.nodeName === 'Bypass Dampers') {
-    //     return true
-    //   }
-    // })
-    // console.log(res)
   };
 
   const handleNodeDeletion = () => {

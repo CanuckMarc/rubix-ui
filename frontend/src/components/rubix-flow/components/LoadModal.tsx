@@ -36,13 +36,9 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
       graph = JSON.parse(value) as GraphJSON;
     }
 
-    // console.log(graph)
-    
     if (graph === undefined) return;
     
     let [nodes, edges] = behaveToFlow(graph);
-    // console.log(nodes)
-    // console.log(edges)
 
     if (hasPositionMetaData(graph) === false) {
       autoLayout(nodes, edges);
@@ -60,6 +56,7 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
     // generate nodes with new id and keep old id to mapping with edge
     const newNodes: NodeInterfaceWithOldId[] = [];
     const nodesL1 = nodes
+      // TODO: verify if this is really not needed
       // .filter((node: NodeInterface) => {
       //   return !nodes.some((node2: NodeInterface) => node2.id === node.parentId);
       // })
@@ -162,7 +159,6 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose }) => {
     //   });
     // }
 
-    // console.log('parentChildEdge is: ', parentChildEdge)
     setParentChildEdge(edges)
     
 
