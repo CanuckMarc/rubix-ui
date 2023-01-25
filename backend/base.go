@@ -71,10 +71,11 @@ func (inst *App) NewTab(workingDir string) {
 		err := cmd.Run()
 		fmt.Println(err)
 	case "darwin":
-
+		err = fmt.Errorf("unsupported platform")
+		log.Error(err)
 	default:
 		err = fmt.Errorf("unsupported platform")
-		fmt.Println(err)
+		log.Error(err)
 	}
 }
 
