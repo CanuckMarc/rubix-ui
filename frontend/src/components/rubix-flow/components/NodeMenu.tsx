@@ -8,6 +8,8 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { SetNameModal } from "./Modals";
 import { NodeHelpModal } from "./NodeHelpModal";
 
+import { useStore } from "../../../App";
+
 type NodeMenuProps = {
   position: XYPosition;
   node: NodeInterface;
@@ -21,6 +23,10 @@ type NodeMenuProps = {
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
   isOpenFromNodeTree: boolean;
+  allNodes: NodeInterface[];
+  setAllNodes: Function;
+  allEdges: Edge[];
+  setAllEdges: Function;
 };
 
 export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
@@ -41,6 +47,10 @@ const NodeMenu = ({
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
   isOpenFromNodeTree = false,
+  allNodes,
+  setAllNodes,
+  allEdges,
+  setAllEdges
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
   const [isModalVisibleHelp, setIsModalVisibleHelp] = useState(false);
@@ -50,6 +60,12 @@ const NodeMenu = ({
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
   const ref = useRef(null);
+
+  const [parentChild, setParentChild, parentChildEdge, setParentChildEdge] = useStore(
+    (state) => [state.parentChild, state.setParentChild, state.parentChildEdge, state.setParentChildEdge]
+  )
+
+  // const instance = useReactFlow();
 
   useEffect(() => {
     function handleClickOutside(event: any) {
@@ -98,8 +114,44 @@ const NodeMenu = ({
   };
 
   const onSubFlowClick = () => {
+    // console.log(node);
+    // console.log('parentChild obj is: ', parentChild)
+    const tempNodes:{[key:string]:[]} = parentChild
+    console.log('child nodes in this subflow are: ', tempNodes[node.id])
+    
+    let tempInOutNodes: NodeInterface[] = [];
+    const nodesInSubFlow: NodeInterface[] = tempNodes[node.id]
+    nodesInSubFlow.forEach((node: NodeInterface) => {
+      if (node.type === 'sub-flow/folder') {
+        // subflow nodes for each folder in the current subflow
+        const res = tempNodes[node.id].filter((item: NodeInterface) => {
+          const name = item.type!.split('/');
+          if (name[0] === 'sub-flow' && name[1] !== 'folder') {
+            tempInOutNodes.push(item)
+          }
+        })
+      }
+    })
+    
+    
+    setAllNodes([...allNodes, ...nodesInSubFlow, ...tempInOutNodes])
+    // const tempEdges:{[key:string]:[]} = parentChildEdge
+    // console.log('child edges in this subflow are: ', tempEdges[node.id])
+    setAllEdges(parentChildEdge)
+
+
+
+
+
     handleAddSubFlow(node);
     onClose();
+
+    // const res = allNodes.filter((node: NodeInterface) => {
+    //   if (node.info?.nodeName === 'Bypass Dampers') {
+    //     return true
+    //   }
+    // })
+    // console.log(res)
   };
 
   const handleNodeDeletion = () => {

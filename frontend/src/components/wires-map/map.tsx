@@ -7,6 +7,14 @@ import { PointsPaneOne } from "./views/pointsPaneOne";
 import { PointsPaneTwo } from "./views/pointsPaneTwo";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
+import { useStore } from '../../App';
+
+import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
+import { NodeInterface, OutputNodeValueType } from "../rubix-flow/lib/Nodes/NodeInterface";
+import { handleGetSettingType } from "../rubix-flow/util/handleSettings";
+import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../rubix-flow/use-nodes-spec";
+import { NodeSpecJSON } from "../rubix-flow/lib";
+import { generateUuid } from "../rubix-flow/lib/generateUuid";
 
 const { Title } = Typography;
 
@@ -40,6 +48,14 @@ export const WiresMap = () => {
     // const mappingFactory = new MappingFactory();
     const pointFactory = new FlowPointFactory();
 
+
+    // const getVotes = useStore(state => state.votes);
+    const [votes, setVotes] = useStore(
+        (state) => [state.votes, state.setVotes]
+    )
+
+
+
     const fetch = async() => {
         try {
             setIsFetching(true);
@@ -60,6 +76,7 @@ export const WiresMap = () => {
         pointFactory.connectionUUID = connUUID;
         pointFactory.hostUUID = hostUUID;
         fetch();
+        // console.log('the stored value is: ', votes)
     }, [connUUID, hostUUID]);
 
     const recordPoints = () => {
@@ -69,7 +86,45 @@ export const WiresMap = () => {
 
         setPointConnections(resObj)
         console.log(resObj)
+        setVotes(10);
     }
+
+    // const renderPointsToFlowEditor = () => {
+    //     const allNodes: NodeInterface[] = [];
+    //     const node = generateNodes()
+    //     allNodes.push(node)
+
+    //     if (allNodes.length > 0) {
+    //         setTimeout(() => {
+    //           flowInstance.addNodes(allNodes);
+    //         }, 50);
+    //     }
+    // }
+
+    // const generateNodes = () => {
+    //     const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, 'constant/const-num');
+    //     const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, 'constant/const-num');
+
+    //     return {
+    //         id: generateUuid(),
+    //         isParent: false,
+    //         // style: null,
+    //         type: 'constant/const-num',
+    //         info: { nodeName: 'my_first_node' },
+    //         position: {
+    //           x: 269.99187629189623,
+    //           y: -46.35749312825459,
+    //         },
+    //         data: {
+    //           inputs: convertDataSpec(spec.inputs || []),
+    //           out: convertDataSpec(spec.outputs || []),
+    //         },
+    //         // parentId: parentNode.id,
+    //         settings: nodeSettings,
+    //         selected: false,
+    //         pin: 'in',
+    //       };
+    // }
 
     return (
         <>

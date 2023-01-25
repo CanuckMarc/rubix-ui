@@ -55,6 +55,9 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
     const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
     const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
 
+    console.log('nodeSettings is: ', nodeSettings)
+    console.log('spec is: ', spec)
+
     return {
       id: generateUuid(),
       isParent: false,
@@ -91,12 +94,20 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
   };
 
   const handleSave = () => {
+    console.log('nodesSpec is: ', nodesSpec)
+
     const inputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputFlow(n.type));
     const outputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputFlow(n.type));
+
+    console.log('inputsFlow is: ', inputsFlow)
+    console.log('outputsFlow is: ', outputsFlow)
+
 
     if (nodesBuilder.length > 0) {
       const allNodes: NodeInterface[] = [];
       const allEdges: Edge[] = [];
+
+      console.log('updated nodesBuilder is: ', nodesBuilder)
 
       nodesBuilder.forEach((node) => {
         let newNodesInput = node.data.inputs
@@ -107,7 +118,10 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
           .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
           .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(outputsFlow, item, node));
 
+        console.log('newNodesInput is: ', newNodesInput)
         newNodesInput = newNodesInput.map((item: NodeSpecJSONWithName, idx: number) => generateNode(item, idx));
+        console.log('updated newNodesInput is: ', newNodesInput)
+
         newNodesOutput = newNodesOutput.map((item: NodeSpecJSONWithName, idx: number) => generateNode(item, idx, true));
         allNodes.push(...[...newNodesInput, ...newNodesOutput]);
 
@@ -245,6 +259,9 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
     if (open) {
       const childNodes = nodes.filter((nodeItem: NodeWithExpose) => nodeItem.parentId === parentNode.id);
       const childNodesSelected = childNodes.filter((item) => item.selected);
+      console.log('childNodes are: ', childNodes)
+      console.log('childNodesSelected are: ', childNodesSelected)
+      console.log('edges are: ', edges)
 
       const newNodeBuilder = (childNodesSelected.length > 0 ? childNodesSelected : childNodes).filter(
         (nodeItem: NodeWithExpose) => {
@@ -252,6 +269,7 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
           const edgeWithNode = edges.filter(
             (edge) => edge.target === nodeItem.id || edge.source === nodeItem.id
           ).length;
+
           return (
             !nodeItem.isParent &&
             !isInputFlow(nodeItem.type!!) &&
@@ -260,6 +278,8 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
           );
         }
       );
+
+      console.log(newNodeBuilder)
 
       setNodesBuilder(
         newNodeBuilder.map((node) => ({

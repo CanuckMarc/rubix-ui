@@ -45,6 +45,8 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+import { TestComponent } from "./components/TestComponent";
+import { useStore } from "../../App";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -62,10 +64,11 @@ declare global {
 type FlowProps = {
   customEdgeTypes: any;
   customNodeTypes: any;
+  allSubFlowNodes: NodeInterface[] | undefined;
   selectedNodeForSubFlow: NodeInterface | undefined;
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
   handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
-  handleRemoveSelectedNodeForSubFlow: () => void;
+  handleRemoveSelectedNodeForSubFlow: (fn?: Function) => void;
 };
 
 const Flow = (props: FlowProps) => {
@@ -73,6 +76,7 @@ const Flow = (props: FlowProps) => {
   const {
     customNodeTypes,
     customEdgeTypes,
+    allSubFlowNodes,
     selectedNodeForSubFlow,
     setSelectedNodeForSubFlow,
     handlePushSelectedNodeForSubFlow,
@@ -100,6 +104,10 @@ const Flow = (props: FlowProps) => {
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
+
+  const [parentChild, setParentChild, parentChildEdge, setParentChildEdge] = useStore(
+    (state) => [state.parentChild, state.setParentChild, state.parentChildEdge, state.setParentChildEdge]
+  )
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -221,12 +229,39 @@ const Flow = (props: FlowProps) => {
 
   // exit each subflow
   const onCloseSubFlow = () => {
-    handleRemoveSelectedNodeForSubFlow();
+    handleRemoveSelectedNodeForSubFlow(deleteNodesAndEdges);
     setIsConnectionBuilder(false);
   };
 
   // close sub flow
   const onBackToMain = () => {
+    // console.log(allSubFlowNodes)
+    // console.log(parentChild)
+    // console.log('all nodes before deletion are: ', nodes);
+    // console.log('all edges before deletion are: ', edges);
+    allSubFlowNodes?.reverse().forEach((nodeToRemove: NodeInterface, index: Number, array: NodeInterface[]) => {
+      const tempNodes:{[key:string]:[]} = parentChild
+      // const tempEdges:{[key:string]:[]} = parentChildEdge
+      // console.log('edges to remove: ', tempEdges[nodeToRemove.id])
+
+      // on removing the last layer of subflow, only remove the non-sub-flow type nodes
+      // such that the top level can still see connections to folders
+      if (index === array.length - 1) {
+        const nodesToRemove = tempNodes[nodeToRemove.id].filter((node: NodeInterface) => {
+          const nodeName = node.type!.split('/');
+          if (nodeName[0] !== 'sub-flow' || node.type === 'sub-flow/folder') {
+            return true
+          }
+        })
+        deleteNodesAndEdges([...nodesToRemove], [])
+      } else {
+        deleteNodesAndEdges([...tempNodes[nodeToRemove.id]], [])
+      }
+    })
+    
+    // console.log('all nodes after deletion are: ', nodes);
+    // console.log('all edges after deletion are: ', edges);
+  
     setSelectedNodeForSubFlow([]);
     setIsConnectionBuilder(false);
   };
@@ -806,6 +841,7 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            <TestComponent />
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
@@ -869,6 +905,10 @@ const Flow = (props: FlowProps) => {
                 isDoubleClick={isDoubleClick}
                 handleAddSubFlow={handleAddSubFlow}
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
+                allNodes={nodes}
+                setAllNodes={setNodes}
+                allEdges={edges} 
+                setAllEdges={setEdges} 
               />
             )}
             {!!selectedNodeForSubFlow && (
@@ -892,6 +932,10 @@ export const RubixFlow = () => {
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
+  const [parentChild, setParentChild, parentChildEdge, setParentChildEdge] = useStore(
+    (state) => [state.parentChild, state.setParentChild, state.parentChildEdge, state.setParentChildEdge]
+  )
+
   useEffect(() => {
     window.subFlowIds = selectedNodeForSubFlow.map((node) => node.id);
     window.selectedNodeForSubFlow = nodeForSubFlowEnd;
@@ -903,8 +947,23 @@ export const RubixFlow = () => {
   };
 
   // remove the last node to exit each subflow
-  const handleRemoveSelectedNodeForSubFlow = () => {
+  const handleRemoveSelectedNodeForSubFlow = (fn?: Function) => {
     const arrNodeForSubFlow = [...selectedNodeForSubFlow];
+    if (fn) {
+      const nodeToRemove = arrNodeForSubFlow[arrNodeForSubFlow.length - 1];
+      const tempNodes:{[key:string]:[]} = parentChild
+      // const tempEdges:{[key:string]:[]} = parentChildEdge
+
+      // filter out nodes that are not subflow in or out type, so that they can be removed
+      const nodesToRemove = tempNodes[nodeToRemove.id].filter((node: NodeInterface) => {
+        const nodeName = node.type!.split('/');
+        if (nodeName[0] !== 'sub-flow' || node.type === 'sub-flow/folder') {
+          return true
+        }
+      })
+      fn([...nodesToRemove], [])
+    }
+    
     arrNodeForSubFlow.pop();
     setSelectedNodeForSubFlow(arrNodeForSubFlow);
   };
@@ -926,6 +985,7 @@ export const RubixFlow = () => {
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
+          allSubFlowNodes={selectedNodeForSubFlow}
           selectedNodeForSubFlow={nodeForSubFlowEnd}
           setSelectedNodeForSubFlow={setSelectedNodeForSubFlow}
           handlePushSelectedNodeForSubFlow={handlePushSelectedNodeForSubFlow}

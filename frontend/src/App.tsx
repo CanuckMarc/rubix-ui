@@ -2,6 +2,7 @@ import { Layout } from "antd";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import cx from "classnames";
+import create from 'zustand';
 
 import { EventsOff, EventsOn } from "../wailsjs/runtime";
 import AppRoutes from "./AppRoutes";
@@ -15,6 +16,20 @@ const { Content } = Layout;
 const OK_EVENT = "ok";
 const WARN_EVENT = "warn";
 const ERR_EVENT = "err";
+
+// const useStore = create(set => ({
+//   votes: 0,
+//   // addVotes: () => set(state => ({ votes: state.votes + 1 })),
+//   // subtractVotes: () => set(state => ({ votes: state.votes - 1 })),
+// }));
+export const useStore = create((set: any) => ({
+  votes: 0,
+  setVotes: (newValue: any) => set(() => ({ votes: newValue })),
+  parentChild: {},
+  setParentChild: (obj: any) => set(() => ({ parentChild: obj})),
+  parentChildEdge: {},
+  setParentChildEdge: (obj: any) => set(() => ({ parentChildEdge: obj}))
+}));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {
   let parentKey: React.Key;
