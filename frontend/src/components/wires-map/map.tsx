@@ -59,6 +59,7 @@ export const WiresMap = () => {
     const fetch = async() => {
         try {
             setIsFetching(true);
+            // const pointRes = await pointFactory.GetPointListPayload(connUUID, hostUUID);
             const pointRes = await pointFactory.GetAll();
             console.log(pointRes)
             setPointList(pointRes);
@@ -89,42 +90,6 @@ export const WiresMap = () => {
         setVotes(10);
     }
 
-    // const renderPointsToFlowEditor = () => {
-    //     const allNodes: NodeInterface[] = [];
-    //     const node = generateNodes()
-    //     allNodes.push(node)
-
-    //     if (allNodes.length > 0) {
-    //         setTimeout(() => {
-    //           flowInstance.addNodes(allNodes);
-    //         }, 50);
-    //     }
-    // }
-
-    // const generateNodes = () => {
-    //     const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, 'constant/const-num');
-    //     const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, 'constant/const-num');
-
-    //     return {
-    //         id: generateUuid(),
-    //         isParent: false,
-    //         // style: null,
-    //         type: 'constant/const-num',
-    //         info: { nodeName: 'my_first_node' },
-    //         position: {
-    //           x: 269.99187629189623,
-    //           y: -46.35749312825459,
-    //         },
-    //         data: {
-    //           inputs: convertDataSpec(spec.inputs || []),
-    //           out: convertDataSpec(spec.outputs || []),
-    //         },
-    //         // parentId: parentNode.id,
-    //         settings: nodeSettings,
-    //         selected: false,
-    //         pin: 'in',
-    //       };
-    // }
 
     return (
         <>

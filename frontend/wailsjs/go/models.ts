@@ -488,6 +488,20 @@ export namespace backend {
 	        this.point_uuid = source["point_uuid"];
 	    }
 	}
+	export class PointListPayload {
+	    uuid: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PointListPayload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uuid = source["uuid"];
+	        this.name = source["name"];
+	    }
+	}
 	export class RcNetworkBody {
 	    eth0_ip_settings: string;
 	    eth0_interface: string;

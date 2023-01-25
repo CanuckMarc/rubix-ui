@@ -706,6 +706,10 @@ export function GetPoint(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPoint'](arg1, arg2, arg3);
 }
 
+export function GetPointListPayload(arg1, arg2) {
+  return window['go']['backend']['App']['GetPointListPayload'](arg1, arg2);
+}
+
 export function GetPointPriority(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPointPriority'](arg1, arg2, arg3);
 }

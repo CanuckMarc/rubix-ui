@@ -372,6 +372,8 @@ export function GetPcTime():Promise<datelib.Time>;
 
 export function GetPoint(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
 
+export function GetPointListPayload(arg1:string,arg2:string):Promise<Array<backend.PointListPayload>>;
+
 export function GetPointPriority(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
 
 export function GetPoints(arg1:string,arg2:string):Promise<Array<model.Point>>;
