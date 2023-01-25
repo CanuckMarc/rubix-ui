@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 )
 
@@ -53,6 +54,29 @@ func (inst *App) OnReload() {
 
 func (inst *App) OnQuit() {
 	wailsruntime.Quit(inst.ctx)
+}
+
+func (inst *App) NewTab(workingDir string) {
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		cmd := exec.Command("./rubix-ui")
+		cmd.Dir = workingDir
+		err := cmd.Run()
+		fmt.Println(err)
+	case "windows":
+		cmdStrings := `.\rubix-ui.exe`
+		cmd := exec.Command(cmdStrings)
+		cmd.Dir = filepath.FromSlash(workingDir)
+		err := cmd.Run()
+		fmt.Println(err)
+	case "darwin":
+		err = fmt.Errorf("unsupported platform")
+		log.Error(err)
+	default:
+		err = fmt.Errorf("unsupported platform")
+		log.Error(err)
+	}
 }
 
 func (inst *App) NubeHelp() {

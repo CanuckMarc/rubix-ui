@@ -24,11 +24,11 @@ func main() {
 		log.Errorf("error on finding home dir %s", err.Error())
 	}
 	log.Infof("user home dir %s", homeDir)
-	pwd, err := os.Getwd()
+	workingDir, err := os.Getwd()
 	if err != nil {
 		log.Errorf("error on finding home dir %s", err.Error())
 	}
-	log.Infof("user app working dir %s", pwd)
+	log.Infof("user app working dir %s", workingDir)
 
 	app := backend.NewApp()
 	AppMenu := menu.NewMenu()
@@ -43,6 +43,9 @@ func main() {
 	FileMenu.AddSeparator()
 	FileMenu.AddText("Reload", keys.Key("f5"), func(_ *menu.CallbackData) {
 		app.OnReload()
+	})
+	FileMenu.AddText("New Tab", keys.CmdOrCtrl("t"), func(_ *menu.CallbackData) {
+		app.NewTab(workingDir)
 	})
 	FileMenu.AddText("Help", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
 		app.NubeHelp()
