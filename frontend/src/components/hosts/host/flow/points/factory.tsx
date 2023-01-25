@@ -2,7 +2,7 @@ import {
   backend,
   model,
   storage,
-  store,
+  store, system,
 } from "../../../../../../wailsjs/go/models";
 import {
   AddPoint,
@@ -12,7 +12,7 @@ import {
   EditPoint,
   ExportPointBulk,
   GetFlowPointSchema,
-  GetPoint, GetPointPriority,
+  GetPoint, GetPointListPayload, GetPointPriority,
   GetPoints,
   GetPointsForDevice,
   ImportPointBulk,
@@ -27,6 +27,11 @@ function hasUUID(uuid: string): Error {
 export class FlowPointFactory {
   hostUUID!: string;
   connectionUUID!: string;
+
+
+  public GetPointListPayload(connectionUUID: string, hostUUID: string): Promise<Array<backend.PointListPayload>> {
+    return GetPointListPayload(connectionUUID, hostUUID);
+  }
 
   async GetAll(): Promise<Array<model.Point>> {
     let resp: Promise<Array<model.Point>> = {} as Promise<Array<model.Point>>;

@@ -2,13 +2,16 @@ package main
 
 import (
 	"embed"
+	"github.com/NubeIO/lib-files/fileutils"
 	"github.com/NubeIO/rubix-ui/backend"
+	"github.com/NubeIO/rubix-ui/backend/system/lora"
 	log "github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"os"
 )
 
 //go:embed frontend/dist
@@ -16,9 +19,25 @@ var assets embed.FS
 
 func main() {
 	var err error
+	homeDir, err := fileutils.HomeDir()
+	if err != nil {
+		log.Errorf("error on finding home dir %s", err.Error())
+	}
+	log.Infof("user home dir %s", homeDir)
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Errorf("error on finding home dir %s", err.Error())
+	}
+	log.Infof("user app working dir %s", pwd)
+
 	app := backend.NewApp()
 	AppMenu := menu.NewMenu()
 	_ = app.GitDownloadReleases()
+	var enableSerial bool
+	if enableSerial {
+		loraStreaming := lora.New(&lora.Instance{})
+		go loraStreaming.Run()
+	}
 
 	FileMenu := AppMenu.AddSubmenu("Options")
 	FileMenu.AddSeparator()

@@ -43,6 +43,7 @@ require (
 	github.com/tidwall/gjson v1.14.3
 	github.com/wailsapp/wails/v2 v2.3.1
 	github.com/xuri/excelize/v2 v2.7.0
+	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.5.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
@@ -55,6 +56,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/creack/goselect v0.1.2 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dop251/goja v0.0.0-20220915101355-d79e1b125a30 // indirect

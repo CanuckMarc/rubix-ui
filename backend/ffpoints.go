@@ -12,6 +12,32 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type PointListPayload struct {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
+}
+
+func (inst *App) GetPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
+	return inst.GetPointListPayload(connUUID, hostUUID)
+}
+
+func (inst *App) getPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
+	var pointPayload []*PointListPayload
+	networks, err := inst.getNetworksWithPoints(connUUID, hostUUID)
+	if err != nil {
+		return nil, err
+	}
+	for _, network := range networks {
+		for _, device := range network.Devices {
+			for _, point := range device.Points {
+				pointPayload = append(pointPayload, &PointListPayload{UUID: point.UUID,
+					Name: fmt.Sprintf("%s:%s:%s:%s", network.PluginPath, network.Name, device.Name, point.Name)})
+			}
+		}
+	}
+	return pointPayload, nil
+}
+
 func (inst *App) GetPointsForDevice(connUUID, hostUUID, deviceUUID string) []*model.Point {
 	device, err := inst.getDevice(connUUID, hostUUID, deviceUUID, true)
 	if err != nil {

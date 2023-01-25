@@ -483,6 +483,18 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.present_value - b.present_value,
   },
   {
+    title: "original value",
+    dataIndex: "original_value",
+    key: "original_value",
+    render(original_value: number) {
+      if (original_value != undefined) {
+        let colour = "#4d4dff";
+        return <Tag color={colour}>{original_value}</Tag>;
+      }
+    },
+    sorter: (a: any, b: any) => a.original_value - b.original_value,
+  },
+  {
     title: "write value",
     dataIndex: "write_value",
     key: "write_value",
