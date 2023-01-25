@@ -1,10 +1,16 @@
 import { Space, Spin, Tooltip } from "antd";
-import { ArrowRightOutlined, DownloadOutlined, FormOutlined, LinkOutlined, ScanOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, DownloadOutlined, FormOutlined, ScanOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import { RbAddButton, RbDeleteButton, RbRefreshButton, RbSyncButton } from "../../../common/rb-table-actions";
+import {
+  RbAddButton,
+  RbDeleteButton,
+  RbMonitorButton,
+  RbRefreshButton,
+  RbSyncButton
+} from "../../../common/rb-table-actions";
 import { HOST_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
@@ -17,10 +23,12 @@ import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-m
 import { InstallFactory } from "./install-rubix-edge/factory";
 import { EdgeAppInfo } from "./install-app-info";
 import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
-import Host = amodel.Host;
-import Location = amodel.Location;
-import UUIDs = backend.UUIDs;
 import { RbSearchInput } from "../../../common/rb-search-input";
+import { Ping } from "./ping/ping";
+import { ConfigureOpenVpn } from "./configure-open-vpn/configure-open-vpn";
+import Host = amodel.Host;
+import UUIDs = backend.UUIDs;
+import { AttachVirtualIP } from "./attach-virtual-ip/attach-virtual-ip";
 
 const ExpandedRow = (props: any) => {
   return (
@@ -32,7 +40,7 @@ const ExpandedRow = (props: any) => {
 
 export const HostsTable = (props: any) => {
   const { connUUID = "", netUUID = "", locUUID = "" } = useParams();
-  const { hosts, networks, isFetching, refreshList } = props;
+  const { hosts, isFetching, refreshList } = props;
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [currentHost, setCurrentHost] = useState({} as Host);
   const [hostSchema, setHostSchema] = useState({});
@@ -41,6 +49,7 @@ export const HostsTable = (props: any) => {
   const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
   const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
+  const [loadingUpdateStatus, setLoadingUpdateStatus] = useState(false);
   const [tokenFactory, setTokenFactory] = useState(new EdgeBiosTokenFactory(connUUID));
   const [filteredData, setFilteredData] = useState(hosts);
 
@@ -61,11 +70,10 @@ export const HostsTable = (props: any) => {
       fixed: "left",
       render: (_: any, host: Host) => (
         <Space size="middle">
-          <Tooltip title="Ping">
-            <a onClick={(e) => handlePing(host.uuid, e)}>
-              <LinkOutlined />
-            </a>
-          </Tooltip>
+          <Ping
+            host={host}
+            factory={factory}
+          />
           <Tooltip title="Edit">
             <a onClick={(e) => showModal(host, e)}>
               <FormOutlined />
@@ -81,6 +89,14 @@ export const HostsTable = (props: any) => {
               <ScanOutlined />
             </a>
           </Tooltip>
+          <ConfigureOpenVpn
+            host={host}
+            factory={factory}
+          />
+          <AttachVirtualIP
+            host={host}
+            factory={factory}
+          />
           <Link
             to={ROUTES.HOST.replace(":connUUID", connUUID)
               .replace(":locUUID", locUUID)
@@ -94,13 +110,7 @@ export const HostsTable = (props: any) => {
         </Space>
       ),
     },
-    ...HOST_HEADERS,
-    {
-      title: "network",
-      dataIndex: "network_uuid",
-      key: "network_uuid",
-      render: (network_uuid: string) => <span>{getNetworkNameByUUID(network_uuid)}</span>,
-    },
+    ...HOST_HEADERS
   ];
 
   const rowSelection = {
@@ -125,17 +135,6 @@ export const HostsTable = (props: any) => {
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     refreshList();
-  };
-
-  const handlePing = (uuid: string, e: any) => {
-    e.stopPropagation();
-    factory.uuid = uuid;
-    factory.PingHost().catch(console.error);
-  };
-
-  const getNetworkNameByUUID = (uuid: string) => {
-    const network = networks.find((l: Location) => l.uuid === uuid);
-    return network ? network.name : "";
   };
 
   const showModal = (host: Host, e: any) => {
@@ -182,12 +181,7 @@ export const HostsTable = (props: any) => {
   const onSyncReleases = async () => {
     setLoadingSyncReleases(true);
     try {
-      const res = await GitDownloadReleases();
-      if (res.code === 0) {
-        openNotificationWithIcon("success", "synced releases successfully");
-      } else {
-        openNotificationWithIcon("error", res.msg);
-      }
+      await GitDownloadReleases();
     } catch (error) {
       openNotificationWithIcon("error", error);
     } finally {
@@ -195,9 +189,22 @@ export const HostsTable = (props: any) => {
     }
   };
 
+  const onUpdateStatus = async () => {
+    setLoadingUpdateStatus(true);
+    try {
+      await factory.UpdateStatus();
+      await refreshList();
+    } catch (error) {
+      openNotificationWithIcon("error", error);
+    } finally {
+      setLoadingUpdateStatus(false);
+    }
+  };
+
   return (
     <div>
       <RbRefreshButton refreshList={refreshList} />
+      <RbMonitorButton onClick={onUpdateStatus} loading={loadingUpdateStatus} text="Update Status" />
       <RbAddButton handleClick={(e: any) => showModal({} as Host, e)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
@@ -206,7 +213,7 @@ export const HostsTable = (props: any) => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={hosts.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
         expandable={{

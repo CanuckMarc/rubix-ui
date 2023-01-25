@@ -94,8 +94,8 @@ github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4/go.mod h1:k8eZvTC5I+B0QHGlM3
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.0.4/go.mod h1:A1BPuc3UpE1EF3ugdf+8QIIKTT8s3eK+pfUcheJX2JM=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.8 h1:gJufnIOek1cOt2lV0KXto2SwhtWLzgZOfztrf1N6Whg=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.8/go.mod h1:J0Xy/dX/f/xIhEnW6ZhkE2LiyuRk2H9gCb0Uk+2SSSk=
-github.com/NubeIO/rubix-assist v0.8.0 h1:mWvLhuAwUwbDk1jsE1onEwwHfSNxQDjUP81nI6z3snk=
-github.com/NubeIO/rubix-assist v0.8.0/go.mod h1:AWA5t9i3aHjsoceDBWC/2ks65k4ClPhX2/aJKQjXjwo=
+github.com/NubeIO/rubix-assist v0.8.5 h1:gkg1cjMO/e/IbYaQ32RGObM6obA8S3fS7uVGOvrPrVE=
+github.com/NubeIO/rubix-assist v0.8.5/go.mod h1:TIIwxqB/nF9bx93zMnbTNxtPxTRYrO95FcjXznFKr8Y=
 github.com/NubeIO/rubix-edge v0.3.0 h1:RtstvcmTVNr6JJGga3FFBnkLedz/NZBxeUDD71oy/E4=
 github.com/NubeIO/rubix-edge v0.3.0/go.mod h1:FvJeLD52UpBDCxQdDqtTyw9LYI30dri2hNIL7heo+P4=
 github.com/NubeIO/rubix-edge-wires v0.2.6 h1:V1evHC4U5jcMighCtOmJiwRbSTW8v52Ooxq2nfOJvko=
@@ -691,8 +691,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.3.1 h1:ZJz+pyIBKyASkgO8JO31NuHO1gTTHmvwiHYHwei1CqM=
-github.com/wailsapp/wails/v2 v2.3.1/go.mod h1:zlNLI0E2c2qA6miiuAHtp0Bac8FaGH0tlhA19OssR/8=
+github.com/wailsapp/wails/v2 v2.2.0 h1:+zRTNjwqyz1kofT0J2R1FpxXB+m3cZJzW3RjxDgxWNw=
+github.com/wailsapp/wails/v2 v2.2.0/go.mod h1:zdc9YVrIijjuNNkLOO3UpTU6M12TJe6TlriL+3ttlMM=
 github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 h1:6932x8ltq1w4utjmfMPVj09jdMlkY0aiA6+Skbtl3/c=
 github.com/xuri/efp v0.0.0-20220603152613-6918739fd470/go.mod h1:ybY/Jr0T0GTCnYjKqmdwxyxn2BQf2RcQIIvex5QldPI=
 github.com/xuri/excelize/v2 v2.7.0 h1:Hri/czwyRCW6f6zrCDWXcXKshlq4xAZNpNOpdfnFhEw=

@@ -82,6 +82,10 @@ export function BulkDeleteWiresConnection(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['BulkDeleteWiresConnection'](arg1, arg2, arg3, arg4);
 }
 
+export function ConfigureOpenVPN(arg1, arg2) {
+  return window['go']['backend']['App']['ConfigureOpenVPN'](arg1, arg2);
+}
+
 export function CreateWriter(arg1, arg2, arg3) {
   return window['go']['backend']['App']['CreateWriter'](arg1, arg2, arg3);
 }
@@ -670,6 +674,22 @@ export function GetNetworksWithPointsDisplay(arg1, arg2) {
   return window['go']['backend']['App']['GetNetworksWithPointsDisplay'](arg1, arg2);
 }
 
+export function GetNodesAllFlowNetworks(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetNodesAllFlowNetworks'](arg1, arg2, arg3);
+}
+
+export function GetNodesAllFlowNetworksChildren(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesAllFlowNetworksChildren'](arg1, arg2, arg3, arg4);
+}
+
+export function GetNodesByCategory(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesByCategory'](arg1, arg2, arg3, arg4);
+}
+
+export function GetNodesByType(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetNodesByType'](arg1, arg2, arg3, arg4);
+}
+
 export function GetPcGetNetworks() {
   return window['go']['backend']['App']['GetPcGetNetworks']();
 }
@@ -688,6 +708,10 @@ export function GetPcTime() {
 
 export function GetPoint(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPoint'](arg1, arg2, arg3);
+}
+
+export function GetPointListPayload(arg1, arg2) {
+  return window['go']['backend']['App']['GetPointListPayload'](arg1, arg2);
 }
 
 export function GetPointPriority(arg1, arg2, arg3) {
@@ -932,6 +956,10 @@ export function UpdateLocation(arg1, arg2, arg3) {
 
 export function UpdateSettings(arg1) {
   return window['go']['backend']['App']['UpdateSettings'](arg1);
+}
+
+export function UpdateStatus(arg1) {
+  return window['go']['backend']['App']['UpdateStatus'](arg1);
 }
 
 export function UpdateWiresConnection(arg1, arg2, arg3, arg4, arg5) {

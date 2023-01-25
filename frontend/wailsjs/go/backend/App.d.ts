@@ -60,6 +60,8 @@ export function BacnetWhois(arg1:string,arg2:string,arg3:string,arg4:string):Pro
 
 export function BulkDeleteWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:Array<string>):Promise<any>;
 
+export function ConfigureOpenVPN(arg1:string,arg2:string):Promise<boolean>;
+
 export function CreateWriter(arg1:string,arg2:string,arg3:model.Writer):Promise<model.Writer>;
 
 export function DeleteAllConnections():Promise<backend.DeleteAllConnections>;
@@ -250,7 +252,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -354,6 +356,14 @@ export function GetNetworksWithPoints(arg1:string,arg2:string):Promise<Array<mod
 
 export function GetNetworksWithPointsDisplay(arg1:string,arg2:string):Promise<Array<backend.NetworksList>>;
 
+export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+
+export function GetNodesAllFlowNetworksChildren(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+
+export function GetNodesByCategory(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+
+export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+
 export function GetPcGetNetworks():Promise<any>;
 
 export function GetPcGetNetworksSchema():Promise<any>;
@@ -363,6 +373,8 @@ export function GetPcInterfaces():Promise<networking.InterfaceNames>;
 export function GetPcTime():Promise<datelib.Time>;
 
 export function GetPoint(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
+
+export function GetPointListPayload(arg1:string,arg2:string):Promise<Array<backend.PointListPayload>>;
 
 export function GetPointPriority(arg1:string,arg2:string,arg3:string):Promise<model.Point>;
 
@@ -485,6 +497,8 @@ export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStora
 export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<amodel.Location>;
 
 export function UpdateSettings(arg1:storage.Settings):Promise<rumodel.Response>;
+
+export function UpdateStatus(arg1:string):Promise<Array<amodel.Host>>;
 
 export function UpdateWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:string,arg5:db.Connection):Promise<db.Connection>;
 

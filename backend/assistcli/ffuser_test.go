@@ -8,12 +8,11 @@ import (
 )
 
 func TestClient_FFLogin(t *testing.T) {
-	https := false
 	cli := New(&Client{
 		Rest:  nil,
 		Ip:    "0.0.0.0",
 		Port:  0,
-		HTTPS: &https,
+		HTTPS: false,
 	})
 	login, err := cli.FFLogin("rc", &user.User{
 		Username: "admin",
@@ -28,12 +27,11 @@ func TestClient_FFLogin(t *testing.T) {
 }
 
 func TestClient_FFGenerateToken(t *testing.T) {
-	https := false
 	cli := New(&Client{
 		Rest:  nil,
 		Ip:    "",
 		Port:  0,
-		HTTPS: &https,
+		HTTPS: false,
 	})
 	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjQ0MjE1MTIsImlhdCI6MTY2MTgyOTUxMiwic3ViIjoiYWRtaW4ifQ.rgJ_300heVLG7dEHM3NwzQzrziIJ6tEVXqJ-bSFxvHw"
 	login, err := cli.FFGenerateToken("rc", jwt, &TokenCreate{Name: "test2", Blocked: nils.NewFalse()})

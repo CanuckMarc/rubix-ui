@@ -30,6 +30,7 @@ export namespace amodel {
 	}
 	export class Host {
 	    uuid: string;
+	    global_uuid: string;
 	    network_uuid?: string;
 	    name: string;
 	    enable?: boolean;
@@ -38,12 +39,13 @@ export namespace amodel {
 	    bios_port: number;
 	    port: number;
 	    https?: boolean;
-	    ping_enable?: boolean;
-	    ping_frequency: number;
-	    is_offline: boolean;
-	    offline_count: number;
-	    message?: string;
+	    is_online?: boolean;
+	    is_valid_token?: boolean;
 	    external_token: string;
+	    virtual_ip: string;
+	    received_bytes: number;
+	    sent_bytes: number;
+	    connected_since: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Host(source);
@@ -52,6 +54,7 @@ export namespace amodel {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.uuid = source["uuid"];
+	        this.global_uuid = source["global_uuid"];
 	        this.network_uuid = source["network_uuid"];
 	        this.name = source["name"];
 	        this.enable = source["enable"];
@@ -60,12 +63,13 @@ export namespace amodel {
 	        this.bios_port = source["bios_port"];
 	        this.port = source["port"];
 	        this.https = source["https"];
-	        this.ping_enable = source["ping_enable"];
-	        this.ping_frequency = source["ping_frequency"];
-	        this.is_offline = source["is_offline"];
-	        this.offline_count = source["offline_count"];
-	        this.message = source["message"];
+	        this.is_online = source["is_online"];
+	        this.is_valid_token = source["is_valid_token"];
 	        this.external_token = source["external_token"];
+	        this.virtual_ip = source["virtual_ip"];
+	        this.received_bytes = source["received_bytes"];
+	        this.sent_bytes = source["sent_bytes"];
+	        this.connected_since = source["connected_since"];
 	    }
 	}
 	export class NetworkUUID {
@@ -486,6 +490,20 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.point_uuid = source["point_uuid"];
+	    }
+	}
+	export class PointListPayload {
+	    uuid: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new PointListPayload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uuid = source["uuid"];
+	        this.name = source["name"];
 	    }
 	}
 	export class RcNetworkBody {

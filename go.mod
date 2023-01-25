@@ -22,7 +22,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-auth-go v1.1.0
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.8
-	github.com/NubeIO/rubix-assist v0.8.0
+	github.com/NubeIO/rubix-assist v0.8.5
 	github.com/NubeIO/rubix-edge v0.3.0
 	github.com/NubeIO/rubix-edge-wires v0.2.6
 	github.com/NubeIO/rubix-registry-go v1.0.0
@@ -41,7 +41,7 @@ require (
 	github.com/stretchr/objx v0.4.0
 	github.com/tidwall/buntdb v1.2.9
 	github.com/tidwall/gjson v1.14.3
-	github.com/wailsapp/wails/v2 v2.3.1
+	github.com/wailsapp/wails/v2 v2.2.0
 	github.com/xuri/excelize/v2 v2.7.0
 	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.21.0
