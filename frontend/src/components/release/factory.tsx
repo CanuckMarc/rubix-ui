@@ -38,11 +38,7 @@ export class ReleasesFactory {
     return await GetRelease(uuid);
   }
 
-  async EdgeUnInstallApp(
-    connUUID: string,
-    hostUUID: string,
-    appName: string
-  ): Promise<amodel.Message> {
+  async EdgeUnInstallApp(connUUID: string, hostUUID: string, appName: string): Promise<amodel.Message> {
     return await EdgeUnInstallApp(connUUID, hostUUID, appName);
   }
 
@@ -50,54 +46,28 @@ export class ReleasesFactory {
     return await EdgeAppsInfo(connUUID, hostUUID);
   }
 
-  async EdgeServiceStart(connUUID: string, hostUUID: string, appName: string) {
-    return await EdgeServiceStart(connUUID, hostUUID, appName);
+  async EdgeServiceStart(connUUID: string, hostUUID: string, serviceName: string) {
+    return await EdgeServiceStart(connUUID, hostUUID, serviceName);
   }
 
-  async EdgeServiceStop(connUUID: string, hostUUID: string, appName: string) {
-    return await EdgeServiceStop(connUUID, hostUUID, appName);
+  async EdgeServiceStop(connUUID: string, hostUUID: string, serviceName: string) {
+    return await EdgeServiceStop(connUUID, hostUUID, serviceName);
   }
 
-  async EdgeServiceRestart(
-    connUUID: string,
-    hostUUID: string,
-    appName: string
-  ) {
-    return await EdgeServiceRestart(connUUID, hostUUID, appName);
+  async EdgeServiceRestart(connUUID: string, hostUUID: string, serviceName: string) {
+    return await EdgeServiceRestart(connUUID, hostUUID, serviceName);
   }
 
-  async EdgeServiceAction(
-    action: string,
-    payload: { connUUID: string; hostUUID: string; appName: string }
-  ) {
+  async EdgeServiceAction(action: string, connUUID: string, hostUUID: string, serviceName: string, appName: string) {
     switch (action) {
       case "start":
-        return this.EdgeServiceStart(
-          payload.connUUID,
-          payload.hostUUID,
-          payload.appName
-        );
-
+        return this.EdgeServiceStart(connUUID, hostUUID, serviceName);
       case "stop":
-        return this.EdgeServiceStop(
-          payload.connUUID,
-          payload.hostUUID,
-          payload.appName
-        );
-
+        return this.EdgeServiceStop(connUUID, hostUUID, serviceName);
       case "restart":
-        return this.EdgeServiceRestart(
-          payload.connUUID,
-          payload.hostUUID,
-          payload.appName
-        );
-
+        return this.EdgeServiceRestart(connUUID, hostUUID, serviceName);
       case "uninstall":
-        return this.EdgeUnInstallApp(
-          payload.connUUID,
-          payload.hostUUID,
-          payload.appName
-        );
+        return this.EdgeUnInstallApp(connUUID, hostUUID, appName);
     }
     return Promise.reject(null);
   }

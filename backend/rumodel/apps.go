@@ -24,6 +24,7 @@ type AppsAvailableForInstall struct {
 
 type RunningServices struct {
 	Name        string `json:"name,omitempty"`
+	ServiceName string `json:"service_name,omitempty"`
 	State       string `json:"state,omitempty"`
 	ActiveState string `json:"active_state,omitempty"`
 	SubState    string `json:"sub_state,omitempty"`

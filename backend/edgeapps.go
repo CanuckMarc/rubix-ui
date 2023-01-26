@@ -214,18 +214,7 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 	if err != nil {
 		return nil, err
 	}
-	release, err := inst.DB.GetRelease(*releaseVersion)
-	if release == nil {
-		// if not exist then try and download the version
-		token, err := inst.DB.GetGitToken(false)
-		if err != nil {
-			return nil, err
-		}
-		release, err = inst.gitDownloadRelease(token, *releaseVersion)
-		if err != nil {
-			return nil, err
-		}
-	}
+	release, err := inst.DB.GetReleaseByVersion(*releaseVersion)
 	if release == nil {
 		return nil, errors.New(fmt.Sprintf("failed to find a valid release: %s", *releaseVersion))
 	}
@@ -310,6 +299,7 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 	for _, state := range runningServicesStates {
 		runningServices = append(runningServices, rumodel.RunningServices{
 			Name:        services[state.ServiceName],
+			ServiceName: state.ServiceName,
 			State:       string(state.State),
 			ActiveState: string(state.ActiveState),
 			SubState:    string(state.SubState),
