@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-edge/service/system"
+	log "github.com/sirupsen/logrus"
 )
 
 func (inst *App) EdgeHostReboot(connUUID, hostUUID string) *system.Message {
@@ -50,7 +51,7 @@ func (inst *App) EdgeServiceStop(connUUID, hostUUID, serviceName string) *amodel
 }
 
 func (inst *App) EdgeServiceRestart(connUUID, hostUUID, serviceName string) *amodel.Message {
-	fmt.Println("restart has been called...", serviceName)
+	log.Infof("restart has been called...%s", serviceName)
 	ctl, err := inst.edgeSystemCtlAction(connUUID, hostUUID, serviceName, amodel.Enable)
 	err = inst.errMsg(err)
 	ctl, err = inst.edgeSystemCtlAction(connUUID, hostUUID, serviceName, amodel.Restart)
