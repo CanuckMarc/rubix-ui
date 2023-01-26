@@ -1,33 +1,5 @@
 export namespace amodel {
 	
-	export class AppSystemState {
-	    service_name?: string;
-	    app_name?: string;
-	    state?: string;
-	    active_state?: string;
-	    sub_state?: string;
-	    active_enter_timestamp?: string;
-	    inactive_enter_timestamp?: string;
-	    restarts?: string;
-	    is_installed?: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new AppSystemState(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.service_name = source["service_name"];
-	        this.app_name = source["app_name"];
-	        this.state = source["state"];
-	        this.active_state = source["active_state"];
-	        this.sub_state = source["sub_state"];
-	        this.active_enter_timestamp = source["active_enter_timestamp"];
-	        this.inactive_enter_timestamp = source["inactive_enter_timestamp"];
-	        this.restarts = source["restarts"];
-	        this.is_installed = source["is_installed"];
-	    }
-	}
 	export class Host {
 	    uuid: string;
 	    global_uuid: string;
@@ -2551,6 +2523,26 @@ export namespace rumodel {
 	        this.max_version = source["max_version"];
 	    }
 	}
+	export class RunningServices {
+	    name?: string;
+	    service_name?: string;
+	    state?: string;
+	    active_state?: string;
+	    sub_state?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RunningServices(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.service_name = source["service_name"];
+	        this.state = source["state"];
+	        this.active_state = source["active_state"];
+	        this.sub_state = source["sub_state"];
+	    }
+	}
 	export class InstalledApps {
 	    app_name?: string;
 	    version?: string;
@@ -2588,8 +2580,9 @@ export namespace rumodel {
 	    }
 	}
 	export class EdgeAppsInfo {
-	    installed_apps?: InstalledApps[];
-	    apps_available_for_install?: AppsAvailableForInstall[];
+	    installed_apps: InstalledApps[];
+	    apps_available_for_install: AppsAvailableForInstall[];
+	    running_services: RunningServices[];
 	
 	    static createFrom(source: any = {}) {
 	        return new EdgeAppsInfo(source);
@@ -2599,6 +2592,7 @@ export namespace rumodel {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.installed_apps = this.convertValues(source["installed_apps"], InstalledApps);
 	        this.apps_available_for_install = this.convertValues(source["apps_available_for_install"], AppsAvailableForInstall);
+	        this.running_services = this.convertValues(source["running_services"], RunningServices);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
