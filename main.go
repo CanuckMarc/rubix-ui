@@ -32,7 +32,6 @@ func main() {
 
 	app := backend.NewApp()
 	AppMenu := menu.NewMenu()
-	_ = app.GitDownloadReleases()
 	var enableSerial bool
 	if enableSerial {
 		loraStreaming := lora.New(&lora.Instance{})
