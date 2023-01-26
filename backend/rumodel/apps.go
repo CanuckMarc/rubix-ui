@@ -22,7 +22,16 @@ type AppsAvailableForInstall struct {
 	MaxVersion string `json:"max_version,omitempty"`
 }
 
+type RunningServices struct {
+	Name        string `json:"name,omitempty"`
+	ServiceName string `json:"service_name,omitempty"`
+	State       string `json:"state,omitempty"`
+	ActiveState string `json:"active_state,omitempty"`
+	SubState    string `json:"sub_state,omitempty"`
+}
+
 type EdgeAppsInfo struct {
-	InstalledApps           []InstalledApps           `json:"installed_apps,omitempty"`
-	AppsAvailableForInstall []AppsAvailableForInstall `json:"apps_available_for_install,omitempty"`
+	InstalledApps           []InstalledApps           `json:"installed_apps"`
+	AppsAvailableForInstall []AppsAvailableForInstall `json:"apps_available_for_install"`
+	RunningServices         []RunningServices         `json:"running_services"`
 }

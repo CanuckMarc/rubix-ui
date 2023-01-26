@@ -394,10 +394,6 @@ export function EdgeServiceStop(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeServiceStop'](arg1, arg2, arg3);
 }
 
-export function EdgeSystemCtlState(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['EdgeSystemCtlState'](arg1, arg2, arg3);
-}
-
 export function EdgeUnInstallApp(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeUnInstallApp'](arg1, arg2, arg3);
 }
@@ -836,6 +832,10 @@ export function ImportNetworksBulk(arg1, arg2, arg3) {
 
 export function ImportPointBulk(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ImportPointBulk'](arg1, arg2, arg3, arg4);
+}
+
+export function NewTab(arg1) {
+  return window['go']['backend']['App']['NewTab'](arg1);
 }
 
 export function NodeHelp(arg1, arg2, arg3) {

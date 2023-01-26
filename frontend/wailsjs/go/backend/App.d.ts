@@ -216,8 +216,6 @@ export function EdgeServiceStart(arg1:string,arg2:string,arg3:string):Promise<am
 
 export function EdgeServiceStop(arg1:string,arg2:string,arg3:string):Promise<amodel.Message>;
 
-export function EdgeSystemCtlState(arg1:string,arg2:string,arg3:string):Promise<amodel.AppSystemState>;
-
 export function EdgeUnInstallApp(arg1:string,arg2:string,arg3:string):Promise<amodel.Message>;
 
 export function EdgeUninstallPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
@@ -437,6 +435,8 @@ export function ImportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ImportNetworksBulk(arg1:string,arg2:string,arg3:string):Promise<backend.BulkAddResponse>;
 
 export function ImportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string):Promise<backend.BulkAddResponse>;
+
+export function NewTab(arg1:string):Promise<void>;
 
 export function NodeHelp(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Help>>;
 

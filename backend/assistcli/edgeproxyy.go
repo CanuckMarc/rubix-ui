@@ -2,6 +2,7 @@ package assistcli
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-registry-go/rubixregistry"
@@ -57,15 +58,15 @@ func (inst *Client) EdgeSystemCtlAction(hostIDName, serviceName string, action a
 	return resp.Result().(*amodel.Message), nil
 }
 
-func (inst *Client) EdgeSystemCtlState(hostIDName, serviceName string) (*amodel.AppSystemState, error) {
+func (inst *Client) EdgeSystemCtlState(hostIDName, serviceName string) (*systemctl.SystemState, error) {
 	url := fmt.Sprintf("/proxy/edge/api/systemctl/state?unit=%s", serviceName)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetResult(&amodel.AppSystemState{}).
-		Post(url))
+		SetResult(&systemctl.SystemState{}).
+		Get(url))
 	if err != nil {
 		return nil, err
 	}
-	return resp.Result().(*amodel.AppSystemState), nil
+	return resp.Result().(*systemctl.SystemState), nil
 }

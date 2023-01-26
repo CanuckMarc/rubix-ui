@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"fmt"
+	libsystemctl "github.com/NubeIO/lib-systemctl-go/systemctl"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-assist/service/systemctl"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
@@ -10,6 +11,7 @@ import (
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/store"
 	"github.com/hashicorp/go-version"
+	"sync"
 )
 
 // EdgeInstallApp install an app
@@ -212,18 +214,7 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 	if err != nil {
 		return nil, err
 	}
-	release, err := inst.DB.GetRelease(*releaseVersion)
-	if release == nil {
-		// if not exist then try and download the version
-		token, err := inst.DB.GetGitToken(false)
-		if err != nil {
-			return nil, err
-		}
-		release, err = inst.gitDownloadRelease(token, *releaseVersion)
-		if err != nil {
-			return nil, err
-		}
-	}
+	release, err := inst.DB.GetReleaseByVersion(*releaseVersion)
 	if release == nil {
 		return nil, errors.New(fmt.Sprintf("failed to find a valid release: %s", *releaseVersion))
 	}
@@ -232,12 +223,29 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 	if err != nil {
 		return nil, err
 	}
-	installedApps, err := inst.edgeInstalledApps(assistClient, hostUUID)
+	services := map[string]string{}
+	for _, service := range release.Services {
+		for _, pro := range service.Products {
+			if deviceInfo.DeviceType == pro {
+				services[service.ServiceName] = service.Name
+			}
+		}
+	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	var runningServicesStates []libsystemctl.SystemState
+	go func() {
+		defer wg.Done()
+		runningServicesStates = inst.edgeRunningServicesStates(assistClient, hostUUID, services) // parallel call
+	}()
+	installedApps, err := inst.edgeInstalledApps(assistClient, hostUUID) // parallel call
+	wg.Wait()
 	if err != nil {
 		return nil, err
 	}
-	var appsList []rumodel.InstalledApps
-	var appsAvailable []rumodel.AppsAvailableForInstall
+	appsList := make([]rumodel.InstalledApps, 0)
+	appsAvailable := make([]rumodel.AppsAvailableForInstall, 0)
+	runningServices := make([]rumodel.RunningServices, 0)
 	for _, versionApp := range release.Apps { // list all the that the edge device can install
 		for _, pro := range versionApp.Products {
 			if deviceInfo.DeviceType == pro {
@@ -288,10 +296,20 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 			}
 		}
 	}
+	for _, state := range runningServicesStates {
+		runningServices = append(runningServices, rumodel.RunningServices{
+			Name:        services[state.ServiceName],
+			ServiceName: state.ServiceName,
+			State:       string(state.State),
+			ActiveState: string(state.ActiveState),
+			SubState:    string(state.SubState),
+		})
+	}
 
 	return &rumodel.EdgeAppsInfo{
 		InstalledApps:           appsList,
 		AppsAvailableForInstall: appsAvailable,
+		RunningServices:         runningServices,
 	}, nil
 }
 
@@ -316,6 +334,23 @@ func (inst *App) edgeInstalledApps(assistClient *assistcli.Client, hostUUID stri
 		filteredApps = append(filteredApps, filteredApp)
 	}
 	return filteredApps, nil
+}
+
+func (inst *App) edgeRunningServicesStates(assistClient *assistcli.Client, hostUUID string, services map[string]string) []libsystemctl.SystemState {
+	runningServices := make([]libsystemctl.SystemState, 0)
+	var wg sync.WaitGroup
+	for k := range services {
+		wg.Add(1)
+		go func(serviceName string) {
+			defer wg.Done()
+			state, _ := assistClient.EdgeSystemCtlState(hostUUID, serviceName)
+			if state != nil && state.IsInstalled {
+				runningServices = append(runningServices, *state)
+			}
+		}(k)
+	}
+	wg.Wait()
+	return runningServices
 }
 
 func (inst *App) getReleaseVersion(assistClient *assistcli.Client, hostUUID string) (*string, error) {
