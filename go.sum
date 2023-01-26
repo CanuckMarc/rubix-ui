@@ -75,6 +75,8 @@ github.com/NubeIO/lib-files v1.0.0 h1:OZjBDXkXKGmI4SzciMnKa9Ko2mUCTbVrc3BCe1s6rw
 github.com/NubeIO/lib-files v1.0.0/go.mod h1:xi4mqMscDl6319i10LFowq5QvwChJLjqHCIJGkGa4RI=
 github.com/NubeIO/lib-goja v0.0.4 h1:IPAL5judMwdB93qe84izkQGd/6kj3CCb0fohTRSAQKQ=
 github.com/NubeIO/lib-goja v0.0.4/go.mod h1:AEkr3/NdsfXWXTi1zU2tF0zWvvDiVY6jprog0B0U1r4=
+github.com/NubeIO/lib-journalctl v0.0.0-20220830013922-d7ec41cce123 h1:s4SKXT2ID6HsHxHE3ODC7PLJkSjViZNpLhINSfsnGsU=
+github.com/NubeIO/lib-journalctl v0.0.0-20220830013922-d7ec41cce123/go.mod h1:sh1uH1qyEB5lwIg1ZvrcQ9bZzK3/EAaKs059jDA5RnU=
 github.com/NubeIO/lib-networking v0.0.9 h1:4asbWZCOOUWvesFL+lSYlHrRgDm9nHciXnm0sIZBio4=
 github.com/NubeIO/lib-networking v0.0.9/go.mod h1:WVj1zTKJ4qYijtzNvu7N5w8+cXFlCjy+HxjnIvSFgNA=
 github.com/NubeIO/lib-schema v0.1.6 h1:H3YGIHny3j4Ih+IjfeGI3eX7r/NsYkEE7ekv27V29aI=
@@ -691,8 +693,8 @@ github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.2.0 h1:+zRTNjwqyz1kofT0J2R1FpxXB+m3cZJzW3RjxDgxWNw=
-github.com/wailsapp/wails/v2 v2.2.0/go.mod h1:zdc9YVrIijjuNNkLOO3UpTU6M12TJe6TlriL+3ttlMM=
+github.com/wailsapp/wails/v2 v2.3.1 h1:ZJz+pyIBKyASkgO8JO31NuHO1gTTHmvwiHYHwei1CqM=
+github.com/wailsapp/wails/v2 v2.3.1/go.mod h1:zlNLI0E2c2qA6miiuAHtp0Bac8FaGH0tlhA19OssR/8=
 github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 h1:6932x8ltq1w4utjmfMPVj09jdMlkY0aiA6+Skbtl3/c=
 github.com/xuri/efp v0.0.0-20220603152613-6918739fd470/go.mod h1:ybY/Jr0T0GTCnYjKqmdwxyxn2BQf2RcQIIvex5QldPI=
 github.com/xuri/excelize/v2 v2.7.0 h1:Hri/czwyRCW6f6zrCDWXcXKshlq4xAZNpNOpdfnFhEw=

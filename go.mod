@@ -42,7 +42,7 @@ require (
 	github.com/stretchr/objx v0.4.0
 	github.com/tidwall/buntdb v1.2.9
 	github.com/tidwall/gjson v1.14.3
-	github.com/wailsapp/wails/v2 v2.2.0
+	github.com/wailsapp/wails/v2 v2.3.1
 	github.com/xuri/excelize/v2 v2.7.0
 	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.21.0
@@ -53,6 +53,7 @@ require (
 
 require (
 	github.com/NubeIO/lib-goja v0.0.4 // indirect
+	github.com/NubeIO/lib-journalctl v0.0.0-20220830013922-d7ec41cce123 // indirect
 	github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
