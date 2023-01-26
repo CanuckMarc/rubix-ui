@@ -9,25 +9,25 @@ import (
 
 func TestApp_EdgeFirewallList(t *testing.T) {
 	app := MockNewApp()
-	msg := app.EdgeFirewallList("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg := app.EdgeFirewallList("cloud", "rc")
 	pprint.Print(msg)
 }
 
 func TestApp_EdgeEdgeFirewallStatus(t *testing.T) {
 	app := MockNewApp()
-	msg := app.EdgeFirewallStatus("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg := app.EdgeFirewallStatus("cloud", "rc")
 	pprint.Print(msg)
 }
 
 func TestApp_EdgeFirewallEnable(t *testing.T) {
 	app := MockNewApp()
-	msg := app.EdgeFirewallEnable("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg := app.EdgeFirewallEnable("cloud", "rc")
 	pprint.Print(msg)
 }
 
 func TestApp_EdgeFirewallDisable(t *testing.T) {
 	app := MockNewApp()
-	msg := app.EdgeFirewallDisable("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg := app.EdgeFirewallDisable("cloud", "rc")
 	pprint.Print(msg)
 }
 
@@ -36,7 +36,7 @@ func TestApp_EdgeFirewallOpen(t *testing.T) {
 	body := system.UFWBody{
 		Port: 1111,
 	}
-	msg := app.EdgeFirewallPortOpen("con_bfe460770a06", "hos_ae400acd3f1a", body)
+	msg := app.EdgeFirewallPortOpen("cloud", "rc", body)
 	pprint.Print(msg)
 }
 
@@ -46,12 +46,12 @@ func TestApp_EdgeFirewallClose(t *testing.T) {
 		Port: 13579,
 	}
 
-	msg_0 := app.EdgeFirewallList("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg_0 := app.EdgeFirewallList("cloud", "rc")
 	pprint.Print(msg_0)
 
-	msg_1 := app.EdgeFirewallPortClose("con_bfe460770a06", "hos_ae400acd3f1a", body)
+	msg_1 := app.EdgeFirewallPortClose("cloud", "rc", body)
 	pprint.Print(msg_1)
 
-	msg_2 := app.EdgeFirewallList("con_bfe460770a06", "hos_ae400acd3f1a")
+	msg_2 := app.EdgeFirewallList("cloud", "rc")
 	pprint.Print(msg_2)
 }
