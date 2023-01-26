@@ -61,15 +61,6 @@ func (inst *App) EdgeServiceRestart(connUUID, hostUUID, appName string) *amodel.
 	return ctl
 }
 
-func (inst *App) EdgeSystemCtlState(connUUID, hostUUID, appName string) *amodel.AppSystemState {
-	resp, err := inst.edgeSystemCtlState(connUUID, hostUUID, appName)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	return resp
-}
-
 func (inst *App) edgeSystemCtlAction(connUUID, hostUUID, appName string, action amodel.Action) (*amodel.Message, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
@@ -77,17 +68,4 @@ func (inst *App) edgeSystemCtlAction(connUUID, hostUUID, appName string, action 
 	}
 	serviceName := namings.GetServiceNameFromAppName(appName)
 	return client.EdgeSystemCtlAction(hostUUID, serviceName, action)
-}
-
-func (inst *App) edgeSystemCtlState(connUUID, hostUUID, appName string) (*amodel.AppSystemState, error) {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		return nil, err
-	}
-	serviceName := namings.GetServiceNameFromAppName(appName)
-	resp, err := client.EdgeSystemCtlState(hostUUID, serviceName)
-	if err != nil {
-		return nil, err
-	}
-	return resp, err
 }
