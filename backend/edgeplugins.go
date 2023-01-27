@@ -14,6 +14,14 @@ import (
 	"strings"
 )
 
+const bacnetServerPlg = "bacnetserver"
+const bacnetMasterPlg = "bacnetmaster"
+const loraPlg = "lora"
+const modbusPlg = "modbus"
+const systemPlg = "system"
+const rubixIOPlg = "rubixio"
+const edge28Plg = "edge28"
+
 func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.Response {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {

@@ -6,8 +6,9 @@ import (
 	"github.com/NubeIO/rubix-edge/pkg/streamlog"
 )
 
-func (inst *Client) EdgeAddLog(hostIDName string, body *streamlog.Log) (*streamlog.Log, error) {
-	url := fmt.Sprintf("proxy/api/logs/")
+// EdgeCreateLog will make, get and delete a log all in the one api
+func (inst *Client) EdgeCreateLog(hostIDName string, body *streamlog.Log) (*streamlog.Log, error) {
+	url := fmt.Sprintf("proxy/api/logs/create/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).

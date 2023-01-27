@@ -4,9 +4,10 @@ import {
   EdgeGetPluginsDistribution,
   EdgeInstallPlugin,
   EdgeRestartPlugins,
-  EdgeUninstallPlugin, EdgeUpdateConfigPlugin,
+  EdgeUninstallPlugin, EdgeUpdateConfigPlugin, FlowNetworkNewLog,
 } from "../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../helpers/checks";
+import { streamlog } from "../../../../../../wailsjs/go/models";
 
 function hasUUID(uuid: string): Error {
   return Helpers.IsUndefined(uuid, "host or connection uuid") as Error;
@@ -62,4 +63,10 @@ export class FlowPluginFactory {
   async EdgeUpdateConfigPlugin(connUUID: string, hostUUID: string, pluginName: string, config: string): Promise<any> {
     return await EdgeUpdateConfigPlugin(connUUID, hostUUID, pluginName, config);
   }
+
+  // FlowNetworkNewLog let user get network driver logs from flow framework
+  async FlowNetworkNewLog(connUUID: string, hostUUID: string, pluginName: string, duration: number):Promise<streamlog.Log> {
+    return await FlowNetworkNewLog(connUUID, hostUUID, pluginName, duration);
+  }
+
 }

@@ -9,7 +9,7 @@ func TestApp_edgeGetLogs(t *testing.T) {
 	app := MockNewApp()
 
 	logs, err := app.edgeGetLogs("cloud", "rc")
-	// fmt.Println(logs, err)
+	fmt.Println(logs, err)
 	if err != nil {
 		return
 	}
@@ -25,7 +25,7 @@ func TestApp_edgeGetLogs(t *testing.T) {
 func TestApp_edgeAddLog(t *testing.T) {
 	app := MockNewApp()
 
-	log, err := app.edgeAddLog("cloud", "rc", "mosquitto.service", 10)
+	log, err := app.edgeCreateLog("cloud", "rc", "nubeio-flow-framework.service", 10, nil)
 	fmt.Println(log, err)
 	if err != nil {
 		return
