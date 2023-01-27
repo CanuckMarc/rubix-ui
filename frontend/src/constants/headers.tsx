@@ -903,15 +903,14 @@ export const LOCAL_FLOW_NETWORKS_SCHEMA = {
   ],
   properties: {
     name: {
-      maxLength: 50,
-      minLength: 2,
       title: "name",
       type: "string",
+      maxLength: 50,
+      minLength: 2,
     },
     is_remote: {
       type: "boolean",
       title: "is remote network",
-      readOnly: false,
     }
   }
 };
@@ -928,53 +927,54 @@ export const REMOTE_FLOW_NETWORKS_SCHEMA = {
   ],
   properties: {
     name: {
-      maxLength: 50,
-      minLength: 2,
       title: "name",
       type: "string",
+      maxLength: 50,
+      minLength: 2,
     },
     is_remote: {
       type: "boolean",
       title: "is remote network",
-      readOnly: false,
     },
     flow_ip_local: {
       type: "string",
       title: "flow ip local",
       default: "10.8.1.1",
+      maxLength: 6,
+      minLength: 100,
     },
     flow_ip: {
       type: "string",
       title: "flow ip remote",
       default: "10.8.1.1",
+      maxLength: 6,
+      minLength: 100,
     },
     flow_port_local: {
       type: "number",
       title: "flow port local",
-      minLength: 2,
-      maxLength: 65535,
+      minimum: 1,
+      maximum: 65535,
       default: 1660,
-      readOnly: false,
     },
     flow_port: {
       type: "number",
       title: "flow port remote",
-      minLength: 2,
-      maxLength: 65535,
+      minimum: 1,
+      maximum: 65535,
       default: 1660,
-      readOnly: false,
     },
     flow_token_local: {
-      maxLength: 200,
-      minLength: 2,
       title: "token local",
       type: "string",
+      maxLength: 60,
+      minLength: 60,
     },
     flow_token: {
-      maxLength: 200,
-      minLength: 2,
       title: "token remote",
       type: "string",
+      maxLength: 60,
+      minLength: 60,
     }
   }
 };
