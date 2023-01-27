@@ -819,12 +819,16 @@ export const SCHEDULES_HEADERS = [
     sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid),
   },
   {
+    title: "time zone",
+    dataIndex: "timezone",
+    key: "timezone",
+    render : (text: any) => String(text)
+  },
+  {
     title: "enable",
     dataIndex: "enable",
     key: "enable",
-    // render : (text: any) => String(text),
     render : (enable: any) => {
-      console.log(enable)
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -838,9 +842,49 @@ export const SCHEDULES_HEADERS = [
     title: "is active",
     dataIndex: "is_active",
     key: "is_active",
-    // render : (text: any) => String(text)
     render : (enable: any) => {
-      console.log(enable)
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    }
+  },
+  {
+    title: "active weekly",
+    dataIndex: "active_weekly",
+    key: "active_weekly",
+    render : (enable: any) => {
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    }
+  },
+  {
+    title: "active exception",
+    dataIndex: "active_exception",
+    key: "active_exception",
+    render : (enable: any) => {
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    }
+  },
+  {
+    title: "active event",
+    dataIndex: "active_event",
+    key: "active_event",
+    render : (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {

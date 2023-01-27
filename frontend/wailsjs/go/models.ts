@@ -300,6 +300,10 @@ export namespace assistcli {
 	    is_active: any;
 	    is_global: any;
 	    schedule: any;
+	    timezone: string;
+	    active_weekly: boolean;
+	    active_exception: boolean;
+	    active_event: boolean;
 	    // Go type: time.Time
 	    created_on: any;
 	    // Go type: time.Time
@@ -319,6 +323,10 @@ export namespace assistcli {
 	        this.is_active = source["is_active"];
 	        this.is_global = source["is_global"];
 	        this.schedule = source["schedule"];
+	        this.timezone = source["timezone"];
+	        this.active_weekly = source["active_weekly"];
+	        this.active_exception = source["active_exception"];
+	        this.active_event = source["active_event"];
 	        this.created_on = this.convertValues(source["created_on"], null);
 	        this.updated_on = this.convertValues(source["updated_on"], null);
 	    }

@@ -24,7 +24,7 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
-      // console.log(res)
+      console.log(res)
       setData(res);
     } catch (error) {
       setData([]);

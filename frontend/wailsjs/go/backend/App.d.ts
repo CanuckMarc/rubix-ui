@@ -44,7 +44,7 @@ export function AddPointsBulk(arg1:string,arg2:string,arg3:Array<model.Point>):P
 
 export function AddProducer(arg1:string,arg2:string,arg3:model.Producer):Promise<model.Producer>;
 
-export function AddSchedule(arg1:string,arg2:string,arg3:string):Promise<any>;
+export function AddSchedule(arg1:string,arg2:string,arg3:string,arg4:string):Promise<any>;
 
 export function AddStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
 
