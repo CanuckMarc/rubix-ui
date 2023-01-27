@@ -92,7 +92,7 @@ export const RbRestartButton = (props: any) => {
       loading={loading}
       icon={<PlayCircleOutlined />}
     >
-      {text ?? "Restart"}
+      {text ?? "Restart Network"}
     </Button>
   );
 };
