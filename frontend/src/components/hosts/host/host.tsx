@@ -14,11 +14,11 @@ import { HostsFactory } from "../factory";
 const { TabPane } = Tabs;
 const { Title } = Typography;
 
-const infoKey = "SETTINGS";
-const networksKey = "DRIVERS";
-const pluginsKey = "MODULES";
-const flownetworksKey = "NETWORKS";
-const flownetworkClonesKey = "REMOTE/MAPPING NETWORK";
+const networksKey = "Drivers";
+const pluginsKey = "Modules";
+const flowNetworksKey = "Flow Networks";
+const flowNetworkClonesKey = "Flow Network Clones";
+const settingsKey = "Settings";
 
 const hostFactory = new HostsFactory();
 
@@ -83,13 +83,13 @@ export const Host = () => {
           <TabPane tab={pluginsKey} key={pluginsKey}>
             <Plugins />
           </TabPane>
-          <TabPane tab={flownetworksKey} key={flownetworksKey}>
+          <TabPane tab={flowNetworksKey} key={flowNetworksKey}>
             <FlowNetworks />
           </TabPane>
-          <TabPane tab={flownetworkClonesKey} key={flownetworkClonesKey}>
+          <TabPane tab={flowNetworkClonesKey} key={flowNetworkClonesKey}>
             <FlowNetworkClones />
           </TabPane>
-          <TabPane tab={infoKey} key={infoKey}>
+          <TabPane tab={settingsKey} key={settingsKey}>
             <HostTable />
           </TabPane>
         </Tabs>

@@ -15,6 +15,7 @@ import {dhcpd} from '../models';
 import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
+import {streamlog} from '../models';
 import {flowcli} from '../models';
 import {store} from '../models';
 import {node} from '../models';
@@ -250,7 +251,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -259,6 +260,8 @@ export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Arra
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
+
+export function FlowNetworkNewLog(arg1:string,arg2:string,arg3:string,arg4:number):Promise<streamlog.Log>;
 
 export function GetBackup(arg1:string):Promise<storage.Backup>;
 

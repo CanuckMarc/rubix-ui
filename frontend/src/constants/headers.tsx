@@ -1,4 +1,4 @@
-import { Tag, Image } from "antd";
+import { Image, Tag } from "antd";
 import { pluginLogo } from "../utils/utils";
 import imageRC5 from "../assets/images/RC5.png";
 import imageRCIO from "../assets/images/RC-IO.png";
@@ -9,18 +9,24 @@ export const FLOW_NETWORKS_HEADERS = [
     key: "flow_ip",
     title: "ip",
     dataIndex: "flow_ip",
-    sorter: (a: any, b: any) => a.flow_ip.localeCompare(b.flow_ip),
+    sorter: (a: any, b: any) => sortIps(a.flow_ip ?? '', b.flow_ip ?? ''),
   },
   {
     key: "flow_port",
     title: "port",
     dataIndex: "flow_port",
-    sorter: (a: any, b: any) => a.flow_port.localeCompare(b.flow_port),
+    sorter: (a: any, b: any) => (a.flow_port ?? 0) - (b.flow_port ?? 0),
   },
   {
     key: "client_name",
     title: "client name",
     dataIndex: "client_name",
+    sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
+  },
+  {
+    key: "site_name",
+    title: "site name",
+    dataIndex: "site_name",
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
@@ -33,12 +39,6 @@ export const FLOW_NETWORKS_HEADERS = [
     key: "message",
     title: "message",
     dataIndex: "message",
-  },
-  {
-    key: "connection",
-    title: "connection",
-    dataIndex: "connection",
-    sorter: (a: any, b: any) => a.connection.localeCompare(b.connection),
   },
   {
     key: "uuid",
@@ -373,7 +373,7 @@ const sortIps = (a: string, b: string) => {
   const num1 = Number(a.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
   const num2 = Number(b.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
   return ('' + num1).localeCompare('' + num2);
-}
+};
 
 export const NETWORK_HEADERS = [
   {
@@ -382,7 +382,7 @@ export const NETWORK_HEADERS = [
     dataIndex: "plugin_name",
     render(name: string) {
       let image = pluginLogo(name);
-      return <Image width={70} preview={false} src={image}/>;
+      return <Image width={70} preview={false} src={image} />;
     },
   },
   {
@@ -822,13 +822,13 @@ export const SCHEDULES_HEADERS = [
     title: "time zone",
     dataIndex: "timezone",
     key: "timezone",
-    render : (text: any) => String(text)
+    render: (text: any) => String(text)
   },
   {
     title: "enable",
     dataIndex: "enable",
     key: "enable",
-    render : (enable: any) => {
+    render: (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -842,7 +842,7 @@ export const SCHEDULES_HEADERS = [
     title: "is active",
     dataIndex: "is_active",
     key: "is_active",
-    render : (enable: any) => {
+    render: (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -856,7 +856,7 @@ export const SCHEDULES_HEADERS = [
     title: "active weekly",
     dataIndex: "active_weekly",
     key: "active_weekly",
-    render : (enable: any) => {
+    render: (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -870,7 +870,7 @@ export const SCHEDULES_HEADERS = [
     title: "active exception",
     dataIndex: "active_exception",
     key: "active_exception",
-    render : (enable: any) => {
+    render: (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -884,7 +884,7 @@ export const SCHEDULES_HEADERS = [
     title: "active event",
     dataIndex: "active_event",
     key: "active_event",
-    render : (enable: any) => {
+    render: (enable: any) => {
       let colour = "blue";
       let text = "disabled";
       if (enable) {
@@ -897,66 +897,86 @@ export const SCHEDULES_HEADERS = [
 ];
 
 //--------------schema-------------//
-export const FLOW_NETWORKS_SCHEMA = {
-  name: {
-    maxLength: 50,
-    minLength: 2,
-    title: "name",
-    type: "string",
-  },
-  flow_ip: {
-    type: "string",
-    title: "flow ip",
-    default: "192.168.15.10",
-  },
-  flow_port: {
-    type: "number",
-    title: "flow port",
-    minLength: 2,
-    maxLength: 65535,
-    default: 1660,
-    readOnly: false,
-  },
-  flow_https: {
-    type: "boolean",
-    title: "enable https",
-    readOnly: false,
-  },
-  is_remote: {
-    type: "boolean",
-    title: "is remote network",
-    readOnly: false,
-  },
-  flow_username: {
-    maxLength: 50,
-    minLength: 2,
-    title: "flow username",
-    default: "admin",
-    type: "string",
-  },
-  flow_password: {
-    maxLength: 50,
-    minLength: 2,
-    title: "flow password",
-    type: "string",
-  },
-  flow_token_local: {
-    maxLength: 200,
-    minLength: 2,
-    title: "this device token",
-    type: "string",
-  },
-  flow_token: {
-    maxLength: 200,
-    minLength: 2,
-    title: "external device token",
-    type: "string",
-  },
-  uuid: {
-    readOnly: true,
-    title: "uuid",
-    type: "string",
-  },
+export const LOCAL_FLOW_NETWORKS_SCHEMA = {
+  required: [
+    "name"
+  ],
+  properties: {
+    name: {
+      title: "name",
+      type: "string",
+      maxLength: 50,
+      minLength: 2,
+    },
+    is_remote: {
+      type: "boolean",
+      title: "is remote network",
+    }
+  }
+};
+
+export const REMOTE_FLOW_NETWORKS_SCHEMA = {
+  required: [
+    "name",
+    "flow_ip_local",
+    "flow_ip",
+    "flow_port_local",
+    "flow_port",
+    "flow_token_local",
+    "flow_token"
+  ],
+  properties: {
+    name: {
+      title: "name",
+      type: "string",
+      maxLength: 50,
+      minLength: 2,
+    },
+    is_remote: {
+      type: "boolean",
+      title: "is remote network",
+    },
+    flow_ip_local: {
+      type: "string",
+      title: "flow ip local",
+      default: "10.8.1.1",
+      minLength: 6,
+      maxLength: 100,
+    },
+    flow_ip: {
+      type: "string",
+      title: "flow ip remote",
+      default: "10.8.1.1",
+      minLength: 6,
+      maxLength: 100,
+    },
+    flow_port_local: {
+      type: "number",
+      title: "flow port local",
+      minimum: 1,
+      maximum: 65535,
+      default: 1660,
+    },
+    flow_port: {
+      type: "number",
+      title: "flow port remote",
+      minimum: 1,
+      maximum: 65535,
+      default: 1660,
+    },
+    flow_token_local: {
+      title: "token local",
+      type: "string",
+      minLength: 60,
+      maxLength: 60,
+    },
+    flow_token: {
+      title: "token remote",
+      type: "string",
+      minLength: 60,
+      maxLength: 60,
+    }
+  }
 };
 
 export const WIRES_CONNECTION_SCHEMA = {

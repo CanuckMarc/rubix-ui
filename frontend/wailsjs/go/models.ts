@@ -933,7 +933,6 @@ export namespace model {
 	    writer_thing_class?: string;
 	    writer_thing_type?: string;
 	    writer_thing_uuid?: string;
-	    writer_thing_name?: string;
 	    data_store?: number[];
 	    connection: string;
 	    message: string;
@@ -941,6 +940,7 @@ export namespace model {
 	    created_on?: any;
 	    // Go type: time.Time
 	    updated_on?: any;
+	    writer_thing_name?: string;
 	    producer_uuid: string;
 	    flow_framework_uuid?: string;
 	    source_uuid: string;
@@ -956,12 +956,12 @@ export namespace model {
 	        this.writer_thing_class = source["writer_thing_class"];
 	        this.writer_thing_type = source["writer_thing_type"];
 	        this.writer_thing_uuid = source["writer_thing_uuid"];
-	        this.writer_thing_name = source["writer_thing_name"];
 	        this.data_store = source["data_store"];
 	        this.connection = source["connection"];
 	        this.message = source["message"];
 	        this.created_on = this.convertValues(source["created_on"], null);
 	        this.updated_on = this.convertValues(source["updated_on"], null);
+	        this.writer_thing_name = source["writer_thing_name"];
 	        this.producer_uuid = source["producer_uuid"];
 	        this.flow_framework_uuid = source["flow_framework_uuid"];
 	        this.source_uuid = source["source_uuid"];
@@ -1089,6 +1089,9 @@ export namespace model {
 	    flow_ip?: string;
 	    flow_port?: number;
 	    flow_token_local?: string;
+	    flow_https_local?: boolean;
+	    flow_ip_local?: string;
+	    flow_port_local?: number;
 	    streams: Stream[];
 	
 	    static createFrom(source: any = {}) {
@@ -1128,6 +1131,9 @@ export namespace model {
 	        this.flow_ip = source["flow_ip"];
 	        this.flow_port = source["flow_port"];
 	        this.flow_token_local = source["flow_token_local"];
+	        this.flow_https_local = source["flow_https_local"];
+	        this.flow_ip_local = source["flow_ip_local"];
+	        this.flow_port_local = source["flow_port_local"];
 	        this.streams = this.convertValues(source["streams"], Stream);
 	    }
 	
@@ -1804,7 +1810,6 @@ export namespace model {
 	    writer_thing_class?: string;
 	    writer_thing_type?: string;
 	    writer_thing_uuid?: string;
-	    writer_thing_name?: string;
 	    data_store?: number[];
 	    connection: string;
 	    message: string;
@@ -1812,6 +1817,7 @@ export namespace model {
 	    created_on?: any;
 	    // Go type: time.Time
 	    updated_on?: any;
+	    writer_thing_name?: string;
 	    consumer_uuid?: string;
 	    present_value?: number;
 	
@@ -1826,12 +1832,12 @@ export namespace model {
 	        this.writer_thing_class = source["writer_thing_class"];
 	        this.writer_thing_type = source["writer_thing_type"];
 	        this.writer_thing_uuid = source["writer_thing_uuid"];
-	        this.writer_thing_name = source["writer_thing_name"];
 	        this.data_store = source["data_store"];
 	        this.connection = source["connection"];
 	        this.message = source["message"];
 	        this.created_on = this.convertValues(source["created_on"], null);
 	        this.updated_on = this.convertValues(source["updated_on"], null);
+	        this.writer_thing_name = source["writer_thing_name"];
 	        this.consumer_uuid = source["consumer_uuid"];
 	        this.present_value = source["present_value"];
 	    }
@@ -3104,6 +3110,31 @@ export namespace store {
 	        this.name = source["name"];
 	        this.path = source["path"];
 	        this.url = source["url"];
+	    }
+	}
+
+}
+
+export namespace streamlog {
+	
+	export class Log {
+	    uuid: string;
+	    service: string;
+	    duration: number;
+	    key_words_filter: string[];
+	    message: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Log(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.uuid = source["uuid"];
+	        this.service = source["service"];
+	        this.duration = source["duration"];
+	        this.key_words_filter = source["key_words_filter"];
+	        this.message = source["message"];
 	    }
 	}
 

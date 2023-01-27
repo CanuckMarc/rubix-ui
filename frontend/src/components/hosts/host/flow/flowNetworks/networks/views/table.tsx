@@ -5,7 +5,7 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
-import { FLOW_NETWORKS_HEADERS, FLOW_NETWORKS_SCHEMA } from "../../../../../../../constants/headers";
+import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { CreateEditModal } from "./create";
@@ -19,7 +19,6 @@ export const FlowNetworksTable = (props: any) => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [filteredData, setFilteredData] = useState(data);
-  const [schema, setSchema] = useState({});
   const [currentNetwork, setCurrentNetwork] = useState({} as FlowNetwork);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -72,13 +71,6 @@ export const FlowNetworksTable = (props: any) => {
     refreshList();
   };
 
-  const getSchema = () => {
-    const schema = {
-      properties: FLOW_NETWORKS_SCHEMA,
-    };
-    setSchema(schema);
-  };
-
   const getNavigationLink = (flNetworkUUID: string): string => {
     return ROUTES.STREAMS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
@@ -90,7 +82,6 @@ export const FlowNetworksTable = (props: any) => {
   const showModal = (network: FlowNetwork) => {
     setCurrentNetwork(network);
     setIsModalVisible(true);
-    getSchema();
   };
 
   const onCloseModal = () => {
@@ -108,12 +99,11 @@ export const FlowNetworksTable = (props: any) => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
       <CreateEditModal
-        schema={schema}
         currentItem={currentNetwork}
         isModalVisible={isModalVisible}
         refreshList={refreshList}
