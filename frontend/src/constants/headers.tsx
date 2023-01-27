@@ -41,12 +41,6 @@ export const FLOW_NETWORKS_HEADERS = [
     dataIndex: "message",
   },
   {
-    key: "connection",
-    title: "connection",
-    dataIndex: "connection",
-    sorter: (a: any, b: any) => a.connection.localeCompare(b.connection),
-  },
-  {
     key: "uuid",
     title: "uuid",
     dataIndex: "uuid",

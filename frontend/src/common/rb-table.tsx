@@ -7,6 +7,9 @@ const RbTable = (props: any) => {
   return (
     <Table
       {...props}
+      rowClassName={(record: any, i) => {
+        return record?.connection === "Disconnected" ? 'table-row-disconnected' : '';
+      }}
       pagination={{
         position: ["bottomLeft"],
         showSizeChanger: true,
