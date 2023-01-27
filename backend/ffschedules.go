@@ -46,6 +46,7 @@ func (inst *App) AddSchedule(connUUID, hostUUID, name, timeZone string) interfac
 		ThingType:  "schedule",
 		TimeZone:   timeZone,
 	}
+	// pprint.PrintJOSN(body)
 	sch, err := client.FFAddSchedule(hostUUID, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
