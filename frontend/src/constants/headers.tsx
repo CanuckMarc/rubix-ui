@@ -9,13 +9,13 @@ export const FLOW_NETWORKS_HEADERS = [
     key: "flow_ip",
     title: "ip",
     dataIndex: "flow_ip",
-    sorter: (a: any, b: any) => a.flow_ip.localeCompare(b.flow_ip),
+    sorter: (a: any, b: any) => sortIps(a.flow_ip ?? '', b.flow_ip ?? ''),
   },
   {
     key: "flow_port",
     title: "port",
     dataIndex: "flow_port",
-    sorter: (a: any, b: any) => a.flow_port.localeCompare(b.flow_port),
+    sorter: (a: any, b: any) => (a.flow_port ?? 0) - (b.flow_port ?? 0),
   },
   {
     key: "client_name",
