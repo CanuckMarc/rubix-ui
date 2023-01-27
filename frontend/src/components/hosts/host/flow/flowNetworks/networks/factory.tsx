@@ -61,10 +61,7 @@ export class FlowFrameworkNetworkFactory {
     return resp;
   }
 
-  async Update(
-    uuid: string,
-    body: model.FlowNetwork
-  ): Promise<model.FlowNetwork> {
+  async Update(uuid: string, body: model.FlowNetwork): Promise<model.FlowNetwork> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
     let resp: model.FlowNetwork = {} as model.FlowNetwork;

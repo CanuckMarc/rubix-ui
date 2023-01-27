@@ -103,7 +103,7 @@ func (inst *App) EditFlowNetwork(connUUID, hostUUID, networkUUID string, body *m
 	}
 	networks, err := client.EditFlowNetwork(hostUUID, networkUUID, body)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return networks

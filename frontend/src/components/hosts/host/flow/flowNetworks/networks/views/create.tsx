@@ -23,13 +23,13 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentItem);
   }, [isModalVisible]);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (formData.is_remote) {
-      setSchema(REMOTE_FLOW_NETWORKS_SCHEMA)
+      setSchema(REMOTE_FLOW_NETWORKS_SCHEMA);
     } else {
-      setSchema(LOCAL_FLOW_NETWORKS_SCHEMA)
+      setSchema(LOCAL_FLOW_NETWORKS_SCHEMA);
     }
-  }, [formData.is_remote])
+  }, [formData.is_remote]);
 
   const handleSubmit = async (network: FlowNetwork) => {
     network.flow_https = false;
