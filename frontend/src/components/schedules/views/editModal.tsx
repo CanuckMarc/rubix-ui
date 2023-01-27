@@ -21,7 +21,7 @@ export const EditModal = (props: any) => {
   useEffect(() => form.resetFields(), [initData]);
 
   return (
-    <Modal forceRender title={props.title} visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='30vw'>
+    <Modal forceRender title={props.title} visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='35vw'>
         <Form
             form={form}
             name="basic"
@@ -50,6 +50,7 @@ export const EditModal = (props: any) => {
                 rules={[{ required: true, message: 'Please select a time zone!' }]}
             >
                 <Select
+                    showSearch={true}
                     style={{width: '20vw'}}
                     options={moment.tz.names().map(aTimeZone => ({
                         value: aTimeZone,

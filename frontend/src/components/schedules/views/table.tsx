@@ -153,7 +153,7 @@ export const SchedulesTable = (props: any) => {
         setCurrentItem={setCurrentItem}
         setScheduleModalVisible={setScheduleModalVisible}
         refreshList={refreshList}
-        handleCancel={handleScheduleCancel}
+        // handleCancel={handleScheduleCancel}
         factory={props.factory}
         connUUID={props.connUUID}
         hostUUID={props.hostUUID}

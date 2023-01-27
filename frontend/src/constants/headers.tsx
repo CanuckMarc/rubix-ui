@@ -825,17 +825,11 @@ export const SCHEDULES_HEADERS = [
     render : (text: any) => String(text)
   },
   {
-    title: "is_active",
+    title: "is active",
     dataIndex: "is_active",
     key: "is_active",
     render : (text: any) => String(text)
-  },
-  {
-    title: "is_global",
-    dataIndex: "is_global",
-    key: "is_global",
-    render : (text: any) => String(text)
-  },
+  }
 ];
 
 //--------------schema-------------//
@@ -954,10 +948,5 @@ export const SCHEDULES_SCHEMA = [
     readOnly: true,
     title: "active",
     type: "boolean",
-  },
-  {
-    readOnly: true,
-    title: "global",
-    type: "boolean",
-  },
+  }
 ];

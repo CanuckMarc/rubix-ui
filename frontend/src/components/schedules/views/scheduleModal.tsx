@@ -117,6 +117,11 @@ export const ScheduleModal = (props: any) => {
 
   const handleOk = async () => {
     props.setScheduleModalVisible(false);
+
+    if (createCat != CreateType.UNSPECIFIED) {
+        handleCreate()
+    }
+
     await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)
     // after updating schedule, refetch and clear the existing table-entries so that new ones can be loaded correctly
     props.refreshList();
@@ -248,12 +253,13 @@ export const ScheduleModal = (props: any) => {
   }
 
   const handleCancel = () => {
-      setCreateCat(CreateType.UNSPECIFIED)
+    setScheduleModalVisible(false)
+    setCreateCat(CreateType.UNSPECIFIED)
   }
 
   const handleCreate = () => {
-      formRef.current.click();
-      setCreateCat(CreateType.UNSPECIFIED)
+    formRef.current.click();
+    setCreateCat(CreateType.UNSPECIFIED)
   }
 
   return (
@@ -261,10 +267,10 @@ export const ScheduleModal = (props: any) => {
         title="Create schedules"
         visible={props.visible}
         onOk={handleOk}
-        onCancel={props.handleCancel}
+        onCancel={handleCancel}
         bodyStyle={{overflowX: 'auto', maxHeight: '50vh'}}
         width='50vw'
-        okButtonProps={{ disabled: createCat != CreateType.UNSPECIFIED  }}
+        // okButtonProps={{ disabled: createCat != CreateType.UNSPECIFIED  }}
     >
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
@@ -274,8 +280,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.EVENT}
                     handleOnClick={eventCreate}
                     exisitingElements={events}
-                    handleCancel={handleCancel}
-                    handleCreate={handleCreate}
+                    // handleCancel={handleCancel}
+                    // handleCreate={handleCreate}
                     buttonName={'Add event'}
                     form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
                 />
@@ -288,8 +294,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.WEEKLY}
                     handleOnClick={weeklyCreate}
                     exisitingElements={weeklys}
-                    handleCancel={handleCancel}
-                    handleCreate={handleCreate}
+                    // handleCancel={handleCancel}
+                    // handleCreate={handleCreate}
                     buttonName={'Add weekly'}
                     form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
                 />
@@ -302,8 +308,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.EXCEPTION}
                     handleOnClick={exceptionCreate}
                     exisitingElements={exceptions}
-                    handleCancel={handleCancel}
-                    handleCreate={handleCreate}
+                    // handleCancel={handleCancel}
+                    // handleCreate={handleCreate}
                     buttonName={'Add exception'}
                     form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
                 }

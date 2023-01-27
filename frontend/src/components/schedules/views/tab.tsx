@@ -12,10 +12,10 @@ export const TabContent = (props: any) => {
                 {(createCat == type) && (
                     <>
                         {form}
-                        <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
+                        {/* <div style={{display: 'flex', flexDirection: 'row', gap: '1vw'}}>
                             <Button type="primary" danger={true} size={'middle'} onClick={handleCancel}>Cancel</Button>
                             <Button type="primary" size={'middle'} onClick={handleCreate}>Ok</Button>
-                        </div>
+                        </div> */}
                     </>
                 )}
             <hr className="solid"/>
