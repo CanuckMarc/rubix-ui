@@ -940,15 +940,15 @@ export const REMOTE_FLOW_NETWORKS_SCHEMA = {
       type: "string",
       title: "flow ip local",
       default: "10.8.1.1",
-      maxLength: 6,
-      minLength: 100,
+      minLength: 6,
+      maxLength: 100,
     },
     flow_ip: {
       type: "string",
       title: "flow ip remote",
       default: "10.8.1.1",
-      maxLength: 6,
-      minLength: 100,
+      minLength: 6,
+      maxLength: 100,
     },
     flow_port_local: {
       type: "number",
@@ -967,14 +967,14 @@ export const REMOTE_FLOW_NETWORKS_SCHEMA = {
     flow_token_local: {
       title: "token local",
       type: "string",
-      maxLength: 60,
       minLength: 60,
+      maxLength: 60,
     },
     flow_token: {
       title: "token remote",
       type: "string",
-      maxLength: 60,
       minLength: 60,
+      maxLength: 60,
     }
   }
 };
