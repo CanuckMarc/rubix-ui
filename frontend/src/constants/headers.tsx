@@ -24,6 +24,12 @@ export const FLOW_NETWORKS_HEADERS = [
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
+    key: "site_name",
+    title: "site name",
+    dataIndex: "site_name",
+    sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
+  },
+  {
     key: "device_name",
     title: "device name",
     dataIndex: "device_name",
