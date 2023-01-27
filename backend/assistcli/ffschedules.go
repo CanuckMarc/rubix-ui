@@ -8,16 +8,20 @@ import (
 )
 
 type Schedule struct {
-	Uuid       string      `json:"uuid"`
-	Name       string      `json:"name"`
-	Enable     interface{} `json:"enable"`
-	ThingClass string      `json:"thing_class"`
-	ThingType  string      `json:"thing_type"`
-	IsActive   interface{} `json:"is_active"`
-	IsGlobal   interface{} `json:"is_global"`
-	Schedule   interface{} `json:"schedule"`
-	CreatedOn  time.Time   `json:"created_on"`
-	UpdatedOn  time.Time   `json:"updated_on"`
+	Uuid            string      `json:"uuid"`
+	Name            string      `json:"name"`
+	Enable          interface{} `json:"enable"`
+	ThingClass      string      `json:"thing_class"`
+	ThingType       string      `json:"thing_type"`
+	IsActive        interface{} `json:"is_active"`
+	IsGlobal        interface{} `json:"is_global"`
+	Schedule        interface{} `json:"schedule"`
+	TimeZone        string      `json:"timezone"`
+	ActiveWeekly    bool        `json:"active_weekly"`
+	ActiveException bool        `json:"active_exception"`
+	ActiveEvent     bool        `json:"active_event"`
+	CreatedOn       time.Time   `json:"created_on"`
+	UpdatedOn       time.Time   `json:"updated_on"`
 }
 
 func (inst *Client) FFGetSchedules(hostIDName string) ([]Schedule, error) {

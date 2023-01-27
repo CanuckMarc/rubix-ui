@@ -33,7 +33,7 @@ func (inst *App) GetSchedule(connUUID, hostUUID, uuid string) interface{} {
 	return sch
 }
 
-func (inst *App) AddSchedule(connUUID, hostUUID, name string) interface{} {
+func (inst *App) AddSchedule(connUUID, hostUUID, name, timeZone string) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
@@ -44,7 +44,9 @@ func (inst *App) AddSchedule(connUUID, hostUUID, name string) interface{} {
 		Enable:     bools.NewTrue(),
 		ThingClass: "schedule",
 		ThingType:  "schedule",
+		TimeZone:   timeZone,
 	}
+	// pprint.PrintJOSN(body)
 	sch, err := client.FFAddSchedule(hostUUID, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -59,6 +61,7 @@ func (inst *App) EditSchedule(connUUID, hostUUID, uuid string, body *assistcli.S
 	if err != nil {
 		return nil
 	}
+	// pprint.PrintJOSN(body)
 	sch, err := client.FFEditSchedule(hostUUID, uuid, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))

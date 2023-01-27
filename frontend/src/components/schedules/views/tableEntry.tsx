@@ -1,12 +1,24 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Descriptions, Button } from "antd";
 import { EditOutlined, EnterOutlined, DeleteOutlined } from '@ant-design/icons';
+import moment from 'moment-timezone';
 
 
 export const TableEntry = (props: any) => {
-  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException } = props;
+  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException, timeZone, setEvents, setExceptions, setWeeklys } = props;
   const formRef = useRef<any>();
   const [editButton, setEditButton] = useState(false);
+  const [eventExceptionStart, setEventExceptionStart] = useState('');
+  const [eventExceptionEnd, setEventExceptionEnd] = useState('');
+
+  useEffect(() => {
+    if (eventException) {
+        const tempStart = data.dates[0].start.split('T')
+        const tempEnd = data.dates[0].end.split('T')
+        setEventExceptionStart(moment.utc(`${tempStart[0]} ${tempStart[1]}`).tz(timeZone).format('MMMM Do YYYY, h:mma'))
+        setEventExceptionEnd(moment.utc(`${tempEnd[0]} ${tempEnd[1]}`).tz(timeZone).format('MMMM Do YYYY, h:mma'))
+    }
+  }, [])
 
   const handleEditClicked = () => {
     setEditButton(true)
@@ -15,6 +27,10 @@ export const TableEntry = (props: any) => {
   const handleCommitClicked = () => {
     formRef.current.click();
     setEditButton(false)
+    // clear the old table and the new one will be loaded automatically
+    setEvents([])
+    setExceptions([])
+    setWeeklys([])
   }
 
   const handleDeleteClicked = () => {
@@ -34,9 +50,12 @@ export const TableEntry = (props: any) => {
   }
 
   const handleFormFinish = (values: any) => {
+    // this needs to be in UTC time
+    // RangePicker think its input is UTC time
     if (eventException) {
-        const startTemp = values.range[0]._d.toISOString().split(':')
-        const endTemp = values.range[1]._d.toISOString().split(':')
+        const startTemp = values.range[0].toISOString().split(':')
+        const endTemp = values.range[1].toISOString().split(':')
+        
         const updatedEventException = {
             ...data,
             name: values.name,
@@ -73,12 +92,12 @@ export const TableEntry = (props: any) => {
         {(!editButton && eventException) && (
             <Descriptions>
                 <Descriptions.Item label="name">{data.name}</Descriptions.Item>
-                <Descriptions.Item label="start">{data.dates[0].start}</Descriptions.Item>
-                <Descriptions.Item label="end">{data.dates[0].end}</Descriptions.Item>
+                <Descriptions.Item label="start">{eventExceptionStart}</Descriptions.Item>
+                <Descriptions.Item label="end">{eventExceptionEnd}</Descriptions.Item>
             </Descriptions>
         )}
         {(editButton && eventException) && (
-            <EditForm eventExceptionData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
+            <EditForm eventExceptionData={data} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
         )}
         {/* if rendering weekly */}
         {(!editButton && !eventException) && (
@@ -90,7 +109,7 @@ export const TableEntry = (props: any) => {
             </Descriptions>
         )}
         {(editButton && !eventException) && (
-            <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={formRef}/>
+            <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
         )}
         <Button type="primary" icon={<EditOutlined />} size={'small'} disabled={editButton} onClick={handleEditClicked}>Edit</Button>
         <Button type="primary" icon={<DeleteOutlined />} size={'small'} danger={true} disabled={editButton} onClick={handleDeleteClicked}>Delete</Button>

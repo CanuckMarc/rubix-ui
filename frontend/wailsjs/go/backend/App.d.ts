@@ -44,7 +44,7 @@ export function AddPointsBulk(arg1:string,arg2:string,arg3:Array<model.Point>):P
 
 export function AddProducer(arg1:string,arg2:string,arg3:model.Producer):Promise<model.Producer>;
 
-export function AddSchedule(arg1:string,arg2:string,arg3:string):Promise<any>;
+export function AddSchedule(arg1:string,arg2:string,arg3:string,arg4:string):Promise<any>;
 
 export function AddStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
 
@@ -250,7 +250,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<Error>;
+export function ExportConnection(arg1:Array<string>):Promise<void>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 

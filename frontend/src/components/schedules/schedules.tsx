@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { SchedulesTable } from "./views/table";
 import { EditModal } from "./views/editModal";
 import { ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import moment from 'moment-timezone';
 
 const { Title } = Typography;
 
@@ -15,6 +16,7 @@ export const Schedules = () => {
   const [createModal, showCreateModal] = useState(false);
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([]);
+  const [timeZone, setTimeZone] = useState(`${moment.tz.guess()}`);
 
   const factory = new SchedulesFactory();
 
@@ -22,7 +24,7 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
-      // console.log(res)
+      console.log(res)
       setData(res);
     } catch (error) {
       setData([]);
@@ -54,9 +56,9 @@ export const Schedules = () => {
 
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
-    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
-    // console.log(res)
-    
+    setTimeZone(value.timeZone);
+    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name, value.timeZone)
+
     fetch();
   }
 
@@ -77,25 +79,27 @@ export const Schedules = () => {
             <Button type="primary" icon={<DeleteOutlined />} danger={true} size={'middle'} disabled={!hasSelected} onClick={handleDeleteClick}>Delete</Button>
           </Space>
 
-          <SchedulesTable 
-            data={data} 
-            isFetching={isFetching} 
-            refreshList={fetch} 
+          <SchedulesTable
+            data={data}
+            isFetching={isFetching}
+            refreshList={fetch}
             factory={factory}
             connUUID={connUUID}
             hostUUID={hostUUID}
             setHasSelected={setHasSelected}
             setSelectedUUIDs={setSelectedUUIDs}
+            timeZone={timeZone}
+            setTimeZone={setTimeZone}
           />
 
         </div>
       </Card>
 
-      <EditModal 
+      <EditModal
         title={'Create schedule'}
-        createModal={createModal} 
+        createModal={createModal}
         moreOptions={false}
-        handleFormFinish={handleFormFinish} 
+        handleFormFinish={handleFormFinish}
         handleCancel={handleCancel}
       />
     </>
