@@ -482,6 +482,10 @@ export function FakeEdgeAppsInfoModelCreationOnUI() {
   return window['go']['backend']['App']['FakeEdgeAppsInfoModelCreationOnUI']();
 }
 
+export function FlowNetworkNewLog(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['FlowNetworkNewLog'](arg1, arg2, arg3, arg4);
+}
+
 export function GetBackup(arg1) {
   return window['go']['backend']['App']['GetBackup'](arg1);
 }
