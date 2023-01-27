@@ -57,8 +57,8 @@ export const Schedules = () => {
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
     setTimeZone(value.timeZone);
-    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
-    
+    await factory.AddSchedules(connUUID, hostUUID, value.schedule_name, value.timeZone)
+
     fetch();
   }
 
@@ -79,10 +79,10 @@ export const Schedules = () => {
             <Button type="primary" icon={<DeleteOutlined />} danger={true} size={'middle'} disabled={!hasSelected} onClick={handleDeleteClick}>Delete</Button>
           </Space>
 
-          <SchedulesTable 
-            data={data} 
-            isFetching={isFetching} 
-            refreshList={fetch} 
+          <SchedulesTable
+            data={data}
+            isFetching={isFetching}
+            refreshList={fetch}
             factory={factory}
             connUUID={connUUID}
             hostUUID={hostUUID}
@@ -95,11 +95,11 @@ export const Schedules = () => {
         </div>
       </Card>
 
-      <EditModal 
+      <EditModal
         title={'Create schedule'}
-        createModal={createModal} 
+        createModal={createModal}
         moreOptions={false}
-        handleFormFinish={handleFormFinish} 
+        handleFormFinish={handleFormFinish}
         handleCancel={handleCancel}
       />
     </>
