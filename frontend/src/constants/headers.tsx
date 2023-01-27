@@ -822,13 +822,33 @@ export const SCHEDULES_HEADERS = [
     title: "enable",
     dataIndex: "enable",
     key: "enable",
-    render : (text: any) => String(text)
+    // render : (text: any) => String(text),
+    render : (enable: any) => {
+      console.log(enable)
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    }
   },
   {
     title: "is active",
     dataIndex: "is_active",
     key: "is_active",
-    render : (text: any) => String(text)
+    // render : (text: any) => String(text)
+    render : (enable: any) => {
+      console.log(enable)
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enable";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    }
   }
 ];
 
