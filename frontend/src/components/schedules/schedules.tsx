@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { SchedulesTable } from "./views/table";
 import { EditModal } from "./views/editModal";
 import { ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import moment from 'moment-timezone';
 
 const { Title } = Typography;
 
@@ -15,6 +16,7 @@ export const Schedules = () => {
   const [createModal, showCreateModal] = useState(false);
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([]);
+  const [timeZone, setTimeZone] = useState(`${moment.tz.guess()}`);
 
   const factory = new SchedulesFactory();
 
@@ -54,8 +56,8 @@ export const Schedules = () => {
 
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
+    setTimeZone(value.timeZone);
     await factory.AddSchedules(connUUID, hostUUID, value.schedule_name)
-    // console.log(res)
     
     fetch();
   }
@@ -86,6 +88,8 @@ export const Schedules = () => {
             hostUUID={hostUUID}
             setHasSelected={setHasSelected}
             setSelectedUUIDs={setSelectedUUIDs}
+            timeZone={timeZone}
+            setTimeZone={setTimeZone}
           />
 
         </div>

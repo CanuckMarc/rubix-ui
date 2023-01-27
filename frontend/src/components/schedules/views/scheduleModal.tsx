@@ -29,7 +29,11 @@ const generateExistingItems = (
     objString: string,
     form: React.FC,
     setCurrentItem: Function,
-    eventException: Boolean
+    eventException: Boolean,
+    timeZone: string,
+    setEvents: Function,
+    setExceptions: Function,
+    setWeeklys: Function
 ) => {
     let existingElementJSX: JSX.Element[] = []
     const res = checkNull(currentItem, objString)
@@ -40,9 +44,13 @@ const generateExistingItems = (
                     key={key}
                     EditForm={form}
                     data={res[key]} itemUUID={key}
-                    currentItem={structuredClone(currentItem)}
+                    currentItem={currentItem}
                     setCurrentItem={setCurrentItem}
                     eventException={eventException}
+                    timeZone={timeZone}
+                    setEvents={setEvents}
+                    setExceptions={setExceptions}
+                    setWeeklys={setWeeklys}
                 />
             )
         });
@@ -51,7 +59,7 @@ const generateExistingItems = (
 }
 
 export const ScheduleModal = (props: any) => {
-  const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
+  const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList, timeZone } = props;
   const formRef = useRef<any>();
   const [events, setEvents] = useState<JSX.Element[]>([]);
   const [weeklys, setWeeklys] = useState<JSX.Element[]>([]);
@@ -61,13 +69,43 @@ export const ScheduleModal = (props: any) => {
   useEffect(() => {
     // map existing items to tableEntry for display if not empty
     if (currentItem.schedule && currentItem.schedule.schedules) {
-        const eventsJSX = generateExistingItems(currentItem, 'schedule.schedules.events', EventExceptionForm, setCurrentItem, true);
+        const eventsJSX = generateExistingItems(
+            structuredClone(currentItem), 
+            'schedule.schedules.events', 
+            EventExceptionForm, 
+            setCurrentItem, 
+            true, 
+            timeZone,
+            setEvents,
+            setExceptions,
+            setWeeklys
+        );
         setEvents(eventsJSX)
 
-        const exceptionJSX = generateExistingItems(currentItem, 'schedule.schedules.exception', EventExceptionForm, setCurrentItem, true);
+        const exceptionJSX = generateExistingItems(
+            structuredClone(currentItem), 
+            'schedule.schedules.exception', 
+            EventExceptionForm, 
+            setCurrentItem, 
+            true, 
+            timeZone, 
+            setEvents,
+            setExceptions,
+            setWeeklys
+        );
         setExceptions(exceptionJSX)
 
-        const weeklyJSX = generateExistingItems(currentItem, 'schedule.schedules.weekly', WeeklyForm, setCurrentItem, false);
+        const weeklyJSX = generateExistingItems(
+            structuredClone(currentItem), 
+            'schedule.schedules.weekly', 
+            WeeklyForm, 
+            setCurrentItem, 
+            false, 
+            timeZone, 
+            setEvents,
+            setExceptions,
+            setWeeklys
+        );
         setWeeklys(weeklyJSX)
     // reset existing items when current schedule item is empty
     } else {
@@ -79,17 +117,18 @@ export const ScheduleModal = (props: any) => {
 
   const handleOk = async () => {
     props.setScheduleModalVisible(false);
-    // console.log(currentItem)
     await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)
-    // if (res) {
-    //   console.log(res)
-    // }
+    // after updating schedule, refetch and clear the existing table-entries so that new ones can be loaded correctly
     props.refreshList();
+    setEvents([])
+    setExceptions([])
+    setWeeklys([])
   }
 
   const parseEvExDateTime = (values: any) => {
-    const startTemp = values.range[0]._d.toISOString().split(':')
-    const endTemp = values.range[1]._d.toISOString().split(':')
+    // time is UTC
+    const startTemp = values.range[0].toISOString().split(':')
+    const endTemp = values.range[1].toISOString().split(':')
     const newEvEx = {
         name: values.name,
         dates: [{
@@ -230,6 +269,7 @@ export const ScheduleModal = (props: any) => {
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
                 <TabContent
+                    timeZone={timeZone}
                     createCat={createCat}
                     type={CreateType.EVENT}
                     handleOnClick={eventCreate}
@@ -237,12 +277,13 @@ export const ScheduleModal = (props: any) => {
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
                     buttonName={'Add event'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
                 />
             </TabPane>
 
             <TabPane tab={weeklyTag} key={weeklyTag}>
                 <TabContent
+                    timeZone={timeZone}
                     createCat={createCat}
                     type={CreateType.WEEKLY}
                     handleOnClick={weeklyCreate}
@@ -250,12 +291,13 @@ export const ScheduleModal = (props: any) => {
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
                     buttonName={'Add weekly'}
-                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>}
+                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
                 />
             </TabPane>
 
             <TabPane tab={exceptionTag} key={exceptionTag}>
                 <TabContent
+                    timeZone={timeZone}
                     createCat={createCat}
                     type={CreateType.EXCEPTION}
                     handleOnClick={exceptionCreate}
@@ -263,7 +305,7 @@ export const ScheduleModal = (props: any) => {
                     handleCancel={handleCancel}
                     handleCreate={handleCreate}
                     buttonName={'Add exception'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef}/>
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
                 }
                 />
             </TabPane>
