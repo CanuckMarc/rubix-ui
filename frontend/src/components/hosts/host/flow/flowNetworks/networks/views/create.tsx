@@ -5,7 +5,6 @@ import { model } from "../../../../../../../../wailsjs/go/models";
 import { JsonForm } from "../../../../../../../common/json-schema-form";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { useParams } from "react-router-dom";
-
 import FlowNetwork = model.FlowNetwork;
 
 export const CreateEditModal = (props: any) => {
@@ -24,6 +23,9 @@ export const CreateEditModal = (props: any) => {
   }, [isModalVisible]);
 
   const handleSubmit = async (network: FlowNetwork) => {
+    network.flow_https = false;
+    network.flow_https_local = false;
+    network.is_token_auth = true;
     try {
       setConfirmLoading(true);
       if (currentItem.uuid) {
