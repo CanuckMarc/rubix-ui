@@ -19,7 +19,6 @@ export const SchedulesTable = (props: any) => {
   const [scheduleModalVisible, setScheduleModalVisible] = useState(false);
 
   const columns = [
-    ...SCHEDULES_HEADERS,
     {
       title: "Actions",
       dataIndex: "actions",
@@ -50,6 +49,7 @@ export const SchedulesTable = (props: any) => {
         </Space>
       ),
     },
+    ...SCHEDULES_HEADERS
   ];
 
   useEffect(() => {
