@@ -478,11 +478,11 @@ func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.GetFlow()
-	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return resp
 	}
+	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
 	return resp
 }
 
