@@ -104,7 +104,9 @@ func (inst *App) EdgeInstallApp(connUUID, hostUUID, appName, appVersion string) 
 			inst.fail(fmt.Sprintf("failed to get git token %s", err))
 			return nil
 		}
-		inst.StoreDownloadApp(token, releaseVersion, appName, appVersion, arch)
+		if err = inst.storeDownloadApp(token, releaseVersion, appName, appVersion, arch); err != nil {
+			return inst.fail(err)
+		}
 		inst.uiSuccessMessage(fmt.Sprintf("(step 2 of %s) %s app is downloaded on app store", lastStep, appName))
 	} else {
 		inst.uiSuccessMessage(fmt.Sprintf("(step 2 of %s) %s already exist on app store", lastStep, appName))

@@ -63,8 +63,8 @@ github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/NubeDev/flow-eng v0.7.5 h1:DfSsZas+x74Jr8UWcn0a4Wns5qKxdXtm5ftaha2S+tk=
 github.com/NubeDev/flow-eng v0.7.5/go.mod h1:1J2wp+k16O/L9sl0PRnIiMjzR0x24KMNQhgCtGLOIaU=
-github.com/NubeIO/git v0.0.8 h1:qRC8r8HLaRXs/muKhDa6bIJACbPWiG4BNFlxLutoLz8=
-github.com/NubeIO/git v0.0.8/go.mod h1:ZjlhXM823d9sKQjv8d4pRugK9z6xJvPqLLX1onCVTbQ=
+github.com/NubeIO/git v0.0.9 h1:vyBZt6ggmbYqKCBFXHc4AZavulw1g1SrpZqCDrOuvI4=
+github.com/NubeIO/git v0.0.9/go.mod h1:ZjlhXM823d9sKQjv8d4pRugK9z6xJvPqLLX1onCVTbQ=
 github.com/NubeIO/lib-date v0.0.6 h1:88Ki7UIOvDEKyd3vKJ7r4fiUeX25Q5iyMO5d0125wrA=
 github.com/NubeIO/lib-date v0.0.6/go.mod h1:VvpSwdwcVCaOgTN+Ad96nHBkFDWTt3VekG933QCtGtc=
 github.com/NubeIO/lib-dhcpd v0.0.2 h1:DC2qcVi3tsRkYlmmlTiZTvsHdFI9/HqSohVj131Pl4I=
@@ -96,8 +96,8 @@ github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4/go.mod h1:k8eZvTC5I+B0QHGlM3
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.0.4/go.mod h1:A1BPuc3UpE1EF3ugdf+8QIIKTT8s3eK+pfUcheJX2JM=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.12 h1:kSXWRAU+BBjm7XpkY4wpC1QaPxkIK/2G0tQT6LchaUU=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.12/go.mod h1:J0Xy/dX/f/xIhEnW6ZhkE2LiyuRk2H9gCb0Uk+2SSSk=
-github.com/NubeIO/rubix-assist v0.8.5 h1:gkg1cjMO/e/IbYaQ32RGObM6obA8S3fS7uVGOvrPrVE=
-github.com/NubeIO/rubix-assist v0.8.5/go.mod h1:TIIwxqB/nF9bx93zMnbTNxtPxTRYrO95FcjXznFKr8Y=
+github.com/NubeIO/rubix-assist v0.8.6 h1:q/RsCweYb37KYCw28vGtIk4CmAYvNkuIWVKHGf+aOYs=
+github.com/NubeIO/rubix-assist v0.8.6/go.mod h1:TIIwxqB/nF9bx93zMnbTNxtPxTRYrO95FcjXznFKr8Y=
 github.com/NubeIO/rubix-edge v0.5.6 h1:SA3xOoICjcGqHQe+DhVtmSdZqg4Z9mJ01AtDJ5hDNsQ=
 github.com/NubeIO/rubix-edge v0.5.6/go.mod h1:fX8t6UV9+PoE0/iVfAM0d4qtrcDg5rIiJxecy2zLY90=
 github.com/NubeIO/rubix-edge-wires v0.2.6 h1:V1evHC4U5jcMighCtOmJiwRbSTW8v52Ooxq2nfOJvko=

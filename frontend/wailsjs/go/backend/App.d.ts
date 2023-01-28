@@ -491,8 +491,6 @@ export function Scanner(arg1:string,arg2:string,arg3:number,arg4:Array<string>):
 
 export function SetGitToken(arg1:string):Promise<rumodel.Response>;
 
-export function StoreDownloadApp(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<store.InstallResponse>;
-
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<storage.RubixConnection>;
 
 export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStorageFlowNetwork):Promise<model.LocalStorageFlowNetwork>;

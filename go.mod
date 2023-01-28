@@ -10,7 +10,7 @@ go 1.18
 
 require (
 	github.com/NubeDev/flow-eng v0.7.5
-	github.com/NubeIO/git v0.0.8
+	github.com/NubeIO/git v0.0.9
 	github.com/NubeIO/lib-date v0.0.6
 	github.com/NubeIO/lib-dhcpd v0.0.2
 	github.com/NubeIO/lib-dirs v0.0.8
@@ -23,7 +23,7 @@ require (
 	github.com/NubeIO/nubeio-rubix-lib-auth-go v1.1.0
 	github.com/NubeIO/nubeio-rubix-lib-helpers-go v0.2.7
 	github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.12
-	github.com/NubeIO/rubix-assist v0.8.5
+	github.com/NubeIO/rubix-assist v0.8.6
 	github.com/NubeIO/rubix-edge v0.5.6
 	github.com/NubeIO/rubix-edge-wires v0.2.6
 	github.com/NubeIO/rubix-registry-go v1.0.0

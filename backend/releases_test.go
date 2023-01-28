@@ -32,7 +32,7 @@ func TestApp_StoreDownloadApp(t *testing.T) { // will save all apps from the ver
 	token := git.DecodeToken(token)
 	fmt.Printf("token: %s\n", token)
 	app := MockNewApp()
-	downloaded := app.StoreDownloadApp(token, "v0.6.8", constants.FlowFramework, "v0.6.6", "amd64")
+	downloaded := app.storeDownloadApp(token, "v0.6.8", constants.FlowFramework, "v0.6.6", "amd64")
 	pprint.PrintJOSN(downloaded)
 }
 
