@@ -942,10 +942,6 @@ export function SetGitToken(arg1) {
   return window['go']['backend']['App']['SetGitToken'](arg1);
 }
 
-export function StoreDownloadApp(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['backend']['App']['StoreDownloadApp'](arg1, arg2, arg3, arg4, arg5);
-}
-
 export function UpdateConnection(arg1, arg2) {
   return window['go']['backend']['App']['UpdateConnection'](arg1, arg2);
 }

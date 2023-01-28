@@ -39,7 +39,8 @@ func (inst *App) edgeBiosRubixEdgeInstall(connUUID, hostUUID, version string) er
 		inst.uiSuccessMessage(fmt.Sprintf("(step 2 of %s) downloaded rubix-edge to local coz it doesn't exist",
 			lastStep))
 		log.Info(fmt.Sprintf("app: %s not found in appStore so download", appName))
-		if _, err = inst.appStore.GitDownloadZip(token, app, false, false); err != nil {
+		_, err = inst.appStore.GitDownloadZip(token, app, false, true, false)
+		if err != nil {
 			return err
 		}
 	} else {

@@ -18,15 +18,13 @@ func (inst *AppStore) DownloadFlowPlugin(token string, app App) (*App, error) {
 	})
 }
 
-func (inst *AppStore) GitDownloadZip(token string, app App, doNotValidateArch, isZipball bool) (
+func (inst *AppStore) GitDownloadZip(token string, app App, doNotValidateArch, matchName, isZipball bool) (
 	*App, error) {
 	app.Repo = namings.GetRepoNameFromAppName(app.Name)
 	opts := git.DownloadOptions{
 		MatchArch: !doNotValidateArch,
 		AssetName: app.Repo,
-	}
-	if !doNotValidateArch {
-		opts.MatchName = true
+		MatchName: matchName,
 	}
 	return inst.gitDownloadZip(token, app, isZipball, false, opts)
 }

@@ -9,12 +9,11 @@ import (
 	"path"
 )
 
-func (inst *App) StoreDownloadApp(token, releaseVersion, appName, appVersion, arch string) *store.InstallResponse {
+func (inst *App) storeDownloadApp(token, releaseVersion, appName, appVersion, arch string) error {
 	out := &store.InstallResponse{}
 	getRelease, err := inst.addRelease(token, releaseVersion)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("release fetch got error: %s", err.Error()))
-		return nil
+		return errors.New(fmt.Sprintf("release fetch got error: %s", err.Error()))
 	}
 	for _, app := range getRelease.Apps {
 		if app.Name == appName {
@@ -23,17 +22,16 @@ func (inst *App) StoreDownloadApp(token, releaseVersion, appName, appVersion, ar
 				Version: appVersion,
 				Arch:    arch,
 			}
-			asset, err := inst.appStore.GitDownloadZip(token, _app, app.DoNotValidateArch, app.IsZiball)
+			asset, err := inst.appStore.GitDownloadZip(token, _app, app.DoNotValidateArch, app.MatchName, app.IsZiball)
 			if err != nil {
-				inst.uiErrorMessage(fmt.Sprintf("%s app download on local store got error: %s", appName, err.Error()))
-				return nil
+				return errors.New(fmt.Sprintf("%s app download on local store got error: %s", appName, err.Error()))
 			}
 			out.AppName = asset.Name
 			out.AppVersion = asset.Version
 			inst.uiSuccessMessage(fmt.Sprintf("%s app downloaded successfully", appName))
 		}
 	}
-	return out
+	return nil
 }
 
 func (inst *App) storeGetPluginPath(body *amodel.Plugin) (absPath string, flowPlugin *builds.BuildDetails, err error) {

@@ -2971,6 +2971,7 @@ export namespace store {
 	    flow_dependency: boolean;
 	    plugin_dependency: string[];
 	    service_dependency: string[];
+	    match_name: boolean;
 	    is_zipball: boolean;
 	    do_not_validate_arch: boolean;
 	    move_extracted_file_to_name_app: boolean;
@@ -2997,13 +2998,13 @@ export namespace store {
 	        this.flow_dependency = source["flow_dependency"];
 	        this.plugin_dependency = source["plugin_dependency"];
 	        this.service_dependency = source["service_dependency"];
+	        this.match_name = source["match_name"];
 	        this.is_zipball = source["is_zipball"];
 	        this.do_not_validate_arch = source["do_not_validate_arch"];
 	        this.move_extracted_file_to_name_app = source["move_extracted_file_to_name_app"];
 	        this.move_one_level_inside_file_to_outside = source["move_one_level_inside_file_to_outside"];
 	    }
 	}
-	
 	export class Plugins {
 	    name: string;
 	    plugin: string;
