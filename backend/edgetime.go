@@ -60,7 +60,7 @@ func (inst *App) EdgeUpdateTimezone(connUUID, hostUUID string, timeZone string) 
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	inst.uiSuccessMessage(fmt.Sprintf("%s", data.Message))
+	inst.uiSuccessMessage(fmt.Sprintf("%s, please now reboot or repower the device", data.Message))
 	return data
 }
 

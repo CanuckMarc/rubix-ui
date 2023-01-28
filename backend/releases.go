@@ -80,5 +80,7 @@ func (inst *App) GitDownloadReleases() *rumodel.Response {
 		}
 		log.Infof("Git downloaded release: %s, path: %s, name: %s", dRelease.Release, release.Path, release.Name)
 	}
-	return inst.success("successfully downloaded releases")
+	releaseVersion, _ := inst.getLatestReleaseVersion()
+	releaseCount := inst.GetReleases()
+	return inst.success(fmt.Sprintf("successfully downloaded releases count: %d, latest version:%s", len(releaseCount), releaseVersion))
 }
