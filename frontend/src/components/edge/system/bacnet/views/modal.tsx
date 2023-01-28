@@ -63,6 +63,8 @@ export const Bacnet = () => {
         }
     }
 
+    useEffect(() => form.resetFields(), [flatConfigData]);
+
     const handleEditClick = () => {
         setModalOpen(true)
     }
