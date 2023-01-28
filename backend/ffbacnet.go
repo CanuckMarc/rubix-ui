@@ -6,6 +6,7 @@ import (
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	"github.com/NubeIO/rubix-ui/backend/constants"
 	"gopkg.in/yaml.v3"
 )
 
@@ -44,7 +45,7 @@ func (inst *App) GetBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 }
 
 func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, addPoints, makeWriteable bool) ([]model.Point, error) {
-	err := inst.bacnetChecks(connUUID, hostUUID, "bacnetmaster")
+	err := inst.bacnetChecks(connUUID, hostUUID, bacnetMasterPlg)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,10 @@ func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 
 func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) ([]model.Device, error) {
 	var err error
-	inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Stop)
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
+	if err != nil {
+		err = inst.errMsg(err)
+	}
 	err = inst.bacnetChecks(connUUID, hostUUID, bacnetMasterPlg)
 	err = inst.errMsg(err)
 	if err != nil {
@@ -80,7 +84,7 @@ func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts 
 		device.NetworkUUID = networkUUID
 		devicesUpdated = append(devicesUpdated, device)
 	}
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Start)
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Start)
 	err = inst.errMsg(err)
 	return devicesUpdated, nil
 }
@@ -139,18 +143,18 @@ func (inst *App) BACnetWriteConfig(connUUID, hostUUID string, config assistcli.C
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return
 	}
-	writeConfig, err := client.BACnetWriteConfig(hostUUID, "bacnet-server-driver", config)
+	writeConfig, err := client.BACnetWriteConfig(hostUUID, constants.BacnetServerDriver, config)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return
 	}
 	inst.uiSuccessMessage(fmt.Sprintf("updated config ok %v", writeConfig.Message))
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, "bacnet-server-driver", amodel.Restart)
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Restart)
 	if err != nil {
-		inst.uiErrorMessage("failed to restart bacnet-server")
+		inst.uiErrorMessage("failed to restart driver-bacnet")
 		return
 	}
-	inst.uiSuccessMessage("restarted bacnet-server")
+	inst.uiSuccessMessage("restarted driver-bacnet")
 }
 
 func (inst *App) BACnetReadConfig(connUUID, hostUUID string) assistcli.ConfigBACnetServer {
@@ -160,13 +164,13 @@ func (inst *App) BACnetReadConfig(connUUID, hostUUID string) assistcli.ConfigBAC
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return data
 	}
-	config, connectionError, requestErr := client.EdgeReadConfig(hostUUID, "bacnet-server-driver", "config.yml")
+	config, connectionError, requestErr := client.EdgeReadConfig(hostUUID, constants.BacnetServerDriver, "config.yml")
 	if connectionError != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(fmt.Sprintf("error %s", connectionError.Error()))
 		return data
 	}
 	if requestErr != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(fmt.Sprintf("error %s", requestErr.Error()))
 		return data
 	}
 	err = yaml.Unmarshal(config.Data, &data)

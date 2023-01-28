@@ -21,7 +21,7 @@ func TestApp_BACnetWriteConfig(t *testing.T) {
 	bac := assistcli.ConfigBACnetServer{
 		ServerName: "test-4",
 		DeviceId:   1234,
-		Port:       47809,
+		Port:       47808,
 		Mqtt: assistcli.Mqtt{
 			BrokerIp: "localhost",
 		},

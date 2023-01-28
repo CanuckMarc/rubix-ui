@@ -844,10 +844,10 @@ export const SCHEDULES_HEADERS = [
     key: "is_active",
     render: (enable: any) => {
       let colour = "blue";
-      let text = "disabled";
+      let text = "inactive";
       if (enable) {
         colour = "orange";
-        text = "enable";
+        text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
     }
@@ -858,10 +858,10 @@ export const SCHEDULES_HEADERS = [
     key: "active_weekly",
     render: (enable: any) => {
       let colour = "blue";
-      let text = "disabled";
+      let text = "inactive";
       if (enable) {
         colour = "orange";
-        text = "enable";
+        text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
     }
@@ -872,10 +872,10 @@ export const SCHEDULES_HEADERS = [
     key: "active_exception",
     render: (enable: any) => {
       let colour = "blue";
-      let text = "disabled";
+      let text = "inactive";
       if (enable) {
         colour = "orange";
-        text = "enable";
+        text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
     }
@@ -886,10 +886,10 @@ export const SCHEDULES_HEADERS = [
     key: "active_event",
     render: (enable: any) => {
       let colour = "blue";
-      let text = "disabled";
+      let text = "inactive";
       if (enable) {
         colour = "orange";
-        text = "enable";
+        text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
     }
