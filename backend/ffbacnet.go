@@ -62,6 +62,12 @@ func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 
 func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) ([]model.Device, error) {
 	var err error
+
+	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
+	if err != nil {
+		err = inst.errMsg(err)
+	}
+
 	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
 	if err != nil {
 		err = inst.errMsg(err)

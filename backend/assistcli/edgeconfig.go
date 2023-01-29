@@ -21,17 +21,19 @@ type Mqtt struct {
 }
 
 type ConfigBACnetServer struct {
-	ServerName string `json:"server_name" yaml:"server_name"`
-	DeviceId   int    `json:"device_id" yaml:"device_id"`
-	Port       int    `json:"port" yaml:"port"`
-	Iface      string `json:"iface" yaml:"iface"`
-	BiMax      int    `json:"bi_max" yaml:"bi_max"`
-	BoMax      int    `json:"bo_max" yaml:"bo_max"`
-	BvMax      int    `json:"bv_max" yaml:"bv_max"`
-	AiMax      int    `json:"ai_max" yaml:"ai_max"`
-	AoMax      int    `json:"ao_max" yaml:"ao_max"`
-	AvMax      int    `json:"av_max" yaml:"av_max"`
-	Mqtt       Mqtt   `json:"mqtt" yaml:"mqtt"`
+	ServerName string   `json:"server_name" yaml:"server_name"`
+	DeviceId   int      `json:"device_id" yaml:"device_id"`
+	Port       int      `json:"port" yaml:"port"`
+	Iface      string   `json:"iface" yaml:"iface"`
+	BiMax      int      `json:"bi_max" yaml:"bi_max"`
+	BoMax      int      `json:"bo_max" yaml:"bo_max"`
+	BvMax      int      `json:"bv_max" yaml:"bv_max"`
+	AiMax      int      `json:"ai_max" yaml:"ai_max"`
+	AoMax      int      `json:"ao_max" yaml:"ao_max"`
+	AvMax      int      `json:"av_max" yaml:"av_max"`
+	Objects    []string `json:"objects" yaml:"objects"`
+	Properties []string `json:"properties" yaml:"properties"`
+	Mqtt       Mqtt     `json:"mqtt" yaml:"mqtt"`
 }
 
 // EdgeWriteConfig replace the config file of a nube app
@@ -136,10 +138,10 @@ func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) Config
 		config.Iface = "eth0"
 	}
 	if config.BiMax == 0 {
-		config.BiMax = 2
+		// config.BiMax = 2
 	}
 	if config.BoMax == 0 {
-		config.BoMax = 2
+		// config.BoMax = 2
 	}
 	if config.BvMax == 0 {
 		config.BvMax = 2
@@ -153,6 +155,10 @@ func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) Config
 	if config.AvMax == 0 {
 		config.AvMax = 2
 	}
+
+	config.Objects = []string{"ai", "av", "ao", "bi", "bo", "bv"}
+	config.Properties = []string{"name", "pv", "pri"}
+
 	if config.Mqtt.BrokerIp == "" {
 		config.Mqtt.BrokerIp = "127.0.0.1"
 	}

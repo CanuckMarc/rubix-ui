@@ -9,6 +9,7 @@ import (
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-edge-wires/flow"
+	"github.com/NubeIO/rubix-ui/backend/constants"
 	"github.com/NubeIO/rubix-ui/backend/flowcli"
 	"github.com/bsm/ratelimit"
 	"github.com/mitchellh/mapstructure"
@@ -692,7 +693,7 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 		} else {
 			inst.uiSuccessMessage(fmt.Sprintf(resp.Message)) // download ok
 			time.Sleep(1500 * time.Millisecond)
-			_, err := inst.edgeSystemCtlAction(connUUID, hostUUID, "rubix-edge-wires", amodel.Restart) // restart edge-wires
+			_, err := inst.edgeSystemCtlAction(connUUID, hostUUID, constants.RubixEdgeWiresServiceName, amodel.Restart) // restart edge-wires
 			if err != nil {
 				inst.uiErrorMessage("failed to restart rubix-edge-wires")
 				return nil

@@ -19,11 +19,25 @@ func TestApp_bacnetWhois(t *testing.T) {
 func TestApp_BACnetWriteConfig(t *testing.T) {
 	app := MockNewApp()
 	bac := assistcli.ConfigBACnetServer{
-		ServerName: "test-4",
+		ServerName: "dev-1234",
 		DeviceId:   1234,
 		Port:       47808,
+		Iface:      "eth0",
+		BiMax:      0,
+		BoMax:      0,
+		BvMax:      60,
+		AiMax:      32,
+		AoMax:      32,
+		AvMax:      60,
 		Mqtt: assistcli.Mqtt{
-			BrokerIp: "localhost",
+			BrokerIp:          "127.0.0.1",
+			BrokerPort:        1883,
+			Debug:             true,
+			Enable:            true,
+			WriteViaSubscribe: true,
+			RetryEnable:       true,
+			RetryLimit:        5,
+			RetryInterval:     5,
 		},
 	}
 	app.BACnetWriteConfig("cloud", "rc", bac)
