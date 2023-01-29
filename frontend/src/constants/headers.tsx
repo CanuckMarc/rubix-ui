@@ -905,7 +905,37 @@ export const SCHEDULES_HEADERS = [
       }
       return <Tag color={colour}>{text}</Tag>;
     }
-  }
+  },
+  {
+    title: "Payload",
+    dataIndex: "payload",
+    key: "payload",
+    render: (text: number) => String(text)
+  },
+  {
+    title: "Next start",
+    dataIndex: "next_start_string",
+    key: "next_start_string",
+    render: (text: string) => text
+  },
+  {
+    title: "Next stop",
+    dataIndex: "next_stop_string",
+    key: "next_stop_string",
+    render: (text: string) => text
+  },
+  {
+    title: "Period start",
+    dataIndex: "period_start_string",
+    key: "period_start_string",
+    render: (text: string) => text
+  },
+  {
+    title: "Period stop",
+    dataIndex: "period_stop_string",
+    key: "period_stop_string",
+    render: (text: string) => text
+  },
 ];
 
 //--------------schema-------------//
