@@ -1,5 +1,5 @@
 import { Space, Spin, Tooltip } from "antd";
-import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined, BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
@@ -23,6 +23,21 @@ import "./style.css";
 import UUIDs = backend.UUIDs;
 import Network = model.Network;
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
+import { LogTable } from "./logTable";
+
+export interface LogTablePropType {
+  pluginName: string | undefined
+  connUUID: string
+  hostUUID: string
+  isLogTableOpen: boolean
+  setIsLogTableOpen: Function
+}
+
+export interface ExternalWindowParamType {
+  connUUID: string
+  hostUUID: string
+  logNetwork: string | undefined
+}
 
 export const FlowNetworkTable = () => {
   let { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
@@ -38,6 +53,8 @@ export const FlowNetworkTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+  const [logNetwork, setLogNetwork] = useState<model.Network>();
+  const [isLogTableOpen, setIsLogTableOpen] = useState(false);
 
   const config = {
     originData: networks,
@@ -56,13 +73,18 @@ export const FlowNetworkTable = () => {
       fixed: "left",
       render: (_: any, network: model.Network) => (
         <Space size="middle">
-          <Tooltip title="Edit">
+          <Tooltip placement="right" title="Edit">
             <a onClick={() => showModal(network)}>
               <FormOutlined />
             </a>
           </Tooltip>
+          <Tooltip placement="right" title="Log">
+            <a onClick={() => onOpenLog(network)}>
+              <BookOutlined />
+            </a>
+          </Tooltip>
           <Link to={getNavigationLink(network.uuid, network.plugin_name || "")}>
-            <Tooltip title="View Devices">
+            <Tooltip placement="right" title="View Devices">
               <ArrowRightOutlined />
             </Tooltip>
           </Link>
@@ -77,6 +99,11 @@ export const FlowNetworkTable = () => {
     },
     ...NETWORK_HEADERS,
   ];
+
+  const onOpenLog = (network: model.Network) => {
+    setLogNetwork(network);
+    setIsLogTableOpen(true);
+  }
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -196,6 +223,7 @@ export const FlowNetworkTable = () => {
         onClose={() => setIsImportModalVisible(false)}
         refreshList={fetchNetworks}
       />
+      <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} isLogTableOpen={isLogTableOpen} setIsLogTableOpen={setIsLogTableOpen}/>
     </>
   );
 };

@@ -410,6 +410,7 @@ export const MenuSidebar = () => {
 
   return (
     <Sider
+      id="sidebarMenu"
       width={280}
       style={{ minHeight: "100vh" }}
       collapsed={collapsed}
