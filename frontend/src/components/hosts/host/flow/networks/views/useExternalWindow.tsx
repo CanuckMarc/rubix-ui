@@ -22,7 +22,7 @@ export const useExternalWindow = (inputObj: ExternalWindowParamType) => {
     
     useEffect(() => {
       if (isOpen) {
-        externalWindow = window.open(`http://localhost:34115/#/log-table/connections/${inputObj.connUUID}/hosts/${inputObj.hostUUID}/pluginName/${inputObj.logNetwork}`, '', 'width=600,height=400,left=200,top=200');
+        externalWindow = window.open(`${window.location.origin}/#/log-table/connections/${inputObj.connUUID}/hosts/${inputObj.hostUUID}/pluginName/${inputObj.logNetwork}`, '', 'width=600,height=400,left=200,top=200');
         // externalWindow = window.open('', 'Log window', 'width=600,height=400,left=200,top=200');
        
         if (externalWindow) {
