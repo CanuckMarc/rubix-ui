@@ -200,6 +200,22 @@ export namespace amodel {
 
 export namespace assistcli {
 	
+	export class BacnetClient {
+	    debug: boolean;
+	    enable: boolean;
+	    commands: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new BacnetClient(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.debug = source["debug"];
+	        this.enable = source["enable"];
+	        this.commands = source["commands"];
+	    }
+	}
 	export class Mqtt {
 	    broker_ip: string;
 	    broker_port: number;
@@ -237,7 +253,10 @@ export namespace assistcli {
 	    ai_max: number;
 	    ao_max: number;
 	    av_max: number;
+	    objects: string[];
+	    properties: string[];
 	    mqtt: Mqtt;
+	    bacnet_client: BacnetClient;
 	
 	    static createFrom(source: any = {}) {
 	        return new ConfigBACnetServer(source);
@@ -255,7 +274,10 @@ export namespace assistcli {
 	        this.ai_max = source["ai_max"];
 	        this.ao_max = source["ao_max"];
 	        this.av_max = source["av_max"];
+	        this.objects = source["objects"];
+	        this.properties = source["properties"];
 	        this.mqtt = this.convertValues(source["mqtt"], Mqtt);
+	        this.bacnet_client = this.convertValues(source["bacnet_client"], BacnetClient);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -304,6 +326,11 @@ export namespace assistcli {
 	    active_weekly: boolean;
 	    active_exception: boolean;
 	    active_event: boolean;
+	    payload: number;
+	    period_start_string: string;
+	    period_stop_string: string;
+	    next_start_string: string;
+	    next_stop_string: string;
 	    // Go type: time.Time
 	    created_on: any;
 	    // Go type: time.Time
@@ -327,6 +354,11 @@ export namespace assistcli {
 	        this.active_weekly = source["active_weekly"];
 	        this.active_exception = source["active_exception"];
 	        this.active_event = source["active_event"];
+	        this.payload = source["payload"];
+	        this.period_start_string = source["period_start_string"];
+	        this.period_stop_string = source["period_stop_string"];
+	        this.next_start_string = source["next_start_string"];
+	        this.next_stop_string = source["next_stop_string"];
 	        this.created_on = this.convertValues(source["created_on"], null);
 	        this.updated_on = this.convertValues(source["updated_on"], null);
 	    }
