@@ -11,7 +11,6 @@ const { Title } = Typography;
 //props: LogTablePropType
 
 export const LogTable = () => {
-
     let { connUUID = "", hostUUID = "", pluginName = ""} = useParams();
     const [isFetching, setIsFetching] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -23,6 +22,16 @@ export const LogTable = () => {
     flowPluginFactory.hostUUID = hostUUID;
 
     useEffect(() => {
+        const sider = window.document.getElementById('sidebarMenu')
+        console.log(sider)
+        if (sider) {
+            console.log(sider.style.display)
+            if (sider.style.display === "none") {
+                sider.style.display = "block";
+            } else {
+                sider.style.display = "none";
+            }
+        }
         fetch();
     }, [])
 

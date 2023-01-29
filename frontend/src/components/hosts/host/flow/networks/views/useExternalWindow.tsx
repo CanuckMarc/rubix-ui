@@ -29,6 +29,7 @@ export const useExternalWindow = (inputObj: ExternalWindowParamType) => {
             externalWindow.addEventListener('unload', cleanupFunc);
             // externalWindow.addEventListener('beforeunload', cleanupFunc);
 
+
             // externalWindow.document.write(`<html><head><title>Log window</title><link rel="stylesheet" type="text/css" href="./style.css"></head><body></body></html>`);
             // externalWindow.document.body.appendChild(containerEl);
             // render(renderedElement, externalWindow.document.getElementById("external-window-container")!);
