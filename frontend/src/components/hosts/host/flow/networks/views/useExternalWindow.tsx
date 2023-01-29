@@ -11,6 +11,14 @@ import { ExternalWindowParamType } from './table'
 export const useExternalWindow = (inputObj: ExternalWindowParamType) => {
     let externalWindow: Window | null = null;
     const [isOpen, setIsOpen] = useState(false);
+
+    const cleanupFunc = (e: Event) => {
+        e.preventDefault();
+        // e.returnValue = '';
+        console.log('accessed event listener callback')
+        externalWindow = null;
+        setIsOpen(false)
+    }
     
     useEffect(() => {
       if (isOpen) {
@@ -18,13 +26,8 @@ export const useExternalWindow = (inputObj: ExternalWindowParamType) => {
         // externalWindow = window.open('', 'Log window', 'width=600,height=400,left=200,top=200');
        
         if (externalWindow) {
-            externalWindow.addEventListener('unload', function (e) {
-                e.preventDefault();
-                // e.returnValue = '';
-                console.log('accessed event listener callback')
-                externalWindow = null;
-                setIsOpen(false)
-            });
+            externalWindow.addEventListener('unload', cleanupFunc);
+            // externalWindow.addEventListener('beforeunload', cleanupFunc);
 
             // externalWindow.document.write(`<html><head><title>Log window</title><link rel="stylesheet" type="text/css" href="./style.css"></head><body></body></html>`);
             // externalWindow.document.body.appendChild(containerEl);
