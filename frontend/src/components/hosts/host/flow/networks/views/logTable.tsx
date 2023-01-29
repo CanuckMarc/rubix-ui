@@ -110,7 +110,7 @@ export const LogTable = () => {
                             pageSizeOptions: [10, 50, 100, 1000],
                             locale: { items_per_page: "" },
                         }}
-                        scroll={{ y: 'auto' }}
+                        // scroll={{ y: 'auto' }}
                         loading={{ indicator: <Spin />, spinning: isFetching }}
                     />
                 </div>
