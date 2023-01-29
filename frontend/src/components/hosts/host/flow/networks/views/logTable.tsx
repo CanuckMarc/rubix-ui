@@ -80,9 +80,13 @@ export const LogTable = () => {
         onChange: onSelectChange,
     };
 
-    const handleButtonClicked = () => {
+    const handleCloseButtonClicked = () => {
         console.log('clicked!')
         window.close();
+    }
+
+    const handleRefreshButtonClicked = () => {
+        fetch();
     }
 
 
@@ -91,7 +95,10 @@ export const LogTable = () => {
             <Title style={{ textAlign: "left" }}>Log table</Title>
             <Card bordered={false}>
                 <div style={{display: 'flex', flexDirection: 'column', alignContent: 'flex-start', gap: '2vh'}}>
-                    <Button type="primary" danger={true} style={{width: '6vw'}} onClick={handleButtonClicked}>Close Log</Button>
+                    <div style={{display: 'flex', flexDirection: 'row', gap: '2vh'}}>
+                        <Button type="primary" style={{width: '6vw'}} onClick={handleRefreshButtonClicked}>Refresh</Button>
+                        <Button type="primary" danger={true} style={{width: '6vw'}} onClick={handleCloseButtonClicked}>Close Log</Button>
+                    </div>
                     <Table
                         rowKey="uuid"
                         // rowSelection={rowSelection}
