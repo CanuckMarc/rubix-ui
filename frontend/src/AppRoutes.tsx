@@ -125,11 +125,6 @@ function AppRoutes() {
         path={routes.USER_GUIDE_REMOTE}
         element={<UserGuide />}
       />
-      {/* <Route
-        key={routes.LOG_TABLE}
-        path={routes.LOG_TABLE}
-        element={<LogTable />}
-      /> */}
     </Routes>
   );
 }

@@ -23,11 +23,9 @@ import "./style.css";
 import UUIDs = backend.UUIDs;
 import Network = model.Network;
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
-import { useExternalWindow } from "./useExternalWindow";
 import { LogTable } from "./logTable";
 
 export interface LogTablePropType {
-  // logNetwork: model.Network | undefined
   pluginName: string | undefined
   connUUID: string
   hostUUID: string
@@ -57,10 +55,6 @@ export const FlowNetworkTable = () => {
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [logNetwork, setLogNetwork] = useState<model.Network>();
   const [isLogTableOpen, setIsLogTableOpen] = useState(false);
-
-  // const { isOpen, setIsOpen } =  useExternalWindow({connUUID: connUUID, hostUUID: hostUUID, logNetwork: logNetwork?.plugin_name});
-
-  //<LogTable logNetwork={logNetwork} connUUID={connUUID} hostUUID={hostUUID}/>
 
   const config = {
     originData: networks,
@@ -109,10 +103,6 @@ export const FlowNetworkTable = () => {
   const onOpenLog = (network: model.Network) => {
     setLogNetwork(network);
     setIsLogTableOpen(true);
-    // console.log('isOpen is: ', isOpen)
-    // if (!isOpen) {
-    //   setIsOpen(true);
-    // }
   }
 
   const rowSelection = {
