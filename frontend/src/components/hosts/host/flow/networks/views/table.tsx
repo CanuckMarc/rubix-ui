@@ -27,9 +27,12 @@ import { useExternalWindow } from "./useExternalWindow";
 import { LogTable } from "./logTable";
 
 export interface LogTablePropType {
-  logNetwork: model.Network | undefined
+  // logNetwork: model.Network | undefined
+  pluginName: string | undefined
   connUUID: string
   hostUUID: string
+  isLogTableOpen: boolean
+  setIsLogTableOpen: Function
 }
 
 export interface ExternalWindowParamType {
@@ -53,7 +56,9 @@ export const FlowNetworkTable = () => {
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [logNetwork, setLogNetwork] = useState<model.Network>();
-  const { isOpen, setIsOpen } =  useExternalWindow({connUUID: connUUID, hostUUID: hostUUID, logNetwork: logNetwork?.plugin_name});
+  const [isLogTableOpen, setIsLogTableOpen] = useState(false);
+
+  // const { isOpen, setIsOpen } =  useExternalWindow({connUUID: connUUID, hostUUID: hostUUID, logNetwork: logNetwork?.plugin_name});
 
   //<LogTable logNetwork={logNetwork} connUUID={connUUID} hostUUID={hostUUID}/>
 
@@ -103,11 +108,11 @@ export const FlowNetworkTable = () => {
 
   const onOpenLog = (network: model.Network) => {
     setLogNetwork(network);
-    console.log('isOpen is: ', isOpen)
-    // setIsOpen(false)
-    if (!isOpen) {
-      setIsOpen(true);
-    }
+    setIsLogTableOpen(true);
+    // console.log('isOpen is: ', isOpen)
+    // if (!isOpen) {
+    //   setIsOpen(true);
+    // }
   }
 
   const rowSelection = {
@@ -228,6 +233,7 @@ export const FlowNetworkTable = () => {
         onClose={() => setIsImportModalVisible(false)}
         refreshList={fetchNetworks}
       />
+      <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} isLogTableOpen={isLogTableOpen} setIsLogTableOpen={setIsLogTableOpen}/>
     </>
   );
 };
