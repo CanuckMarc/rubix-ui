@@ -45,4 +45,5 @@ export const ROUTES: ROUTE = {
   USER_GUIDE_REMOTE: "/user-guide/connections/:connUUID/hosts/:hostUUID",
   SCHEDULES: "/schedules",
   SCHEDULES_REMOTE: "/schedules/connections/:connUUID/hosts/:hostUUID",
+  LOG_TABLE: "/log-table/connections/:connUUID/hosts/:hostUUID/pluginName/:pluginName"
 };

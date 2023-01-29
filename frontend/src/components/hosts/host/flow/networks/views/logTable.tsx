@@ -1,0 +1,104 @@
+import { useEffect, useState } from "react";
+import { Layout, Spin, Table, Card, Button } from "antd";
+import { Link, useParams } from "react-router-dom";
+import { Typography } from 'antd';
+import { FlowPluginFactory } from "../../plugins/factory";
+import { LogTablePropType } from "./table";
+import { streamlog } from "../../../../../../../wailsjs/go/models";
+
+const { Title } = Typography;
+
+//props: LogTablePropType
+
+export const LogTable = () => {
+
+    let { connUUID = "", hostUUID = "", pluginName = ""} = useParams();
+    const [isFetching, setIsFetching] = useState(false);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [logsObj, setLogsObj] = useState<streamlog.Log | {}>({});
+    const [allLogs, setAllLogs] = useState<object[]>([]);
+
+    const flowPluginFactory = new FlowPluginFactory();
+    flowPluginFactory.connectionUUID = connUUID;
+    flowPluginFactory.hostUUID = hostUUID;
+
+    useEffect(() => {
+        fetch();
+    }, [])
+
+    const fetch = async () => {
+        try {
+            setIsFetching(true)
+            // console.log('logNetwork is: ', props.logNetwork)
+            // props.logNetwork!.plugin_name!
+            const logs = await flowPluginFactory.FlowNetworkNewLog(connUUID, hostUUID, pluginName, 10)
+            if (logs) {
+                // console.log(logs)
+                // setLogsObj(logs)
+                let i = 0;
+                setAllLogs(logs.message.map((item: any) => {
+                    i++;
+                    return {
+                        message: item,
+                        key: i
+                    }
+                }))
+            }
+        } catch (error) {
+            console.log('error fetching logs: ', error)
+        } finally {
+            setIsFetching(false)
+        }
+    }
+
+
+    const columns = [
+        {
+          title: "Logs",
+          dataIndex: "message",
+          key: "key",
+        },
+      ];
+
+
+    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+        // console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+        setSelectedRowKeys(newSelectedRowKeys);
+    };
+    
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: onSelectChange,
+    };
+
+    const handleButtonClicked = () => {
+        console.log('clicked!')
+        window.close();
+    }
+
+
+    return (
+        <>
+            <Title style={{ textAlign: "left" }}>Log table</Title>
+            <Card bordered={false}>
+                <div style={{display: 'flex', flexDirection: 'column', alignContent: 'flex-start', gap: '2vh'}}>
+                    <Button type="primary" danger={true} style={{width: '6vw'}} onClick={handleButtonClicked}>Close Log</Button>
+                    <Table
+                        rowKey="uuid"
+                        // rowSelection={rowSelection}
+                        dataSource={allLogs}
+                        columns={columns}
+                        pagination={{
+                            position: ["bottomLeft"],
+                            showSizeChanger: true,
+                            pageSizeOptions: [10, 50, 100, 1000],
+                            locale: { items_per_page: "" },
+                        }}
+                        scroll={{ y: 'auto' }}
+                        loading={{ indicator: <Spin />, spinning: isFetching }}
+                    />
+                </div>
+            </Card>
+        </>
+    );
+}

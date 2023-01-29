@@ -21,6 +21,7 @@ import RubixFlow from "./components/rubix-flow/rubix-flow";
 import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
+import { LogTable } from "./components/hosts/host/flow/networks/views/logTable";
 
 function AppRoutes() {
   return (
@@ -123,6 +124,11 @@ function AppRoutes() {
         key={routes.USER_GUIDE}
         path={routes.USER_GUIDE_REMOTE}
         element={<UserGuide />}
+      />
+      <Route
+        key={routes.LOG_TABLE}
+        path={routes.LOG_TABLE}
+        element={<LogTable />}
       />
     </Routes>
   );
