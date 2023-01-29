@@ -807,16 +807,16 @@ export const WIRES_CONNECTIONS_HEADERS = [
 
 export const SCHEDULES_HEADERS = [
   {
-    title: "name",
-    dataIndex: "name",
-    key: "name",
-    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-  },
-  {
     title: "uuid",
     dataIndex: "uuid",
     key: "uuid",
     sorter: (a: any, b: any) => a.uuid.localeCompare(b.uuid),
+  },
+  {
+    title: "name",
+    dataIndex: "name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
     title: "time zone",
