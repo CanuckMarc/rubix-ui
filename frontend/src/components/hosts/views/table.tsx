@@ -220,7 +220,6 @@ export const HostsTable = (props: any) => {
           expandedRowRender: (host: any) => <ExpandedRow host={host} />,
           rowExpandable: (record: any) => record.name !== "Not Expandable",
         }}
-        expandRowByClick
       />
 
       <CreateEditModal
