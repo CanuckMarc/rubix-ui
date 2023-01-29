@@ -12,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"os"
+	"strings"
 )
 
 //go:embed frontend/dist
@@ -23,11 +24,13 @@ func main() {
 	if err != nil {
 		log.Errorf("error on finding home dir %s", err.Error())
 	}
+	homeDir = cleanPath(homeDir)
 	log.Infof("user home dir %s", homeDir)
 	workingDir, err := os.Getwd()
 	if err != nil {
 		log.Errorf("error on finding home dir %s", err.Error())
 	}
+	workingDir = cleanPath(workingDir)
 	log.Infof("user app working dir %s", workingDir)
 
 	app := backend.NewApp()
@@ -71,4 +74,8 @@ func main() {
 	if err != nil {
 		log.Errorln("Start Error:", err)
 	}
+}
+
+func cleanPath(s string) string {
+	return strings.Trim(s, "\"")
 }
