@@ -9,6 +9,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type BacnetClient struct {
+	Debug    bool     `json:"debug" yaml:"debug"`
+	Enable   bool     `json:"enable" yaml:"enable"`
+	Commands []string `json:"commands" yaml:"commands"`
+}
+
 type Mqtt struct {
 	BrokerIp          string `json:"broker_ip"  yaml:"broker_ip"`
 	BrokerPort        int    `json:"broker_port"  yaml:"broker_port"`
@@ -21,19 +27,20 @@ type Mqtt struct {
 }
 
 type ConfigBACnetServer struct {
-	ServerName string   `json:"server_name" yaml:"server_name"`
-	DeviceId   int      `json:"device_id" yaml:"device_id"`
-	Port       int      `json:"port" yaml:"port"`
-	Iface      string   `json:"iface" yaml:"iface"`
-	BiMax      int      `json:"bi_max" yaml:"bi_max"`
-	BoMax      int      `json:"bo_max" yaml:"bo_max"`
-	BvMax      int      `json:"bv_max" yaml:"bv_max"`
-	AiMax      int      `json:"ai_max" yaml:"ai_max"`
-	AoMax      int      `json:"ao_max" yaml:"ao_max"`
-	AvMax      int      `json:"av_max" yaml:"av_max"`
-	Objects    []string `json:"objects" yaml:"objects"`
-	Properties []string `json:"properties" yaml:"properties"`
-	Mqtt       Mqtt     `json:"mqtt" yaml:"mqtt"`
+	ServerName   string       `json:"server_name" yaml:"server_name"`
+	DeviceId     int          `json:"device_id" yaml:"device_id"`
+	Port         int          `json:"port" yaml:"port"`
+	Iface        string       `json:"iface" yaml:"iface"`
+	BiMax        int          `json:"bi_max" yaml:"bi_max"`
+	BoMax        int          `json:"bo_max" yaml:"bo_max"`
+	BvMax        int          `json:"bv_max" yaml:"bv_max"`
+	AiMax        int          `json:"ai_max" yaml:"ai_max"`
+	AoMax        int          `json:"ao_max" yaml:"ao_max"`
+	AvMax        int          `json:"av_max" yaml:"av_max"`
+	Objects      []string     `json:"objects" yaml:"objects"`
+	Properties   []string     `json:"properties" yaml:"properties"`
+	Mqtt         Mqtt         `json:"mqtt" yaml:"mqtt"`
+	BacnetClient BacnetClient `json:"bacnet_client" yaml:"bacnet_client"`
 }
 
 // EdgeWriteConfig replace the config file of a nube app
@@ -137,27 +144,11 @@ func (inst *Client) defaultWrapperBACnetConfig(config ConfigBACnetServer) Config
 	if config.Iface == "" {
 		config.Iface = "eth0"
 	}
-	if config.BiMax == 0 {
-		// config.BiMax = 2
-	}
-	if config.BoMax == 0 {
-		// config.BoMax = 2
-	}
-	if config.BvMax == 0 {
-		config.BvMax = 2
-	}
-	if config.AiMax == 0 {
-		config.AiMax = 2
-	}
-	if config.AoMax == 0 {
-		config.AoMax = 2
-	}
-	if config.AvMax == 0 {
-		config.AvMax = 2
-	}
 
 	config.Objects = []string{"ai", "av", "ao", "bi", "bo", "bv"}
 	config.Properties = []string{"name", "pv", "pri"}
+
+	config.BacnetClient.Commands = []string{"whois", "read_value", "write_value"}
 
 	if config.Mqtt.BrokerIp == "" {
 		config.Mqtt.BrokerIp = "127.0.0.1"

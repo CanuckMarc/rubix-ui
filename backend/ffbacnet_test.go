@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 	"testing"
 )
 
@@ -46,5 +47,5 @@ func TestApp_BACnetWriteConfig(t *testing.T) {
 func TestApp_BACnetReadConfig(t *testing.T) {
 	app := MockNewApp()
 	c := app.BACnetReadConfig("cloud", "rc")
-	fmt.Println(c)
+	pprint.PrintJOSN(c)
 }

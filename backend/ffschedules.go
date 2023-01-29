@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/bools"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 )
 
 func (inst *App) GetSchedules(connUUID, hostUUID string) interface{} {
@@ -46,7 +47,7 @@ func (inst *App) AddSchedule(connUUID, hostUUID, name, timeZone string) interfac
 		ThingType:  "schedule",
 		TimeZone:   timeZone,
 	}
-	// pprint.PrintJOSN(body)
+	pprint.PrintJOSN(body)
 	sch, err := client.FFAddSchedule(hostUUID, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -61,7 +62,7 @@ func (inst *App) EditSchedule(connUUID, hostUUID, uuid string, body *assistcli.S
 	if err != nil {
 		return nil
 	}
-	// pprint.PrintJOSN(body)
+	pprint.PrintJOSN(body)
 	sch, err := client.FFEditSchedule(hostUUID, uuid, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))

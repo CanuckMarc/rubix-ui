@@ -556,6 +556,18 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.write_value - b.write_value,
   },
   {
+    title: "current_priority",
+    dataIndex: "current_priority",
+    key: "current_priority",
+    render(current_priority: number) {
+      if (current_priority != undefined) {
+        let colour = "#4d4dff";
+        return <Tag color={colour}>{current_priority}</Tag>;
+      }
+    },
+    sorter: (a: any, b: any) => a.current_priority - b.current_priority,
+  },
+  {
     title: "message",
     dataIndex: "message",
     key: "message",
