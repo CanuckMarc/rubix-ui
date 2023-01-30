@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react";
-import { Spin, Table, Button, Modal } from "antd";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Spin, Table, Button, Modal, Input, Typography } from "antd";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { LogTablePropType } from "./table";
+
+const { Title } = Typography;
 
 export const LogTable = (props: LogTablePropType) => {
     let { connUUID, hostUUID, pluginName, isLogTableOpen, setIsLogTableOpen} = props
     const [isFetching, setIsFetching] = useState(false);
     const [allLogs, setAllLogs] = useState<object[]>([]);
+    const [duration, setDuration] = useState<number | undefined>(undefined);
 
     const flowPluginFactory = new FlowPluginFactory();
     flowPluginFactory.connectionUUID = connUUID;
     flowPluginFactory.hostUUID = hostUUID;
 
-    useEffect(() => {
-        if (isLogTableOpen) {
-            fetch();
-        }
-    }, [isLogTableOpen])
-
-    const fetch = async () => {
+    const fetch = async (duration: number) => {
         try {
             setIsFetching(true)
-            const logs = await flowPluginFactory.FlowNetworkNewLog(connUUID, hostUUID, pluginName!, 10)
+            const logs = await flowPluginFactory.FlowNetworkNewLog(connUUID, hostUUID, pluginName!, duration)
             if (logs) {
                 let i = 0;
                 setAllLogs(logs.message.map((item: any) => {
@@ -47,8 +44,11 @@ export const LogTable = (props: LogTablePropType) => {
         },
     ];
 
-    const handleRefreshButtonClicked = () => {
-        fetch();
+    const handleLoadButtonClicked = () => {
+        if (duration) {
+            setAllLogs([]);
+            fetch(duration);
+        }
     }
 
     const handleOk = () => {
@@ -61,12 +61,24 @@ export const LogTable = (props: LogTablePropType) => {
         setIsLogTableOpen(false)
     }
 
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.value !== '') {
+            setDuration(parseInt(event.target.value))
+        } else {
+            setDuration(undefined)
+        }
+    }
+
 
     return (
         <>
             <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={'70vw'}>
                     <div style={{display: 'flex', flexDirection: 'column', alignContent: 'flex-start', gap: '2vh'}}>
-                        <Button type="primary" style={{width: '6vw'}} onClick={handleRefreshButtonClicked}>Refresh</Button>
+                        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5vw'}}>
+                            <Title level={5}>Duration: </Title>
+                            <Input value={duration} onChange={handleInputChange} style={{width: '6vw'}}/>
+                            <Button type="primary" style={{width: '6vw'}} disabled={duration === undefined} onClick={handleLoadButtonClicked}>Load Logs</Button>
+                        </div>
                         <Table
                             rowKey="uuid"
                             dataSource={allLogs}
