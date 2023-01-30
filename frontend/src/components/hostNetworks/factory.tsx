@@ -8,6 +8,8 @@ import {
 } from "../../../wailsjs/go/backend/App";
 import { Helpers } from "../../helpers/checks";
 import { amodel, backend } from "../../../wailsjs/go/models";
+import { hasError } from "../../utils/response";
+import { openNotificationWithIcon } from "../../utils/utils";
 
 function hasUUID(uuid: string): Error {
   return Helpers.IsUndefined(uuid, "network or connection uuid") as Error;
@@ -47,17 +49,25 @@ export class NetworksFactory {
   async Add(): Promise<amodel.Network> {
     hasUUID(this.connectionUUID);
     const res = await AddHostNetwork(this.connectionUUID, this._this)
-    const one = res as amodel.Network;
-    this._this = one;
-    return one;
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `added ${this._this.name} success`);
+      this._this = res.data as amodel.Network;
+    } else {
+      openNotificationWithIcon("error", res.msg);
+    }
+    return this._this;
   }
 
   async Update(): Promise<amodel.Network> {
     hasUUID(this.uuid);
     const res = await EditHostNetwork(this.connectionUUID, this.uuid, this._this)
-    const one = res as amodel.Network;
-    this._this = one;
-    return one;
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `updated ${this._this.name} success`);
+      this._this = res.data as amodel.Network;
+    } else {
+      openNotificationWithIcon("error", res.msg);
+    }
+    return this._this;
   }
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
