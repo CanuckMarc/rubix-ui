@@ -1,6 +1,4 @@
-import { Typography, Card, Select, Spin, Button } from "antd";
 import { useState, useEffect } from "react";
-import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { useParams } from "react-router-dom";
 import { useStore } from '../../../App';
 
@@ -11,15 +9,19 @@ import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../use-nodes-s
 import { NodeSpecJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
 
+type NodeGenInputType = {
+  type: string;
+  name: string;
+  isParent: boolean;
+  parentId: string | undefined;
+}
 
+function getRandomArbitrary(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
-    // const [isFetching, setIsFetching] = useState(false);
-    // const [pointList, setPointList] = useState<model.Point[]>([]);
-    // const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType[]>([]);
-    // const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType[]>([]);
-    // const [pointConnections, setPointConnections] = useState<PointTableTypeRecord>({});
     const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
         (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
     )
@@ -29,65 +31,103 @@ export const LoadWiresMap = () => {
 
     useEffect(() => {
         renderPointsToFlowEditor();
-        console.log(wiresMapNodes)
-    }, [wiresMapNodes])
-
-
-    // useEffect(() => {
-    //     console.log(pointConnections)
-    // }, [pointConnections])
-
+    }, [])
 
     const renderPointsToFlowEditor = () => {
-        const oldNodes = flowInstance.getNodes();
-        const oldEdges = flowInstance.getEdges();
-        oldNodes.forEach((item) => (item.selected = false));
-        oldEdges.forEach((item) => (item.selected = false));
+        const points: any = wiresMapNodes
 
+        const newNodes: NodeInterface[] = [];
 
-        const allNodes: NodeInterface[] = [];
-        const node = generateNodes()
-        allNodes.push(node)
+        const parentNode = generateNodes({
+          type: 'flow/flow-network',
+          name: '',
+          isParent: true,
+          parentId: undefined
+        })
+        newNodes.push(parentNode)
 
-        if (allNodes.length > 0) {
-            setTimeout(() => {
-            //   flowInstance.addNodes(allNodes);
-              flowInstance.setNodes([...oldNodes, ...allNodes]);
-              flowInstance.setEdges([...oldEdges]);
-            }, 500);
+        const typeNames: NodeGenInputType[] = [
+          {
+            type: 'flow/flow-point',
+            name: points.pointOne?.name || '',
+            isParent: false,
+            parentId: parentNode.id
+          }, 
+          {
+            type: 'flow/flow-point-write',
+            name: points.pointTwo?.name || '',
+            isParent: false,
+            parentId: parentNode.id
+          }
+        ]
+
+        
+
+        let nodeIds: string[] = []
+        typeNames.forEach((item: NodeGenInputType) => {
+          const node = generateNodes(item)
+          nodeIds.push(node.id)
+          newNodes.push(node)
+        })
+
+        const newEdge: Edge = {
+          id: generateUuid(),
+          source: nodeIds[0],
+          sourceHandle: "out",
+          target: nodeIds[1],
+          targetHandle: "in16"
+        }
+
+        if (newNodes.length > 0) {
+          setTimeout(() => {
+            const oldNodes = flowInstance.getNodes();
+            console.log('old nodes are: ', oldNodes)
+            console.log('new nodes are: ', newNodes)
+            flowInstance.setNodes([...oldNodes, ...newNodes]);
+            
+            const oldEdges = flowInstance.getEdges();
+            console.log('old edges are: ', oldEdges)
+            flowInstance.setEdges([...oldEdges, newEdge]);
+          }, 500);
         }
     }
 
-    const generateNodes = () => {
-        const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, 'constant/const-num');
-        const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, 'constant/const-num');
+    const generateNodes = (item: NodeGenInputType) => {
+        const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
+        const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
 
-        console.log(nodeSettings)
+        console.log('nodesSpec is: ', nodesSpec)
         console.log(spec)
+
+        const x = getRandomArbitrary(-200, 200)
+        const y = getRandomArbitrary(-200, 200)
 
         return {
             id: generateUuid(),
-            isParent: false,
-            type: 'constant/const-num',
-            info: { nodeName: 'my_first_node' },
+            isParent: item.isParent,
+            type: item.type,
+            info: { nodeName: item.name },
             position: {
-              x: 269.99187629189623,
-              y: -46.35749312825459,
+              x: x,
+              y: y,
+            },
+            positionAbsolute: {
+              x: x,
+              y: y,
             },
             data: {
               inputs: convertDataSpec(spec.inputs || []),
               out: convertDataSpec(spec.outputs || []),
             },
-            parentId: undefined,
+            style: {},
+            status: undefined,
+            parentId: item.parentId,
             settings: nodeSettings,
             selected: false,
-            pin: 'in',
           };
     }
 
     return (
-        <>
-            
-        </>
+        <></>
     );
 }

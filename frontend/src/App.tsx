@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import cx from "classnames";
 import create from 'zustand';
 
+import { model } from "../wailsjs/go/models";
+
 import { EventsOff, EventsOn } from "../wailsjs/runtime";
 import AppRoutes from "./AppRoutes";
 import { MenuSidebar } from "./components/sidebar/sidebar";
@@ -16,6 +18,16 @@ const { Content } = Layout;
 const OK_EVENT = "ok";
 const WARN_EVENT = "warn";
 const ERR_EVENT = "err";
+
+
+export interface WiresMapNodeType {
+  pointOne: model.Point;
+  pointTwo: model.Point;
+}
+interface WiresMapState {
+  wiresMapNodes: WiresMapNodeType;
+  setWiresMapNodes: (obj: WiresMapNodeType) => void;
+}
 
 export const useStore = create((set: any) => ({
   wiresMapNodes: {},
