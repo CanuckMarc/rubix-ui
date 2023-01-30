@@ -63,7 +63,7 @@ type IP struct {
 	Default string `json:"default" default:"0.0.0.0"`
 }
 
-type ConnectionSchema struct {
+type ConnectionProperties struct {
 	Name          schema.Name        `json:"name"`
 	Description   schema.Description `json:"description"`
 	IP            IP                 `json:"ip"`
@@ -72,16 +72,24 @@ type ConnectionSchema struct {
 	ExternalToken schema.Token       `json:"external_token"`
 }
 
-func connectionSchema() *ConnectionSchema {
-	m := &ConnectionSchema{}
+func GetConnectionProperties() *ConnectionProperties {
+	m := &ConnectionProperties{}
 	m.Port.Default = 1662
 	schema.Set(m)
 	return m
 }
 
+type ConnectionSchema struct {
+	Required   []string              `json:"required"`
+	Properties *ConnectionProperties `json:"properties"`
+}
+
 func (inst *App) GetConnectionSchema() *ConnectionSchema {
-	c := connectionSchema()
-	return c
+	m := &ConnectionSchema{
+		Required:   []string{"name", "ip", "port"},
+		Properties: GetConnectionProperties(),
+	}
+	return m
 }
 
 func (inst *App) getConnection(uuid string) (*storage.RubixConnection, error) {

@@ -35,10 +35,7 @@ export const CreateConnectionsModal = (props: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
+    const jsonSchema = await factory.Schema();
     setSchema(jsonSchema);
     setIsLoadingForm(false);
   };

@@ -86,10 +86,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
+    const jsonSchema = await factory.Schema();
     setConnectionSchema(jsonSchema);
     setIsLoadingForm(false);
   };
@@ -181,7 +178,6 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         rowSelection={rowSelection}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
-        rowClassName={(record: RubixConnection) => (record.enable ? "" : "opacity-05")}
       />
       <CreateEditModal
         currentConnection={currentConnection}

@@ -4,13 +4,13 @@ import { storage } from "../../../../wailsjs/go/models";
 import { openNotificationWithIcon } from "../../../utils/utils";
 import { ConnectionFactory } from "../factory";
 import { JsonForm } from "../../../common/json-schema-form";
-
 import RubixConnection = storage.RubixConnection;
 
 export const CreateEditModal = (props: any) => {
   const { currentConnection, connectionSchema, isModalVisible, isLoadingForm, refreshList, onCloseModal } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentConnection);
+  const [validationError, setValidationError] = useState(true);
   const factory = new ConnectionFactory();
 
   useEffect(() => {
@@ -44,6 +44,9 @@ export const CreateEditModal = (props: any) => {
   };
 
   const handleSubmit = async (connection: RubixConnection) => {
+    if (validationError) {
+      return;
+    }
     setConfirmLoading(true);
     if (currentConnection.uuid) {
       connection.uuid = currentConnection.uuid;
@@ -62,9 +65,9 @@ export const CreateEditModal = (props: any) => {
       visible={isModalVisible}
       onOk={() => handleSubmit(formData)}
       okText="Save"
-      okButtonProps={{}}
       onCancel={handleClose}
       confirmLoading={confirmLoading}
+      okButtonProps={{ disabled: validationError }}
       maskClosable={false} // prevent modal from closing on click outside
       style={{ textAlign: "start" }}
     >
@@ -72,8 +75,8 @@ export const CreateEditModal = (props: any) => {
         <JsonForm
           formData={formData}
           setFormData={setFormData}
-          handleSubmit={handleSubmit}
           jsonSchema={connectionSchema}
+          setValidationError={setValidationError}
         />
       </Spin>
     </Modal>
