@@ -7,7 +7,7 @@ import { PointsPaneOne } from "./views/pointsPaneOne";
 import { PointsPaneTwo } from "./views/pointsPaneTwo";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
-// import { useStore } from '../../App';
+import { useStore } from '../../App';
 
 import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
 import { NodeInterface, OutputNodeValueType } from "../rubix-flow/lib/Nodes/NodeInterface";
@@ -48,18 +48,17 @@ export const WiresMap = () => {
     // const mappingFactory = new MappingFactory();
     const pointFactory = new FlowPointFactory();
 
-
-    // const getVotes = useStore(state => state.votes);
-    // const [votes, setVotes] = useStore(
-    //     (state) => [state.votes, state.setVotes]
-    // )
+    const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
+        (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
+    )
 
 
 
     const fetch = async() => {
         try {
             setIsFetching(true);
-            // const pointRes = await pointFactory.GetPointListPayload(connUUID, hostUUID);
+            // const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
+            // console.log('new end point res: ', res);
             const pointRes = await pointFactory.GetAll();
             console.log(pointRes)
             setPointList(pointRes);
@@ -87,7 +86,7 @@ export const WiresMap = () => {
 
         setPointConnections(resObj)
         console.log(resObj)
-        // setVotes(10);
+        setWiresMapNodes(resObj)
     }
 
 
