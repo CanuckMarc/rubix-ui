@@ -27,21 +27,11 @@ export const CreateEditModal = (props: any) => {
   }, [currentHost]);
 
   const addHost = async (host: Host) => {
-    const res = await AddHost(connUUID, host);
-    if (!hasError(res)) {
-      openNotificationWithIcon("success", `added ${host.name} success`);
-    } else {
-      openNotificationWithIcon("error", res.msg);
-    }
+    return await AddHost(connUUID, host);
   };
 
   const editHost = async (host: Host) => {
-    const res = await EditHost(connUUID, host.uuid, host);
-    if (!hasError(res)) {
-      openNotificationWithIcon("success", `updated ${host.name} success`);
-    } else {
-      openNotificationWithIcon("error", res.msg);
-    }
+    return EditHost(connUUID, host.uuid, host);
   };
 
   const handleClose = () => {
@@ -55,13 +45,22 @@ export const CreateEditModal = (props: any) => {
     }
     setConfirmLoading(true);
     host.network_uuid = netUUID;
+    let res: any;
+    let operation: string;
     if (currentHost.uuid) {
-      await editHost(host);
+      res = await editHost(host);
+      operation = "updated";
     } else {
-      await addHost(host);
+      res = await addHost(host);
+      operation = "added";
+    }
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `${operation} ${host.name} success`);
+      handleClose();
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
     setConfirmLoading(false);
-    handleClose();
     refreshList();
   };
 
