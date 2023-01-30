@@ -13,6 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 //go:embed frontend/dist
@@ -77,5 +78,7 @@ func main() {
 }
 
 func cleanPath(s string) string {
-	return filepath.Clean(s)
+	s = strings.Replace(s, "\\", `\`, -1)
+	s = filepath.Clean(s)
+	return s
 }
