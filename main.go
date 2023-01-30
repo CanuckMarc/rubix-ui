@@ -47,9 +47,9 @@ func main() {
 	FileMenu.AddText("Reload", keys.Key("f5"), func(_ *menu.CallbackData) {
 		app.OnReload()
 	})
-	FileMenu.AddText("New Tab", keys.CmdOrCtrl("t"), func(_ *menu.CallbackData) {
-		app.NewTab(workingDir)
-	})
+	// FileMenu.AddText("New Tab", keys.CmdOrCtrl("t"), func(_ *menu.CallbackData) {
+	// 	app.NewTab(workingDir)
+	// })
 	FileMenu.AddText("Help", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
 		app.NubeHelp()
 	})
@@ -78,7 +78,7 @@ func main() {
 }
 
 func cleanPath(s string) string {
-	s = strings.Replace(s, "\\", `\`, -1)
+	s = strings.Replace(s, `\\`, `\`, -1)
 	s = filepath.Clean(s)
 	return s
 }

@@ -23,8 +23,8 @@ export const WeeklyForm = (props: any) => {
     if (Object.keys(weeklyData).length != 0) {
         init = {
             name: weeklyData.name,
-            start: moment(weeklyData.start,'h:mm'),
-            end: moment(weeklyData.end,'h:mm'),
+            start: moment(weeklyData.start,'HH:mm'),
+            end: moment(weeklyData.end,'HH:mm'),
             days: weeklyData.days
         }
     }
