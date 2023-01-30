@@ -3,11 +3,11 @@
 import {storage} from '../models';
 import {model} from '../models';
 import {amodel} from '../models';
+import {rumodel} from '../models';
 import {db} from '../models';
 import {assistcli} from '../models';
 import {backend} from '../models';
 import {flow} from '../models';
-import {rumodel} from '../models';
 import {ebmodel} from '../models';
 import {externaltoken} from '../models';
 import {system} from '../models';
@@ -31,11 +31,11 @@ export function AddDevicesBulk(arg1:string,arg2:string,arg3:Array<model.Device>)
 
 export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<model.FlowNetwork>;
 
-export function AddHost(arg1:string,arg2:amodel.Host):Promise<amodel.Host>;
+export function AddHost(arg1:string,arg2:amodel.Host):Promise<rumodel.Response>;
 
-export function AddHostNetwork(arg1:string,arg2:amodel.Network):Promise<amodel.Network>;
+export function AddHostNetwork(arg1:string,arg2:amodel.Network):Promise<rumodel.Response>;
 
-export function AddLocation(arg1:string,arg2:amodel.Location):Promise<amodel.Location>;
+export function AddLocation(arg1:string,arg2:amodel.Location):Promise<rumodel.Response>;
 
 export function AddNetwork(arg1:string,arg2:string,arg3:model.Network):Promise<model.Network>;
 
@@ -233,9 +233,9 @@ export function EditDevice(arg1:string,arg2:string,arg3:string,arg4:model.Device
 
 export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<model.FlowNetwork>;
 
-export function EditHost(arg1:string,arg2:string,arg3:amodel.Host):Promise<amodel.Host>;
+export function EditHost(arg1:string,arg2:string,arg3:amodel.Host):Promise<rumodel.Response>;
 
-export function EditHostNetwork(arg1:string,arg2:string,arg3:amodel.Network):Promise<amodel.Network>;
+export function EditHostNetwork(arg1:string,arg2:string,arg3:amodel.Network):Promise<rumodel.Response>;
 
 export function EditNetwork(arg1:string,arg2:string,arg3:string,arg4:model.Network):Promise<model.Network>;
 
@@ -251,7 +251,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -315,7 +315,7 @@ export function GetHostNetwork(arg1:string,arg2:string):Promise<amodel.Network>;
 
 export function GetHostNetworks(arg1:string):Promise<Array<amodel.Network>>;
 
-export function GetHostSchema(arg1:string):Promise<amodel.HostSchema>;
+export function GetHostSchema(arg1:string):Promise<string>;
 
 export function GetHostTime(arg1:string,arg2:string):Promise<any>;
 
@@ -325,9 +325,7 @@ export function GetLocalStorage(arg1:string,arg2:string):Promise<model.LocalStor
 
 export function GetLocation(arg1:string,arg2:string):Promise<amodel.Location>;
 
-export function GetLocationSchema(arg1:string):Promise<any>;
-
-export function GetLocationTableSchema(arg1:string):Promise<any>;
+export function GetLocationSchema(arg1:string):Promise<string>;
 
 export function GetLocations(arg1:string):Promise<Array<amodel.Location>>;
 
@@ -347,7 +345,7 @@ export function GetNetworkByPluginName(arg1:string,arg2:string,arg3:string,arg4:
 
 export function GetNetworkDevices(arg1:string,arg2:string,arg3:string):Promise<Array<model.Device>>;
 
-export function GetNetworkSchema(arg1:string):Promise<any>;
+export function GetNetworkSchema(arg1:string):Promise<string>;
 
 export function GetNetworkWithPoints(arg1:string,arg2:string,arg3:string):Promise<model.Network>;
 
@@ -495,7 +493,7 @@ export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promi
 
 export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStorageFlowNetwork):Promise<model.LocalStorageFlowNetwork>;
 
-export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<amodel.Location>;
+export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<rumodel.Response>;
 
 export function UpdateSettings(arg1:storage.Settings):Promise<rumodel.Response>;
 

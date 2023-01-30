@@ -79,8 +79,8 @@ github.com/NubeIO/lib-journalctl v0.0.0-20220830013922-d7ec41cce123 h1:s4SKXT2ID
 github.com/NubeIO/lib-journalctl v0.0.0-20220830013922-d7ec41cce123/go.mod h1:sh1uH1qyEB5lwIg1ZvrcQ9bZzK3/EAaKs059jDA5RnU=
 github.com/NubeIO/lib-networking v0.0.9 h1:4asbWZCOOUWvesFL+lSYlHrRgDm9nHciXnm0sIZBio4=
 github.com/NubeIO/lib-networking v0.0.9/go.mod h1:WVj1zTKJ4qYijtzNvu7N5w8+cXFlCjy+HxjnIvSFgNA=
-github.com/NubeIO/lib-schema v0.1.6 h1:H3YGIHny3j4Ih+IjfeGI3eX7r/NsYkEE7ekv27V29aI=
-github.com/NubeIO/lib-schema v0.1.6/go.mod h1:TGKDA6IIWHDwr5Aabawj6FF7NXUWXqu4ozWfph/hIjw=
+github.com/NubeIO/lib-schema v0.2.4 h1:O0/3zOKElhQJ61Hmcnrr9ssqjoZspmKny946WmL/j68=
+github.com/NubeIO/lib-schema v0.2.4/go.mod h1:TGKDA6IIWHDwr5Aabawj6FF7NXUWXqu4ozWfph/hIjw=
 github.com/NubeIO/lib-systemctl-go v0.2.0 h1:Ch4UmA8LH+YoNVM02tfmb3olCyjmo+qKc7wCtxbq/aM=
 github.com/NubeIO/lib-systemctl-go v0.2.0/go.mod h1:P/Ij5pgTtjNnp/TQhsvwipk8sv+5cbZdtuvHiPAYXCE=
 github.com/NubeIO/lib-ufw v0.0.3 h1:dHzhUFyG6AJ9g+iQ18cYJNU6qO5Ad6dAaXKIRoGDa28=
@@ -96,8 +96,8 @@ github.com/NubeIO/nubeio-rubix-lib-modbus-go v0.0.4/go.mod h1:k8eZvTC5I+B0QHGlM3
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.0.4/go.mod h1:A1BPuc3UpE1EF3ugdf+8QIIKTT8s3eK+pfUcheJX2JM=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.12 h1:kSXWRAU+BBjm7XpkY4wpC1QaPxkIK/2G0tQT6LchaUU=
 github.com/NubeIO/nubeio-rubix-lib-models-go v1.4.12/go.mod h1:J0Xy/dX/f/xIhEnW6ZhkE2LiyuRk2H9gCb0Uk+2SSSk=
-github.com/NubeIO/rubix-assist v0.8.6 h1:q/RsCweYb37KYCw28vGtIk4CmAYvNkuIWVKHGf+aOYs=
-github.com/NubeIO/rubix-assist v0.8.6/go.mod h1:TIIwxqB/nF9bx93zMnbTNxtPxTRYrO95FcjXznFKr8Y=
+github.com/NubeIO/rubix-assist v0.9.0 h1:ZYZ2EC5ZW+/PkbuyV6P3NVRXNHPSYd7daACLjKoT+cw=
+github.com/NubeIO/rubix-assist v0.9.0/go.mod h1:5yGkGd5Nll4GqrdFowY1kFlejwIQvFk/+A3uWZpZoJ4=
 github.com/NubeIO/rubix-edge v0.5.6 h1:SA3xOoICjcGqHQe+DhVtmSdZqg4Z9mJ01AtDJ5hDNsQ=
 github.com/NubeIO/rubix-edge v0.5.6/go.mod h1:fX8t6UV9+PoE0/iVfAM0d4qtrcDg5rIiJxecy2zLY90=
 github.com/NubeIO/rubix-edge-wires v0.2.6 h1:V1evHC4U5jcMighCtOmJiwRbSTW8v52Ooxq2nfOJvko=
