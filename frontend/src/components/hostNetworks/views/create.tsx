@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { JsonForm } from "../../../common/json-schema-form";
 import { useParams } from "react-router-dom";
 import { NetworksFactory } from "../factory";
-
+import { hasError } from "../../../utils/response";
+import { openNotificationWithIcon } from "../../../utils/utils";
 import Network = amodel.Network;
 
 export const CreateEditModal = (props: any) => {
@@ -29,13 +30,13 @@ export const CreateEditModal = (props: any) => {
 
   const addNetwork = async (network: Network) => {
     factory._this = network;
-    await factory.Add();
+    return await factory.Add();
   };
 
   const editNetwork = async (network: Network) => {
     factory.uuid = network.uuid;
     factory._this = network;
-    await factory.Update();
+    return await factory.Update();
   };
 
   const handleClose = () => {
@@ -46,15 +47,24 @@ export const CreateEditModal = (props: any) => {
   const handleSubmit = async (network: Network) => {
     try {
       setConfirmLoading(true);
-      network.location_uuid = locUUID
+      network.location_uuid = locUUID;
+      let res: any;
+      let operation: string;
       if (currentNetwork.uuid) {
         network.uuid = currentNetwork.uuid;
         network.hosts = currentNetwork.hosts;
-        await editNetwork(network);
+        res = await editNetwork(network);
+        operation = "updated";
       } else {
-        await addNetwork(network);
+        res = await addNetwork(network);
+        operation = "added";
       }
-      handleClose();
+      if (!hasError(res)) {
+        openNotificationWithIcon("success", `${operation} ${network.name} success`);
+        handleClose();
+      } else {
+        openNotificationWithIcon("error", res.msg);
+      }
       refreshList();
     } catch (err) {
       console.log(err);

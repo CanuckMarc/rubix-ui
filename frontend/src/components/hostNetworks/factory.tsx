@@ -7,9 +7,7 @@ import {
   GetNetworkSchema,
 } from "../../../wailsjs/go/backend/App";
 import { Helpers } from "../../helpers/checks";
-import { amodel, backend } from "../../../wailsjs/go/models";
-import { hasError } from "../../utils/response";
-import { openNotificationWithIcon } from "../../utils/utils";
+import { amodel, backend, rumodel } from "../../../wailsjs/go/models";
 
 function hasUUID(uuid: string): Error {
   return Helpers.IsUndefined(uuid, "network or connection uuid") as Error;
@@ -46,28 +44,14 @@ export class NetworksFactory {
     return one;
   }
 
-  async Add(): Promise<amodel.Network> {
+  async Add(): Promise<rumodel.Response> {
     hasUUID(this.connectionUUID);
-    const res = await AddHostNetwork(this.connectionUUID, this._this)
-    if (!hasError(res)) {
-      openNotificationWithIcon("success", `added ${this._this.name} success`);
-      this._this = res.data as amodel.Network;
-    } else {
-      openNotificationWithIcon("error", res.msg);
-    }
-    return this._this;
+    return await AddHostNetwork(this.connectionUUID, this._this)
   }
 
-  async Update(): Promise<amodel.Network> {
+  async Update(): Promise<rumodel.Response> {
     hasUUID(this.uuid);
-    const res = await EditHostNetwork(this.connectionUUID, this.uuid, this._this)
-    if (!hasError(res)) {
-      openNotificationWithIcon("success", `updated ${this._this.name} success`);
-      this._this = res.data as amodel.Network;
-    } else {
-      openNotificationWithIcon("error", res.msg);
-    }
-    return this._this;
+    return await EditHostNetwork(this.connectionUUID, this.uuid, this._this)
   }
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
