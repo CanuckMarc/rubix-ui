@@ -75,8 +75,10 @@ export const TableEntry = (props: any) => {
             ...data,
             name: values.name,
             days: values.days,
-            start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            start: values.start.format("HH:mm"),
+            end: values.end.format("HH:mm")
+            // start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            // end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
       
         }
         if (itemUUID in currentItem.schedule.schedules.weekly) {
