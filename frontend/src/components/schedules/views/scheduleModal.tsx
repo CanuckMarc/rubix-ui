@@ -59,7 +59,7 @@ const generateExistingItems = (
 }
 
 export const ScheduleModal = (props: any) => {
-  const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList, timeZone } = props;
+  const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
   const formRef = useRef<any>();
   const [events, setEvents] = useState<JSX.Element[]>([]);
   const [weeklys, setWeeklys] = useState<JSX.Element[]>([]);
@@ -75,7 +75,7 @@ export const ScheduleModal = (props: any) => {
             EventExceptionForm, 
             setCurrentItem, 
             true, 
-            timeZone,
+            currentItem.timezone,
             setEvents,
             setExceptions,
             setWeeklys
@@ -88,7 +88,7 @@ export const ScheduleModal = (props: any) => {
             EventExceptionForm, 
             setCurrentItem, 
             true, 
-            timeZone, 
+            currentItem.timezone, 
             setEvents,
             setExceptions,
             setWeeklys
@@ -101,7 +101,7 @@ export const ScheduleModal = (props: any) => {
             WeeklyForm, 
             setCurrentItem, 
             false, 
-            timeZone, 
+            currentItem.timezone, 
             setEvents,
             setExceptions,
             setWeeklys
@@ -276,7 +276,7 @@ export const ScheduleModal = (props: any) => {
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
                 <TabContent
-                    timeZone={timeZone}
+                    timeZone={currentItem.timezone}
                     createCat={createCat}
                     type={CreateType.EVENT}
                     handleOnClick={eventCreate}
@@ -284,13 +284,13 @@ export const ScheduleModal = (props: any) => {
                     // handleCancel={handleCancel}
                     // handleCreate={handleCreate}
                     buttonName={'Add event'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>}
                 />
             </TabPane>
 
             <TabPane tab={weeklyTag} key={weeklyTag}>
                 <TabContent
-                    timeZone={timeZone}
+                    timeZone={currentItem.timezone}
                     createCat={createCat}
                     type={CreateType.WEEKLY}
                     handleOnClick={weeklyCreate}
@@ -298,13 +298,13 @@ export const ScheduleModal = (props: any) => {
                     // handleCancel={handleCancel}
                     // handleCreate={handleCreate}
                     buttonName={'Add weekly'}
-                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>}
+                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>}
                 />
             </TabPane>
 
             <TabPane tab={exceptionTag} key={exceptionTag}>
                 <TabContent
-                    timeZone={timeZone}
+                    timeZone={currentItem.timezone}
                     createCat={createCat}
                     type={CreateType.EXCEPTION}
                     handleOnClick={exceptionCreate}
@@ -312,7 +312,7 @@ export const ScheduleModal = (props: any) => {
                     // handleCancel={handleCancel}
                     // handleCreate={handleCreate}
                     buttonName={'Add exception'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>
                 }
                 />
             </TabPane>

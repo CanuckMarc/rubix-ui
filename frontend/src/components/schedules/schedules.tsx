@@ -16,7 +16,6 @@ export const Schedules = () => {
   const [createModal, showCreateModal] = useState(false);
   const [hasSelected, setHasSelected] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([]);
-  const [timeZone, setTimeZone] = useState(`${moment.tz.guess()}`);
 
   const factory = new SchedulesFactory();
 
@@ -24,9 +23,7 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
-      // console.log(res)
       setData(res);
-      setTimeZone(res[0].timezone);
     } catch (error) {
       setData([]);
     } finally {
@@ -57,7 +54,6 @@ export const Schedules = () => {
 
   const handleFormFinish = async(value: any) => {
     showCreateModal(false)
-    setTimeZone(value.timeZone);
     await factory.AddSchedules(connUUID, hostUUID, value.schedule_name, value.timeZone)
 
     fetch();
@@ -89,8 +85,6 @@ export const Schedules = () => {
             hostUUID={hostUUID}
             setHasSelected={setHasSelected}
             setSelectedUUIDs={setSelectedUUIDs}
-            timeZone={timeZone}
-            setTimeZone={setTimeZone}
           />
 
         </div>

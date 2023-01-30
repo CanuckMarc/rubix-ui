@@ -11,7 +11,7 @@ import { DeleteOutlined, EditOutlined, ScheduleOutlined } from '@ant-design/icon
 import { assistcli } from "../../../../wailsjs/go/models";
 
 export const SchedulesTable = (props: any) => {
-  const { data, isFetching, refreshList, timeZone, setTimeZone } = props;
+  const { data, isFetching, refreshList } = props;
   const [currentItem, setCurrentItem] = useState({} as assistcli.Schedule);
   const [schema, setSchema] = useState({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -114,18 +114,12 @@ export const SchedulesTable = (props: any) => {
 
     await props.factory.EditSchedule(props.connUUID, props.hostUUID, currentItem.uuid, opts)
     
-    setTimeZone(value.timeZone);
-    
     setEditModalVisible(false);
     refreshList();
   }
 
   const handleEditCancel = () => {
     setEditModalVisible(false)
-  }
-
-  const handleScheduleCancel = () => {
-    setScheduleModalVisible(false)
   }
 
   return (
@@ -154,11 +148,9 @@ export const SchedulesTable = (props: any) => {
         setCurrentItem={setCurrentItem}
         setScheduleModalVisible={setScheduleModalVisible}
         refreshList={refreshList}
-        // handleCancel={handleScheduleCancel}
         factory={props.factory}
         connUUID={props.connUUID}
         hostUUID={props.hostUUID}
-        timeZone={timeZone}
       />
     </>
   );
