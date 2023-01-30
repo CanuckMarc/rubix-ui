@@ -72,10 +72,10 @@ func (inst *App) EdgeFirewallPortOpen(connUUID, hostUUID string, body system.UFW
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	if body.Port == 1883 { // mqtt
-		inst.uiErrorMessage(fmt.Sprintf("port %d can not be opened", body.Port))
-		return nil
-	}
+	// if body.Port == 1883 { // mqtt
+	// 	inst.uiErrorMessage(fmt.Sprintf("port %d can not be opened", body.Port))
+	// 	return nil
+	// }
 	if body.Port == 1665 { // edge-wires
 		inst.uiErrorMessage(fmt.Sprintf("port %d can not be opened", body.Port))
 		return nil
