@@ -17,7 +17,7 @@ export const CreateEditModal = (props: any) => {
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentLocation);
-  const [validationError, setValidationError] = useState(false);
+  const [validationError, setValidationError] = useState(true);
 
   useEffect(() => {
     setFormData(currentLocation);
