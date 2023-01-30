@@ -45,6 +45,7 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+import { LoadWiresMap } from "./components/LoadWiresMap";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -806,6 +807,7 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            <LoadWiresMap />
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap

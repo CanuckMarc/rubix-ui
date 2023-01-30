@@ -19,7 +19,7 @@ const ERR_EVENT = "err";
 
 export const useStore = create((set: any) => ({
   wiresMapNodes: {},
-  setWiresMapNodes: (obj: any) => set(() => ({ wiresMap: obj})),
+  setWiresMapNodes: (obj: any) => set(() => ({ wiresMapNodes: obj})),
   wiresMapEdge: {},
   setWiresMapEdge: (obj: any) => set(() => ({ wiresMapEdge: obj}))
 }));

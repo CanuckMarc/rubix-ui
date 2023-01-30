@@ -39,13 +39,21 @@ export const LoadWiresMap = () => {
 
 
     const renderPointsToFlowEditor = () => {
+        const oldNodes = flowInstance.getNodes();
+        const oldEdges = flowInstance.getEdges();
+        oldNodes.forEach((item) => (item.selected = false));
+        oldEdges.forEach((item) => (item.selected = false));
+
+
         const allNodes: NodeInterface[] = [];
         const node = generateNodes()
         allNodes.push(node)
 
         if (allNodes.length > 0) {
             setTimeout(() => {
-              flowInstance.addNodes(allNodes);
+            //   flowInstance.addNodes(allNodes);
+              flowInstance.setNodes([...oldNodes, ...allNodes]);
+              flowInstance.setEdges([...oldEdges]);
             }, 500);
         }
     }
@@ -54,10 +62,12 @@ export const LoadWiresMap = () => {
         const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, 'constant/const-num');
         const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, 'constant/const-num');
 
+        console.log(nodeSettings)
+        console.log(spec)
+
         return {
             id: generateUuid(),
             isParent: false,
-            // style: null,
             type: 'constant/const-num',
             info: { nodeName: 'my_first_node' },
             position: {
@@ -68,7 +78,7 @@ export const LoadWiresMap = () => {
               inputs: convertDataSpec(spec.inputs || []),
               out: convertDataSpec(spec.outputs || []),
             },
-            // parentId: parentNode.id,
+            parentId: undefined,
             settings: nodeSettings,
             selected: false,
             pin: 'in',

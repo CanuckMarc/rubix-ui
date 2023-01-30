@@ -1,13 +1,14 @@
 import { Typography, Card, Select, Spin, Button } from "antd";
 import { useState, useEffect } from "react";
 import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { model } from "../../../wailsjs/go/models";
 import { PointsPaneOne } from "./views/pointsPaneOne";
 import { PointsPaneTwo } from "./views/pointsPaneTwo";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
 import { useStore } from '../../App';
+import { ROUTES } from "../../constants/routes";
 
 import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
 import { NodeInterface, OutputNodeValueType } from "../rubix-flow/lib/Nodes/NodeInterface";
@@ -39,6 +40,7 @@ const filterForFullObj = (pointList: model.Point[], selectedPoints: PointTableTy
 
 export const WiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
+    const nav = useNavigate();
     const [isFetching, setIsFetching] = useState(false);
     const [pointList, setPointList] = useState<model.Point[]>([]);
     const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType[]>([]);
@@ -87,6 +89,7 @@ export const WiresMap = () => {
         setPointConnections(resObj)
         console.log(resObj)
         setWiresMapNodes(resObj)
+        nav(ROUTES.RUBIX_FLOW)
     }
 
 
