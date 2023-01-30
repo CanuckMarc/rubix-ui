@@ -65,7 +65,7 @@ export const HostsTable = (props: any) => {
 
   const columns = [
     {
-      title: "actions",
+      title: "Actions",
       key: "actions",
       fixed: "left",
       render: (_: any, host: Host) => (

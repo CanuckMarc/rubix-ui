@@ -93,7 +93,7 @@ export const Locations = () => {
     try {
       const _columns = [
         {
-          title: "actions",
+          title: "Actions",
           key: "actions",
           fixed: "left",
           render: (_: any, location: Location) => (

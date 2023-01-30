@@ -39,7 +39,7 @@ export const NetworksTable = () => {
 
   const columns = [
     {
-      title: "actions",
+      title: "Actions",
       key: "actions",
       fixed: "left",
       render: (_: any, network: amodel.Network) => (
@@ -62,12 +62,6 @@ export const NetworksTable = () => {
       ),
     },
     ...HOST_NETWORK_HEADERS,
-    {
-      title: "Location",
-      dataIndex: "location_uuid",
-      key: "location_uuid",
-      render: (location_uuid: string) => <span>{getLocationNameByUUID(location_uuid)}</span>,
-    },
   ];
 
   const rowSelection = {

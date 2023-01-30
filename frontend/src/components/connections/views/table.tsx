@@ -9,7 +9,7 @@ import RbTable from "../../../common/rb-table";
 import { RbRefreshButton, RbAddButton, RbDeleteButton, RbExportButton } from "../../../common/rb-table-actions";
 import { CONNECTION_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
-import { exportExcelCSV, isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
+import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
 import { TokenModal } from "../../../common/token/token-modal";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
@@ -40,7 +40,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const columns = [
     {
-      title: "actions",
+      title: "Actions",
       key: "actions",
       fixed: "left",
       render: (_: any, conn: RubixConnection) => (

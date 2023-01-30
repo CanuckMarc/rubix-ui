@@ -208,35 +208,30 @@ export const WRITER_HEADERS = [
 
 export const CONNECTION_HEADERS = [
   {
-    title: "uuid",
-    dataIndex: "uuid",
-    key: "uuid",
-  },
-  {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "description",
+    title: "Description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "address",
+    title: "Address",
     dataIndex: "ip",
     key: "ip",
     sorter: (a: any, b: any) => a.ip.localeCompare(b.ip),
   },
   {
-    title: "port",
+    title: "Port",
     dataIndex: "port",
     key: "port",
     sorter: (a: any, b: any) => a.port - b.port,
   },
   {
-    title: "enable",
+    title: "Enable",
     key: "enable",
     dataIndex: "enable",
     render(enable: boolean) {
@@ -251,7 +246,7 @@ export const CONNECTION_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
     key: "uuid",
   },
@@ -259,23 +254,23 @@ export const CONNECTION_HEADERS = [
 
 export const LOCATION_HEADERS = [
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "description",
+    title: "Description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
     key: "uuid",
   },
   {
-    title: "Networks count",
+    title: "Networks Count",
     dataIndex: "networks",
     key: "networks",
     render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
@@ -284,32 +279,32 @@ export const LOCATION_HEADERS = [
 
 export const HOST_NETWORK_HEADERS = [
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "description",
+    title: "Description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "controllers number",
+    title: "UUID",
+    dataIndex: "uuid",
+    key: "uuid",
+  },
+  {
+    title: "Controllers Count",
     dataIndex: "hosts",
     key: "hosts",
     render: (hosts: []) => <a>{hosts ? hosts.length : 0}</a>,
-  },
-  {
-    title: "uuid",
-    dataIndex: "uuid",
-    key: "uuid",
   },
 ];
 
 export const HOST_HEADERS = [
   {
-    title: "product",
+    title: "Product",
     key: "product_type",
     dataIndex: "product_type",
     render(product: string) {
@@ -327,66 +322,66 @@ export const HOST_HEADERS = [
     },
   },
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "ip",
+    title: "IP",
     dataIndex: "ip",
     key: "ip",
     sorter: (a: any, b: any) => sortIps(a.ip ?? '', b.ip ?? ''),
   },
   {
-    title: "description",
+    title: "Description",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
     key: "uuid",
   },
   {
-    title: "global_uuid",
+    title: "Global UUID",
     dataIndex: "global_uuid",
     key: "global_uuid",
   },
   {
-    title: "is_online",
+    title: "Is Online",
     dataIndex: "is_online",
     key: "is_online",
     render: (a: any) => '' + (a ?? ''),
     sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
-    title: "is_valid_token",
+    title: "Is Valid Token",
     dataIndex: "is_valid_token",
     key: "is_valid_token",
     render: (a: any) => '' + (a ?? ''),
     sorter: (a: any, b: any) => a.is_valid_token - b.is_valid_token,
   },
   {
-    title: "virtual_ip",
+    title: "Virtual IP",
     dataIndex: "virtual_ip",
     key: "virtual_ip",
     sorter: (a: any, b: any) => sortIps(a.virtual_ip ?? '', b.virtual_ip ?? ''),
   },
   {
-    title: "received_bytes",
+    title: "Received Bytes",
     dataIndex: "received_bytes",
     key: "received_bytes",
     sorter: (a: any, b: any) => (a.received_bytes ?? 0) - (b.received_bytes ?? 0),
   },
   {
-    title: "sent_bytes",
+    title: "Sent Bytes",
     dataIndex: "sent_bytes",
     key: "sent_bytes",
     sorter: (a: any, b: any) => (a.received_bytes ?? 0) - (b.received_bytes ?? 0),
   },
   {
-    title: "connected_since",
+    title: "Connected Since",
     dataIndex: "connected_since",
     key: "connected_since",
     sorter: (a: any, b: any) => (a.connected_since ?? '').localeCompare(b.connected_since ?? ''),
@@ -763,13 +758,13 @@ export const BACKUP_HEADERS = [
 
 export const SCANNER_HEADERS = [
   {
-    title: "ip",
+    title: "IP",
     dataIndex: "ip",
     key: "ip",
     sorter: (a: any, b: any) => a.ip.localeCompare(b.ip),
   },
   {
-    title: "ports",
+    title: "Ports",
     dataIndex: "ports",
     render: (services: any[]) =>
       services.map((service, index) => <p key={index}> {`${service.service}: ${service.port}`} </p>),
