@@ -1,17 +1,15 @@
 import { Modal, Spin } from "antd";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AddHost, EditHost } from "../../../../wailsjs/go/backend/App";
 import { amodel } from "../../../../wailsjs/go/models";
 import { JsonForm } from "../../../common/json-schema-form";
 import { openNotificationWithIcon } from "../../../utils/utils";
-
 import Host = amodel.Host;
 
 export const CreateEditModal = (props: any) => {
-  const { connUUID = "" } = useParams();
+  const { connUUID = "", netUUID = "" } = useParams();
   const {
-    hosts,
     hostSchema,
     currentHost,
     isModalVisible,
@@ -39,7 +37,6 @@ export const CreateEditModal = (props: any) => {
   const editHost = async (host: Host) => {
     try {
       await EditHost(connUUID, host.uuid, host);
-      hosts.findIndex((n: Host) => n.uuid === host.uuid);
       openNotificationWithIcon("success", `updated ${host.name} success`);
     } catch (error) {
       openNotificationWithIcon("error", `updated ${host.name} fail`);
@@ -56,8 +53,8 @@ export const CreateEditModal = (props: any) => {
       return;
     }
     setConfirmLoading(true);
+    host.network_uuid = netUUID;
     if (currentHost.uuid) {
-      host.uuid = currentHost.uuid;
       await editHost(host);
     } else {
       await addHost(host);

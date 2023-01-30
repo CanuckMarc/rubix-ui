@@ -30,18 +30,8 @@ func (inst *App) AddHost(connUUID string, host *amodel.Host) *amodel.Host {
 	}
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
-	}
-	if host == nil {
-		return nil
-	}
-	if host.NetworkUUID == "" {
-		nets, _ := client.GetHostNetworks()
-		for _, net := range nets {
-			host.NetworkUUID = net.UUID
-			break
-		}
 	}
 	data, _ := client.AddHost(host)
 	return data
@@ -56,7 +46,7 @@ func (inst *App) DeleteHostBulk(connUUID string, uuids []UUIDs) interface{} {
 			inst.uiSuccessMessage(fmt.Sprintf("deleted host: %s", item.Name))
 		}
 	}
-	return "ok"
+	return "deleted successfully"
 }
 
 func (inst *App) deleteHost(connUUID string, uuid string) (*assistcli.Response, error) {
@@ -114,7 +104,6 @@ func (inst *App) EditHost(connUUID string, uuid string, host *amodel.Host) *amod
 		return nil
 	}
 	data, _ := client.UpdateHost(uuid, host)
-
 	return data
 }
 

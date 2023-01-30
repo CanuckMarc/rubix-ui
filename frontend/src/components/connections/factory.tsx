@@ -2,7 +2,8 @@ import { Helpers } from "../../helpers/checks";
 import { backend, storage } from "../../../wailsjs/go/models";
 import {
   AddConnection,
-  DeleteConnectionBulk, DeleteHostBulk, ExportConnection,
+  DeleteConnectionBulk,
+  ExportConnection,
   GetConnection,
   GetConnections,
   GetConnectionSchema,

@@ -220,7 +220,6 @@ export const HostsTable = (props: any) => {
       />
 
       <CreateEditModal
-        hosts={hosts}
         currentHost={currentHost}
         hostSchema={hostSchema}
         isModalVisible={isModalVisible}
