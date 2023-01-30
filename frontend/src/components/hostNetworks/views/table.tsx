@@ -92,17 +92,6 @@ export const NetworksTable = () => {
   const getSchema = async () => {
     setIsLoadingForm(true);
     const res = await factory.Schema();
-    res.properties = {
-      ...res.properties,
-      location_uuid: {
-        title: "location",
-        type: "string",
-        anyOf: locations.map((l: amodel.Location) => {
-          return { type: "string", enum: [l.uuid], title: l.name };
-        }),
-        default: locUUID,
-      },
-    };
     setNetworkSchema(res);
     setIsLoadingForm(false);
   };
@@ -110,11 +99,6 @@ export const NetworksTable = () => {
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
-  };
-
-  const getLocationNameByUUID = (location_uuid: string) => {
-    const location = locations.find((l: amodel.Location) => l.uuid === location_uuid);
-    return location ? location.name : "";
   };
 
   const showModal = (network: amodel.Network) => {

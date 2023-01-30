@@ -1,7 +1,6 @@
 package assistcli
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
 )
@@ -52,12 +51,12 @@ func (inst *Client) DeleteHostNetwork(uuid string) (response *Response) {
 	return response.buildResponse(resp, err)
 }
 
-func (inst *Client) GetNetworkSchema() (data *amodel.NetworkSchema, response *Response) {
+func (inst *Client) GetNetworkSchema() string {
 	path := fmt.Sprintf("%s/%s", Paths.HostNetwork.Path, "schema")
-	response = &Response{}
 	resp, err := inst.Rest.R().
 		Get(path)
-	var result *amodel.NetworkSchema
-	err = json.Unmarshal(resp.Body(), &result)
-	return result, response.buildResponse(resp, err)
+	if err != nil {
+		return "{}"
+	}
+	return string(resp.Body())
 }

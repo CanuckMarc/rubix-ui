@@ -8,7 +8,7 @@ import { NetworksFactory } from "../factory";
 import Network = amodel.Network;
 
 export const CreateEditModal = (props: any) => {
-  const { connUUID = "" } = useParams();
+  const { connUUID = "", locUUID = "" } = useParams();
   const {
     schema,
     currentNetwork,
@@ -46,6 +46,7 @@ export const CreateEditModal = (props: any) => {
   const handleSubmit = async (network: Network) => {
     try {
       setConfirmLoading(true);
+      network.location_uuid = locUUID
       if (currentNetwork.uuid) {
         network.uuid = currentNetwork.uuid;
         network.hosts = currentNetwork.hosts;

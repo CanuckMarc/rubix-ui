@@ -114,14 +114,7 @@ export class NetworksFactory {
 
   async Schema(): Promise<any> {
     hasUUID(this.connectionUUID);
-    let out = {} as any;
-    await GetNetworkSchema(this.connectionUUID)
-      .then((res) => {
-        out = res;
-      })
-      .catch((err) => {
-        return out;
-      });
-    return out;
+    const resp = await GetNetworkSchema(this.connectionUUID)
+    return JSON.parse(resp || "{}");
   }
 }
