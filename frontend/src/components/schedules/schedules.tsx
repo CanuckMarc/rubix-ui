@@ -24,8 +24,9 @@ export const Schedules = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetSchedules(connUUID, hostUUID);
-      console.log(res)
+      // console.log(res)
       setData(res);
+      setTimeZone(res[0].timezone);
     } catch (error) {
       setData([]);
     } finally {

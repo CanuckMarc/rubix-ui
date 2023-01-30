@@ -8,14 +8,14 @@ export const EditModal = (props: any) => {
   const [initData, setInitData] = useState({})
 
   useEffect(() => {
-      if (currentItem) {
-        setInitData({
-            schedule_name: currentItem.name,
-            enable: currentItem.enable,
-            is_global: currentItem.is_global,
-            timeZone: moment.tz.guess()
-        })
-      }
+    if (currentItem) {
+    setInitData({
+        schedule_name: currentItem.name,
+        enable: currentItem.enable,
+        is_global: currentItem.is_global,
+        timeZone: currentItem.timezone ?? moment.tz.guess()
+    })
+    }
   }, [currentItem])
 
   useEffect(() => form.resetFields(), [initData]);

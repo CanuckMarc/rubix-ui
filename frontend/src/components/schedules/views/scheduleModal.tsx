@@ -218,6 +218,7 @@ export const ScheduleModal = (props: any) => {
             start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
             end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         }
+        
         weekly[crypto.randomUUID()] = newWeekly
         const weeklyRes = checkNull(clonedItem, 'schedule.schedules.weekly')
 
