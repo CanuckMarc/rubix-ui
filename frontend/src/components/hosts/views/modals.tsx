@@ -5,6 +5,7 @@ import { AddHost, EditHost } from "../../../../wailsjs/go/backend/App";
 import { amodel } from "../../../../wailsjs/go/models";
 import { JsonForm } from "../../../common/json-schema-form";
 import { openNotificationWithIcon } from "../../../utils/utils";
+import { hasError } from "../../../utils/response";
 import Host = amodel.Host;
 
 export const CreateEditModal = (props: any) => {
@@ -26,20 +27,20 @@ export const CreateEditModal = (props: any) => {
   }, [currentHost]);
 
   const addHost = async (host: Host) => {
-    try {
-      await AddHost(connUUID, host);
+    const res = await AddHost(connUUID, host);
+    if (!hasError(res)) {
       openNotificationWithIcon("success", `added ${host.name} success`);
-    } catch (error) {
-      openNotificationWithIcon("error", `added ${host.name} fail`);
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
   };
 
   const editHost = async (host: Host) => {
-    try {
-      await EditHost(connUUID, host.uuid, host);
+    const res = await EditHost(connUUID, host.uuid, host);
+    if (!hasError(res)) {
       openNotificationWithIcon("success", `updated ${host.name} success`);
-    } catch (error) {
-      openNotificationWithIcon("error", `updated ${host.name} fail`);
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
   };
 

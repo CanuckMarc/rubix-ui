@@ -3,9 +3,9 @@ package backend
 import (
 	"errors"
 	"fmt"
-	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,23 +18,16 @@ func (inst *App) GetHostSchema(connUUID string) string {
 	return client.GetHostSchema()
 }
 
-func (inst *App) AddHost(connUUID string, host *amodel.Host) *amodel.Host {
-	if host.Name == "" {
-		host.Name = fmt.Sprintf("host-%s", uuid.ShortUUID("")[5:10])
-	}
-	if host.BiosPort == 0 {
-		host.BiosPort = 1659
-	}
-	if host.Port == 0 {
-		host.Port = 1661
-	}
+func (inst *App) AddHost(connUUID string, host *amodel.Host) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(err)
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	data, _ := client.AddHost(host)
-	return data
+	resp, err := client.AddHost(host)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse(resp)
 }
 
 func (inst *App) DeleteHostBulk(connUUID string, uuids []UUIDs) interface{} {
@@ -94,17 +87,16 @@ func (inst *App) GetHost(connUUID string, uuid string) *amodel.Host {
 	return host
 }
 
-func (inst *App) EditHost(connUUID string, uuid string, host *amodel.Host) *amodel.Host {
+func (inst *App) EditHost(connUUID string, uuid string, host *amodel.Host) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	if host == nil {
-		return nil
+	resp, err := client.UpdateHost(uuid, host)
+	if err != nil {
+		return rumodel.FailResponse(err)
 	}
-	data, _ := client.UpdateHost(uuid, host)
-	return data
+	return rumodel.SuccessResponse(resp)
 }
 
 func (inst *App) GetHosts(connUUID string) (resp []amodel.Host) {

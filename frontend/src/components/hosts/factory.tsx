@@ -1,4 +1,4 @@
-import { amodel, assistcli, backend } from "../../../wailsjs/go/models";
+import { amodel, assistcli, backend, rumodel } from "../../../wailsjs/go/models";
 import {
   AddHost,
   DeleteHost,
@@ -45,11 +45,11 @@ export class HostsFactory {
     return await GetHost(this.connectionUUID, this.uuid);
   }
 
-  async Add(): Promise<Host> {
+  async Add(): Promise<rumodel.Response> {
     return await AddHost(this.connectionUUID, this._this);
   }
 
-  async Update(): Promise<Host> {
+  async Update(): Promise<rumodel.Response> {
     return await EditHost(this.connectionUUID, this.uuid, this._this);
   }
 
