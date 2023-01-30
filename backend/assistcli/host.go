@@ -1,9 +1,9 @@
 package assistcli
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
+	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 )
 
 func (inst *Client) GetHosts() (data []amodel.Host, response *Response) {
@@ -24,24 +24,28 @@ func (inst *Client) GetHost(uuid string) (data *amodel.Host, response *Response)
 	return resp.Result().(*amodel.Host), response.buildResponse(resp, err)
 }
 
-func (inst *Client) AddHost(body *amodel.Host) (data *amodel.Host, response *Response) {
+func (inst *Client) AddHost(body *amodel.Host) (data *amodel.Host, err error) {
 	path := fmt.Sprintf(Paths.Hosts.Path)
-	response = &Response{}
-	resp, err := inst.Rest.R().
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetBody(body).
 		SetResult(&amodel.Host{}).
-		Post(path)
-	return resp.Result().(*amodel.Host), response.buildResponse(resp, err)
+		Post(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*amodel.Host), nil
 }
 
-func (inst *Client) UpdateHost(uuid string, body *amodel.Host) (data *amodel.Host, response *Response) {
+func (inst *Client) UpdateHost(uuid string, body *amodel.Host) (data *amodel.Host, err error) {
 	path := fmt.Sprintf("%s/%s", Paths.Hosts.Path, uuid)
-	response = &Response{}
-	resp, err := inst.Rest.R().
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetBody(body).
 		SetResult(&amodel.Host{}).
-		Patch(path)
-	return resp.Result().(*amodel.Host), response.buildResponse(resp, err)
+		Patch(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*amodel.Host), nil
 }
 
 func (inst *Client) DeleteHost(uuid string) (response *Response) {
@@ -52,14 +56,14 @@ func (inst *Client) DeleteHost(uuid string) (response *Response) {
 	return response.buildResponse(resp, err)
 }
 
-func (inst *Client) GetHostSchema() (data *amodel.HostSchema, response *Response) {
+func (inst *Client) GetHostSchema() string {
 	path := fmt.Sprintf("%s/%s", Paths.Hosts.Path, "schema")
-	response = &Response{}
 	resp, err := inst.Rest.R().
 		Get(path)
-	var result *amodel.HostSchema
-	err = json.Unmarshal(resp.Body(), &result)
-	return result, response.buildResponse(resp, err)
+	if err != nil {
+		return "{}"
+	}
+	return string(resp.Body())
 }
 
 func (inst *Client) UpdateStatus() (data []amodel.Host, response *Response) {

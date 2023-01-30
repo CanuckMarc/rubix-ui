@@ -39,7 +39,7 @@ export const NetworksTable = () => {
 
   const columns = [
     {
-      title: "actions",
+      title: "Actions",
       key: "actions",
       fixed: "left",
       render: (_: any, network: amodel.Network) => (
@@ -62,12 +62,6 @@ export const NetworksTable = () => {
       ),
     },
     ...HOST_NETWORK_HEADERS,
-    {
-      title: "Location",
-      dataIndex: "location_uuid",
-      key: "location_uuid",
-      render: (location_uuid: string) => <span>{getLocationNameByUUID(location_uuid)}</span>,
-    },
   ];
 
   const rowSelection = {
@@ -79,10 +73,9 @@ export const NetworksTable = () => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll();
-      const networksByLocUUID = res.filter((n) => n.location_uuid === locUUID);
-      setNetworks(networksByLocUUID);
-      setFilteredData(networksByLocUUID);
+      const networks = await factory.GetAll(locUUID);
+      setNetworks(networks);
+      setFilteredData(networks);
     } catch (error) {
       console.log(error);
     } finally {
@@ -98,17 +91,6 @@ export const NetworksTable = () => {
   const getSchema = async () => {
     setIsLoadingForm(true);
     const res = await factory.Schema();
-    res.properties = {
-      ...res.properties,
-      location_uuid: {
-        title: "location",
-        type: "string",
-        anyOf: locations.map((l: amodel.Location) => {
-          return { type: "string", enum: [l.uuid], title: l.name };
-        }),
-        default: locUUID,
-      },
-    };
     setNetworkSchema(res);
     setIsLoadingForm(false);
   };
@@ -116,11 +98,6 @@ export const NetworksTable = () => {
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
-  };
-
-  const getLocationNameByUUID = (location_uuid: string) => {
-    const location = locations.find((l: amodel.Location) => l.uuid === location_uuid);
-    return location ? location.name : "";
   };
 
   const showModal = (network: amodel.Network) => {

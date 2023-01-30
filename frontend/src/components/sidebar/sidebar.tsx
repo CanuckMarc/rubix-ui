@@ -363,13 +363,12 @@ export const MenuSidebar = () => {
     try {
       setIsFetching(true);
       const connections = ((await connectionFactory.GetAll()) || []) as any[];
-      const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
-      for (const c of enabledConnections) {
+      for (const c of connections) {
         let locations = [];
         locations = await getLocations(c.uuid);
         c.locations = locations;
       }
-      const route = getTreeDataIterative(enabledConnections);
+      const route = getTreeDataIterative(connections);
       updateRouteData(route);
     } finally {
       setIsFetching(false);

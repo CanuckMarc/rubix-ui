@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
+import { hasError } from "../../../utils/response";
 
 const { Panel } = Collapse;
 
@@ -35,10 +36,7 @@ export const CreateConnectionsModal = (props: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
+    const jsonSchema = await factory.Schema();
     setSchema(jsonSchema);
     setIsLoadingForm(false);
   };
@@ -165,11 +163,11 @@ export const CreateHostsModal = (props: any) => {
 
   const add = async (host: Host) => {
     factory.this = host;
-    try {
-      await factory.Add();
+    const res = await factory.Add();
+    if (!hasError(res)) {
       openNotificationWithIcon("success", `added ${host.name} success`);
-    } catch (err) {
-      console.log(err);
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
   };
 

@@ -32,7 +32,6 @@ type RubixConnection struct {
 	UUID          string `json:"uuid"`
 	Name          string `json:"name"`
 	Description   string `json:"description"`
-	Enable        bool   `json:"enable"`
 	IP            string `json:"ip"`
 	Port          int    `json:"port"`
 	HTTPS         bool   `json:"https"`

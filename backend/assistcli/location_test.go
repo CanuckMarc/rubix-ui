@@ -7,11 +7,10 @@ import (
 )
 
 func TestHostLocation(*testing.T) {
-	hosts, res := client.GetHostSchema()
+	hosts := client.GetHostSchema()
 	fmt.Println(hosts)
 	uuid := ""
 	fmt.Println(hosts)
-	fmt.Println(res.StatusCode)
 	host, res := client.GetLocation(uuid)
 	fmt.Println(res.StatusCode)
 	if res.StatusCode != 200 {

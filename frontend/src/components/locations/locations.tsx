@@ -2,7 +2,7 @@ import { Card, Space, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { GetConnection, GetLocations } from "../../../wailsjs/go/backend/App";
-import { amodel, storage } from "../../../wailsjs/go/models";
+import { amodel } from "../../../wailsjs/go/models";
 import { RbAddButton, RbRefreshButton } from "../../common/rb-table-actions";
 import { ROUTES } from "../../constants/routes";
 import { isObjectEmpty } from "../../utils/utils";
@@ -12,8 +12,8 @@ import { CreateEditModal } from "./views/create";
 import { LocationsTable } from "./views/table";
 import useTitlePrefix from "../../hooks/usePrefixedTitle";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
+import { LOCATION_HEADERS } from "../../constants/headers";
 import Location = amodel.Location;
-import RubixConnection = storage.RubixConnection;
 
 const { Title } = Typography;
 
@@ -23,8 +23,7 @@ export const Locations = () => {
   const [locations, setLocations] = useState([] as Location[]);
   const [currentLocation, setCurrentLocation] = useState({} as Location);
   const [locationSchema, setLocationSchema] = useState({});
-  const [tableSchema, setTableSchema] = useState([]);
-  const [connection, setConnection] = useState({} as RubixConnection);
+  const [columns, setColumns] = useState([] as any);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
@@ -33,13 +32,13 @@ export const Locations = () => {
   locationFactory.connectionUUID = connUUID as string;
 
   useEffect(() => {
-    getSchemaTable();
-  }, []); //on first load hook react
+    getColumns();
+  }, []);
 
   useEffect(() => {
     fetchList();
     getConnection();
-  }, [connUUID]); //on load when connUUID changes
+  }, [connUUID]);
 
   const fetchList = async () => {
     try {
@@ -57,28 +56,16 @@ export const Locations = () => {
   const getConnection = async () => {
     try {
       const res = await GetConnection(locationFactory.connectionUUID);
-      setConnection(res);
       addPrefix(res?.name);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getSchema = async () => {
+  const getLocationSchema = async () => {
     setIsLoadingForm(true);
-    let res = await locationFactory.Schema();
-    res = {
-      properties: {
-        ...res.properties,
-        connection_name: {
-          title: "Connection",
-          type: "string",
-          default: connection.name,
-          readOnly: true,
-        },
-      },
-    };
-    setLocationSchema(res);
+    let jsonSchema = await locationFactory.Schema();
+    setLocationSchema(jsonSchema);
     setIsLoadingForm(false);
   };
 
@@ -90,7 +77,7 @@ export const Locations = () => {
     setCurrentLocation(location);
     setIsModalVisible(true);
     if (isObjectEmpty(locationSchema)) {
-      getSchema();
+      getLocationSchema();
     }
   };
 
@@ -99,12 +86,11 @@ export const Locations = () => {
     setCurrentLocation({} as Location);
   };
 
-  const getSchemaTable = async () => {
+  const getColumns = async () => {
     try {
-      let tableSchema = await locationFactory.TableSchema();
-      tableSchema = [
+      const _columns = [
         {
-          title: "actions",
+          title: "Actions",
           key: "actions",
           fixed: "left",
           render: (_: any, location: Location) => (
@@ -124,16 +110,11 @@ export const Locations = () => {
             </Space>
           ),
         },
-        ...tableSchema,
-        {
-          title: "Networks count",
-          dataIndex: "networks",
-          key: "networks",
-          render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
-        },
+        ...LOCATION_HEADERS,
       ];
-      setTableSchema(tableSchema);
-    } catch (error) {}
+      setColumns(_columns);
+    } catch (error) {
+    }
   };
 
   const routes = [
@@ -159,7 +140,7 @@ export const Locations = () => {
         <LocationsTable
           locations={locations}
           isFetching={isFetching}
-          tableSchema={tableSchema}
+          tableSchema={columns}
           connUUID={connUUID}
           refreshList={refreshList}
         />

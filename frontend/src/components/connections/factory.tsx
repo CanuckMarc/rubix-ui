@@ -2,7 +2,8 @@ import { Helpers } from "../../helpers/checks";
 import { backend, storage } from "../../../wailsjs/go/models";
 import {
   AddConnection,
-  DeleteConnectionBulk, DeleteHostBulk, ExportConnection,
+  DeleteConnectionBulk,
+  ExportConnection,
   GetConnection,
   GetConnections,
   GetConnectionSchema,
@@ -50,40 +51,8 @@ export class ConnectionFactory {
     return out;
   }
 
-  // get the first connection uuid
   async Schema(): Promise<backend.ConnectionSchema> {
-    let out: backend.ConnectionSchema = {} as backend.ConnectionSchema;
-    await GetConnectionSchema()
-      .then((res) => {
-        out = res;
-      })
-      .catch((err) => {
-        return out;
-      });
-    return out;
-  }
-
-  // get the first connection uuid
-  async GetFist(): Promise<storage.RubixConnection> {
-    let one: storage.RubixConnection = {} as storage.RubixConnection;
-    await this.GetAll()
-      .then((res) => {
-        one = res.at(0) as storage.RubixConnection;
-        this._this = one;
-      })
-      .catch((err) => {
-        return one;
-      });
-    return one;
-  }
-
-  // get the first connection uuid
-  async GetFistUUID(): Promise<string> {
-    let uuid = "";
-    this.GetFist().then((res) => {
-      uuid = res.uuid;
-    });
-    return uuid;
+    return await GetConnectionSchema()
   }
 
   async GetAll(): Promise<Array<storage.RubixConnection>> {

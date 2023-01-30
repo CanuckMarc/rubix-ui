@@ -2,7 +2,7 @@ import { Card, Tabs, Typography } from "antd";
 import { ApartmentOutlined, RedoOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { GetHostNetworks, GetHosts } from "../../../wailsjs/go/backend/App";
+import { GetHostNetwork, GetHostNetworks } from "../../../wailsjs/go/backend/App";
 import { ROUTES } from "../../constants/routes";
 import RbxBreadcrumb from "../breadcrumbs/breadcrumbs";
 import { PcScanner } from "../pc/scanner/table";
@@ -73,13 +73,8 @@ export const Hosts = () => {
   const fetchList = async () => {
     try {
       setIsFetching(true);
-      const res = (await GetHosts(connUUID))
-        .filter((h) => h.network_uuid === netUUID)
-        .map((h) => {
-          h.enable = !h.enable ? false : h.enable;
-          return h;
-        });
-      setHosts(res);
+      const res = await GetHostNetwork(connUUID, netUUID)
+      setHosts(res.hosts);
     } catch (error) {
       console.log(error);
     } finally {

@@ -1,4 +1,4 @@
-import { amodel, assistcli, backend } from "../../../wailsjs/go/models";
+import { amodel, assistcli, backend, rumodel } from "../../../wailsjs/go/models";
 import {
   AddHost,
   DeleteHost,
@@ -12,7 +12,6 @@ import {
   UpdateStatus,
 } from "../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
-import HostSchema = amodel.HostSchema;
 import Response = assistcli.Response;
 import UUIDs = backend.UUIDs;
 
@@ -29,8 +28,9 @@ export class HostsFactory {
     this._this = value;
   }
 
-  async Schema(): Promise<HostSchema> {
-    return await GetHostSchema(this.connectionUUID);
+  async Schema(): Promise<any> {
+    const resp = await GetHostSchema(this.connectionUUID);
+    return JSON.parse(resp || "{}");
   }
 
   async PingHost(): Promise<boolean> {
@@ -45,11 +45,11 @@ export class HostsFactory {
     return await GetHost(this.connectionUUID, this.uuid);
   }
 
-  async Add(): Promise<Host> {
+  async Add(): Promise<rumodel.Response> {
     return await AddHost(this.connectionUUID, this._this);
   }
 
-  async Update(): Promise<Host> {
+  async Update(): Promise<rumodel.Response> {
     return await EditHost(this.connectionUUID, this.uuid, this._this);
   }
 

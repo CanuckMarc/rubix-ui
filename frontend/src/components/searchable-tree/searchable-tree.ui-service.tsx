@@ -148,7 +148,7 @@ export const getTreeDataIterative = (connections: any) => {
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...objectMap(
               getTreeObject(
-                { ...location, name: location.name + " (devices)" },
+                network,
                 ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
                 "",
                 <LaptopOutlined />

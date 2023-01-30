@@ -3,51 +3,37 @@ package backend
 import (
 	"errors"
 	"fmt"
-	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
-func (inst *App) GetNetworkSchema(connUUID string) interface{} {
+func (inst *App) GetNetworkSchema(connUUID string) string {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		inst.uiErrorMessage(err)
+		return "{}"
 	}
-	data, res := client.GetNetworkSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-		return nil
-	}
-	out := map[string]interface{}{
-		"properties": data,
-	}
-	return out
+	return client.GetNetworkSchema()
 }
 
-func (inst *App) AddHostNetwork(connUUID string, host *amodel.Network) *amodel.Network {
-	if host.Name == "" {
-		host.Name = fmt.Sprintf("net-%s", uuid.ShortUUID("")[5:10])
-	}
+func (inst *App) AddHostNetwork(connUUID string, host *amodel.Network) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	data, res := client.AddHostNetwork(host)
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("issue in adding new host network %s", res.Message))
-	} else {
-		inst.uiSuccessMessage(fmt.Sprintf("added new host network %s", data.Name))
+	res, err := client.AddHostNetwork(host)
+	if err != nil {
+		return rumodel.FailResponse(err)
 	}
-	return data
+	return rumodel.SuccessResponse(res)
 }
 
 func (inst *App) GetHostNetworks(connUUID string) (resp []amodel.Network) {
 	resp = []amodel.Network{}
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	data, res := client.GetHostNetworks()
@@ -66,7 +52,7 @@ func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) interface
 			inst.uiSuccessMessage(fmt.Sprintf("deleted network: %s", item.Name))
 		}
 	}
-	return "ok"
+	return "deleted successfully"
 }
 
 func (inst *App) deleteHostNetwork(connUUID string, uuid string) (*assistcli.Response, error) {
@@ -84,7 +70,7 @@ func (inst *App) deleteHostNetwork(connUUID string, uuid string) (*assistcli.Res
 func (inst *App) DeleteHostNetwork(connUUID string, uuid string) *assistcli.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	res := client.DeleteHostNetwork(uuid)
@@ -99,7 +85,7 @@ func (inst *App) DeleteHostNetwork(connUUID string, uuid string) *assistcli.Resp
 func (inst *App) GetHostNetwork(connUUID string, uuid string) *amodel.Network {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	data, res := client.GetHostNetwork(uuid)
@@ -110,23 +96,14 @@ func (inst *App) GetHostNetwork(connUUID string, uuid string) *amodel.Network {
 	return data
 }
 
-func (inst *App) EditHostNetwork(connUUID string, hostUUID string, host *amodel.Network) *amodel.Network {
-	if host.Name == "" {
-		host.Name = fmt.Sprintf("net-%s", uuid.ShortUUID("")[5:10])
-	}
+func (inst *App) EditHostNetwork(connUUID string, hostUUID string, host *amodel.Network) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	if host == nil {
-		return nil
+	res, err := client.UpdateHostNetwork(hostUUID, host)
+	if err != nil {
+		return rumodel.FailResponse(err)
 	}
-	data, res := client.UpdateHostNetwork(hostUUID, host)
-	if res.StatusCode > 299 {
-		inst.uiErrorMessage(fmt.Sprintf("issue in editing host network %s", res.Message))
-	} else {
-		inst.uiSuccessMessage(fmt.Sprintf("edit ok"))
-	}
-	return data
+	return rumodel.SuccessResponse(res)
 }

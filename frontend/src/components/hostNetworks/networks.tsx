@@ -12,14 +12,12 @@ let locationFactory = new LocationFactory();
 
 export const Networks = () => {
   const { connUUID = "", locUUID = "" } = useParams();
-  const [currentLocation, updateCurrentLocation] = useState({});
   const { prefixedTitle, addPrefix } = useTitlePrefix("Locations");
   locationFactory.connectionUUID = connUUID;
   locationFactory.uuid = locUUID;
 
   useEffect(() => {
     locationFactory.GetOne().then((location) => {
-      updateCurrentLocation(location);
       if (location) addPrefix(location.name);
     });
   }, []);
