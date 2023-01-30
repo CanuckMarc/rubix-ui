@@ -39,7 +39,7 @@ func (inst *App) GetHostNetworks(connUUID string) (resp []amodel.Network) {
 	resp = []amodel.Network{}
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	data, res := client.GetHostNetworks()
@@ -58,7 +58,7 @@ func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) interface
 			inst.uiSuccessMessage(fmt.Sprintf("deleted network: %s", item.Name))
 		}
 	}
-	return "ok"
+	return "deleted successfully"
 }
 
 func (inst *App) deleteHostNetwork(connUUID string, uuid string) (*assistcli.Response, error) {
