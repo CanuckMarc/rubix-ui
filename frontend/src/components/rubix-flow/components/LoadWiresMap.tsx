@@ -14,6 +14,8 @@ type NodeGenInputType = {
   name: string;
   isParent: boolean;
   parentId: string | undefined;
+  x: number;
+  y: number;
 }
 
 function getRandomArbitrary(min: number, max: number) {
@@ -22,9 +24,11 @@ function getRandomArbitrary(min: number, max: number) {
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
-    const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
-        (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
-    )
+    // const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
+    //     (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
+    // )
+
+    const wiresMapNodes = useStore(state => state.wiresMapNodes)
 
     const [nodesSpec] = useNodesSpec();
     const flowInstance = useReactFlow();
@@ -35,36 +39,44 @@ export const LoadWiresMap = () => {
 
     const renderPointsToFlowEditor = () => {
         const points: any = wiresMapNodes
-
         const newNodes: NodeInterface[] = [];
 
+        const x = getRandomArbitrary(-200, 200)
+        const y = getRandomArbitrary(-200, 200)
+
+        // generate new nodes
         const parentNode = generateNodes({
           type: 'flow/flow-network',
           name: '',
           isParent: true,
-          parentId: undefined
+          parentId: undefined,
+          x: x,
+          y: y
         })
         newNodes.push(parentNode)
 
-        const typeNames: NodeGenInputType[] = [
+        const nodeSpecs: NodeGenInputType[] = [
           {
             type: 'flow/flow-point',
             name: points.pointOne?.name || '',
             isParent: false,
-            parentId: parentNode.id
+            parentId: parentNode.id,
+            x: x,
+            y: y
           }, 
           {
             type: 'flow/flow-point-write',
             name: points.pointTwo?.name || '',
             isParent: false,
-            parentId: parentNode.id
+            parentId: parentNode.id,
+            x: x + 300,
+            y: y
           }
         ]
 
-        
-
+        // generate new edge
         let nodeIds: string[] = []
-        typeNames.forEach((item: NodeGenInputType) => {
+        nodeSpecs.forEach((item: NodeGenInputType) => {
           const node = generateNodes(item)
           nodeIds.push(node.id)
           newNodes.push(node)
@@ -78,15 +90,13 @@ export const LoadWiresMap = () => {
           targetHandle: "in16"
         }
 
+        // set new nodes and edges into flow editor
         if (newNodes.length > 0) {
           setTimeout(() => {
             const oldNodes = flowInstance.getNodes();
-            console.log('old nodes are: ', oldNodes)
-            console.log('new nodes are: ', newNodes)
             flowInstance.setNodes([...oldNodes, ...newNodes]);
             
             const oldEdges = flowInstance.getEdges();
-            console.log('old edges are: ', oldEdges)
             flowInstance.setEdges([...oldEdges, newEdge]);
           }, 500);
         }
@@ -96,24 +106,18 @@ export const LoadWiresMap = () => {
         const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
         const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
 
-        console.log('nodesSpec is: ', nodesSpec)
-        console.log(spec)
-
-        const x = getRandomArbitrary(-200, 200)
-        const y = getRandomArbitrary(-200, 200)
-
         return {
             id: generateUuid(),
             isParent: item.isParent,
             type: item.type,
             info: { nodeName: item.name },
             position: {
-              x: x,
-              y: y,
+              x: item.x,
+              y: item.y,
             },
             positionAbsolute: {
-              x: x,
-              y: y,
+              x: item.x,
+              y: item.y,
             },
             data: {
               inputs: convertDataSpec(spec.inputs || []),
