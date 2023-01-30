@@ -5,6 +5,8 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
@@ -94,10 +96,11 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset" }}>
-          <span style={{ padding: "10px 0" }}>
-            <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
+        <NavLink to={next} style={{ color: "unset", display: "flex" }}>
+          {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
+          <span style={{ width: "100%" }}>
             {item.name}
+            <CaretDownOutlined style={{ float: "right", marginTop: "13px", marginRight: "12px" }} />
           </span>
         </NavLink>
       ),
