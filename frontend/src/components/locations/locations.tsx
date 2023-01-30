@@ -2,7 +2,7 @@ import { Card, Space, Tooltip, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { GetConnection, GetLocations } from "../../../wailsjs/go/backend/App";
-import { amodel, storage } from "../../../wailsjs/go/models";
+import { amodel } from "../../../wailsjs/go/models";
 import { RbAddButton, RbRefreshButton } from "../../common/rb-table-actions";
 import { ROUTES } from "../../constants/routes";
 import { isObjectEmpty } from "../../utils/utils";
@@ -12,9 +12,8 @@ import { CreateEditModal } from "./views/create";
 import { LocationsTable } from "./views/table";
 import useTitlePrefix from "../../hooks/usePrefixedTitle";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
-import Location = amodel.Location;
-import RubixConnection = storage.RubixConnection;
 import { LOCATION_HEADERS } from "../../constants/headers";
+import Location = amodel.Location;
 
 const { Title } = Typography;
 
@@ -25,7 +24,6 @@ export const Locations = () => {
   const [currentLocation, setCurrentLocation] = useState({} as Location);
   const [locationSchema, setLocationSchema] = useState({});
   const [columns, setColumns] = useState([] as any);
-  const [connection, setConnection] = useState({} as RubixConnection);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
@@ -35,12 +33,12 @@ export const Locations = () => {
 
   useEffect(() => {
     getColumns();
-  }, []); //on first load hook react
+  }, []);
 
   useEffect(() => {
     fetchList();
     getConnection();
-  }, [connUUID]); //on load when connUUID changes
+  }, [connUUID]);
 
   const fetchList = async () => {
     try {
@@ -58,7 +56,6 @@ export const Locations = () => {
   const getConnection = async () => {
     try {
       const res = await GetConnection(locationFactory.connectionUUID);
-      setConnection(res);
       addPrefix(res?.name);
     } catch (error) {
       console.log(error);
@@ -116,7 +113,8 @@ export const Locations = () => {
         ...LOCATION_HEADERS,
       ];
       setColumns(_columns);
-    } catch (error) {}
+    } catch (error) {
+    }
   };
 
   const routes = [

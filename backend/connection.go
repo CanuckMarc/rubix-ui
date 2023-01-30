@@ -57,18 +57,16 @@ func (inst *App) ExportConnection(uuid []string) error {
 	return nil
 }
 
-type Ip struct {
+type IP struct {
 	Type    string `json:"type" default:"string"`
 	Title   string `json:"title" default:"host ip address"`
 	Default string `json:"default" default:"0.0.0.0"`
 }
 
 type ConnectionSchema struct {
-	UUID          schema.UUID        `json:"uuid"`
 	Name          schema.Name        `json:"name"`
 	Description   schema.Description `json:"description"`
-	Enable        schema.Enable      `json:"enable"`
-	IP            Ip                 `json:"ip"`
+	IP            IP                 `json:"ip"`
 	Port          schema.Port        `json:"port"`
 	HTTPS         schema.HTTPS       `json:"https"`
 	ExternalToken schema.Token       `json:"external_token"`

@@ -231,19 +231,19 @@ export const CONNECTION_HEADERS = [
     sorter: (a: any, b: any) => a.port - b.port,
   },
   {
-    title: "Enable",
-    key: "enable",
-    dataIndex: "enable",
+    title: "HTTPS",
+    key: "https",
+    dataIndex: "https",
     render(enable: boolean) {
-      let colour = "blue";
+      let colour = "orange";
       let text = "disabled";
       if (enable) {
-        colour = "orange";
+        colour = "blue";
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
     },
-    sorter: (a: any, b: any) => a.enable - b.enable,
+    sorter: (a: any, b: any) => a.https - b.https,
   },
   {
     title: "UUID",
