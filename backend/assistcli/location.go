@@ -1,13 +1,12 @@
 package assistcli
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/rubix-assist/amodel"
 )
 
 func (inst *Client) GetLocations() (data []amodel.Location, response *Response) {
-	path := fmt.Sprintf(Paths.Location.Path)
+	path := Paths.Location.Path
 	response = &Response{}
 	resp, err := inst.Rest.R().
 		SetResult(&[]amodel.Location{}).
@@ -52,12 +51,12 @@ func (inst *Client) DeleteLocation(uuid string) (response *Response) {
 	return response.buildResponse(resp, err)
 }
 
-func (inst *Client) GetLocationSchema() (data interface{}, response *Response) {
+func (inst *Client) GetLocationSchema() string {
 	path := fmt.Sprintf("%s/%s", Paths.Location.Path, "schema")
-	response = &Response{}
 	resp, err := inst.Rest.R().
 		Get(path)
-	var result interface{}
-	err = json.Unmarshal(resp.Body(), &result)
-	return result, response.buildResponse(resp, err)
+	if err != nil {
+		return "{}"
+	}
+	return string(resp.Body())
 }

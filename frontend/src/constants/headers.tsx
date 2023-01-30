@@ -257,6 +257,31 @@ export const CONNECTION_HEADERS = [
   },
 ];
 
+export const LOCATION_HEADERS = [
+  {
+    title: "name",
+    dataIndex: "name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
+    title: "description",
+    dataIndex: "description",
+    key: "description",
+  },
+  {
+    title: "uuid",
+    dataIndex: "uuid",
+    key: "uuid",
+  },
+  {
+    title: "Networks count",
+    dataIndex: "networks",
+    key: "networks",
+    render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
+  }
+];
+
 export const HOST_NETWORK_HEADERS = [
   {
     title: "name",
@@ -275,7 +300,6 @@ export const HOST_NETWORK_HEADERS = [
     key: "hosts",
     render: (hosts: []) => <a>{hosts ? hosts.length : 0}</a>,
   },
-
   {
     title: "uuid",
     dataIndex: "uuid",

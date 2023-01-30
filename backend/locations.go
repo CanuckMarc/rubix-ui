@@ -6,36 +6,15 @@ import (
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
-	"github.com/NubeIO/rubix-ui/backend/helpers/humanize"
 )
 
-func (inst *App) GetLocationSchema(connUUID string) interface{} {
+func (inst *App) GetLocationSchema(connUUID string) string {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		inst.uiErrorMessage(err)
+		return "{}"
 	}
-	data, res := client.GetLocationSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-	}
-	out := map[string]interface{}{
-		"properties": data,
-	}
-	return out
-}
-
-func (inst *App) GetLocationTableSchema(connUUID string) interface{} {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	data, res := client.GetLocationSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-	}
-	return humanize.BuildTableSchema(data)
+	return client.GetLocationSchema()
 }
 
 func (inst *App) AddLocation(connUUID string, body *amodel.Location) *amodel.Location {

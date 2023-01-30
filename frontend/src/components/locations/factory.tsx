@@ -4,7 +4,6 @@ import {
   GetLocation,
   GetLocations,
   GetLocationSchema,
-  GetLocationTableSchema,
   UpdateLocation,
 } from "../../../wailsjs/go/backend/App";
 import { Helpers } from "../../helpers/checks";
@@ -42,27 +41,8 @@ export class LocationFactory {
   }
 
   async Schema(): Promise<any> {
-    let all: Promise<any> = {} as Promise<any>;
-    await GetLocationSchema(this.connectionUUID)
-      .then((res) => {
-        all = res as Promise<any>;
-      })
-      .catch((err) => {
-        return undefined;
-      });
-    return all;
-  }
-
-  async TableSchema(): Promise<any> {
-    let all: Promise<any> = {} as Promise<any>;
-    await GetLocationTableSchema(this.connectionUUID)
-      .then((res) => {
-        all = res as Promise<any>;
-      })
-      .catch((err) => {
-        return undefined;
-      });
-    return all;
+    const resp = await GetLocationSchema(this.connectionUUID)
+    return JSON.parse(resp || "{}");
   }
 
   // get the first connection uuid

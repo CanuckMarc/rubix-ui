@@ -14,6 +14,7 @@ import useTitlePrefix from "../../hooks/usePrefixedTitle";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import Location = amodel.Location;
 import RubixConnection = storage.RubixConnection;
+import { LOCATION_HEADERS } from "../../constants/headers";
 
 const { Title } = Typography;
 
@@ -23,7 +24,7 @@ export const Locations = () => {
   const [locations, setLocations] = useState([] as Location[]);
   const [currentLocation, setCurrentLocation] = useState({} as Location);
   const [locationSchema, setLocationSchema] = useState({});
-  const [tableSchema, setTableSchema] = useState([]);
+  const [columns, setColumns] = useState([] as any);
   const [connection, setConnection] = useState({} as RubixConnection);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -33,7 +34,7 @@ export const Locations = () => {
   locationFactory.connectionUUID = connUUID as string;
 
   useEffect(() => {
-    getSchemaTable();
+    getColumns();
   }, []); //on first load hook react
 
   useEffect(() => {
@@ -64,21 +65,10 @@ export const Locations = () => {
     }
   };
 
-  const getSchema = async () => {
+  const getLocationSchema = async () => {
     setIsLoadingForm(true);
-    let res = await locationFactory.Schema();
-    res = {
-      properties: {
-        ...res.properties,
-        connection_name: {
-          title: "Connection",
-          type: "string",
-          default: connection.name,
-          readOnly: true,
-        },
-      },
-    };
-    setLocationSchema(res);
+    let jsonSchema = await locationFactory.Schema();
+    setLocationSchema(jsonSchema);
     setIsLoadingForm(false);
   };
 
@@ -90,7 +80,7 @@ export const Locations = () => {
     setCurrentLocation(location);
     setIsModalVisible(true);
     if (isObjectEmpty(locationSchema)) {
-      getSchema();
+      getLocationSchema();
     }
   };
 
@@ -99,10 +89,9 @@ export const Locations = () => {
     setCurrentLocation({} as Location);
   };
 
-  const getSchemaTable = async () => {
+  const getColumns = async () => {
     try {
-      let tableSchema = await locationFactory.TableSchema();
-      tableSchema = [
+      const _columns = [
         {
           title: "actions",
           key: "actions",
@@ -124,15 +113,9 @@ export const Locations = () => {
             </Space>
           ),
         },
-        ...tableSchema,
-        {
-          title: "Networks count",
-          dataIndex: "networks",
-          key: "networks",
-          render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
-        },
+        ...LOCATION_HEADERS,
       ];
-      setTableSchema(tableSchema);
+      setColumns(_columns);
     } catch (error) {}
   };
 
@@ -159,7 +142,7 @@ export const Locations = () => {
         <LocationsTable
           locations={locations}
           isFetching={isFetching}
-          tableSchema={tableSchema}
+          tableSchema={columns}
           connUUID={connUUID}
           refreshList={refreshList}
         />
