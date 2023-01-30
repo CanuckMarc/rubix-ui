@@ -12,7 +12,6 @@ import {
   UpdateStatus,
 } from "../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
-import HostSchema = amodel.HostSchema;
 import Response = assistcli.Response;
 import UUIDs = backend.UUIDs;
 
@@ -29,8 +28,9 @@ export class HostsFactory {
     this._this = value;
   }
 
-  async Schema(): Promise<HostSchema> {
-    return await GetHostSchema(this.connectionUUID);
+  async Schema(): Promise<any> {
+    const resp = await GetHostSchema(this.connectionUUID);
+    return JSON.parse(resp || "{}");
   }
 
   async PingHost(): Promise<boolean> {

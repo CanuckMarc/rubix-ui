@@ -9,18 +9,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (inst *App) GetHostSchema(connUUID string) *amodel.HostSchema {
+func (inst *App) GetHostSchema(connUUID string) string {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		inst.uiErrorMessage(err)
+		return "{}"
 	}
-	data, res := client.GetHostSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-		return nil
-	}
-	return data
+	return client.GetHostSchema()
 }
 
 func (inst *App) AddHost(connUUID string, host *amodel.Host) *amodel.Host {

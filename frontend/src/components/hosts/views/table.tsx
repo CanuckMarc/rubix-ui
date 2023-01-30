@@ -119,13 +119,10 @@ export const HostsTable = (props: any) => {
     },
   };
 
-  const getSchema = async () => {
+  const getHostSchema = async () => {
     setIsLoadingForm(true);
     try {
-      const res = await factory.Schema();
-      const jsonSchema = {
-        properties: res,
-      };
+      const jsonSchema = await factory.Schema();
       setHostSchema(jsonSchema);
     } finally {
       setIsLoadingForm(false);
@@ -142,7 +139,7 @@ export const HostsTable = (props: any) => {
     setCurrentHost(host);
     setIsModalVisible(true);
     if (isObjectEmpty(hostSchema)) {
-      getSchema();
+      getHostSchema();
     }
   };
 
