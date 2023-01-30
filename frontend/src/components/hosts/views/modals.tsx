@@ -21,6 +21,7 @@ export const CreateEditModal = (props: any) => {
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentHost);
+  const [validationError, setValidationError] = useState(false);
 
   useEffect(() => {
     setFormData(currentHost);
@@ -51,6 +52,9 @@ export const CreateEditModal = (props: any) => {
   };
 
   const handleSubmit = async (host: Host) => {
+    if (validationError) {
+      return;
+    }
     setConfirmLoading(true);
     if (currentHost.uuid) {
       host.uuid = currentHost.uuid;
@@ -72,6 +76,7 @@ export const CreateEditModal = (props: any) => {
         onCancel={handleClose}
         confirmLoading={confirmLoading}
         okText="Save"
+        okButtonProps={{ disabled: validationError }}
         maskClosable={false} // prevent modal from closing on click outside
         style={{ textAlign: "start" }}
       >
@@ -79,8 +84,8 @@ export const CreateEditModal = (props: any) => {
           <JsonForm
             formData={formData}
             setFormData={setFormData}
-            handleSubmit={handleSubmit}
             jsonSchema={hostSchema}
+            setValidationError={setValidationError}
           />
         </Spin>
       </Modal>

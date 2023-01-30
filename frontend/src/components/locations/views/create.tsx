@@ -1,9 +1,6 @@
 import { Modal, Spin } from "antd";
 import { useEffect, useState } from "react";
-import {
-  AddLocation,
-  UpdateLocation
-} from "../../../../wailsjs/go/backend/App";
+import { AddLocation, UpdateLocation } from "../../../../wailsjs/go/backend/App";
 import { JsonForm } from "../../../common/json-schema-form";
 import { amodel } from "../../../../wailsjs/go/models";
 import Location = amodel.Location;
@@ -20,6 +17,7 @@ export const CreateEditModal = (props: any) => {
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentLocation);
+  const [validationError, setValidationError] = useState(false);
 
   useEffect(() => {
     setFormData(currentLocation);
@@ -39,6 +37,9 @@ export const CreateEditModal = (props: any) => {
   };
 
   const handleSubmit = async (location: any) => {
+    if (validationError) {
+      return;
+    }
     try {
       setConfirmLoading(true);
       delete location.connection_name;
@@ -70,6 +71,7 @@ export const CreateEditModal = (props: any) => {
       onCancel={handleClose}
       okText="Save"
       confirmLoading={confirmLoading}
+      okButtonProps={{ disabled: validationError }}
       maskClosable={false} // prevent modal from closing on click outside
       style={{ textAlign: "start" }}
     >
@@ -77,8 +79,8 @@ export const CreateEditModal = (props: any) => {
         <JsonForm
           formData={formData}
           setFormData={setFormData}
-          handleSubmit={handleSubmit}
           jsonSchema={locationSchema}
+          setValidationError={setValidationError}
         />
       </Spin>
     </Modal>
