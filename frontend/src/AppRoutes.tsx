@@ -22,6 +22,7 @@ import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
 import { LogTable } from "./components/hosts/host/flow/networks/views/logTable";
+import { WiresMap } from "./components/wires-map/map";
 
 function AppRoutes() {
   return (
@@ -124,6 +125,11 @@ function AppRoutes() {
         key={routes.USER_GUIDE}
         path={routes.USER_GUIDE_REMOTE}
         element={<UserGuide />}
+      />
+      <Route
+        key={routes.WIRES_MAP}
+        path={routes.WIRES_MAP_REMOTE}
+        element={<WiresMap />}
       />
     </Routes>
   );
