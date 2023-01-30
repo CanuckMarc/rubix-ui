@@ -73,10 +73,9 @@ export const NetworksTable = () => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll();
-      const networksByLocUUID = res.filter((n) => n.location_uuid === locUUID);
-      setNetworks(networksByLocUUID);
-      setFilteredData(networksByLocUUID);
+      const networks = await factory.GetAll(locUUID);
+      setNetworks(networks);
+      setFilteredData(networks);
     } catch (error) {
       console.log(error);
     } finally {

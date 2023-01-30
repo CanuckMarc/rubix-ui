@@ -3,7 +3,7 @@ import {
   DeleteHostNetworkBulk,
   EditHostNetwork,
   GetHostNetwork,
-  GetHostNetworks,
+  GetLocation,
   GetNetworkSchema,
 } from "../../../wailsjs/go/backend/App";
 import { Helpers } from "../../helpers/checks";
@@ -31,8 +31,9 @@ export class NetworksFactory {
     return this.count;
   }
 
-  async GetAll(): Promise<Array<amodel.Network>> {
-    return GetHostNetworks(this.connectionUUID)
+  async GetAll(locationUUID: string): Promise<Array<amodel.Network>> {
+    const res = await GetLocation(this.connectionUUID, locationUUID)
+    return res.networks
   }
 
   async GetOne(): Promise<amodel.Network> {
