@@ -1,17 +1,16 @@
 import { Modal, Spin } from "antd";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AddHost, EditHost } from "../../../../wailsjs/go/backend/App";
 import { amodel } from "../../../../wailsjs/go/models";
 import { JsonForm } from "../../../common/json-schema-form";
 import { openNotificationWithIcon } from "../../../utils/utils";
-
+import { hasError } from "../../../utils/response";
 import Host = amodel.Host;
 
 export const CreateEditModal = (props: any) => {
-  const { connUUID = "" } = useParams();
+  const { connUUID = "", netUUID = "" } = useParams();
   const {
-    hosts,
     hostSchema,
     currentHost,
     isModalVisible,
@@ -21,28 +20,26 @@ export const CreateEditModal = (props: any) => {
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentHost);
+  const [validationError, setValidationError] = useState(true);
 
   useEffect(() => {
     setFormData(currentHost);
   }, [currentHost]);
 
-  const addHost = async (host: Host) => {
-    try {
-      await AddHost(connUUID, host);
-      openNotificationWithIcon("success", `added ${host.name} success`);
-    } catch (error) {
-      openNotificationWithIcon("error", `added ${host.name} fail`);
+  useEffect(() => {
+    if (currentHost.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
     }
+  }, [currentHost.uuid]);
+
+  const addHost = async (host: Host) => {
+    return await AddHost(connUUID, host);
   };
 
   const editHost = async (host: Host) => {
-    try {
-      await EditHost(connUUID, host.uuid, host);
-      hosts.findIndex((n: Host) => n.uuid === host.uuid);
-      openNotificationWithIcon("success", `updated ${host.name} success`);
-    } catch (error) {
-      openNotificationWithIcon("error", `updated ${host.name} fail`);
-    }
+    return EditHost(connUUID, host.uuid, host);
   };
 
   const handleClose = () => {
@@ -51,15 +48,27 @@ export const CreateEditModal = (props: any) => {
   };
 
   const handleSubmit = async (host: Host) => {
+    if (validationError) {
+      return;
+    }
     setConfirmLoading(true);
+    host.network_uuid = netUUID;
+    let res: any;
+    let operation: string;
     if (currentHost.uuid) {
-      host.uuid = currentHost.uuid;
-      await editHost(host);
+      res = await editHost(host);
+      operation = "updated";
     } else {
-      await addHost(host);
+      res = await addHost(host);
+      operation = "added";
+    }
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
+      handleClose();
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
     setConfirmLoading(false);
-    handleClose();
     refreshList();
   };
 
@@ -72,6 +81,7 @@ export const CreateEditModal = (props: any) => {
         onCancel={handleClose}
         confirmLoading={confirmLoading}
         okText="Save"
+        okButtonProps={{ disabled: validationError }}
         maskClosable={false} // prevent modal from closing on click outside
         style={{ textAlign: "start" }}
       >
@@ -79,8 +89,8 @@ export const CreateEditModal = (props: any) => {
           <JsonForm
             formData={formData}
             setFormData={setFormData}
-            handleSubmit={handleSubmit}
             jsonSchema={hostSchema}
+            setValidationError={setValidationError}
           />
         </Spin>
       </Modal>

@@ -6,54 +6,31 @@ import (
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
-	"github.com/NubeIO/rubix-ui/backend/helpers/humanize"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
-func (inst *App) GetLocationSchema(connUUID string) interface{} {
+func (inst *App) GetLocationSchema(connUUID string) string {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		inst.uiErrorMessage(err)
+		return "{}"
 	}
-	data, res := client.GetLocationSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-	}
-	out := map[string]interface{}{
-		"properties": data,
-	}
-	return out
+	return client.GetLocationSchema()
 }
 
-func (inst *App) GetLocationTableSchema(connUUID string) interface{} {
+func (inst *App) AddLocation(connUUID string, body *amodel.Location) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	data, res := client.GetLocationSchema()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", res.Message))
-	}
-	return humanize.BuildTableSchema(data)
-}
-
-func (inst *App) AddLocation(connUUID string, body *amodel.Location) *amodel.Location {
 	if body.Name == "" {
 		body.Name = fmt.Sprintf("loc-%s", uuid.ShortUUID("")[5:10])
 	}
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	res, err := client.AddLocation(body)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	data, res := client.AddLocation(body)
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("issue in adding new host locations %s", res.Message))
-	} else {
-		inst.uiSuccessMessage(fmt.Sprintf("added new host location %s", data.Name))
-	}
-	return data
+	return rumodel.SuccessResponse(res)
 }
 
 func (inst *App) GetLocations(connUUID string) (resp []amodel.Location) {
@@ -124,20 +101,14 @@ func (inst *App) GetLocation(connUUID string, uuid string) *amodel.Location {
 	return data
 }
 
-func (inst *App) UpdateLocation(connUUID string, uuid string, host *amodel.Location) *amodel.Location {
+func (inst *App) UpdateLocation(connUUID string, uuid string, host *amodel.Location) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	if host == nil {
-		return nil
+	res, err := client.UpdateLocation(uuid, host)
+	if err != nil {
+		return rumodel.FailResponse(err)
 	}
-	data, res := client.UpdateLocation(uuid, host)
-	if res.StatusCode > 299 {
-		inst.uiErrorMessage(fmt.Sprintf("issue in editing host location %s", res.Message))
-	} else {
-		inst.uiSuccessMessage(fmt.Sprintf("edit ok"))
-	}
-	return data
+	return rumodel.SuccessResponse(res)
 }

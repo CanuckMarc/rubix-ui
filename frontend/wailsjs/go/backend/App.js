@@ -614,10 +614,6 @@ export function GetLocationSchema(arg1) {
   return window['go']['backend']['App']['GetLocationSchema'](arg1);
 }
 
-export function GetLocationTableSchema(arg1) {
-  return window['go']['backend']['App']['GetLocationTableSchema'](arg1);
-}
-
 export function GetLocations(arg1) {
   return window['go']['backend']['App']['GetLocations'](arg1);
 }

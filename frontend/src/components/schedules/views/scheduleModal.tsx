@@ -33,7 +33,9 @@ const generateExistingItems = (
     timeZone: string,
     setEvents: Function,
     setExceptions: Function,
-    setWeeklys: Function
+    setWeeklys: Function,
+    okButtonDisable: Boolean,
+    setOkButtonDisable: Function
 ) => {
     let existingElementJSX: JSX.Element[] = []
     const res = checkNull(currentItem, objString)
@@ -51,6 +53,8 @@ const generateExistingItems = (
                     setEvents={setEvents}
                     setExceptions={setExceptions}
                     setWeeklys={setWeeklys}
+                    okButtonDisable={okButtonDisable}
+                    setOkButtonDisable={setOkButtonDisable}
                 />
             )
         });
@@ -60,11 +64,12 @@ const generateExistingItems = (
 
 export const ScheduleModal = (props: any) => {
   const { connUUID, hostUUID, currentItem, setCurrentItem, factory, setScheduleModalVisible, refreshList } = props;
-  const formRef = useRef<any>();
+  const createFormRef = useRef<any>();
   const [events, setEvents] = useState<JSX.Element[]>([]);
   const [weeklys, setWeeklys] = useState<JSX.Element[]>([]);
   const [exceptions, setExceptions] = useState<JSX.Element[]>([]);
   const [createCat, setCreateCat] = useState<CreateType>(CreateType.UNSPECIFIED);
+  const [okButtonDisable, setOkButtonDisable] = useState(false);
 
   useEffect(() => {
     // map existing items to tableEntry for display if not empty
@@ -78,7 +83,9 @@ export const ScheduleModal = (props: any) => {
             currentItem.timezone,
             setEvents,
             setExceptions,
-            setWeeklys
+            setWeeklys,
+            okButtonDisable,
+            setOkButtonDisable
         );
         setEvents(eventsJSX)
 
@@ -91,7 +98,9 @@ export const ScheduleModal = (props: any) => {
             currentItem.timezone, 
             setEvents,
             setExceptions,
-            setWeeklys
+            setWeeklys,
+            okButtonDisable,
+            setOkButtonDisable
         );
         setExceptions(exceptionJSX)
 
@@ -104,7 +113,9 @@ export const ScheduleModal = (props: any) => {
             currentItem.timezone, 
             setEvents,
             setExceptions,
-            setWeeklys
+            setWeeklys,
+            okButtonDisable,
+            setOkButtonDisable
         );
         setWeeklys(weeklyJSX)
     // reset existing items when current schedule item is empty
@@ -113,7 +124,7 @@ export const ScheduleModal = (props: any) => {
         setExceptions([])
         setWeeklys([])
     }
-  }, [currentItem])
+  }, [currentItem, okButtonDisable])
 
   const handleOk = async () => {
     props.setScheduleModalVisible(false);
@@ -122,7 +133,8 @@ export const ScheduleModal = (props: any) => {
         handleCreate()
     }
 
-    await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem)
+    await props.factory.EditSchedule(connUUID, hostUUID, currentItem.uuid, currentItem),
+    
     // after updating schedule, refetch and clear the existing table-entries so that new ones can be loaded correctly
     props.refreshList();
     setEvents([])
@@ -217,8 +229,6 @@ export const ScheduleModal = (props: any) => {
             days: values.days,
             start: values.start.format("HH:mm"),
             end: values.end.format("HH:mm")
-            // start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            // end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         }
 
         weekly[crypto.randomUUID()] = newWeekly
@@ -261,7 +271,7 @@ export const ScheduleModal = (props: any) => {
   }
 
   const handleCreate = () => {
-    formRef.current.click();
+    createFormRef.current.click();
     setCreateCat(CreateType.UNSPECIFIED)
   }
 
@@ -273,7 +283,7 @@ export const ScheduleModal = (props: any) => {
         onCancel={handleCancel}
         bodyStyle={{overflowX: 'auto', maxHeight: '50vh'}}
         width='50vw'
-        // okButtonProps={{ disabled: createCat != CreateType.UNSPECIFIED  }}
+        okButtonProps={{ disabled: okButtonDisable }}
     >
         <Tabs defaultActiveKey="1">
             <TabPane tab={eventsTag} key={eventsTag}>
@@ -283,10 +293,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.EVENT}
                     handleOnClick={eventCreate}
                     exisitingElements={events}
-                    // handleCancel={handleCancel}
-                    // handleCreate={handleCreate}
                     buttonName={'Add event'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>}
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={currentItem.timezone}/>}
                 />
             </TabPane>
 
@@ -297,10 +305,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.WEEKLY}
                     handleOnClick={weeklyCreate}
                     exisitingElements={weeklys}
-                    // handleCancel={handleCancel}
-                    // handleCreate={handleCreate}
                     buttonName={'Add weekly'}
-                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>}
+                    form={<WeeklyForm weeklyData={{}} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={currentItem.timezone}/>}
                 />
             </TabPane>
 
@@ -311,10 +317,8 @@ export const ScheduleModal = (props: any) => {
                     type={CreateType.EXCEPTION}
                     handleOnClick={exceptionCreate}
                     exisitingElements={exceptions}
-                    // handleCancel={handleCancel}
-                    // handleCreate={handleCreate}
                     buttonName={'Add exception'}
-                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={formRef} timeZone={currentItem.timezone}/>
+                    form={<EventExceptionForm eventExceptionData={{}} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={currentItem.timezone}/>
                 }
                 />
             </TabPane>

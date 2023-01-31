@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
 
 import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
@@ -138,7 +138,7 @@ export const isOutputFlow = (type: string) => {
   return ["output-float", "output-string", "output-bool"].includes(newType);
 };
 
-export const Node = (props: NodeProps) => {
+export const Node = memo((props: NodeProps) => {
   const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
   const nodes = useNodes();
   const edges = useEdges();
@@ -168,7 +168,7 @@ export const Node = (props: NodeProps) => {
             pin: `${firstInput.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstInput.pin,
-            subName: `${firstInput.pin}${arr.length > 1 ? index + 1 : ""} ${
+            subName: `${firstInput.pin || "in"}${arr.length > 1 ? index + 1 : ""} ${
               info?.nodeName ? `(${info.nodeName})` : ""
             }`,
           };
@@ -187,7 +187,9 @@ export const Node = (props: NodeProps) => {
             pin: `${firstOut.pin}${SPLIT_KEY}${nodeId}`,
             nodeId,
             name: firstOut.pin,
-            subName: `${firstOut.pin}${arr.length > 1 ? index + 1 : ""} ${info?.nodeName ? `(${info.nodeName})` : ""}`,
+            subName: `${firstOut.pin || "out"}${arr.length > 1 ? index + 1 : ""} ${
+              info?.nodeName ? `(${info.nodeName})` : ""
+            }`,
           };
         })
     : node.data.out;
@@ -297,4 +299,4 @@ export const Node = (props: NodeProps) => {
       <SettingsModal node={node} isModalVisible={isSettingModal} onCloseModal={handleCloseModalSetting} />
     </NodeContainer>
   );
-};
+});

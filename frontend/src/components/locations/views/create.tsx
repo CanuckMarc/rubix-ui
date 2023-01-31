@@ -1,11 +1,10 @@
 import { Modal, Spin } from "antd";
 import { useEffect, useState } from "react";
-import {
-  AddLocation,
-  UpdateLocation
-} from "../../../../wailsjs/go/backend/App";
+import { AddLocation, UpdateLocation } from "../../../../wailsjs/go/backend/App";
 import { JsonForm } from "../../../common/json-schema-form";
 import { amodel } from "../../../../wailsjs/go/models";
+import { hasError } from "../../../utils/response";
+import { openNotificationWithIcon } from "../../../utils/utils";
 import Location = amodel.Location;
 
 export const CreateEditModal = (props: any) => {
@@ -20,17 +19,26 @@ export const CreateEditModal = (props: any) => {
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentLocation);
+  const [validationError, setValidationError] = useState(true);
 
   useEffect(() => {
     setFormData(currentLocation);
   }, [currentLocation]);
 
+  useEffect(() => {
+    if (currentLocation.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentLocation.uuid]);
+
   const addLocation = async (location: any) => {
-    await AddLocation(connUUID, location);
+    return AddLocation(connUUID, location);
   };
 
   const editLocation = async (location: Location) => {
-    await UpdateLocation(connUUID, location.uuid, location);
+    return UpdateLocation(connUUID, location.uuid, location);
   };
 
   const handleClose = () => {
@@ -39,17 +47,29 @@ export const CreateEditModal = (props: any) => {
   };
 
   const handleSubmit = async (location: any) => {
+    if (validationError) {
+      return;
+    }
     try {
       setConfirmLoading(true);
       delete location.connection_name;
+      let res: any;
+      let operation: string;
       if (currentLocation.uuid) {
         location.uuid = currentLocation.uuid;
         location.networks = currentLocation.networks;
-        await editLocation(location);
+        res = await editLocation(location);
+        operation = "updated";
       } else {
-        await addLocation(location);
+        res = await addLocation(location);
+        operation = "added";
       }
-      handleClose();
+      if (!hasError(res)) {
+        openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
+        handleClose();
+      } else {
+        openNotificationWithIcon("error", res.msg);
+      }
       refreshList();
     } catch (error) {
       console.log(error);
@@ -70,6 +90,7 @@ export const CreateEditModal = (props: any) => {
       onCancel={handleClose}
       okText="Save"
       confirmLoading={confirmLoading}
+      okButtonProps={{ disabled: validationError }}
       maskClosable={false} // prevent modal from closing on click outside
       style={{ textAlign: "start" }}
     >
@@ -77,8 +98,8 @@ export const CreateEditModal = (props: any) => {
         <JsonForm
           formData={formData}
           setFormData={setFormData}
-          handleSubmit={handleSubmit}
           jsonSchema={locationSchema}
+          setValidationError={setValidationError}
         />
       </Spin>
     </Modal>

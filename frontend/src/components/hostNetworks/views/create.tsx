@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { JsonForm } from "../../../common/json-schema-form";
 import { useParams } from "react-router-dom";
 import { NetworksFactory } from "../factory";
-
+import { hasError } from "../../../utils/response";
+import { openNotificationWithIcon } from "../../../utils/utils";
 import Network = amodel.Network;
 
 export const CreateEditModal = (props: any) => {
-  const { connUUID = "" } = useParams();
+  const { connUUID = "", locUUID = "" } = useParams();
   const {
     schema,
     currentNetwork,
@@ -18,6 +19,7 @@ export const CreateEditModal = (props: any) => {
     onCloseModal,
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [validationError, setValidationError] = useState(true);
   const [formData, setFormData] = useState(currentNetwork);
 
   const factory = new NetworksFactory();
@@ -27,15 +29,24 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentNetwork);
   }, [currentNetwork]);
 
+  useEffect(() => {
+    console.log("here i am...")
+    if (currentNetwork.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentNetwork.uuid]);
+
   const addNetwork = async (network: Network) => {
     factory._this = network;
-    await factory.Add();
+    return await factory.Add();
   };
 
   const editNetwork = async (network: Network) => {
     factory.uuid = network.uuid;
     factory._this = network;
-    await factory.Update();
+    return await factory.Update();
   };
 
   const handleClose = () => {
@@ -46,14 +57,24 @@ export const CreateEditModal = (props: any) => {
   const handleSubmit = async (network: Network) => {
     try {
       setConfirmLoading(true);
+      network.location_uuid = locUUID;
+      let res: any;
+      let operation: string;
       if (currentNetwork.uuid) {
         network.uuid = currentNetwork.uuid;
         network.hosts = currentNetwork.hosts;
-        await editNetwork(network);
+        res = await editNetwork(network);
+        operation = "updated";
       } else {
-        await addNetwork(network);
+        res = await addNetwork(network);
+        operation = "added";
       }
-      handleClose();
+      if (!hasError(res)) {
+        openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
+        handleClose();
+      } else {
+        openNotificationWithIcon("error", res.msg);
+      }
       refreshList();
     } catch (err) {
       console.log(err);
@@ -72,6 +93,7 @@ export const CreateEditModal = (props: any) => {
         onOk={() => handleSubmit(formData)}
         onCancel={handleClose}
         confirmLoading={confirmLoading}
+        okButtonProps={{ disabled: validationError }}
         okText="Save"
         maskClosable={false} // prevent modal from closing on click outside
         style={{ textAlign: "start" }}
@@ -80,7 +102,7 @@ export const CreateEditModal = (props: any) => {
           <JsonForm
             formData={formData}
             setFormData={setFormData}
-            handleSubmit={handleSubmit}
+            setValidationError={setValidationError}
             jsonSchema={schema}
           />
         </Spin>
