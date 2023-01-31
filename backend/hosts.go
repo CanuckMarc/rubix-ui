@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
@@ -20,6 +21,9 @@ func (inst *App) GetHostSchema(connUUID string) string {
 
 func (inst *App) AddHost(connUUID string, host *amodel.Host) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if host.Name == "" {
+		host.Name = fmt.Sprintf("host-%s", uuid.ShortUUID("")[5:10])
+	}
 	if err != nil {
 		return rumodel.FailResponse(err)
 	}

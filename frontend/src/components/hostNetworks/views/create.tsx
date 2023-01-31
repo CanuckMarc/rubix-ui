@@ -19,6 +19,7 @@ export const CreateEditModal = (props: any) => {
     onCloseModal,
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [validationError, setValidationError] = useState(true);
   const [formData, setFormData] = useState(currentNetwork);
 
   const factory = new NetworksFactory();
@@ -27,6 +28,14 @@ export const CreateEditModal = (props: any) => {
   useEffect(() => {
     setFormData(currentNetwork);
   }, [currentNetwork]);
+
+  useEffect(() => {
+    if (currentNetwork.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentNetwork.uuid]);
 
   const addNetwork = async (network: Network) => {
     factory._this = network;
@@ -83,6 +92,7 @@ export const CreateEditModal = (props: any) => {
         onOk={() => handleSubmit(formData)}
         onCancel={handleClose}
         confirmLoading={confirmLoading}
+        okButtonProps={{ disabled: validationError }}
         okText="Save"
         maskClosable={false} // prevent modal from closing on click outside
         style={{ textAlign: "start" }}

@@ -25,6 +25,14 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentLocation);
   }, [currentLocation]);
 
+  useEffect(() => {
+    if (currentLocation.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentLocation.uuid]);
+
   const addLocation = async (location: any) => {
     return AddLocation(connUUID, location);
   };

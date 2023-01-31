@@ -26,6 +26,14 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentHost);
   }, [currentHost]);
 
+  useEffect(() => {
+    if (currentHost.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentHost.uuid]);
+
   const addHost = async (host: Host) => {
     return await AddHost(connUUID, host);
   };

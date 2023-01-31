@@ -18,6 +18,14 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentConnection);
   }, [currentConnection]);
 
+  useEffect(() => {
+    if (currentConnection.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentConnection.uuid]);
+
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
     return await factory.Add();
