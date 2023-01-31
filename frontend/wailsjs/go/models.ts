@@ -382,6 +382,7 @@ export namespace backend {
 	export class ConnectionProperties {
 	    name: schema.Name;
 	    description: schema.Description;
+	    enable: schema.Enable;
 	    ip: IP;
 	    port: schema.Port;
 	    https: schema.HTTPS;
@@ -395,6 +396,7 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = this.convertValues(source["name"], schema.Name);
 	        this.description = this.convertValues(source["description"], schema.Description);
+	        this.enable = this.convertValues(source["enable"], schema.Enable);
 	        this.ip = this.convertValues(source["ip"], IP);
 	        this.port = this.convertValues(source["port"], schema.Port);
 	        this.https = this.convertValues(source["https"], schema.HTTPS);
@@ -2658,6 +2660,24 @@ export namespace schema {
 	        this.title = source["title"];
 	    }
 	}
+	export class Enable {
+	    type: string;
+	    title: string;
+	    default: boolean;
+	    readOnly: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Enable(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.type = source["type"];
+	        this.title = source["title"];
+	        this.default = source["default"];
+	        this.readOnly = source["readOnly"];
+	    }
+	}
 	export class HTTPS {
 	    type: string;
 	    title: string;
@@ -2851,6 +2871,7 @@ export namespace storage {
 	    uuid: string;
 	    name: string;
 	    description: string;
+	    enable: boolean;
 	    ip: string;
 	    port: number;
 	    https: boolean;
@@ -2865,6 +2886,7 @@ export namespace storage {
 	        this.uuid = source["uuid"];
 	        this.name = source["name"];
 	        this.description = source["description"];
+	        this.enable = source["enable"];
 	        this.ip = source["ip"];
 	        this.port = source["port"];
 	        this.https = source["https"];

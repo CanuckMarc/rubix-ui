@@ -1,13 +1,11 @@
 import { Helpers } from "../../helpers/checks";
-import { backend, storage } from "../../../wailsjs/go/models";
+import { backend, rumodel, storage } from "../../../wailsjs/go/models";
 import {
   AddConnection,
   DeleteConnectionBulk,
   ExportConnection,
-  GetConnection,
   GetConnections,
   GetConnectionSchema,
-  PingRubixAssist,
   UpdateConnection,
 } from "../../../wailsjs/go/backend/App";
 
@@ -37,87 +35,24 @@ export class ConnectionFactory {
     return await ExportConnection(uuids);
   }
 
-  // will try and ping the remote server
-  // example ping 192,1568.15.10:1662
-  async PingConnection(): Promise<boolean> {
-    let out = false;
-    await PingRubixAssist(this.uuid)
-      .then((res) => {
-        out = res as boolean;
-      })
-      .catch((err) => {
-        return out;
-      });
-    return out;
-  }
-
   async Schema(): Promise<backend.ConnectionSchema> {
     return await GetConnectionSchema()
   }
 
   async GetAll(): Promise<Array<storage.RubixConnection>> {
-    let all: Array<storage.RubixConnection> =
-      {} as Array<storage.RubixConnection>;
-    await GetConnections()
-      .then((res) => {
-        all = res as Array<storage.RubixConnection>;
-      })
-      .catch((err) => {
-        return all;
-      });
-    return all;
+    return await GetConnections()
   }
 
-  async GetOne(): Promise<storage.RubixConnection> {
+  async Add(): Promise<rumodel.Response> {
+    return await AddConnection(this._this)
+  }
+
+  async Update(): Promise<rumodel.Response> {
     hasUUID(this.uuid);
-    let one: storage.RubixConnection = {} as storage.RubixConnection;
-    await GetConnection(this.uuid)
-      .then((res) => {
-        one = res as storage.RubixConnection;
-        this._this = one;
-      })
-      .catch((err) => {
-        return one;
-      });
-    return one;
-  }
-
-  async Add(): Promise<storage.RubixConnection> {
-    let one: storage.RubixConnection = {} as storage.RubixConnection;
-    await AddConnection(this._this)
-      .then((res) => {
-        one = res as storage.RubixConnection;
-        this._this = one;
-      })
-      .catch((err) => {
-        return one;
-      });
-    return one;
-  }
-
-  async Update(): Promise<storage.RubixConnection> {
-    hasUUID(this.uuid);
-    let one: storage.RubixConnection = {} as storage.RubixConnection;
-    await UpdateConnection(this.uuid, this._this)
-      .then((res) => {
-        one = res as storage.RubixConnection;
-        this._this = one;
-      })
-      .catch((err) => {
-        return one;
-      });
-    return one;
+    return await UpdateConnection(this.uuid, this._this)
   }
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
-    let out: Promise<any> = {} as Promise<any>;
-    await DeleteConnectionBulk(uuids)
-      .then((res: any) => {
-        out = res as Promise<any>;
-      })
-      .catch((err: any) => {
-        return out;
-      });
-    return out;
+    return await DeleteConnectionBulk(uuids)
   }
 }

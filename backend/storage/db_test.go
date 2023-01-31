@@ -12,7 +12,6 @@ func TestInitializeBuntDB(t *testing.T) {
 	add, err := db.Add(&RubixConnection{
 		Name:        "test",
 		Description: "test",
-		Customer:    "test",
 	})
 	fmt.Println(err, add)
 	if err != nil {
