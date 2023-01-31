@@ -2,7 +2,6 @@ import { Typography, Card, Select, Spin, Button } from "antd";
 import { useState, useEffect } from "react";
 import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from "react-router-dom";
-import { model } from "../../../wailsjs/go/models";
 import { PointsPaneOne } from "./views/pointsPaneOne";
 import { PointsPaneTwo } from "./views/pointsPaneTwo";
 import { MappingFactory } from "./factory";
@@ -51,7 +50,6 @@ export const WiresMap = () => {
         try {
             setIsFetching(true);
             const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
-            // console.log('new end point res: ', res);
             setPointList(res.map(item => ({
                 key: item.uuid,
                 name: item.name,
@@ -79,7 +77,6 @@ export const WiresMap = () => {
         resObj['pointTwo'] = filterForFullObj(pointList, selectedPointsTwo)
 
         setPointConnections(resObj)
-        // console.log(resObj)
         setWiresMapNodes(resObj)
         nav(ROUTES.RUBIX_FLOW)
     }
@@ -92,7 +89,7 @@ export const WiresMap = () => {
             </Title>
             <Card bordered={false}>
                 <div style={{display: 'flex', flexDirection: 'column', gap: '2vw'}}>
-                    <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
+                    {/* <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
                         <span>Select flow network:</span>
                         <Select
                             mode="multiple"
@@ -103,7 +100,7 @@ export const WiresMap = () => {
                             // onChange={handleChange}
                             // options={options}
                         />
-                    </div>
+                    </div> */}
                     <Spin spinning={isFetching} style={{ width: '100%' }}>
                         <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center', justifyContent: 'space-around'}}>
                             <PointsPaneOne pointList={pointList} selectedPoints={selectedPointsTwo} setSelectedPoints={setSelectedPointsOne}/>
