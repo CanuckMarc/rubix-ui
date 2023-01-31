@@ -30,6 +30,7 @@ export const CreateEditModal = (props: any) => {
   }, [currentNetwork]);
 
   useEffect(() => {
+    console.log("here i am...")
     if (currentNetwork.uuid) {
       setValidationError(true);
     } else {
@@ -69,7 +70,7 @@ export const CreateEditModal = (props: any) => {
         operation = "added";
       }
       if (!hasError(res)) {
-        openNotificationWithIcon("success", `${operation} ${network.name} success`);
+        openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
         handleClose();
       } else {
         openNotificationWithIcon("error", res.msg);
@@ -101,7 +102,7 @@ export const CreateEditModal = (props: any) => {
           <JsonForm
             formData={formData}
             setFormData={setFormData}
-            handleSubmit={handleSubmit}
+            setValidationError={setValidationError}
             jsonSchema={schema}
           />
         </Spin>

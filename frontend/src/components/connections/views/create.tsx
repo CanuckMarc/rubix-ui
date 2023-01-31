@@ -58,7 +58,7 @@ export const CreateEditModal = (props: any) => {
       operation = "added";
     }
     if (!hasError(res)) {
-      openNotificationWithIcon("success", `${operation} ${connection.name} success`);
+      openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
       handleClose();
     } else {
       openNotificationWithIcon("error", res.msg);
