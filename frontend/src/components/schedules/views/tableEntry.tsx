@@ -5,8 +5,8 @@ import moment from 'moment-timezone';
 
 
 export const TableEntry = (props: any) => {
-  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException, timeZone, setEvents, setExceptions, setWeeklys } = props;
-  const formRef = useRef<any>();
+  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException, timeZone, setEvents, setExceptions, setWeeklys, commitClickCount, setCommitClickCount } = props;
+  const createFormRef = useRef<any>();
   const [editButton, setEditButton] = useState(false);
   const [eventExceptionStart, setEventExceptionStart] = useState('');
   const [eventExceptionEnd, setEventExceptionEnd] = useState('');
@@ -15,22 +15,26 @@ export const TableEntry = (props: any) => {
     if (eventException) {
         const tempStart = data.dates[0].start.split('T')
         const tempEnd = data.dates[0].end.split('T')
-        setEventExceptionStart(moment.utc(`${tempStart[0]} ${tempStart[1]}`).tz(timeZone).format('MMMM Do YYYY, h:mma'))
-        setEventExceptionEnd(moment.utc(`${tempEnd[0]} ${tempEnd[1]}`).tz(timeZone).format('MMMM Do YYYY, h:mma'))
+        setEventExceptionStart(moment.utc(`${tempStart[0]} ${tempStart[1]}`).tz(timeZone).format('MMMM Do YYYY, HH:mm'))
+        setEventExceptionEnd(moment.utc(`${tempEnd[0]} ${tempEnd[1]}`).tz(timeZone).format('MMMM Do YYYY, HH:mm'))
     }
   }, [])
 
   const handleEditClicked = () => {
-    setEditButton(true)
+    // console.log('edit clicked: ', commitClickCount)
+    setCommitClickCount(true);
+    setEditButton(true);
   }
 
   const handleCommitClicked = () => {
-    formRef.current.click();
-    setEditButton(false)
+    createFormRef.current.click();
+    // console.log('commit clicked: ', commitClickCount)
+    setCommitClickCount(false);
+    setEditButton(false);
     // clear the old table and the new one will be loaded automatically
-    setEvents([])
-    setExceptions([])
-    setWeeklys([])
+    setEvents([]);
+    setExceptions([]);
+    setWeeklys([]);
   }
 
   const handleDeleteClicked = () => {
@@ -99,7 +103,7 @@ export const TableEntry = (props: any) => {
             </Descriptions>
         )}
         {(editButton && eventException) && (
-            <EditForm eventExceptionData={data} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
+            <EditForm eventExceptionData={data} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={timeZone}/>
         )}
         {/* if rendering weekly */}
         {(!editButton && !eventException) && (
@@ -111,7 +115,7 @@ export const TableEntry = (props: any) => {
             </Descriptions>
         )}
         {(editButton && !eventException) && (
-            <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={formRef} timeZone={timeZone}/>
+            <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={timeZone}/>
         )}
         <Button type="primary" icon={<EditOutlined />} size={'small'} disabled={editButton} onClick={handleEditClicked}>Edit</Button>
         <Button type="primary" icon={<DeleteOutlined />} size={'small'} danger={true} disabled={editButton} onClick={handleDeleteClicked}>Delete</Button>
