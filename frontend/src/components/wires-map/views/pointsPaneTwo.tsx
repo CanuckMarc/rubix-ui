@@ -79,7 +79,7 @@ export const PointsPaneTwo = (props: any) => {
                 bordered={true}
                 columns={columns} 
                 dataSource={tableData} 
-                style={{ width: '50%' }}
+                style={{ width: '45%' }}
                 rowSelection={rowSelection}
                 pagination={{
                     position: ["bottomCenter"],
