@@ -5,6 +5,7 @@ import { openNotificationWithIcon } from "../../../utils/utils";
 import { ConnectionFactory } from "../factory";
 import { JsonForm } from "../../../common/json-schema-form";
 import RubixConnection = storage.RubixConnection;
+import { hasError } from "../../../utils/response";
 
 export const CreateEditModal = (props: any) => {
   const { currentConnection, connectionSchema, isModalVisible, isLoadingForm, refreshList, onCloseModal } = props;
@@ -17,25 +18,22 @@ export const CreateEditModal = (props: any) => {
     setFormData(currentConnection);
   }, [currentConnection]);
 
+  useEffect(() => {
+    if (currentConnection.uuid) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  }, [currentConnection.uuid]);
+
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
-    try {
-      const res = await factory.Add();
-      if (res && res.uuid) {
-        openNotificationWithIcon("success", `added ${connection.name} success`);
-      } else {
-        openNotificationWithIcon("error", `added ${connection.name} fail`);
-      }
-    } catch (err) {
-      openNotificationWithIcon("error", err);
-      console.log(err);
-    }
+    return await factory.Add();
   };
 
   const editConnection = async (connection: RubixConnection) => {
-    factory.this = connection;
     factory.uuid = connection.uuid;
-    await factory.Update();
+    return await factory.Update();
   };
 
   const handleClose = () => {
@@ -48,15 +46,25 @@ export const CreateEditModal = (props: any) => {
       return;
     }
     setConfirmLoading(true);
+    factory.this = connection;
+    let res: any;
+    let operation: string;
     if (currentConnection.uuid) {
       connection.uuid = currentConnection.uuid;
-      await editConnection(connection);
+      res = await editConnection(connection);
+      operation = "updated";
     } else {
-      await addConnection(connection);
+      res = await addConnection(connection);
+      operation = "added";
+    }
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `${operation} ${connection.name} success`);
+      handleClose();
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
     refreshList();
     setConfirmLoading(false);
-    handleClose();
   };
 
   return (

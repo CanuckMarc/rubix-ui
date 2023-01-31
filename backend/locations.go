@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"fmt"
+	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
@@ -21,6 +22,9 @@ func (inst *App) AddLocation(connUUID string, body *amodel.Location) *rumodel.Re
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return rumodel.FailResponse(err)
+	}
+	if body.Name == "" {
+		body.Name = fmt.Sprintf("loc-%s", uuid.ShortUUID("")[5:10])
 	}
 	res, err := client.AddLocation(body)
 	if err != nil {

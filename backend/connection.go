@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/lib-schema/schema"
-	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-ui/backend/helpers/json2csv"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
 	log "github.com/sirupsen/logrus"
@@ -66,6 +66,7 @@ type IP struct {
 type ConnectionProperties struct {
 	Name          schema.Name        `json:"name"`
 	Description   schema.Description `json:"description"`
+	Enable        schema.Enable      `json:"enable"`
 	IP            IP                 `json:"ip"`
 	Port          schema.Port        `json:"port"`
 	HTTPS         schema.HTTPS       `json:"https"`
@@ -74,6 +75,7 @@ type ConnectionProperties struct {
 
 func GetConnectionProperties() *ConnectionProperties {
 	m := &ConnectionProperties{}
+	m.Name.Min = 0
 	m.Port.Default = 1662
 	schema.Set(m)
 	return m
@@ -86,7 +88,7 @@ type ConnectionSchema struct {
 
 func (inst *App) GetConnectionSchema() *ConnectionSchema {
 	m := &ConnectionSchema{
-		Required:   []string{"name", "ip", "port"},
+		Required:   []string{"ip", "port"},
 		Properties: GetConnectionProperties(),
 	}
 	return m
@@ -116,16 +118,13 @@ func (inst *App) GetConnections() []storage.RubixConnection {
 	return conn
 }
 
-func (inst *App) AddConnection(conn *storage.RubixConnection) *storage.RubixConnection {
-	if conn.Name == "" {
-		conn.Name = fmt.Sprintf("conn-%s", uuid.ShortUUID("")[5:10])
-	}
+func (inst *App) AddConnection(conn *storage.RubixConnection) *rumodel.Response {
 	conn, err := inst.DB.Add(conn)
 	if err != nil {
-		return nil
+		return rumodel.FailResponse(err)
 	}
 	_, _ = inst.forceGetAssistClient(conn.UUID)
-	return conn
+	return rumodel.SuccessResponse(conn)
 }
 
 func (inst *App) updateConnection(uuid string, conn *storage.RubixConnection) (*storage.RubixConnection, error) {
@@ -137,13 +136,12 @@ func (inst *App) updateConnection(uuid string, conn *storage.RubixConnection) (*
 	return conn, nil
 }
 
-func (inst *App) UpdateConnection(uuid string, conn *storage.RubixConnection) *storage.RubixConnection {
+func (inst *App) UpdateConnection(uuid string, conn *storage.RubixConnection) *rumodel.Response {
 	resp, err := inst.updateConnection(uuid, conn)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	return resp
+	return rumodel.SuccessResponse(resp)
 }
 
 func (inst *App) DeleteConnectionBulk(uuids []UUIDs) interface{} {

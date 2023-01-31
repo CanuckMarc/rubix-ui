@@ -19,6 +19,7 @@ import { ImportExcelModal } from "../../hosts/host/flow/points/views/import-expo
 
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;
+import { hasError } from "../../../utils/response";
 
 export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -124,15 +125,11 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
-    try {
-      const res = await factory.Add();
-      if (res && res.uuid) {
-        openNotificationWithIcon("success", `added ${connection.name} success`);
-      } else {
-        openNotificationWithIcon("error", `added ${connection.name} fail`);
-      }
-    } catch (err) {
-      openNotificationWithIcon("error", err);
+    const res = await factory.Add();
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `added ${connection.name} success`);
+    } else {
+      openNotificationWithIcon("error", `added ${connection.name} fail`);
     }
   };
 
