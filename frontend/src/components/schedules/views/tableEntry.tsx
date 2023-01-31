@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 
 
 export const TableEntry = (props: any) => {
-  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException, timeZone, setEvents, setExceptions, setWeeklys, commitClickCount, setCommitClickCount } = props;
+  const { itemUUID, data, EditForm, currentItem, setCurrentItem, eventException, timeZone, setEvents, setExceptions, setWeeklys, okButtonDisable, setOkButtonDisable } = props;
   const createFormRef = useRef<any>();
   const [editButton, setEditButton] = useState(false);
   const [eventExceptionStart, setEventExceptionStart] = useState('');
@@ -21,15 +21,13 @@ export const TableEntry = (props: any) => {
   }, [])
 
   const handleEditClicked = () => {
-    // console.log('edit clicked: ', commitClickCount)
-    setCommitClickCount(true);
+    setOkButtonDisable(true);
     setEditButton(true);
   }
 
   const handleCommitClicked = () => {
     createFormRef.current.click();
-    // console.log('commit clicked: ', commitClickCount)
-    setCommitClickCount(false);
+    setOkButtonDisable(false);
     setEditButton(false);
     // clear the old table and the new one will be loaded automatically
     setEvents([]);
@@ -81,9 +79,6 @@ export const TableEntry = (props: any) => {
             days: values.days,
             start: values.start.format("HH:mm"),
             end: values.end.format("HH:mm")
-            // start: values.start._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            // end: values.end._d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      
         }
         if (itemUUID in currentItem.schedule.schedules.weekly) {
             currentItem.schedule.schedules.weekly[itemUUID] = updatedWeekly
@@ -117,8 +112,8 @@ export const TableEntry = (props: any) => {
         {(editButton && !eventException) && (
             <EditForm weeklyData={data} handleFinish={handleFormFinish} innerRef={createFormRef} timeZone={timeZone}/>
         )}
-        <Button type="primary" icon={<EditOutlined />} size={'small'} disabled={editButton} onClick={handleEditClicked}>Edit</Button>
-        <Button type="primary" icon={<DeleteOutlined />} size={'small'} danger={true} disabled={editButton} onClick={handleDeleteClicked}>Delete</Button>
+        <Button type="primary" icon={<EditOutlined />} size={'small'} disabled={editButton || okButtonDisable} onClick={handleEditClicked}>Edit</Button>
+        <Button type="primary" icon={<DeleteOutlined />} size={'small'} danger={true} disabled={editButton || okButtonDisable} onClick={handleDeleteClicked}>Delete</Button>
         <Button type="primary" icon={<EnterOutlined />} size={'small'} disabled={!editButton} onClick={handleCommitClicked}>Commit</Button>
     </div>
   );
