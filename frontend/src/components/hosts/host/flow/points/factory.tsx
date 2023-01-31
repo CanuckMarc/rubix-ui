@@ -29,7 +29,7 @@ export class FlowPointFactory {
   connectionUUID!: string;
 
 
-  public GetPointListPayload(connectionUUID: string, hostUUID: string): Promise<Array<backend.PointListPayload>> {
+  async GetPointListPayload(connectionUUID: string, hostUUID: string): Promise<Array<backend.PointListPayload>> {
     return GetPointListPayload(connectionUUID, hostUUID);
   }
 

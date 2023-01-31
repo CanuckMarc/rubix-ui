@@ -10,13 +10,6 @@ import { FlowPointFactory } from '../../components/hosts/host/flow/points/factor
 import { useStore } from '../../App';
 import { ROUTES } from "../../constants/routes";
 
-import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
-import { NodeInterface, OutputNodeValueType } from "../rubix-flow/lib/Nodes/NodeInterface";
-import { handleGetSettingType } from "../rubix-flow/util/handleSettings";
-import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../rubix-flow/use-nodes-spec";
-import { NodeSpecJSON } from "../rubix-flow/lib";
-import { generateUuid } from "../rubix-flow/lib/generateUuid";
-
 const { Title } = Typography;
 
 export interface PointTableType {
@@ -26,10 +19,10 @@ export interface PointTableType {
 }
 
 export interface PointTableTypeRecord {
-    [key: string]: model.Point
+    [key: string]: PointTableType
  }
 
-const filterForFullObj = (pointList: model.Point[], selectedPoints: PointTableType[]) => {
+const filterForFullObj = (pointList: PointTableType[], selectedPoints: PointTableType[]) => {
     const filteredPoint = pointList.filter(item => {
         if (item.uuid === selectedPoints[0].uuid) {
             return item
@@ -42,7 +35,7 @@ export const WiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
     const nav = useNavigate();
     const [isFetching, setIsFetching] = useState(false);
-    const [pointList, setPointList] = useState<model.Point[]>([]);
+    const [pointList, setPointList] = useState<PointTableType[]>([]);
     const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType[]>([]);
     const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType[]>([]);
     const [pointConnections, setPointConnections] = useState<PointTableTypeRecord>({});
@@ -54,18 +47,18 @@ export const WiresMap = () => {
         (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
     )
 
-
-
     const fetch = async() => {
         try {
             setIsFetching(true);
-            // const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
+            const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
             // console.log('new end point res: ', res);
-            const pointRes = await pointFactory.GetAll();
-            console.log(pointRes)
-            setPointList(pointRes);
+            setPointList(res.map(item => ({
+                key: item.uuid,
+                name: item.name,
+                uuid: item.uuid
+            })));
 
-            // const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, true)
+            // const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, false)
             // console.log(flowNetRes)
         } catch (error) {
             setPointList([]);
@@ -78,7 +71,6 @@ export const WiresMap = () => {
         pointFactory.connectionUUID = connUUID;
         pointFactory.hostUUID = hostUUID;
         fetch();
-        // console.log('the stored value is: ', votes)
     }, [connUUID, hostUUID]);
 
     const recordPoints = () => {
@@ -87,7 +79,7 @@ export const WiresMap = () => {
         resObj['pointTwo'] = filterForFullObj(pointList, selectedPointsTwo)
 
         setPointConnections(resObj)
-        console.log(resObj)
+        // console.log(resObj)
         setWiresMapNodes(resObj)
         nav(ROUTES.RUBIX_FLOW)
     }

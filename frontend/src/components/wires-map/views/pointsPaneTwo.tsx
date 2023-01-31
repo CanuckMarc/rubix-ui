@@ -39,7 +39,7 @@ export const PointsPaneTwo = (props: any) => {
     ]
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+        // console.log('selectedRowKeys changed: ', newSelectedRowKeys);
         setSelectedRowKeys(newSelectedRowKeys);
         let selectedItems: PointTableType[] = []
         newSelectedRowKeys.forEach(i => {

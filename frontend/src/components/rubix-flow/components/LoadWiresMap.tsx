@@ -24,17 +24,20 @@ function getRandomArbitrary(min: number, max: number) {
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
-    // const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
-    //     (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
-    // )
+    const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
+        (state) => [state.wiresMapNodes, state.wiresMapEdge, state.setWiresMapNodes, state.setWiresMapEdge]
+    )
 
-    const wiresMapNodes = useStore(state => state.wiresMapNodes)
+    // const wiresMapNodes = useStore(state => state.wiresMapNodes)
 
     const [nodesSpec] = useNodesSpec();
     const flowInstance = useReactFlow();
 
     useEffect(() => {
-        renderPointsToFlowEditor();
+        if (Object.keys(wiresMapNodes).length !== 0) {
+          renderPointsToFlowEditor();
+          setWiresMapNodes({});
+        }
     }, [])
 
     const renderPointsToFlowEditor = () => {
@@ -69,7 +72,7 @@ export const LoadWiresMap = () => {
             name: points.pointTwo?.name || '',
             isParent: false,
             parentId: parentNode.id,
-            x: x + 300,
+            x: x + 800,
             y: y
           }
         ]
