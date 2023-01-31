@@ -26,6 +26,7 @@ export const ProducersTable = (props: any) => {
   const factory = new FlowProducerFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+  factory.streamUUID = streamUUID;
 
   const config = {
     originData: producers,

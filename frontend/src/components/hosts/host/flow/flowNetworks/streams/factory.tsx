@@ -4,7 +4,6 @@ import {
   DeleteStream,
   DeleteStreamBulk,
   EditStream,
-  GetStream,
   GetStreams, GetStreamsByFlowNetwork,
 } from "../../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../../helpers/checks";
@@ -30,12 +29,6 @@ export class FlowStreamFactory {
     return await GetStreamsByFlowNetwork(this.connectionUUID, this.hostUUID, flowNetworkUUID);
   }
 
-  async GetOne(uuid: string): Promise<model.Stream> {
-    hasUUID(this.connectionUUID);
-    hasUUID(this.hostUUID);
-    return await GetStream(this.connectionUUID, this.hostUUID, uuid);
-  }
-
   async Add(flowNetworkUUID: string, body: model.Stream): Promise<model.Stream> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
@@ -54,11 +47,9 @@ export class FlowStreamFactory {
     return await DeleteStream(this.connectionUUID, this.hostUUID, uuid);
   }
 
-
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
     return DeleteStreamBulk(this.connectionUUID, this.hostUUID, uuids);
   }
-
 }

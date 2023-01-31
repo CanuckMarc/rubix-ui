@@ -4,8 +4,8 @@ import {
   DeleteConsumer,
   DeleteConsumerBulk,
   EditConsumer,
-  GetConsumers,
   GetConsumer,
+  GetConsumers,
 } from "../../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../../helpers/checks";
 
@@ -16,6 +16,7 @@ function hasUUID(uuid: string): Error {
 export class FlowConsumerFactory {
   hostUUID!: string;
   connectionUUID!: string;
+  streamCloneUUID!: string;
 
   async GetAll(withStream: boolean): Promise<Array<model.Consumer>> {
     let resp: Promise<Array<model.Consumer>> = {} as Promise<

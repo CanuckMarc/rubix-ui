@@ -88,7 +88,7 @@ func (inst *Client) GetStreams(hostIDName string) ([]model.Stream, error) {
 }
 
 func (inst *Client) GetStream(hostIDName, uuid string) (*model.Stream, error) {
-	url := fmt.Sprintf("proxy/ff/api/streams/%s", uuid)
+	url := fmt.Sprintf("proxy/ff/api/streams/%s?with_producers=true", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).

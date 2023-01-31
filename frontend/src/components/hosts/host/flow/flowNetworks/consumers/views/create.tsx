@@ -5,12 +5,11 @@ import { FlowConsumerFactory } from "../factory";
 import { FlowProducerFactory } from "../../producers/factory";
 import { model } from "../../../../../../../../wailsjs/go/models";
 import { JsonForm } from "../../../../../../../common/json-schema-form";
-
 import Consumer = model.Consumer;
 
 export const CreateEditModal = (props: any) => {
   const { currentItem, isModalVisible, refreshList, onCloseModal } = props;
-  const { connUUID = "", hostUUID = "", streamCloneUUID = "" } = useParams();
+  const { connUUID = "", hostUUID = "", streamUUID = "", streamCloneUUID = "" } = useParams();
   const [formData, setFormData] = useState(currentItem);
   const [schema, setSchema] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -20,6 +19,8 @@ export const CreateEditModal = (props: any) => {
   const producerFactory = new FlowProducerFactory();
   factory.connectionUUID = producerFactory.connectionUUID = connUUID;
   factory.hostUUID = producerFactory.hostUUID = hostUUID;
+  producerFactory.streamUUID = streamUUID;
+  factory.streamCloneUUID = streamCloneUUID;
 
   useEffect(() => {
     setFormData(currentItem);
