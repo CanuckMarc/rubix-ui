@@ -97,10 +97,14 @@ export const LoadWiresMap = () => {
         if (newNodes.length > 0) {
           setTimeout(() => {
             const oldNodes = flowInstance.getNodes();
+            console.log('oldNodes are: ', oldNodes)
             flowInstance.setNodes([...oldNodes, ...newNodes]);
+            console.log('newNodes are: ', [...oldNodes, ...newNodes])
             
             const oldEdges = flowInstance.getEdges();
+            console.log('oldEdges are: ', oldEdges)
             flowInstance.setEdges([...oldEdges, newEdge]);
+            console.log('newEdges are: ', [...oldEdges, newEdge])
           }, 500);
         }
     }

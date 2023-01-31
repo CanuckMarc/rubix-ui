@@ -39,7 +39,7 @@ export const WiresMap = () => {
     const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType[]>([]);
     const [pointConnections, setPointConnections] = useState<PointTableTypeRecord>({});
 
-    // const mappingFactory = new MappingFactory();
+    const mappingFactory = new MappingFactory();
     const pointFactory = new FlowPointFactory();
 
     const [wiresMapNodes, wiresMapEdge, setWiresMapNodes, setWiresMapEdge] = useStore(
@@ -56,8 +56,8 @@ export const WiresMap = () => {
                 uuid: item.uuid
             })));
 
-            // const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, false)
-            // console.log(flowNetRes)
+            const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, false)
+            console.log(flowNetRes)
         } catch (error) {
             setPointList([]);
         } finally {
