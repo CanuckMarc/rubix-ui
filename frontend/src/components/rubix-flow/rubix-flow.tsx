@@ -51,11 +51,14 @@ type SelectableBoxType = {
   rect: DOMRect | null;
 };
 
+type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
+
 // this is save all nodes
 declare global {
   interface Window {
     subFlowIds: string[];
     selectedNodeForSubFlow: NodeInterface | undefined;
+    allFlow: { nodes: NodeInterface[]; edges: Edge[] }; // save all nodes and edges
   }
 }
 
@@ -78,6 +81,10 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
+  // const [allFlow, setAllFlow] = useState<{ nodes: NodeInterface[]; edges: Edge[] }>({
+  //   nodes: [],
+  //   edges: [],
+  // });
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -161,6 +168,7 @@ const Flow = (props: FlowProps) => {
       };
 
       onNodesChange([{ type: "add", item: newNode }]);
+      window.allFlow.nodes = [...window.allFlow.nodes, newNode];
       setTimeout(() => {
         setNodes((newNodes) => newNodes.map((item) => ({ ...item, selected: false })));
       }, 100);
@@ -178,13 +186,12 @@ const Flow = (props: FlowProps) => {
       }
 
       onEdgesChange([{ type: "add", item: newEdge }]);
+      window.allFlow.edges = [...window.allFlow.edges, newEdge];
     },
     [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow]
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
-    setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
-    setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
     handlePushSelectedNodeForSubFlow(node);
   };
 
@@ -195,6 +202,82 @@ const Flow = (props: FlowProps) => {
       handlePushSelectedNodeForSubFlow(node);
     }
     setIsConnectionBuilder(true);
+  };
+
+  const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
+    console.log("LOADING NODES AND EDGES", { nodes: newNodes, edges: newEdges });
+
+    const currentNodes = nodes.map((item) => ({ ...item, selected: false }));
+    const currentEdges = edges.map((item) => ({ ...item, selected: false }));
+
+    // filter parent nodes and nodes not belonging to sub flow
+    // generate nodes with new id and keep old id to mapping with edge
+    const newNodesWithOldId: NodeInterfaceWithOldId[] = [];
+    const nodesL1 = newNodes
+      .filter((node: NodeInterface) => {
+        return !newNodes.some((node2: NodeInterface) => node2.id === node.parentId);
+      })
+      .map((node: NodeInterface) => ({
+        ...node,
+        parentId: selectedNodeForSubFlow?.id || undefined,
+      }));
+
+    // nodes not included in nodesL1
+    const nodesRemaining = newNodes.filter(
+      (node: NodeInterface) => !nodesL1.some((node2: NodeInterface) => node2.id === node.id)
+    );
+
+    const copyAllNode = (id: string, newId: string) => {
+      const childNodes = newNodes.filter((node: NodeInterface) => id === node.parentId);
+
+      childNodes.forEach((childItem: NodeInterface) => {
+        const childNodeId = generateUuid();
+        newNodesWithOldId.push({ ...childItem, oldId: childItem.id, id: childNodeId, parentId: newId });
+
+        if (childItem.isParent) {
+          copyAllNode(childItem.id, childNodeId);
+        }
+      });
+    };
+
+    nodesL1.forEach((item: NodeInterface) => {
+      const newNodeId = generateUuid();
+      newNodesWithOldId.push({ ...item, oldId: item.id, id: newNodeId });
+
+      if (item.isParent) {
+        copyAllNode(item.id, newNodeId);
+      }
+    });
+
+    nodesRemaining.forEach((item: NodeInterface) => {
+      const isExist = newNodesWithOldId.some((node: NodeInterfaceWithOldId) => node.oldId === item.id);
+      if (!isExist) {
+        newNodesWithOldId.push({ ...item, oldId: item.id, id: generateUuid() });
+      }
+    });
+
+    const finalEdges = newEdges.map((edge: Edge) => {
+      const target = newNodesWithOldId.find((n: any) => n.oldId === edge.target);
+      const source = newNodesWithOldId.find((n: any) => n.oldId === edge.source);
+      return {
+        ...edge,
+        id: generateUuid(),
+        target: target?.id || edge.target,
+        source: source?.id || edge.source,
+      };
+    });
+
+    setNodes([...currentNodes, ...newNodesWithOldId]);
+    setEdges([...currentEdges, ...finalEdges]);
+    window.allFlow = {
+      nodes: [...window.allFlow.nodes, ...newNodesWithOldId],
+      edges: [...window.allFlow.edges, ...finalEdges],
+    };
+
+    // TODO better way to call fit vew after edges render
+    setTimeout(() => {
+      rubixFlowInstance.fitView();
+    }, 100);
   };
 
   const onCloseBuilderModal = () => {
@@ -213,9 +296,17 @@ const Flow = (props: FlowProps) => {
       const remainingEdges = edges.filter((item: Edge) => !edgeIdsCleared.includes(item.id));
       setNodes(remainingNodes);
       setEdges(remainingEdges);
+      window.allFlow = {
+        nodes: window.allFlow.nodes.filter((n) => !nodeIdsCleared.includes(n.id)),
+        edges: window.allFlow.edges.filter((n) => !edgeIdsCleared.includes(n.id)),
+      };
     } else {
       setNodes([]);
       setEdges([]);
+      window.allFlow = {
+        nodes: [],
+        edges: [],
+      };
     }
   };
 
@@ -232,18 +323,49 @@ const Flow = (props: FlowProps) => {
   };
 
   const onHandelSaveFlow = async () => {
-    const newNodesFiltered = nodes.filter((node: NodeInterface) => {
+    const allNodes = [...nodes];
+    window.allFlow.nodes.forEach((node) => {
+      const isExist = allNodes.some((n) => n.id === node.id);
+      if (!isExist) {
+        allNodes.push(node);
+      }
+    });
+
+    const newNodesFiltered = allNodes.filter((node: NodeInterface) => {
       if (node.parentId) {
-        return nodes.some((n) => n.id === node.parentId);
+        return allNodes.some((n) => n.id === node.parentId);
       }
       return true;
     });
-    const graphJson = flowToBehave(newNodesFiltered, edges);
+    const graphJson = flowToBehave(newNodesFiltered, window.allFlow.edges);
+
+    // save nodes and edges
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
-    const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newNodesFiltered);
-    setNodes(newNodes);
-    setEdges(edges);
+    // format nodes with settings
+    const nodesWithSetting = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newNodesFiltered);
+
+    // filter nodes at level 1 or in sub flow
+    const newNodesL1 = nodesWithSetting.filter((node) => {
+      return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
+    });
+
+    nodesWithSetting.forEach((node1) => {
+      const hasParent = newNodesL1.some((node2) => {
+        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
+      });
+      if (hasParent) {
+        newNodesL1.push(node1);
+      }
+    });
+    const edgesL1 = window.allFlow.edges.filter((e) =>
+      newNodesL1.some((node) => node.id === e.target || node.id === e.source)
+    );
+
+    setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
+    setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
+    window.allFlow = { nodes: nodesWithSetting, edges: window.allFlow.edges };
+    handleRefreshValues();
   };
 
   const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
@@ -296,6 +418,7 @@ const Flow = (props: FlowProps) => {
 
           const newEdges = edges.map((item) => (item.id === edgeByTarget.id ? edgeByTarget : item));
           setEdges(newEdges);
+          window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
           setUndoable({
             edges: newEdges,
             nodes,
@@ -339,6 +462,7 @@ const Flow = (props: FlowProps) => {
 
         if (newEdges) {
           setEdges(newEdges);
+          window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
           setUndoable({
             edges: newEdges,
             nodes,
@@ -360,6 +484,7 @@ const Flow = (props: FlowProps) => {
           };
 
           onEdgesChange([{ type: "add", item: newEdge }]);
+          window.allFlow.edges = [...window.allFlow.edges, newEdge];
         }
       }
     }
@@ -532,6 +657,16 @@ const Flow = (props: FlowProps) => {
         !nodeIds.includes(item.source)
     );
 
+    const allRemainingNodes = window.allFlow.nodes.filter((n) => !nodeIds.includes(n.id));
+    window.allFlow = {
+      nodes: allRemainingNodes,
+      edges: window.allFlow.edges.filter(
+        (item) =>
+          !_edgesDeleted.some((item2) => item.id === item2.id) &&
+          !nodeIds.includes(item.target) &&
+          !nodeIds.includes(item.source)
+      ),
+    };
     setNodes(remainingNodes);
     setEdges(remainingEdges);
     setUndoable({
@@ -549,7 +684,7 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, nodes, edges);
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges);
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
 
@@ -585,7 +720,23 @@ const Flow = (props: FlowProps) => {
     // unique items and delete oldId field
     const nodesUniq = uniqArray([...nodes, ...newFlow.nodes]).map(({ oldId, ...node }: NodeInterface) => node);
     const edgesUniq = uniqArray([...edges, ...newFlow.edges]).map(({ oldId, ...edge }: any) => edge);
+    const newAllNodes = [...window.allFlow.nodes];
+    const newAllEdges = [...window.allFlow.edges];
 
+    nodesUniq.forEach((n: NodeInterface) => {
+      const exist = newAllNodes.some((node: NodeInterface) => node.id === n.id);
+      if (!exist) {
+        newAllNodes.push(n);
+      }
+    });
+    edgesUniq.forEach((n: Edge) => {
+      const exist = newAllEdges.some((node: Edge) => node.id === n.id);
+      if (!exist) {
+        newAllEdges.push(n);
+      }
+    });
+
+    window.allFlow = { nodes: newAllNodes, edges: newAllEdges };
     setNodes(nodesUniq);
     setEdges(edgesUniq);
     setUndoable({ edges: edgesUniq, nodes: nodesUniq });
@@ -715,15 +866,51 @@ const Flow = (props: FlowProps) => {
     if (node.parentId) {
       node.isParent
         ? handleAddSubFlow(node)
-        : handleAddSubFlow(nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
+        : handleAddSubFlow(window.allFlow.nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
     } else {
       setSelectedNodeForSubFlow([]);
     }
-    const nodeSelected = nodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id }));
-    setNodes(nodeSelected);
-
+    setTimeout(() => {
+      setNodes((newNodes) => newNodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id })));
+    }, 1000);
     rubixFlowInstance.fitView(node.position);
   };
+
+  useEffect(() => {
+    if (!window.allFlow) {
+      window.allFlow = { nodes: [], edges: [] };
+    }
+
+    // save all nodes with latest values
+    window.allFlow.nodes = window.allFlow.nodes.map((node) => {
+      return nodes.find((node2: NodeInterface) => node2.id === node.id) || node;
+    });
+
+    // get nodes and edges by sub flow or level 1 from all nodes and edges saved
+    // when change sub flow
+    const newNodes = window.allFlow.nodes.filter((node) => {
+      return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
+    });
+
+    window.allFlow.nodes.forEach((node1) => {
+      const hasParent = newNodes.some((node2) => {
+        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
+      });
+      if (hasParent) {
+        newNodes.push(node1);
+      }
+    });
+    const edgesL1 = window.allFlow.edges.filter((e) =>
+      newNodes.some((node) => node.id === e.target || node.id === e.source)
+    );
+
+    setNodes(newNodes.map((n) => ({ ...n, selected: false })));
+    setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
+    handleRefreshValues();
+    setTimeout(() => {
+      rubixFlowInstance?.fitView();
+    }, 30);
+  }, [selectedNodeForSubFlow, setNodes, setEdges]);
 
   useEffect(() => {
     closeNodePicker();
@@ -734,14 +921,27 @@ const Flow = (props: FlowProps) => {
         _nodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
 
         const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, _nodes);
+        // just show nodes and edges at level 1
+        const nodesL1 = newNodes.filter((node) => !node.parentId);
 
-        setNodes(newNodes);
-        setEdges(_edges);
-        setUndoable({
-          nodes: newNodes,
-          edges: _edges,
+        newNodes.forEach((node1) => {
+          const hasParent = nodesL1.some(
+            (node2) =>
+              !!node1.parentId &&
+              node2.id === node1.parentId &&
+              (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!))
+          );
+          if (hasParent) {
+            nodesL1.push(node1);
+          }
         });
+        const edgesL1 = _edges.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
+        // tracking all nodes and edges to save
+        window.allFlow = { nodes: newNodes, edges: _edges };
+        setNodes(nodesL1);
+        setEdges(edgesL1);
+        setUndoable({ nodes: nodesL1, edges: edgesL1 });
         /* Get output Nodes */
         handleRefreshValues();
       })
@@ -769,16 +969,14 @@ const Flow = (props: FlowProps) => {
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
         <NodesTree
-          nodes={nodes}
+          nodes={window.allFlow?.nodes || []}
           selectedSubFlowId={selectedNodeForSubFlow?.id}
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
         />
       )}
-      {flowSettings.showNodesPallet && (
-        <NodeSideBar nodesSpec={nodesSpec} />
-      )}
+      {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
@@ -846,6 +1044,7 @@ const Flow = (props: FlowProps) => {
               onHandelSaveFlow={onHandelSaveFlow}
               isConnectionBuilder={isConnectionBuilder}
               handleConnectionBuilderFlow={handleConnectionBuilderFlow}
+              handleLoadNodesAndEdges={handleLoadNodesAndEdges}
             />
             {nodePickerVisibility && (
               <NodePicker
@@ -888,7 +1087,6 @@ const Flow = (props: FlowProps) => {
 
 export const RubixFlow = () => {
   const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
-  const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 

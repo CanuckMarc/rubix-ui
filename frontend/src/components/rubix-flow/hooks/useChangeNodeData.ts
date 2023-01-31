@@ -42,6 +42,14 @@ export const useChangeNodeProperties = (id: string) => {
           [key]: value,
         };
       })));
+
+      window.allFlow.nodes = (window.allFlow?.nodes || []).map(node => {
+        if (node.id !== id) return node;
+        return {
+          ...node,
+          [key]: value,
+        };
+      });
     },
     [instance, id]
   );

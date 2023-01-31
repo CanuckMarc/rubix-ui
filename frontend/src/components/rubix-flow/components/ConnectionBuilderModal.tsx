@@ -60,7 +60,7 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
       isParent: false,
       style: null,
       type: item.type,
-      info: { nodeName: item.nodeName },
+      info: { nodeName: item.nodeName.trim() },
       position: {
         x: isOut ? item.node.position.x + item.node.width!! + 50 : item.node.position.x - item.node.width!! - 50,
         y: item.node.position.y + (index - 1) * item.node.height!! + 50,
@@ -136,6 +136,10 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
 
       if (allNodes.length > 0) {
         setTimeout(() => {
+          window.allFlow = {
+            nodes: [...window.allFlow.nodes, ...allNodes],
+            edges: [...window.allFlow.edges, ...allEdges],
+          };
           flowInstance.addNodes(allNodes);
           flowInstance.addEdges(allEdges);
         }, 50);

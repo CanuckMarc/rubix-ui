@@ -32,6 +32,7 @@ type ControlProps = {
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
   handleConnectionBuilderFlow: (node: NodeInterface) => void;
+  handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
 const Controls = ({
@@ -49,6 +50,7 @@ const Controls = ({
   onCloseSubFlow,
   onBackToMain,
   onHandelSaveFlow,
+  handleLoadNodesAndEdges,
 }: ControlProps) => {
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -222,7 +224,11 @@ const Controls = ({
           <PlayCircleOutlined className="p-2 text-gray-700 align-middle" />
         </div>
       </div>
-      <LoadModal open={loadModalOpen} onClose={() => setLoadModalOpen(false)} />
+      <LoadModal
+        open={loadModalOpen}
+        onClose={() => setLoadModalOpen(false)}
+        handleLoadNodesAndEdges={handleLoadNodesAndEdges}
+      />
       <SaveModal
         selectedNodeForSubFlow={selectedNodeForSubFlow}
         open={saveModalOpen}

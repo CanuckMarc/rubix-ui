@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { useEdges, useNodes } from "react-flow-renderer/nocss";
+import { Edge, useEdges, useNodes } from "react-flow-renderer/nocss";
 import { NodeJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { flowToBehave } from "../transformers/flowToBehave";
@@ -15,7 +15,6 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSub
   const ref = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
-  const edges = useEdges();
   const nodes = useNodes();
 
   const handleCopy = () => {
@@ -31,7 +30,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSub
   };
 
   const findAllNodes = (id: string) => {
-    const nodesChild: NodeInterface[] = nodes.filter((item: NodeInterface) => item.parentId === id);
+    const nodesChild: NodeInterface[] = window.allFlow.nodes.filter((item: NodeInterface) => item.parentId === id);
     const allNodes: NodeInterface[] = [];
 
     nodesChild.forEach((item) => {
@@ -67,7 +66,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSub
     });
 
     const finalNodes: NodeInterface[] = isInSubFlow ? allNodes : allNodes.length > 0 ? allNodes : nodes;
-    const newNodes: NodeJSON[] = flowToBehave(finalNodes, edges).nodes;
+    const newNodes: NodeJSON[] = flowToBehave(finalNodes, window.allFlow.edges).nodes;
     setNodeRender(JSON.stringify({ nodes: newNodes }, null, 2));
   };
 
