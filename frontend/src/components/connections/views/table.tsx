@@ -127,9 +127,9 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     factory.this = connection;
     const res = await factory.Add();
     if (!hasError(res)) {
-      openNotificationWithIcon("success", `added ${connection.name} success`);
+      openNotificationWithIcon("success", `added ${res.data.name} success`);
     } else {
-      openNotificationWithIcon("error", `added ${connection.name} fail`);
+      openNotificationWithIcon("error", res.msg);
     }
   };
 

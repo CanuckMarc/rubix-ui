@@ -43,16 +43,11 @@ export const CreateConnectionsModal = (props: any) => {
 
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
-    try {
-      const res = await factory.Add();
-      if (res && res.uuid) {
-        openNotificationWithIcon("success", `added ${connection.name} success`);
-      } else {
-        openNotificationWithIcon("error", `added ${connection.name} fail`);
-      }
-    } catch (err) {
-      openNotificationWithIcon("error", err);
-      console.log(err);
+    const res = await factory.Add();
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `added ${res.data.name} success`);
+    } else {
+      openNotificationWithIcon("error", `added ${connection.name} fail`);
     }
   };
 
@@ -63,29 +58,19 @@ export const CreateConnectionsModal = (props: any) => {
   };
 
   const handleSubmit = async (connections: RubixConnection[]) => {
-    let valid = true;
-    connections.forEach((c) => {
-      if (!c.name) {
-        return (valid = false);
+    try {
+      setConfirmLoading(true);
+      const promises = [];
+      for (const c of connections) {
+        promises.push(addConnection(c));
       }
-    });
-    if (valid) {
-      try {
-        setConfirmLoading(true);
-        const promises = [];
-        for (const c of connections) {
-          promises.push(addConnection(c));
-        }
-        await Promise.all(promises);
-        refreshList();
-        handleClose();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setConfirmLoading(false);
-      }
-    } else {
-      openNotificationWithIcon("error", "Please check again 'name' inputs!");
+      await Promise.all(promises);
+      refreshList();
+      handleClose();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
