@@ -2,6 +2,7 @@ package backend
 
 import (
 	"errors"
+	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/mitchellh/mapstructure"
@@ -9,7 +10,7 @@ import (
 )
 
 // GetNodesAllFlowNetworks all nodes of type flow/flow-network
-func (inst *App) GetNodesAllFlowNetworks(connUUID, hostUUID string, isRemote bool) interface{} {
+func (inst *App) GetNodesAllFlowNetworks(connUUID, hostUUID string, isRemote bool) []*node.Schema {
 	return inst.GetNodesByType(connUUID, hostUUID, "flow/flow-network", isRemote)
 }
 
@@ -36,14 +37,14 @@ func decodeType(nodeType string) (category, name string, err error) {
 	return "", "", errors.New("failed to get category and name from node-type")
 }
 
-func (inst *App) GetNodesByType(connUUID, hostUUID, nodeType string, isRemote bool) interface{} {
+func (inst *App) GetNodesByType(connUUID, hostUUID, nodeType string, isRemote bool) []*node.Schema {
 	resp := inst.GetFlow(connUUID, hostUUID, isRemote)
 	nodeList := &nodes.NodesList{}
 	var nodesByType []*node.Schema
 	mapstructure.Decode(resp, &nodeList)
 	for _, schema := range nodeList.Nodes {
-		_, nodeByType, _ := decodeType(schema.Type)
-		if nodeByType == nodeType {
+		cat, nodeByType, _ := decodeType(schema.Type)
+		if nodeType == fmt.Sprintf("%s/%s", cat, nodeByType) {
 			nodesByType = append(nodesByType, schema)
 		}
 	}
