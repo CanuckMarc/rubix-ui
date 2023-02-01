@@ -2338,6 +2338,135 @@ export namespace node {
 	        this.dynamicOutputs = source["dynamicOutputs"];
 	    }
 	}
+	export class Payload {
+	    any?: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Payload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.any = source["any"];
+	    }
+	}
+	export class SchemaOutputs {
+	    position: number;
+	    overridePosition: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaOutputs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
+	    }
+	}
+	export class SchemaLinks {
+	    nodeId: string;
+	    socket: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaLinks(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nodeId = source["nodeId"];
+	        this.socket = source["socket"];
+	    }
+	}
+	export class SchemaInputs {
+	    value?: any;
+	    links?: SchemaLinks[];
+	    position: number;
+	    overridePosition: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaInputs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.value = source["value"];
+	        this.links = this.convertValues(source["links"], SchemaLinks);
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Schema {
+	    id: string;
+	    type: string;
+	    nodeName?: string;
+	    icon?: string;
+	    metadata?: Metadata;
+	    inputs: {[key: string]: SchemaInputs};
+	    outputs: {[key: string]: SchemaOutputs};
+	    settings?: {[key: string]: any};
+	    isParent: boolean;
+	    parentId?: string;
+	    payload?: Payload;
+	
+	    static createFrom(source: any = {}) {
+	        return new Schema(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.type = source["type"];
+	        this.nodeName = source["nodeName"];
+	        this.icon = source["icon"];
+	        this.metadata = this.convertValues(source["metadata"], Metadata);
+	        this.inputs = this.convertValues(source["inputs"], SchemaInputs, true);
+	        this.outputs = this.convertValues(source["outputs"], SchemaOutputs, true);
+	        this.settings = source["settings"];
+	        this.isParent = source["isParent"];
+	        this.parentId = source["parentId"];
+	        this.payload = this.convertValues(source["payload"], Payload);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
+	
 	export class Status {
 	    subTitle?: string;
 	    activeMessage?: boolean;

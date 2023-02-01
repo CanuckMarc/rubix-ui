@@ -3,8 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import cx from "classnames";
 import create from 'zustand';
-
-import { model } from "../wailsjs/go/models";
+import { node } from "../wailsjs/go/models";
 
 import { EventsOff, EventsOn } from "../wailsjs/runtime";
 import AppRoutes from "./AppRoutes";
@@ -19,21 +18,22 @@ const OK_EVENT = "ok";
 const WARN_EVENT = "warn";
 const ERR_EVENT = "err";
 
-
-export interface WiresMapNodeType {
-  pointOne: model.Point;
-  pointTwo: model.Point;
+export interface PointTableType {
+  key: string;
+  name: string;
+  uuid: string;
 }
-interface WiresMapState {
-  wiresMapNodes: WiresMapNodeType;
-  setWiresMapNodes: (obj: WiresMapNodeType) => void;
+
+export interface PointTableTypeRecord {
+  pointOne: PointTableType
+  pointTwo: PointTableType
 }
 
 export const useStore = create((set: any) => ({
-  wiresMapNodes: {},
-  setWiresMapNodes: (obj: any) => set(() => ({ wiresMapNodes: obj})),
-  wiresMapEdge: {},
-  setWiresMapEdge: (obj: any) => set(() => ({ wiresMapEdge: obj}))
+  wiresMapNodes: [] as PointTableTypeRecord[],
+  setWiresMapNodes: (obj: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: obj})),
+  existingFlowNet: {} as node.Schema | undefined,
+  setExistingFlowNet: (obj: node.Schema | undefined) => set(() => ({ existingFlowNet: obj}))
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {

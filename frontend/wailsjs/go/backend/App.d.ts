@@ -17,8 +17,8 @@ import {networking} from '../models';
 import {datelib} from '../models';
 import {streamlog} from '../models';
 import {flowcli} from '../models';
-import {store} from '../models';
 import {node} from '../models';
+import {store} from '../models';
 import {nodes} from '../models';
 
 export function AddConnection(arg1:storage.RubixConnection):Promise<rumodel.Response>;
@@ -355,13 +355,13 @@ export function GetNetworksWithPoints(arg1:string,arg2:string):Promise<Array<mod
 
 export function GetNetworksWithPointsDisplay(arg1:string,arg2:string):Promise<Array<backend.NetworksList>>;
 
-export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Schema>>;
 
 export function GetNodesAllFlowNetworksChildren(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetNodesByCategory(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
-export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<node.Schema>>;
 
 export function GetPcGetNetworks():Promise<any>;
 
