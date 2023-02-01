@@ -230,8 +230,8 @@ export const MenuSidebar = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [routeData, updateRouteData] = useState([] as TDataNode[]);
   const [menu, setMenu] = useState<MenuProps["items"]>([]);
-  const [openMenuKeys, setOpenMenuKeys] = useState<string[]>([]);
-  const [allMenuKeys, setAllMenuKeys] = useState<string[]>([]);
+  const [openKeyMenus, setOpenKeyMenus] = useState<string[]>([]);
+  const [allKeyMenus, setAllKeyMenus] = useState<string[]>([]);
 
   const sidebarItems = [
     {
@@ -388,7 +388,7 @@ export const MenuSidebar = () => {
       menu[0] = { ...routeData[0], icon: <Icon /> };
     }
     setMenu(menu);
-    getMenuKeys();
+    getKeyMenus();
   };
 
   const handleCollapse = (value: boolean) => {
@@ -402,7 +402,7 @@ export const MenuSidebar = () => {
   };
 
   const onOpenChange = (openKeys: string[]) => {
-    setOpenMenuKeys(openKeys);
+    setOpenKeyMenus(openKeys);
   };
 
   const onUpdateOpenKeys = ({ key, isOpen }: any) => {
@@ -411,14 +411,14 @@ export const MenuSidebar = () => {
       openingKeys = [routeData[0].next] as any;
     }
     if (isOpen) {
-      openingKeys = openingKeys.concat(allMenuKeys.filter((menuKey) => menuKey.startsWith(key)));
+      openingKeys = openingKeys.concat(allKeyMenus.filter((menuKey) => menuKey.startsWith(key)));
     } else {
-      openingKeys = openingKeys.concat(allMenuKeys.filter((menuKey) => !menuKey.startsWith(key)));
+      openingKeys = openingKeys.concat(allKeyMenus.filter((menuKey) => !menuKey.startsWith(key)));
     }
-    setOpenMenuKeys(openingKeys);
+    setOpenKeyMenus(openingKeys);
   };
 
-  const getMenuKeys = () => {
+  const getKeyMenus = () => {
     if (!routeData[0]) return [];
     let menuKeys: any[] = [routeData[0].key];
     routeData[0].children?.forEach((conenction: TDataNode) => {
@@ -444,7 +444,7 @@ export const MenuSidebar = () => {
         });
       }
     });
-    setAllMenuKeys(menuKeys);
+    setAllKeyMenus(menuKeys);
   };
 
   useEffect(() => {
@@ -457,7 +457,7 @@ export const MenuSidebar = () => {
 
   useEffect(() => {
     eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
-  }, [allMenuKeys]);
+  }, [allKeyMenus]);
 
   return (
     <Sider
@@ -486,7 +486,7 @@ export const MenuSidebar = () => {
             items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
-            openKeys={openMenuKeys}
+            openKeys={openKeyMenus}
             onOpenChange={onOpenChange}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
