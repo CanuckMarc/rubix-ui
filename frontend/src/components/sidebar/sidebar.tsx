@@ -37,6 +37,7 @@ const settingsFactory = new SettingsFactory();
 
 interface TDataNode extends DataNode {
   name?: string;
+  next?: string;
 }
 
 const DividerLock = (props: any) => {
@@ -229,6 +230,8 @@ export const MenuSidebar = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [routeData, updateRouteData] = useState([] as TDataNode[]);
   const [menu, setMenu] = useState<MenuProps["items"]>([]);
+  const [openMenuKeys, setOpenMenuKeys] = useState<string[]>([]);
+  const [allMenuKeys, setAllMenuKeys] = useState<string[]>([]);
 
   const sidebarItems = [
     {
@@ -385,6 +388,7 @@ export const MenuSidebar = () => {
       menu[0] = { ...routeData[0], icon: <Icon /> };
     }
     setMenu(menu);
+    getMenuKeys();
   };
 
   const handleCollapse = (value: boolean) => {
@@ -398,17 +402,62 @@ export const MenuSidebar = () => {
   };
 
   const onOpenChange = (openKeys: string[]) => {
-    console.log("openKeys", openKeys);
+    setOpenMenuKeys(openKeys);
+  };
+
+  const onUpdateOpenKeys = ({ key, isOpen }: any) => {
+    let openingKeys = [] as any;
+    if (key !== "/connections" && routeData[0]) {
+      openingKeys = [routeData[0].next] as any;
+    }
+    if (isOpen) {
+      openingKeys = openingKeys.concat(allMenuKeys.filter((menuKey) => menuKey.startsWith(key)));
+    } else {
+      openingKeys = openingKeys.concat(allMenuKeys.filter((menuKey) => !menuKey.startsWith(key)));
+    }
+    setOpenMenuKeys(openingKeys);
+  };
+
+  const getMenuKeys = () => {
+    if (!routeData[0]) return [];
+    let menuKeys: any[] = [routeData[0].key];
+    routeData[0].children?.forEach((conenction: TDataNode) => {
+      menuKeys.push(conenction.key);
+      if (conenction.children && conenction.children.length > 0) {
+        conenction.children.forEach((location: TDataNode) => {
+          menuKeys.push(location.key);
+          if (location.children && location.children.length > 0) {
+            location.children.forEach((group: TDataNode) => {
+              menuKeys.push(group.key);
+              if (group.children && group.children.length > 0) {
+                group.children.forEach((controller: TDataNode) => {
+                  menuKeys.push(controller.key);
+                  if (controller.children && controller.children.length > 0) {
+                    controller.children.forEach((host: TDataNode) => {
+                      menuKeys.push(host.key);
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    setAllMenuKeys(menuKeys);
   };
 
   useEffect(() => {
     fetchConnections();
-    eventEmit.on("openAllMenus", (data: any) => console.log("data", data));
   }, []);
 
   useEffect(() => {
     getSupervisorsMenu();
   }, [routeData]);
+
+  useEffect(() => {
+    eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
+  }, [allMenuKeys]);
 
   return (
     <Sider
@@ -437,6 +486,7 @@ export const MenuSidebar = () => {
             items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
+            openKeys={openMenuKeys}
             onOpenChange={onOpenChange}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
