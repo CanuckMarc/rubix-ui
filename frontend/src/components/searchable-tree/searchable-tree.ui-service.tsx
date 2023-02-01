@@ -85,10 +85,16 @@ const isActionLoading = {} as any;
 const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
   e.preventDefault();
   e.stopPropagation();
+  if (next === "/connections") {
+    for (const key in isActionLoading) {
+      isActionLoading[key] = isActionLoading["Supervisors"];
+    }
+  }
   eventEmit.dispatch("openAllMenus", { key: next, isOpen });
 };
 
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
+  isActionLoading[item.name] = false;
   if (!next) {
     return {
       name: item.name,
