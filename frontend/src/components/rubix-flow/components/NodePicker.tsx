@@ -72,9 +72,9 @@ const NodePicker = ({
         />
       </div>
       <div className="overflow-y-scroll" style={{ maxHeight: "23rem" }}>
-        {filtered.map(({ type, isParent, style }) => (
+        {filtered.map(({ type, isParent, style }, index) => (
           <div
-            key={type}
+            key={`${type}-${index}`}
             className="cursor-pointer border-b border-gray-600 ant-menu-item text-white"
             onClick={() =>
               onPickNode(

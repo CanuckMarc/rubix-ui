@@ -57,6 +57,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 declare global {
   interface Window {
     subFlowIds: string[];
+    selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
     allFlow: { nodes: NodeInterface[]; edges: Edge[] }; // save all nodes and edges
   }
@@ -81,10 +82,6 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
-  // const [allFlow, setAllFlow] = useState<{ nodes: NodeInterface[]; edges: Edge[] }>({
-  //   nodes: [],
-  //   edges: [],
-  // });
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -397,18 +394,23 @@ const Flow = (props: FlowProps) => {
       if (
         targetNodeId &&
         targetHandleId &&
-        !isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
+        !isValidConnection(
+          window.allFlow.nodes,
+          lastConnectStart,
+          { nodeId: targetNodeId, handleId: targetHandleId },
+          isTarget
+        )
       ) {
         return;
       }
 
-      const edgeByTarget: Edge | undefined = edges.find((e) =>
+      const edgeByTarget: Edge | undefined = window.allFlow.edges.find((e) =>
         isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === lastConnectStartNodeId
       );
 
       const isSameTarget = lastConnectStart.handleType === "target" && isTarget;
 
-      if (edgeByTarget && !isSameTarget) {
+      if (edgeByTarget && !isSameTarget && nodeId) {
         const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
         const newSourceHandle = isTarget ? lastConnectStartHandleId!! : targetHandleId!!;
 
@@ -627,7 +629,9 @@ const Flow = (props: FlowProps) => {
   };
 
   const getChildNodeIds = (parentId: string) => {
-    const childNodes: NodeInterface[] = nodes.filter((node: NodeInterface) => node.parentId === parentId);
+    const childNodes: NodeInterface[] = window.allFlow.nodes.filter(
+      (node: NodeInterface) => node.parentId === parentId
+    );
     const nodeIds: string[] = [];
 
     for (const node of childNodes) {

@@ -113,7 +113,7 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
                 <div className="bg-gray-800">
                   {nodes[category].map(({ info, type, isParent }, index) => (
                     <div
-                      key={type}
+                      key={`${type}-${index}`}
                       className={`py-2 cursor-po inter text-white flex flex-row justify-between
                     border-gray-600 text-left ant-menu-item
                     ${index === 0 ? "" : "border-t"}`}
