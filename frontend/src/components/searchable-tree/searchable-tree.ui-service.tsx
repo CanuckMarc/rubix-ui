@@ -11,6 +11,7 @@ import {
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
+import eventEmit from "../rubix-flow/util/evenEmit";
 
 let ObjectType = {
   CONNECTIONS: "Connections",
@@ -79,6 +80,12 @@ interface RubixObjectI {
   hosts?: any;
 }
 
+const handleOpenAllMenus = (e: React.MouseEvent, item: any, next: string) => {
+  e.preventDefault();
+  e.stopPropagation();
+  eventEmit.dispatch("openAllMenus", { item, next });
+};
+
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
   if (!next) {
     return {
@@ -100,7 +107,10 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
           <span style={{ width: "100%" }}>
             {item.name}
-            <CaretDownOutlined style={{ float: "right", marginTop: "13px", marginRight: "12px" }} />
+            <CaretDownOutlined
+              style={{ float: "right", marginTop: "13px", marginRight: "12px" }}
+              onClick={(e) => handleOpenAllMenus(e, item, next)}
+            />
           </span>
         </NavLink>
       ),

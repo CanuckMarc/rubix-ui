@@ -24,6 +24,7 @@ import { ConnectionFactory } from "../connections/factory";
 import { DataNode } from "antd/es/tree";
 import { storage } from "../../../wailsjs/go/models";
 import { getTreeDataIterative } from "../searchable-tree/searchable-tree.ui-service";
+import eventEmit from "../rubix-flow/util/evenEmit";
 
 import RubixConnection = storage.RubixConnection;
 
@@ -402,6 +403,7 @@ export const MenuSidebar = () => {
 
   useEffect(() => {
     fetchConnections();
+    eventEmit.on("openAllMenus", (data: any) => console.log("data", data));
   }, []);
 
   useEffect(() => {
