@@ -470,11 +470,11 @@ func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 		resp, err := inst.getFlow(connUUID, hostUUID)
 		nodeList := &nodes.NodesList{}
 		mapstructure.Decode(resp, &nodeList)
-		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
+		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
 		return resp
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
@@ -510,20 +510,20 @@ func (inst *App) GetSubFlow(connUUID, hostUUID, subFlowID string, isRemote bool)
 		resp, err := inst.getSubFlow(connUUID, hostUUID, subFlowID)
 		nodeList := &nodes.NodesList{}
 		mapstructure.Decode(resp, &nodeList)
-		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
+		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
 		return resp
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.GetSubFlow(subFlowID)
-	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return resp
 	}
+	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
 	return resp
 }
 
