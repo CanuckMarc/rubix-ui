@@ -3,10 +3,10 @@ export namespace amodel {
 	export class Host {
 	    uuid: string;
 	    global_uuid: string;
-	    network_uuid?: string;
 	    name: string;
+	    network_uuid?: string;
 	    enable?: boolean;
-	    description?: string;
+	    description: string;
 	    ip: string;
 	    bios_port: number;
 	    port: number;
@@ -27,8 +27,8 @@ export namespace amodel {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.uuid = source["uuid"];
 	        this.global_uuid = source["global_uuid"];
-	        this.network_uuid = source["network_uuid"];
 	        this.name = source["name"];
+	        this.network_uuid = source["network_uuid"];
 	        this.enable = source["enable"];
 	        this.description = source["description"];
 	        this.ip = source["ip"];
@@ -44,76 +44,11 @@ export namespace amodel {
 	        this.connected_since = source["connected_since"];
 	    }
 	}
-	export class NetworkUUID {
-	    type: string;
-	    title: string;
-	    readOnly: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new NetworkUUID(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.type = source["type"];
-	        this.title = source["title"];
-	        this.readOnly = source["readOnly"];
-	    }
-	}
-	export class HostSchema {
-	    uuid: schema.UUID;
-	    network_uuid: NetworkUUID;
-	    name: schema.Name;
-	    enable: schema.Enable;
-	    description: schema.Description;
-	    ip: schema.Host;
-	    bios_port: schema.Port;
-	    port: schema.Port;
-	    https: schema.HTTPS;
-	    external_token: schema.Token;
-	    required: string[];
-	
-	    static createFrom(source: any = {}) {
-	        return new HostSchema(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.uuid = this.convertValues(source["uuid"], schema.UUID);
-	        this.network_uuid = this.convertValues(source["network_uuid"], NetworkUUID);
-	        this.name = this.convertValues(source["name"], schema.Name);
-	        this.enable = this.convertValues(source["enable"], schema.Enable);
-	        this.description = this.convertValues(source["description"], schema.Description);
-	        this.ip = this.convertValues(source["ip"], schema.Host);
-	        this.bios_port = this.convertValues(source["bios_port"], schema.Port);
-	        this.port = this.convertValues(source["port"], schema.Port);
-	        this.https = this.convertValues(source["https"], schema.HTTPS);
-	        this.external_token = this.convertValues(source["external_token"], schema.Token);
-	        this.required = source["required"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class Network {
 	    uuid: string;
 	    name: string;
 	    location_uuid?: string;
+	    description: string;
 	    hosts: Host[];
 	
 	    static createFrom(source: any = {}) {
@@ -125,6 +60,7 @@ export namespace amodel {
 	        this.uuid = source["uuid"];
 	        this.name = source["name"];
 	        this.location_uuid = source["location_uuid"];
+	        this.description = source["description"];
 	        this.hosts = this.convertValues(source["hosts"], Host);
 	    }
 	
@@ -194,7 +130,6 @@ export namespace amodel {
 	        this.message = source["message"];
 	    }
 	}
-	
 
 }
 
@@ -428,13 +363,13 @@ export namespace backend {
 	        this.error_count = source["error_count"];
 	    }
 	}
-	export class Ip {
+	export class IP {
 	    type: string;
 	    title: string;
 	    default: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new Ip(source);
+	        return new IP(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -444,15 +379,51 @@ export namespace backend {
 	        this.default = source["default"];
 	    }
 	}
-	export class ConnectionSchema {
-	    uuid: schema.UUID;
+	export class ConnectionProperties {
 	    name: schema.Name;
 	    description: schema.Description;
 	    enable: schema.Enable;
-	    ip: Ip;
+	    ip: IP;
 	    port: schema.Port;
 	    https: schema.HTTPS;
 	    external_token: schema.Token;
+	
+	    static createFrom(source: any = {}) {
+	        return new ConnectionProperties(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = this.convertValues(source["name"], schema.Name);
+	        this.description = this.convertValues(source["description"], schema.Description);
+	        this.enable = this.convertValues(source["enable"], schema.Enable);
+	        this.ip = this.convertValues(source["ip"], IP);
+	        this.port = this.convertValues(source["port"], schema.Port);
+	        this.https = this.convertValues(source["https"], schema.HTTPS);
+	        this.external_token = this.convertValues(source["external_token"], schema.Token);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ConnectionSchema {
+	    required: string[];
+	    properties?: ConnectionProperties;
 	
 	    static createFrom(source: any = {}) {
 	        return new ConnectionSchema(source);
@@ -460,14 +431,8 @@ export namespace backend {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.uuid = this.convertValues(source["uuid"], schema.UUID);
-	        this.name = this.convertValues(source["name"], schema.Name);
-	        this.description = this.convertValues(source["description"], schema.Description);
-	        this.enable = this.convertValues(source["enable"], schema.Enable);
-	        this.ip = this.convertValues(source["ip"], Ip);
-	        this.port = this.convertValues(source["port"], schema.Port);
-	        this.https = this.convertValues(source["https"], schema.HTTPS);
-	        this.external_token = this.convertValues(source["external_token"], schema.Token);
+	        this.required = source["required"];
+	        this.properties = this.convertValues(source["properties"], ConnectionProperties);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2729,24 +2694,6 @@ export namespace schema {
 	        this.readOnly = source["readOnly"];
 	    }
 	}
-	export class Host {
-	    type: string;
-	    title: string;
-	    default: string;
-	    readOnly: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new Host(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.type = source["type"];
-	        this.title = source["title"];
-	        this.default = source["default"];
-	        this.readOnly = source["readOnly"];
-	    }
-	}
 	export class Name {
 	    type: string;
 	    title: string;
@@ -2808,22 +2755,6 @@ export namespace schema {
 	        this.title = source["title"];
 	        this.minLength = source["minLength"];
 	        this.maxLength = source["maxLength"];
-	        this.readOnly = source["readOnly"];
-	    }
-	}
-	export class UUID {
-	    type: string;
-	    title: string;
-	    readOnly: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new UUID(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.type = source["type"];
-	        this.title = source["title"];
 	        this.readOnly = source["readOnly"];
 	    }
 	}

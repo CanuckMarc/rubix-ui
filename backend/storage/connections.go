@@ -19,7 +19,7 @@ func matchUUID(uuid string) bool {
 
 func (inst *db) Add(rc *RubixConnection) (*RubixConnection, error) {
 	if rc.Name == "" {
-		rc.Name = uuid.ShortUUID("tmp")
+		rc.Name = fmt.Sprintf("conn-%s", uuid.ShortUUID("")[5:10])
 	}
 	if rc.Description == "" {
 		rc.Description = "a rubix connection to devices"

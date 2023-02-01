@@ -38,7 +38,7 @@ export const LocationsTable = (props: any) => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={locations.length > 0 ? filteredData : []}
         columns={tableSchema}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

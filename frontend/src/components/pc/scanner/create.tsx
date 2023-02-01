@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
+import { hasError } from "../../../utils/response";
 
 const { Panel } = Collapse;
 
@@ -35,26 +36,18 @@ export const CreateConnectionsModal = (props: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
+    const jsonSchema = await factory.Schema();
     setSchema(jsonSchema);
     setIsLoadingForm(false);
   };
 
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
-    try {
-      const res = await factory.Add();
-      if (res && res.uuid) {
-        openNotificationWithIcon("success", `added ${connection.name} success`);
-      } else {
-        openNotificationWithIcon("error", `added ${connection.name} fail`);
-      }
-    } catch (err) {
-      openNotificationWithIcon("error", err);
-      console.log(err);
+    const res = await factory.Add();
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `added ${res.data.name} success`);
+    } else {
+      openNotificationWithIcon("error", `added ${connection.name} fail`);
     }
   };
 
@@ -65,29 +58,19 @@ export const CreateConnectionsModal = (props: any) => {
   };
 
   const handleSubmit = async (connections: RubixConnection[]) => {
-    let valid = true;
-    connections.forEach((c) => {
-      if (!c.name) {
-        return (valid = false);
+    try {
+      setConfirmLoading(true);
+      const promises = [];
+      for (const c of connections) {
+        promises.push(addConnection(c));
       }
-    });
-    if (valid) {
-      try {
-        setConfirmLoading(true);
-        const promises = [];
-        for (const c of connections) {
-          promises.push(addConnection(c));
-        }
-        await Promise.all(promises);
-        refreshList();
-        handleClose();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setConfirmLoading(false);
-      }
-    } else {
-      openNotificationWithIcon("error", "Please check again 'name' inputs!");
+      await Promise.all(promises);
+      refreshList();
+      handleClose();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -165,11 +148,11 @@ export const CreateHostsModal = (props: any) => {
 
   const add = async (host: Host) => {
     factory.this = host;
-    try {
-      await factory.Add();
+    const res = await factory.Add();
+    if (!hasError(res)) {
       openNotificationWithIcon("success", `added ${host.name} success`);
-    } catch (err) {
-      console.log(err);
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
   };
 

@@ -7,15 +7,6 @@ import (
 
 func TestApp_GetFlowNetworkSchema(t *testing.T) {
 	app := MockNewApp()
-
 	resp := app.GetFlowNetworkSchema("cloud", "rc", "modbus")
 	pprint.PrintJOSN(resp)
-}
-
-func TestApp_GetLocationTableSchema(t *testing.T) {
-	app := MockNewApp()
-
-	resp := app.GetLocationTableSchema("cloud")
-	pprint.PrintJOSN(resp)
-
 }

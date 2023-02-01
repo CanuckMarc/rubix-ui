@@ -9,7 +9,7 @@ import RbTable from "../../../common/rb-table";
 import { RbRefreshButton, RbAddButton, RbDeleteButton, RbExportButton } from "../../../common/rb-table-actions";
 import { CONNECTION_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
-import { exportExcelCSV, isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
+import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
 import { TokenModal } from "../../../common/token/token-modal";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
@@ -19,6 +19,7 @@ import { ImportExcelModal } from "../../hosts/host/flow/points/views/import-expo
 
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;
+import { hasError } from "../../../utils/response";
 
 export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -40,7 +41,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const columns = [
     {
-      title: "actions",
+      title: "Actions",
       key: "actions",
       fixed: "left",
       render: (_: any, conn: RubixConnection) => (
@@ -86,10 +87,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const getSchema = async () => {
     setIsLoadingForm(true);
-    const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
+    const jsonSchema = await factory.Schema();
     setConnectionSchema(jsonSchema);
     setIsLoadingForm(false);
   };
@@ -127,15 +125,11 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
 
   const addConnection = async (connection: RubixConnection) => {
     factory.this = connection;
-    try {
-      const res = await factory.Add();
-      if (res && res.uuid) {
-        openNotificationWithIcon("success", `added ${connection.name} success`);
-      } else {
-        openNotificationWithIcon("error", `added ${connection.name} fail`);
-      }
-    } catch (err) {
-      openNotificationWithIcon("error", err);
+    const res = await factory.Add();
+    if (!hasError(res)) {
+      openNotificationWithIcon("success", `added ${res.data.name} success`);
+    } else {
+      openNotificationWithIcon("error", res.msg);
     }
   };
 
@@ -181,7 +175,6 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         rowSelection={rowSelection}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
-        rowClassName={(record: RubixConnection) => (record.enable ? "" : "opacity-05")}
       />
       <CreateEditModal
         currentConnection={currentConnection}
