@@ -129,6 +129,22 @@ const Flow = (props: FlowProps) => {
       selectableBoxes.current = elemEdges;
     },
     onSelectionEnd: () => {
+      // when draw area to select nodes
+      // we will unselected node that is not show in current view
+      setTimeout(() => {
+        setNodes((nodes) => {
+          const nodesL1 = nodes.filter((n: NodeInterface) => {
+            return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === n.parentId : !n.parentId;
+          });
+          const newNodesSelected = nodes.map((node: NodeInterface) => {
+            return {
+              ...node,
+              selected: node.selected ? nodesL1.some((node2: NodeInterface) => node2.id === node.id) : false,
+            };
+          });
+          return newNodesSelected;
+        });
+      }, 100);
       selectableBoxes.current = [];
       isDragSelection.current = true;
     },
@@ -202,8 +218,6 @@ const Flow = (props: FlowProps) => {
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
-    console.log("LOADING NODES AND EDGES", { nodes: newNodes, edges: newEdges });
-
     const currentNodes = nodes.map((item) => ({ ...item, selected: false }));
     const currentEdges = edges.map((item) => ({ ...item, selected: false }));
 
