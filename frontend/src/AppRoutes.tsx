@@ -127,7 +127,7 @@ function AppRoutes() {
         element={<UserGuide />}
       />
       <Route
-        key={routes.WIRES_MAP}
+        key={routes.WIRES_MAP_REMOTE}
         path={routes.WIRES_MAP_REMOTE}
         element={<WiresMap />}
       />

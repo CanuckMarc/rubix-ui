@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { PointsPane } from "./views/pointsPane";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
-import { useStore, PointTableTypeRecord, PointTableType } from '../../App';
+import { useStore, useIsLoading, PointTableTypeRecord, PointTableType } from '../../App';
 import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
@@ -52,11 +52,15 @@ export const WiresMap = () => {
     const mappingFactory = new MappingFactory();
     const pointFactory = new FlowPointFactory();
 
-    // const isRemote = !!connUUID && !!hostUUID;
+    const isRemote = !!connUUID && !!hostUUID;
 
     const [wiresMapNodes, setWiresMapNodes] = useStore(
         (state) => [state.wiresMapNodes, state.setWiresMapNodes]
     )
+
+    const [isLoadingRubixFlow, reset, setIsLoadingRubixFlow] = useIsLoading(
+        (state) => [state.isLoadingRubixFlow, state.reset, state.setIsLoadingRubixFlow]
+      )
 
     const fetch = async() => {
         try {
@@ -68,7 +72,7 @@ export const WiresMap = () => {
                 uuid: item.uuid
             })));
             // TODO: this func only works when isRemote is false
-            const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, false)
+            const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, isRemote)
             if (flowNetRes) {
                 setFlowNetList(flowNetRes)
                 setFlowNetOptionList(flowNetRes.map((item: any) => ({
@@ -86,6 +90,8 @@ export const WiresMap = () => {
     useEffect(() => {
         pointFactory.connectionUUID = connUUID;
         pointFactory.hostUUID = hostUUID;
+        setWiresMapNodes([]);
+        reset();
         fetch();
     }, [connUUID, hostUUID]);
 
@@ -140,8 +146,9 @@ export const WiresMap = () => {
     }
 
     const recordPoints = () => {
-        console.log(wiresMapNodes)
-        nav(ROUTES.RUBIX_FLOW)
+        // console.log(wiresMapNodes)
+        // nav(ROUTES.RUBIX_FLOW_REMOTE)
+        nav(ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID))
     }
 
     const handleChange = (value: string) => {

@@ -34,8 +34,12 @@ export interface PointTableTypeRecord {
 export const useStore = create((set: any) => ({
   wiresMapNodes: [] as PointTableTypeRecord[],
   setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray})),
-  // existingFlowNet: {} as node.Schema | undefined,
-  // setExistingFlowNet: (obj: node.Schema | undefined) => set(() => ({ existingFlowNet: obj}))
+}));
+
+export const useIsLoading = create((set: any) => ({
+  isLoadingRubixFlow: 0 as Number,
+  reset: () => set(() => ({ isLoadingRubixFlow: 0})),
+  setIsLoadingRubixFlow: () => set((state: any) => ({ isLoadingRubixFlow: state.isLoadingRubixFlow + 1}))
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {

@@ -46,6 +46,7 @@ import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 import { LoadWiresMap } from "./components/LoadWiresMap";
+import { useIsLoading } from "../../App";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -108,6 +109,19 @@ const Flow = (props: FlowProps) => {
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
+
+  const [isLoadingRubixFlow, setIsLoadingRubixFlow] = useIsLoading(
+    (state) => [state.isLoadingRubixFlow, state.setIsLoadingRubixFlow]
+  )
+
+  // useEffect(() => {
+  //   console.log('is loading from flow: ', isFetchingNodeSpec)
+  //   if (isFetchingNodeSpec === true) {
+  //     setIsLoadingRubixFlow(true)
+  //   } else if (isFetchingNodeSpec === false) {
+  //     setIsLoadingRubixFlow(false)
+  //   }
+  // }, [isFetchingNodeSpec])
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -945,8 +959,10 @@ const Flow = (props: FlowProps) => {
         setUndoable({ nodes: nodesL1, edges: edgesL1 });
         /* Get output Nodes */
         handleRefreshValues();
+        setIsLoadingRubixFlow();
       })
       .catch(() => {});
+    
   }, [connUUID, hostUUID]);
 
   useEffect(() => {
@@ -1088,7 +1104,7 @@ const Flow = (props: FlowProps) => {
 };
 
 export const RubixFlow = () => {
-  const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
@@ -1122,7 +1138,7 @@ export const RubixFlow = () => {
 
   return (
     <>
-      {isFetchingNodeSpec ? (
+      {!isFetchingNodeSpec ? (
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}

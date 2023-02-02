@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useStore } from '../../../App';
+import { useStore, useIsLoading } from '../../../App';
 
 import { Edge, useReactFlow } from "react-flow-renderer/nocss";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
@@ -25,15 +25,19 @@ function getRandomArbitrary(min: number, max: number) {
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
+    const [newNodes, setNewNodes] = useState<NodeInterface[]>([]);
+    const [newEdges, setNewEdges] = useState<Edge[]>([]);
     const [wiresMapNodes, setWiresMapNodes] = useStore(
       (state) => [state.wiresMapNodes, state.setWiresMapNodes]
+    )
+    const [isLoadingRubixFlow, reset, setIsLoadingRubixFlow] = useIsLoading(
+      (state) => [state.isLoadingRubixFlow, state.reset, state.setIsLoadingRubixFlow]
     )
 
     const [nodesSpec] = useNodesSpec();
     const flowInstance = useReactFlow();
 
     useEffect(() => {
-      console.log('on render: ', wiresMapNodes)
       let newNodes: NodeInterface[] = [];
       let newEdges: Edge[] = [];
       if (wiresMapNodes.length !== 0) {
@@ -42,10 +46,34 @@ export const LoadWiresMap = () => {
           newNodes = [...newNodes, ...resObj.nodes]
           newEdges = [...newEdges, ...resObj.edges]
         })
+        setNewNodes(newNodes)
+        setNewEdges(newEdges)
+        // renderPointsToFlowEditor(newNodes, newEdges);
+        // setWiresMapNodes([]);
+      }
+    }, [])
+
+    useEffect(() => {
+      // console.log('is loading is: ', isLoadingRubixFlow)
+      if (isLoadingRubixFlow === 2) {
+        // deBounce(isLoadingRubixFlow)
+        // console.log('accessed!!! new nodes are: ', newNodes)
         renderPointsToFlowEditor(newNodes, newEdges);
         setWiresMapNodes([]);
       }
-    }, [])
+    }, [isLoadingRubixFlow])
+
+    // const deBounce = (currentVal: Number) => {
+    //   setTimeout(() => {
+    //     if (isLoadingRubixFlow === currentVal) {
+    //       console.log('accessed!!! new nodes are: ', newNodes)
+    //       renderPointsToFlowEditor(newNodes, newEdges);
+    //       setWiresMapNodes([]);
+    //     } else {
+    //       deBounce(isLoadingRubixFlow);
+    //     }
+    //   }, 4000)
+    // }
 
     const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined) => {
       const nodes: NodeInterface[] = [];
@@ -118,7 +146,7 @@ export const LoadWiresMap = () => {
         const oldEdges = flowInstance.getEdges();
         flowInstance.setEdges([...oldEdges, ...newEdges]);
         window.allFlow.edges = [...window.allFlow.edges, ...newEdges]
-      }, 1000);
+      }, 50);
 
     }
 
