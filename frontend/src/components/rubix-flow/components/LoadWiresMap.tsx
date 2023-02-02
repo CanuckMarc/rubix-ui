@@ -25,8 +25,8 @@ function getRandomArbitrary(min: number, max: number) {
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
-    const [wiresMapNodes, existingFlowNet, setWiresMapNodes, setExistingFlowNet] = useStore(
-      (state) => [state.wiresMapNodes, state.existingFlowNet, state.setWiresMapNodes, state.setExistingFlowNet]
+    const [wiresMapNodes, setWiresMapNodes] = useStore(
+      (state) => [state.wiresMapNodes, state.setWiresMapNodes]
   )
 
     const [nodesSpec] = useNodesSpec();
@@ -34,7 +34,7 @@ export const LoadWiresMap = () => {
 
     useEffect(() => {
         if (wiresMapNodes.length !== 0) {
-          renderPointsToFlowEditor(existingFlowNet);
+          renderPointsToFlowEditor(wiresMapNodes[0].existingFlowNet);
           setWiresMapNodes([]);
         }
     }, [])

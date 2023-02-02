@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { PointTableType } from '../../../App';
 
 export const PointsPane = (props: any) => {
-    const {pointList, selectedPoints, setSelectedPoints} = props
+    const {title, pointList, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [ownSelection, setOwnSelection] = useState<PointTableType | undefined>(undefined);
     const [tableData, setTableData] = useState<PointTableType[]>([])
@@ -24,9 +24,18 @@ export const PointsPane = (props: any) => {
         setTableData(mappedList)
     }, [pointList])
 
+    useEffect(() => {
+        if (clearSelection) {
+            setSelectedRowKeys([]);
+            setOwnSelection(undefined);
+            setSelectedPoints(undefined);
+            setClearSelection(false);
+        }
+    }, [clearSelection])
+
     const columns: ColumnsType<PointTableType> = [
         {
-            title: 'Point one',
+            title: title,
             dataIndex: 'name',
             key: 'name',
             fixed: 'left'
@@ -40,7 +49,6 @@ export const PointsPane = (props: any) => {
     ]
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        // console.log('selectedRowKeys changed: ', newSelectedRowKeys);
         setSelectedRowKeys(newSelectedRowKeys);
         let selectedItems: PointTableType = {} as PointTableType
         newSelectedRowKeys.forEach(i => {
@@ -77,7 +85,8 @@ export const PointsPane = (props: any) => {
                 }
             }
         }
-    };
+    }
+
 
     return (
         <>

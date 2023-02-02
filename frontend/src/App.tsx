@@ -25,15 +25,17 @@ export interface PointTableType {
 }
 
 export interface PointTableTypeRecord {
-  pointOne: PointTableType
-  pointTwo: PointTableType
+  id: string;
+  existingFlowNet: node.Schema | undefined;
+  pointOne: PointTableType;
+  pointTwo: PointTableType;
 }
 
 export const useStore = create((set: any) => ({
   wiresMapNodes: [] as PointTableTypeRecord[],
-  setWiresMapNodes: (obj: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: obj})),
-  existingFlowNet: {} as node.Schema | undefined,
-  setExistingFlowNet: (obj: node.Schema | undefined) => set(() => ({ existingFlowNet: obj}))
+  setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray})),
+  // existingFlowNet: {} as node.Schema | undefined,
+  // setExistingFlowNet: (obj: node.Schema | undefined) => set(() => ({ existingFlowNet: obj}))
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {
