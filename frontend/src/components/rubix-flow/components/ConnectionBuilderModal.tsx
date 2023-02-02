@@ -72,91 +72,20 @@ export const generateNodeFromBuilder = (
   };
 };
 
-export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
-  parentNode,
-  open = false,
-  nodesSpec,
-  onClose,
+export const RenderNodeBuilder = ({
+  node,
+  index,
+  nodesBuilder,
+  edges,
+  setNodesBuilder,
+}: {
+  node: NodeInterface;
+  index: number;
+  nodesBuilder: NodeWithExpose[];
+  edges: Edge[];
+  setNodesBuilder: (value: NodeWithExpose[]) => void;
 }) => {
-  const flowInstance = useReactFlow();
-  const { connUUID = "", hostUUID = "" } = useParams();
-  const nodes = useNodes() as NodeWithExpose[];
-  const edges = useEdges();
-  const [nodesBuilder, setNodesBuilder] = useState<NodeWithExpose[]>([]);
-
-  const getFlowInputOutput = (flowItems: NodeSpecJSON[], item: OutputNodeValueTypeWithExpose, node: NodeInterface) => {
-    const result = flowItems.find((flowItem: NodeSpecJSON) =>
-      flowItem.type.includes(item.dataType === "number" ? "float" : item.dataType)
-    );
-    return {
-      ...result,
-      node,
-      pin: item.pin,
-      nodeName: [item.nodeName, item.isUseNodeName ? item.pin : ""].join(" "),
-    };
-  };
-
-  const handleSave = () => {
-    const inputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputFlow(n.type));
-    const outputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputFlow(n.type));
-
-    if (nodesBuilder.length > 0) {
-      const allNodes: NodeInterface[] = [];
-      const allEdges: Edge[] = [];
-
-      nodesBuilder.forEach((node) => {
-        let newNodesInput = node.data.inputs
-          .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
-          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(inputsFlow, item, node));
-
-        let newNodesOutput = node.data.out
-          .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
-          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(outputsFlow, item, node));
-
-        newNodesInput = newNodesInput.map((item: NodeSpecJSONWithName, idx: number) =>
-          generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
-        );
-        newNodesOutput = newNodesOutput.map((item: NodeSpecJSONWithName, idx: number) =>
-          generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
-        );
-        allNodes.push(...[...newNodesInput, ...newNodesOutput]);
-
-        newNodesInput.forEach((nodeItem: NodeInterface & { pin: string }) => {
-          const newEdge = {
-            id: generateUuid(),
-            source: nodeItem.id,
-            sourceHandle: "out",
-            target: node.id,
-            targetHandle: nodeItem.pin,
-          };
-          allEdges.push(newEdge);
-        });
-
-        newNodesOutput.forEach((nodeItem: NodeInterface & { pin: string }) => {
-          const newEdge = {
-            id: generateUuid(),
-            source: node.id,
-            sourceHandle: nodeItem.pin,
-            target: nodeItem.id,
-            targetHandle: "in",
-          };
-          allEdges.push(newEdge);
-        });
-      });
-
-      if (allNodes.length > 0) {
-        setTimeout(() => {
-          window.allFlow = {
-            nodes: [...window.allFlow.nodes, ...allNodes],
-            edges: [...window.allFlow.edges, ...allEdges],
-          };
-          flowInstance.addNodes(allNodes);
-          flowInstance.addEdges(allEdges);
-        }, 50);
-      }
-    }
-    onClose();
-  };
+  const [type, name] = node.type!!.split("/");
 
   const updateValue = (
     items: OutputNodeValueTypeWithExpose[],
@@ -232,27 +161,122 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
       );
     };
 
-  const renderNode = (node: NodeInterface, index: number) => {
-    const [type, name] = node.type!!.split("/");
-    return (
-      <div key={node.id} className={`w-full mt-${index > 0 ? 8 : 0}`}>
-        <table className="w-full">
-          <thead className="pl-4">
-            <tr>
-              <th></th>
-              <th className="pl-2">{node.info?.nodeName || [name.toLocaleUpperCase(), type].join(" | ")}</th>
-              <th className="text-right" style={{ width: 106 }}>
-                Use node name
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {node.data.inputs.map(renderRow(node.id, index, true))}
-            {node.data.out.map(renderRow(node.id, index, false))}
-          </tbody>
-        </table>
-      </div>
+  return (
+    <div className={`w-full mt-${index > 0 ? 8 : 0}`}>
+      <table className="w-full">
+        <thead className="pl-4">
+          <tr>
+            <th></th>
+            <th className="pl-2">{node.info?.nodeName || [name.toLocaleUpperCase(), type].join(" | ")}</th>
+            <th className="text-right" style={{ width: 106 }}>
+              Use node name
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {node.data.inputs.map(renderRow(node.id, index, true))}
+          {node.data.out.map(renderRow(node.id, index, false))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
+  parentNode,
+  open = false,
+  nodesSpec,
+  onClose,
+}) => {
+  const flowInstance = useReactFlow();
+  const { connUUID = "", hostUUID = "" } = useParams();
+  const nodes = useNodes() as NodeWithExpose[];
+  const edges = useEdges();
+  const [nodesBuilder, setNodesBuilder] = useState<NodeWithExpose[]>([]);
+
+  const getFlowInputOutput = (flowItems: NodeSpecJSON[], item: OutputNodeValueTypeWithExpose, node: NodeInterface) => {
+    const result = flowItems.find((flowItem: NodeSpecJSON) =>
+      flowItem.type.includes(item.dataType === "number" ? "float" : item.dataType)
     );
+    return {
+      ...result,
+      node,
+      pin: item.pin,
+      nodeName: [item.nodeName, item.isUseNodeName ? item.pin : ""].join(" "),
+    };
+  };
+
+  const handleSave = () => {
+    const inputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputFlow(n.type));
+    const outputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputFlow(n.type));
+
+    if (nodesBuilder.length > 0) {
+      const allNodes: NodeInterface[] = [];
+      const allEdges: Edge[] = [];
+
+      nodesBuilder.forEach((node) => {
+        let newNodesInput = node.data.inputs
+          .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
+          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(inputsFlow, item, node));
+
+        let newNodesOutput = node.data.out
+          .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
+          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(outputsFlow, item, node));
+
+        newNodesInput = newNodesInput
+          .map((item: NodeSpecJSONWithName, idx: number) =>
+            item.type
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
+              : null
+          )
+          .filter(Boolean);
+        newNodesOutput = newNodesOutput
+          .map((item: NodeSpecJSONWithName, idx: number) =>
+            item.type
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
+              : null
+          )
+          .filter(Boolean);
+        allNodes.push(...[...newNodesInput, ...newNodesOutput]);
+
+        newNodesInput.forEach((nodeItem: NodeInterface & { pin: string }) => {
+          const newEdge = {
+            id: generateUuid(),
+            source: nodeItem.id,
+            sourceHandle: "out",
+            target: node.id,
+            targetHandle: nodeItem.pin,
+          };
+          allEdges.push(newEdge);
+        });
+
+        newNodesOutput.forEach((nodeItem: NodeInterface & { pin: string }) => {
+          const newEdge = {
+            id: generateUuid(),
+            source: node.id,
+            sourceHandle: nodeItem.pin,
+            target: nodeItem.id,
+            targetHandle: "in",
+          };
+          allEdges.push(newEdge);
+        });
+      });
+
+      if (allNodes.length > 0) {
+        setTimeout(() => {
+          window.allFlow = {
+            nodes: [...window.allFlow.nodes, ...allNodes],
+            edges: [...window.allFlow.edges, ...allEdges],
+          };
+          flowInstance.addNodes(allNodes);
+          flowInstance.addEdges(allEdges);
+          setTimeout(() => {
+            flowInstance.fitView();
+          }, 50);
+        }, 50);
+      }
+    }
+    onClose();
   };
 
   useEffect(() => {
@@ -309,7 +333,20 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
       onClose={onClose}
     >
       <div className="my-3 px-4 py-3">
-        {nodesBuilder.length > 0 ? nodesBuilder.map(renderNode) : <p>All node connected</p>}
+        {nodesBuilder.length > 0 ? (
+          nodesBuilder.map((node, index) => (
+            <RenderNodeBuilder
+              key={node.id}
+              node={node}
+              index={index}
+              edges={edges}
+              nodesBuilder={nodesBuilder}
+              setNodesBuilder={setNodesBuilder}
+            />
+          ))
+        ) : (
+          <p>All node connected</p>
+        )}
       </div>
     </Modal>
   );

@@ -1,7 +1,6 @@
 import { FC, memo, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
-import { Checkbox } from "antd";
 
 import { NodeInterface, OutputNodeValueType } from "../lib/Nodes/NodeInterface";
 import { Modal } from "./Modal";
@@ -13,7 +12,7 @@ import {
   NodeSpecJSONWithName,
   NodeWithExpose,
   OutputNodeValueTypeWithExpose,
-  SettingKey,
+  RenderNodeBuilder,
 } from "./ConnectionBuilderModal";
 
 type LinkBuilderModalProps = {
@@ -68,12 +67,20 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
           .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
           .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(inputsLink, item, node));
 
-        newNodesInput = newNodesInput.map((item: NodeSpecJSONWithName, idx: number) =>
-          generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
-        );
-        newNodesOutput = newNodesOutput.map((item: NodeSpecJSONWithName, idx: number) =>
-          generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
-        );
+        newNodesInput = newNodesInput
+          .map((item: NodeSpecJSONWithName, idx: number) =>
+            item.type
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
+              : null
+          )
+          .filter(Boolean);
+        newNodesOutput = newNodesOutput
+          .map((item: NodeSpecJSONWithName, idx: number) =>
+            item.type
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
+              : null
+          )
+          .filter(Boolean);
         allNodes.push(...[...newNodesInput, ...newNodesOutput]);
 
         newNodesInput.forEach((nodeItem: NodeInterface & { pin: string }) => {
@@ -107,107 +114,13 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
           };
           flowInstance.addNodes(allNodes);
           flowInstance.addEdges(allEdges);
+          setTimeout(() => {
+            flowInstance.fitView();
+          }, 50);
         }, 50);
       }
     }
     onClose();
-  };
-
-  const updateValue = (
-    items: OutputNodeValueTypeWithExpose[],
-    settingIndex: number,
-    keyUpdate: SettingKey,
-    event: any
-  ) => {
-    return items.map((item: OutputNodeValueTypeWithExpose, index: number) => {
-      if (index === settingIndex) {
-        if (keyUpdate === "nodeName") {
-          item[keyUpdate] = (event.target as HTMLInputElement).value;
-        } else {
-          item[keyUpdate] = !Boolean(item[keyUpdate]);
-        }
-      }
-      return item;
-    });
-  };
-
-  const onChangeSetting =
-    (nodeIndex: number, isInput: boolean, settingIndex: number, keyUpdate: SettingKey) => (e: any) => {
-      const newNodes = nodesBuilder.map((node, nInd) => {
-        if (nInd === nodeIndex) {
-          if (isInput) {
-            node.data.inputs = updateValue(node.data.inputs, settingIndex, keyUpdate, e);
-          } else {
-            node.data.out = updateValue(node.data.out, settingIndex, keyUpdate, e);
-          }
-        }
-        return node;
-      });
-
-      setNodesBuilder([...newNodes]);
-    };
-
-  const renderRow =
-    (nodeId: string, nodeIndex: number, isInput: boolean) =>
-    (item: OutputNodeValueTypeWithExpose, itemIndex: number) => {
-      const isExist = edges.some((edge) => {
-        if (isInput) {
-          return edge.target === nodeId && edge.targetHandle === item.pin;
-        }
-        return edge.source === nodeId && edge.sourceHandle === item.pin;
-      });
-
-      return (
-        <tr key={item.pin} className="pl-4" style={{ display: isExist ? "none" : undefined }}>
-          <td>
-            <Checkbox
-              onChange={onChangeSetting(nodeIndex, isInput, itemIndex, "isExported")}
-              checked={item.isExported}
-            />
-          </td>
-          <td className="px-2 py-1 flex-1">
-            <div className="flex gap-2">
-              <span className="flex-1">{item.pin}</span>
-              <input
-                className="border-b border-gray-300 px-2 align-top flex-1"
-                placeholder="New node name"
-                value={item.nodeName}
-                onChange={onChangeSetting(nodeIndex, isInput, itemIndex, "nodeName")}
-              />
-            </div>
-          </td>
-          <td className="flex">
-            <Checkbox
-              className="m-auto mt-1"
-              onChange={onChangeSetting(nodeIndex, isInput, itemIndex, "isUseNodeName")}
-              checked={item.isUseNodeName}
-            />
-          </td>
-        </tr>
-      );
-    };
-
-  const renderNode = (node: NodeInterface, index: number) => {
-    const [type, name] = node.type!!.split("/");
-    return (
-      <div key={node.id} className={`w-full mt-${index > 0 ? 8 : 0}`}>
-        <table className="w-full">
-          <thead className="pl-4">
-            <tr>
-              <th></th>
-              <th className="pl-2">{node.info?.nodeName || [name.toLocaleUpperCase(), type].join(" | ")}</th>
-              <th className="text-right" style={{ width: 106 }}>
-                Use node name
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {node.data.inputs.map(renderRow(node.id, index, true))}
-            {node.data.out.map(renderRow(node.id, index, false))}
-          </tbody>
-        </table>
-      </div>
-    );
   };
 
   useEffect(() => {
@@ -264,7 +177,20 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
       onClose={onClose}
     >
       <div className="my-3 px-4 py-3">
-        {nodesBuilder.length > 0 ? nodesBuilder.map(renderNode) : <p>All node connected</p>}
+        {nodesBuilder.length > 0 ? (
+          nodesBuilder.map((node, index) => (
+            <RenderNodeBuilder
+              key={node.id}
+              node={node}
+              index={index}
+              edges={edges}
+              nodesBuilder={nodesBuilder}
+              setNodesBuilder={setNodesBuilder}
+            />
+          ))
+        ) : (
+          <p>All node connected</p>
+        )}
       </div>
     </Modal>
   );
