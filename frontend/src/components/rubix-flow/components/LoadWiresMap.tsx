@@ -27,87 +27,99 @@ export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
     const [wiresMapNodes, setWiresMapNodes] = useStore(
       (state) => [state.wiresMapNodes, state.setWiresMapNodes]
-  )
+    )
 
     const [nodesSpec] = useNodesSpec();
     const flowInstance = useReactFlow();
 
     useEffect(() => {
-        if (wiresMapNodes.length !== 0) {
-          renderPointsToFlowEditor(wiresMapNodes[0].existingFlowNet);
-          setWiresMapNodes([]);
-        }
+      console.log('on render: ', wiresMapNodes)
+      let newNodes: NodeInterface[] = [];
+      let newEdges: Edge[] = [];
+      if (wiresMapNodes.length !== 0) {
+        wiresMapNodes.forEach(item => {
+          const resObj = addNewNodesEdges(item, item.existingFlowNet);
+          newNodes = [...newNodes, ...resObj.nodes]
+          newEdges = [...newEdges, ...resObj.edges]
+        })
+        renderPointsToFlowEditor(newNodes, newEdges);
+        setWiresMapNodes([]);
+      }
     }, [])
 
-    const renderPointsToFlowEditor = (existingFlowNet: node.Schema | undefined) => {
-        const points: any = wiresMapNodes
-        const newNodes: NodeInterface[] = [];
-        let parentNode: NodeInterface = {} as NodeInterface;
+    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined) => {
+      const nodes: NodeInterface[] = [];
+      const edges: Edge[] = [];
+      let parentNode: NodeInterface = {} as NodeInterface;
 
-        const x = getRandomArbitrary(-200, 200)
-        const y = getRandomArbitrary(-200, 200)
+      const x = getRandomArbitrary(-200, 200)
+      const y = getRandomArbitrary(-200, 200)
 
-        // generate new nodes
-        // only add new flow-network when no existing one selected
-        if (existingFlowNet === undefined) {
-          parentNode = generateNodes({
-            type: 'flow/flow-network',
-            name: '',
-            isParent: true,
-            parentId: undefined,
-            x: x,
-            y: y
-          })
-          newNodes.push(parentNode)
-        }
-
-        const nodeSpecs: NodeGenInputType[] = [
-          {
-            type: 'flow/flow-point',
-            name: points[0].pointOne?.name || '',
-            isParent: false,
-            parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
-            x: x,
-            y: y
-          }, 
-          {
-            type: 'flow/flow-point-write',
-            name: points[0].pointTwo?.name || '',
-            isParent: false,
-            parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
-            x: x + 800,
-            y: y
-          }
-        ]
-
-        // generate new edge
-        let nodeIds: string[] = []
-        nodeSpecs.forEach((item: NodeGenInputType) => {
-          const node = generateNodes(item)
-          nodeIds.push(node.id)
-          newNodes.push(node)
+      // generate new nodes
+      // only add new flow-network when no existing one selected
+      if (existingFlowNet === undefined) {
+        parentNode = generateNodes({
+          type: 'flow/flow-network',
+          name: '',
+          isParent: true,
+          parentId: undefined,
+          x: x,
+          y: y
         })
+        nodes.push(parentNode)
+      }
 
-        const newEdge: Edge = {
-          id: generateUuid(),
-          source: nodeIds[0],
-          sourceHandle: "out",
-          target: nodeIds[1],
-          targetHandle: "in16"
+      const nodeSpecs: NodeGenInputType[] = [
+        {
+          type: 'flow/flow-point',
+          name: points.pointOne?.name || '',
+          isParent: false,
+          parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
+          x: x,
+          y: y
+        }, 
+        {
+          type: 'flow/flow-point-write',
+          name: points.pointTwo?.name || '',
+          isParent: false,
+          parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
+          x: x + 800,
+          y: y
         }
+      ]
 
-        // set new nodes and edges into flow editor
-        if (newNodes.length > 0) {
-          setTimeout(() => {
-            let oldNodes = flowInstance.getNodes();
-            flowInstance.setNodes([...oldNodes, ...newNodes]);
-            window.allFlow.nodes = [...window.allFlow.nodes, ...newNodes]
-            
-            const oldEdges = flowInstance.getEdges();
-            flowInstance.setEdges([...oldEdges, newEdge]);
-            window.allFlow.edges = [...window.allFlow.edges, newEdge]
-          }, 500);
-        }
+      let nodeIds: string[] = []
+      nodeSpecs.forEach((item: NodeGenInputType) => {
+        const node = generateNodes(item)
+        nodeIds.push(node.id)
+        nodes.push(node)
+      })
+
+      // generate new edge
+      const Edge: Edge = {
+        id: generateUuid(),
+        source: nodeIds[0],
+        sourceHandle: "out",
+        target: nodeIds[1],
+        targetHandle: "in16"
+      }
+      edges.push(Edge);
+
+      return {nodes: nodes, edges: edges}
+    }
+
+    const renderPointsToFlowEditor = (newNodes: NodeInterface[], newEdges: Edge[]) => {
+      // set new nodes and edges into flow editor
+      setTimeout(() => {
+        let oldNodes = flowInstance.getNodes();
+        flowInstance.setNodes([...oldNodes, ...newNodes]);
+        window.allFlow.nodes = [...window.allFlow.nodes, ...newNodes]
+        
+        const oldEdges = flowInstance.getEdges();
+        flowInstance.setEdges([...oldEdges, ...newEdges]);
+        window.allFlow.edges = [...window.allFlow.edges, ...newEdges]
+      }, 1000);
+
     }
 
     const generateNodes = (item: NodeGenInputType) => {

@@ -141,7 +141,7 @@ export const WiresMap = () => {
 
     const recordPoints = () => {
         console.log(wiresMapNodes)
-        // nav(ROUTES.RUBIX_FLOW)
+        nav(ROUTES.RUBIX_FLOW)
     }
 
     const handleChange = (value: string) => {
@@ -233,7 +233,6 @@ export const WiresMap = () => {
                                     bordered={true}
                                     columns={columns} 
                                     dataSource={tableData} 
-                                    // style={{ width: '45%' }}
                                     rowSelection={rowSelection}
                                     pagination={{
                                         position: ["bottomRight"],
