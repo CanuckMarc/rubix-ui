@@ -45,6 +45,7 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+import { LinkBuilderModal } from "./components/LinkBuilderModal";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -101,6 +102,7 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [isLinkBuilder, setIsLinkBuilder] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -208,13 +210,14 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow(node);
   };
 
-  const handleConnectionBuilderFlow = (node: NodeInterface) => {
+  const handleConnectionBuilderFlow = (node: NodeInterface, isConnection = true) => {
     setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
     setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
     if (node.id !== selectedNodeForSubFlow?.id) {
       handlePushSelectedNodeForSubFlow(node);
     }
-    setIsConnectionBuilder(true);
+    setIsConnectionBuilder(isConnection);
+    setIsLinkBuilder(!isConnection);
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
@@ -293,6 +296,7 @@ const Flow = (props: FlowProps) => {
 
   const onCloseBuilderModal = () => {
     setIsConnectionBuilder(false);
+    setIsLinkBuilder(false);
   };
 
   const onClearAllNodes = () => {
@@ -1067,12 +1071,20 @@ const Flow = (props: FlowProps) => {
               />
             )}
             {!!selectedNodeForSubFlow && (
-              <ConnectionBuilderModal
-                parentNode={selectedNodeForSubFlow}
-                open={isConnectionBuilder}
-                onClose={onCloseBuilderModal}
-                nodesSpec={nodesSpec}
-              />
+              <>
+                <ConnectionBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open={isConnectionBuilder}
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+                <LinkBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open={isLinkBuilder}
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+              </>
             )}
           </ReactFlow>
         </ReactFlowProvider>

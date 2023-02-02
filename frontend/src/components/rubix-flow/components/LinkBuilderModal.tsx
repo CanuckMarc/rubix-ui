@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
 import { Checkbox } from "antd";
@@ -7,77 +7,23 @@ import { NodeInterface, OutputNodeValueType } from "../lib/Nodes/NodeInterface";
 import { Modal } from "./Modal";
 import { NodeSpecJSON } from "../lib";
 import { isInputFlow, isOutputFlow } from "./Node";
-import { handleGetSettingType } from "../util/handleSettings";
-import { convertDataSpec, getNodeSpecDetail } from "../use-nodes-spec";
 import { generateUuid } from "../lib/generateUuid";
+import {
+  generateNodeFromBuilder,
+  NodeSpecJSONWithName,
+  NodeWithExpose,
+  OutputNodeValueTypeWithExpose,
+  SettingKey,
+} from "./ConnectionBuilderModal";
 
-type ConnectionBuilderModalProps = {
+type LinkBuilderModalProps = {
   parentNode: NodeInterface;
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   open?: boolean;
   onClose: () => void;
 };
 
-export type OutputNodeValueTypeWithExpose = OutputNodeValueType & {
-  isExported: boolean;
-  isUseNodeName: boolean;
-  nodeName: string;
-};
-
-export type NodeWithExpose = NodeInterface & {
-  data: {
-    inputs: OutputNodeValueTypeWithExpose[];
-    out: OutputNodeValueTypeWithExpose[];
-  };
-};
-
-export type NodeSpecJSONWithName = NodeSpecJSON & {
-  pin: string;
-  node: NodeInterface;
-  nodeName: string;
-};
-
-export type SettingKey = "isExported" | "isUseNodeName" | "nodeName";
-
-export const generateNodeFromBuilder = (
-  connUUID: string,
-  hostUUID: string,
-  nodesSpec: NodeSpecJSON[],
-  parentId: string,
-  item: NodeSpecJSONWithName,
-  index: number,
-  isOut = false
-) => {
-  const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
-  const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
-
-  return {
-    id: generateUuid(),
-    isParent: false,
-    style: null,
-    type: item.type,
-    info: { nodeName: item.nodeName.trim() },
-    position: {
-      x: isOut ? item.node.position.x + item.node.width!! + 50 : item.node.position.x - item.node.width!! - 50,
-      y: item.node.position.y + (index - 1) * item.node.height!! + 50,
-    },
-    data: {
-      inputs: convertDataSpec(spec.inputs || []),
-      out: convertDataSpec(spec.outputs || []),
-    },
-    parentId,
-    settings: nodeSettings,
-    selected: false,
-    pin: item.pin,
-  };
-};
-
-export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
-  parentNode,
-  open = false,
-  nodesSpec,
-  onClose,
-}) => {
+export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, open = false, nodesSpec, onClose }) => {
   const flowInstance = useReactFlow();
   const { connUUID = "", hostUUID = "" } = useParams();
   const nodes = useNodes() as NodeWithExpose[];
@@ -85,9 +31,8 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
   const [nodesBuilder, setNodesBuilder] = useState<NodeWithExpose[]>([]);
 
   const getFlowInputOutput = (flowItems: NodeSpecJSON[], item: OutputNodeValueTypeWithExpose, node: NodeInterface) => {
-    const result = flowItems.find((flowItem: NodeSpecJSON) =>
-      flowItem.type.includes(item.dataType === "number" ? "float" : item.dataType)
-    );
+    const result = flowItems.find((flowItem: NodeSpecJSON) => flowItem.type.includes(item.dataType));
+
     return {
       ...result,
       node,
@@ -96,9 +41,19 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
     };
   };
 
+  const isInputLink = (type: string) => {
+    const newType = type.split("/")?.[1];
+    return ["link-input-number", "link-input-string", "link-input-boolean"].includes(newType);
+  };
+
+  const isOutputLink = (type: string) => {
+    const newType = type.split("/")?.[1];
+    return ["link-output-number", "link-output-string", "link-output-boolean"].includes(newType);
+  };
+
   const handleSave = () => {
-    const inputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputFlow(n.type));
-    const outputsFlow = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputFlow(n.type));
+    const inputsLink = (nodesSpec as NodeSpecJSON[]).filter((n) => isInputLink(n.type));
+    const outputsLink = (nodesSpec as NodeSpecJSON[]).filter((n) => isOutputLink(n.type));
 
     if (nodesBuilder.length > 0) {
       const allNodes: NodeInterface[] = [];
@@ -107,11 +62,11 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
       nodesBuilder.forEach((node) => {
         let newNodesInput = node.data.inputs
           .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
-          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(inputsFlow, item, node));
+          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(outputsLink, item, node));
 
         let newNodesOutput = node.data.out
           .filter((item: OutputNodeValueTypeWithExpose) => item.isExported)
-          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(outputsFlow, item, node));
+          .map((item: OutputNodeValueTypeWithExpose) => getFlowInputOutput(inputsLink, item, node));
 
         newNodesInput = newNodesInput.map((item: NodeSpecJSONWithName, idx: number) =>
           generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
@@ -300,7 +255,7 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
 
   return (
     <Modal
-      title="Connection Builder"
+      title="Link Builder"
       actions={[
         { label: "Close", onClick: onClose },
         { label: "Generate nodes", onClick: handleSave },
@@ -313,4 +268,4 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
       </div>
     </Modal>
   );
-};
+});

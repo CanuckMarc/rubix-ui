@@ -1,6 +1,6 @@
 import { Collapse, Layout, Modal, Tooltip } from "antd";
 import { CaretRightOutlined, CaretDownOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent, useEffect, memo } from "react";
 import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeHelpModal } from "./NodeHelpModal";
@@ -11,7 +11,7 @@ type NodeSiderBarProps = {
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
 };
 
-export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
+export const NodeSideBar = memo(({ nodesSpec }: NodeSiderBarProps) => {
   const [search, setSearch] = useState("");
   const [nodes, setNodes] = useState<{ [key: string]: NodeSpecJSON[] }>({});
   const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
@@ -128,4 +128,4 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
       </Sider>
     </div>
   );
-};
+});

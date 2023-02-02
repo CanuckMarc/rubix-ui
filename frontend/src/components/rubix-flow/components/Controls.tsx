@@ -31,7 +31,7 @@ type ControlProps = {
   onBackToMain: () => void;
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
-  handleConnectionBuilderFlow: (node: NodeInterface) => void;
+  handleConnectionBuilderFlow: (node: NodeInterface, isConnection?: boolean) => void;
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
@@ -157,6 +157,10 @@ const Controls = ({
     handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
   };
 
+  const onLinkBuilder = () => {
+    handleConnectionBuilderFlow(selectedNodeForSubFlow!!, false);
+  };
+
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
@@ -164,10 +168,17 @@ const Controls = ({
           <>
             <div
               className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+              title="Link Builder"
+              onClick={onLinkBuilder}
+            >
+              Link Builder
+            </div>
+            <div
+              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
               title="Connection Builder"
               onClick={onConnectionBuilder}
             >
-              {isConnectionBuilder ? "Close Connection Builder" : "Connection Builder"}
+              Connection Builder
             </div>
             <div
               className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
