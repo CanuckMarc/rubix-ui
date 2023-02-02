@@ -102,6 +102,12 @@ const NodeMenu = ({
     onClose();
   };
 
+  const exportSubFlowClick = () => {
+    window.selectedNodeForExport = node;
+    document.getElementById("exportButton")?.click();
+    onClose();
+  };
+
   const handleNodeDeletion = () => {
     deleteNode([node], []);
     onClose();
@@ -195,6 +201,13 @@ const NodeMenu = ({
                 onClick={onSubFlowClick}
               >
                 Open Sub Flow
+              </div>
+              <div
+                key="Export Sub flow"
+                className="cursor-pointer border-b border-gray-600 ant-menu-item"
+                onClick={exportSubFlowClick}
+              >
+                Export Sub Flow
               </div>
               <div
                 key="Delete all input"

@@ -1,9 +1,5 @@
 import { Collapse, Layout, Modal, Tooltip } from "antd";
-import {
-  CaretRightOutlined,
-  CaretDownOutlined,
-  QuestionCircleOutlined,
-} from "@ant-design/icons";
+import { CaretRightOutlined, CaretDownOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useState, ChangeEvent, useEffect } from "react";
 import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
@@ -46,10 +42,7 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
     const key = search.toLowerCase().trim();
     const items = nodesSpec as NodeSpecJSON[];
     const types = {} as { [key: string]: NodeSpecJSON[] };
-    const filtered =
-      key.length > 0
-        ? items.filter((node) => node.type.toLowerCase().includes(key))
-        : items;
+    const filtered = key.length > 0 ? items.filter((node) => node.type.toLowerCase().includes(key)) : items;
 
     filtered.forEach((item) => {
       if (types[item.category]) {
@@ -70,17 +63,11 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
           Add Node
           {activeKeyPanel.length !== Object.keys(nodes).length ? (
             <Tooltip title="expand all">
-              <CaretRightOutlined
-                className="title-icon"
-                onClick={() => onChangeOpenPanels(Object.keys(nodes))}
-              />
+              <CaretRightOutlined className="title-icon" onClick={() => onChangeOpenPanels(Object.keys(nodes))} />
             </Tooltip>
           ) : (
             <Tooltip title="collapse all">
-              <CaretDownOutlined
-                className="title-icon"
-                onClick={() => onChangeOpenPanels([])}
-              />
+              <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
             </Tooltip>
           )}
         </div>
@@ -94,10 +81,7 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
             onChange={onChangeSearch}
           />
         </div>
-        <div
-          className="overflow-y-scroll"
-          style={{ height: "calc(100vh - 70px)" }}
-        >
+        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 70px)" }}>
           <Collapse
             activeKey={activeKeyPanel}
             expandIconPosition="right"
@@ -105,21 +89,15 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
             className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
           >
             {Object.keys(nodes).map((category) => (
-              <Panel
-                key={category}
-                header={category}
-                className="panel-no-padding border-gray-600"
-              >
+              <Panel key={category} header={category} className="panel-no-padding border-gray-600">
                 <div className="bg-gray-800">
                   {nodes[category].map(({ info, type, isParent }, index) => (
                     <div
-                      key={type}
+                      key={`${type}-${index}`}
                       className={`py-2 cursor-po inter text-white flex flex-row justify-between
                     border-gray-600 text-left ant-menu-item
                     ${index === 0 ? "" : "border-t"}`}
-                      onDragStart={(event) =>
-                        onDragStart(event, isParent, type)
-                      }
+                      onDragStart={(event) => onDragStart(event, isParent, type)}
                       draggable
                       style={{ paddingLeft: 24 }}
                     >
@@ -132,9 +110,7 @@ export const NodeSideBar = ({ nodesSpec }: NodeSiderBarProps) => {
                         {type.split("/")[1]}
                       </div>
                       <div>
-                        <QuestionCircleOutlined
-                          onClick={(e) => onClickHelpIcon(e, type)}
-                        />
+                        <QuestionCircleOutlined onClick={(e) => onClickHelpIcon(e, type)} />
                       </div>
                     </div>
                   ))}

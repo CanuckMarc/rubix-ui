@@ -209,6 +209,7 @@ const Controls = ({
         <div
           className="cursor-pointer border-r bg-white hover:bg-gray-100"
           title="Save"
+          id="exportButton"
           onClick={() => setSaveModalOpen(true)}
         >
           <DownloadOutlined className="p-2 text-gray-700 align-middle" />
@@ -229,11 +230,7 @@ const Controls = ({
         onClose={() => setLoadModalOpen(false)}
         handleLoadNodesAndEdges={handleLoadNodesAndEdges}
       />
-      <SaveModal
-        selectedNodeForSubFlow={selectedNodeForSubFlow}
-        open={saveModalOpen}
-        onClose={() => setSaveModalOpen(false)}
-      />
+      <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
       <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
       <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
       <FlowSettingsModal

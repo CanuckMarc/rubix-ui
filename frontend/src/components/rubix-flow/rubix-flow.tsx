@@ -57,6 +57,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 declare global {
   interface Window {
     subFlowIds: string[];
+    selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
     allFlow: { nodes: NodeInterface[]; edges: Edge[] }; // save all nodes and edges
   }
@@ -81,10 +82,6 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
-  // const [allFlow, setAllFlow] = useState<{ nodes: NodeInterface[]; edges: Edge[] }>({
-  //   nodes: [],
-  //   edges: [],
-  // });
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -132,6 +129,22 @@ const Flow = (props: FlowProps) => {
       selectableBoxes.current = elemEdges;
     },
     onSelectionEnd: () => {
+      // when draw area to select nodes
+      // we will unselected node that is not show in current view
+      setTimeout(() => {
+        setNodes((nodes) => {
+          const nodesL1 = nodes.filter((n: NodeInterface) => {
+            return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === n.parentId : !n.parentId;
+          });
+          const newNodesSelected = nodes.map((node: NodeInterface) => {
+            return {
+              ...node,
+              selected: node.selected ? nodesL1.some((node2: NodeInterface) => node2.id === node.id) : false,
+            };
+          });
+          return newNodesSelected;
+        });
+      }, 100);
       selectableBoxes.current = [];
       isDragSelection.current = true;
     },
@@ -205,8 +218,6 @@ const Flow = (props: FlowProps) => {
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
-    console.log("LOADING NODES AND EDGES", { nodes: newNodes, edges: newEdges });
-
     const currentNodes = nodes.map((item) => ({ ...item, selected: false }));
     const currentEdges = edges.map((item) => ({ ...item, selected: false }));
 
@@ -397,18 +408,23 @@ const Flow = (props: FlowProps) => {
       if (
         targetNodeId &&
         targetHandleId &&
-        !isValidConnection(nodes, lastConnectStart, { nodeId: targetNodeId, handleId: targetHandleId }, isTarget)
+        !isValidConnection(
+          window.allFlow.nodes,
+          lastConnectStart,
+          { nodeId: targetNodeId, handleId: targetHandleId },
+          isTarget
+        )
       ) {
         return;
       }
 
-      const edgeByTarget: Edge | undefined = edges.find((e) =>
+      const edgeByTarget: Edge | undefined = window.allFlow.edges.find((e) =>
         isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === lastConnectStartNodeId
       );
 
       const isSameTarget = lastConnectStart.handleType === "target" && isTarget;
 
-      if (edgeByTarget && !isSameTarget) {
+      if (edgeByTarget && !isSameTarget && nodeId) {
         const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
         const newSourceHandle = isTarget ? lastConnectStartHandleId!! : targetHandleId!!;
 
@@ -627,7 +643,9 @@ const Flow = (props: FlowProps) => {
   };
 
   const getChildNodeIds = (parentId: string) => {
-    const childNodes: NodeInterface[] = nodes.filter((node: NodeInterface) => node.parentId === parentId);
+    const childNodes: NodeInterface[] = window.allFlow.nodes.filter(
+      (node: NodeInterface) => node.parentId === parentId
+    );
     const nodeIds: string[] = [];
 
     for (const node of childNodes) {
@@ -688,34 +706,12 @@ const Flow = (props: FlowProps) => {
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
 
-    // remove output connection if node at level 1
-    // get nodes level 1
-    const nodesL1: NodeInterface[] = _copied.nodes.filter((node: NodeInterface) => {
-      return !node.parentId || !_copied.nodes.some((node2) => node.parentId === node2.id);
+    // remove connections if have source or target is not belong to new nodes
+    newFlow.edges = newFlow.edges.filter((edge: Edge) => {
+      const existSource = newFlow.nodes.some((node: NodeInterface) => node.id === edge.source);
+      const existTarget = newFlow.nodes.some((node: NodeInterface) => node.id === edge.target);
+      return existSource && existTarget;
     });
-    // get nodes level 1 corresponding with new id
-    const newNodeL1: NodeInterface[] = newFlow.nodes.filter((node: NodeInterface) =>
-      nodesL1.some((node2: NodeInterface) => node2.id === node.oldId)
-    );
-
-    // save all node have output connection
-    // if node is parent then get connection of outputs
-    const allNodes: NodeInterface[] = [];
-    newNodeL1.forEach((node) => {
-      if (node.isParent) {
-        const outputs = newFlow.nodes
-          .filter((node2: NodeInterface) => node2.parentId === node.id)
-          .filter((n) => isOutputFlow(n.type!!));
-        allNodes.push(...outputs);
-      } else {
-        allNodes.push(node);
-      }
-    });
-
-    // remove connections have source id is belong allNodes
-    newFlow.edges = newFlow.edges.filter(
-      (edge: Edge) => !allNodes.some((node: NodeInterface) => node.id === edge.source)
-    );
 
     // unique items and delete oldId field
     const nodesUniq = uniqArray([...nodes, ...newFlow.nodes]).map(({ oldId, ...node }: NodeInterface) => node);
