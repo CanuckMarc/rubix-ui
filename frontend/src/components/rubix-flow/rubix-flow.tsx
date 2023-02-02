@@ -131,19 +131,19 @@ const Flow = (props: FlowProps) => {
     onSelectionEnd: () => {
       // when draw area to select nodes
       // we will unselected node that is not show in current view
-      const nodesL1 = nodes.filter((n: NodeInterface) => {
-        return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === n.parentId : !n.parentId;
-      });
-      const newNodesSelected = nodes.map((node: NodeInterface) => {
-        return {
-          ...node,
-          selected: node.selected ? nodesL1.some((node2: NodeInterface) => node2.id === node.id) : false,
-        };
-      });
-
-      // wait a bit to update selection because have asynchronously
       setTimeout(() => {
-        setNodes(newNodesSelected);
+        setNodes((nodes) => {
+          const nodesL1 = nodes.filter((n: NodeInterface) => {
+            return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === n.parentId : !n.parentId;
+          });
+          const newNodesSelected = nodes.map((node: NodeInterface) => {
+            return {
+              ...node,
+              selected: node.selected ? nodesL1.some((node2: NodeInterface) => node2.id === node.id) : false,
+            };
+          });
+          return newNodesSelected;
+        });
       }, 100);
       selectableBoxes.current = [];
       isDragSelection.current = true;
