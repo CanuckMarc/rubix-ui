@@ -110,18 +110,9 @@ const Flow = (props: FlowProps) => {
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
-  const [isLoadingRubixFlow, setIsLoadingRubixFlow] = useIsLoading(
-    (state) => [state.isLoadingRubixFlow, state.setIsLoadingRubixFlow]
+  const [refreshCounter, incrementRefreshCounter] = useIsLoading(
+    (state) => [state.refreshCounter, state.incrementRefreshCounter]
   )
-
-  // useEffect(() => {
-  //   console.log('is loading from flow: ', isFetchingNodeSpec)
-  //   if (isFetchingNodeSpec === true) {
-  //     setIsLoadingRubixFlow(true)
-  //   } else if (isFetchingNodeSpec === false) {
-  //     setIsLoadingRubixFlow(false)
-  //   }
-  // }, [isFetchingNodeSpec])
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -959,7 +950,7 @@ const Flow = (props: FlowProps) => {
         setUndoable({ nodes: nodesL1, edges: edgesL1 });
         /* Get output Nodes */
         handleRefreshValues();
-        setIsLoadingRubixFlow();
+        incrementRefreshCounter();
       })
       .catch(() => {});
     

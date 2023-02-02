@@ -58,8 +58,8 @@ export const WiresMap = () => {
         (state) => [state.wiresMapNodes, state.setWiresMapNodes]
     )
 
-    const [isLoadingRubixFlow, reset, setIsLoadingRubixFlow] = useIsLoading(
-        (state) => [state.isLoadingRubixFlow, state.reset, state.setIsLoadingRubixFlow]
+    const [refreshCounter, reset, incrementRefreshCounter] = useIsLoading(
+        (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
       )
 
     const fetch = async() => {

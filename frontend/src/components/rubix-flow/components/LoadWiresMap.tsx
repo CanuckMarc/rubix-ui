@@ -30,47 +30,46 @@ export const LoadWiresMap = () => {
     const [wiresMapNodes, setWiresMapNodes] = useStore(
       (state) => [state.wiresMapNodes, state.setWiresMapNodes]
     )
-    const [isLoadingRubixFlow, reset, setIsLoadingRubixFlow] = useIsLoading(
-      (state) => [state.isLoadingRubixFlow, state.reset, state.setIsLoadingRubixFlow]
+    const [refreshCounter, reset, setIsLoadingRubixFlow] = useIsLoading(
+      (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
     )
 
     const [nodesSpec] = useNodesSpec();
     const flowInstance = useReactFlow();
 
     useEffect(() => {
-      let newNodes: NodeInterface[] = [];
-      let newEdges: Edge[] = [];
+      let localNodes: NodeInterface[] = [];
+      let localEdges: Edge[] = [];
       if (wiresMapNodes.length !== 0) {
         wiresMapNodes.forEach(item => {
           const resObj = addNewNodesEdges(item, item.existingFlowNet);
-          newNodes = [...newNodes, ...resObj.nodes]
-          newEdges = [...newEdges, ...resObj.edges]
+          localNodes = [...localNodes, ...resObj.nodes]
+          localEdges = [...localEdges, ...resObj.edges]
         })
-        setNewNodes(newNodes)
-        setNewEdges(newEdges)
-        // renderPointsToFlowEditor(newNodes, newEdges);
-        // setWiresMapNodes([]);
+        setNewNodes(localNodes);
+        setNewEdges(localEdges);
       }
     }, [])
 
     useEffect(() => {
-      // console.log('is loading is: ', isLoadingRubixFlow)
-      if (isLoadingRubixFlow === 2) {
-        // deBounce(isLoadingRubixFlow)
-        // console.log('accessed!!! new nodes are: ', newNodes)
+      // console.log('is loading is: ', refreshCounter)
+      // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
+      // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
+      if (refreshCounter === 2) {
+        // deBounce(refreshCounter)
         renderPointsToFlowEditor(newNodes, newEdges);
         setWiresMapNodes([]);
       }
-    }, [isLoadingRubixFlow])
+    }, [refreshCounter])
 
     // const deBounce = (currentVal: Number) => {
     //   setTimeout(() => {
-    //     if (isLoadingRubixFlow === currentVal) {
+    //     if (refreshCounter === currentVal) {
     //       console.log('accessed!!! new nodes are: ', newNodes)
     //       renderPointsToFlowEditor(newNodes, newEdges);
     //       setWiresMapNodes([]);
     //     } else {
-    //       deBounce(isLoadingRubixFlow);
+    //       deBounce(refreshCounter);
     //     }
     //   }, 4000)
     // }

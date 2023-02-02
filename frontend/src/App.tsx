@@ -37,9 +37,9 @@ export const useStore = create((set: any) => ({
 }));
 
 export const useIsLoading = create((set: any) => ({
-  isLoadingRubixFlow: 0 as Number,
-  reset: () => set(() => ({ isLoadingRubixFlow: 0})),
-  setIsLoadingRubixFlow: () => set((state: any) => ({ isLoadingRubixFlow: state.isLoadingRubixFlow + 1}))
+  refreshCounter: 0 as Number,
+  reset: () => set(() => ({ refreshCounter: 0})),
+  incrementRefreshCounter: () => set((state: any) => ({ refreshCounter: state.refreshCounter + 1}))
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {
