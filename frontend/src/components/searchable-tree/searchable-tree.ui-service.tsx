@@ -5,10 +5,13 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
+import eventEmit from "../rubix-flow/util/evenEmit";
 
 let ObjectType = {
   CONNECTIONS: "Connections",
@@ -77,7 +80,21 @@ interface RubixObjectI {
   hosts?: any;
 }
 
+const isActionLoading = {} as any;
+
+const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (next === "/connections") {
+    for (const key in isActionLoading) {
+      isActionLoading[key] = isActionLoading["Supervisors"];
+    }
+  }
+  eventEmit.dispatch("openAllMenus", { key: next, isOpen });
+};
+
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
+  isActionLoading[item.name] = false;
   if (!next) {
     return {
       name: item.name,
@@ -91,13 +108,20 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
       icon,
     };
   } else {
+    const isFromSupervisor = next.split("/").length < 5 && next.split("/")[1] === "connections";
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset" }}>
-          <span style={{ padding: "10px 0" }}>
-            <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
+        <NavLink to={next} style={{ color: "unset", display: "flex" }}>
+          {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
+          <span style={{ width: "100%" }}>
             {item.name}
+            {isFromSupervisor && (
+              <MenuOutlined
+                style={{ float: "right", marginTop: "13px", marginRight: "12px" }}
+                onClick={(e) => handleOpenAllMenus(e, next, (isActionLoading[item.name] = !isActionLoading[item.name]))}
+              />
+            )}
           </span>
         </NavLink>
       ),
@@ -170,7 +194,21 @@ export const getTreeDataIterative = (connections: any) => {
               children: [
                 {
                   ...objectMap(
-                    getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, "", <NodeIndexOutlined />)
+                    getTreeObject(
+                      {
+                        name: "wires",
+                        uuid:
+                          ObjectTypesToRoutes[ObjectType.HOSTS](
+                            connection.uuid,
+                            location.uuid,
+                            network.uuid,
+                            host.uuid
+                          ) + "_wires",
+                      },
+                      undefined,
+                      "",
+                      <NodeIndexOutlined />
+                    )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
