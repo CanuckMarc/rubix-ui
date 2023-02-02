@@ -230,8 +230,8 @@ export const MenuSidebar = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [routeData, updateRouteData] = useState([] as TDataNode[]);
   const [menu, setMenu] = useState<MenuProps["items"]>([]);
-  const [openKeyMenus, setOpenKeyMenus] = useState<string[]>([]);
   const [allKeyMenus, setAllKeyMenus] = useState<string[]>([]);
+  const [openingKeys, setOpenningKeys] = useState<string[]>([]);
 
   const sidebarItems = [
     {
@@ -380,14 +380,14 @@ export const MenuSidebar = () => {
     }
   };
 
-  const getSupervisorsMenu = () => {
+  const getSupervisorsMenu = async () => {
     let menu = menuItems as any;
     if (routeData.length > 0) {
       let supervisorsMenu = sidebarItems.find((item) => item.name === "Supervisors");
       const Icon = supervisorsMenu?.icon as any;
       menu[0] = { ...routeData[0], icon: <Icon /> };
     }
-    setMenu(menu);
+    await setMenu(menu);
     getKeyMenus();
   };
 
@@ -401,21 +401,20 @@ export const MenuSidebar = () => {
     setIsBlockMenu(value);
   };
 
+  eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
+
   const onOpenChange = (openKeys: string[]) => {
-    setOpenKeyMenus(openKeys);
+    setOpenningKeys(openKeys);
   };
 
   const onUpdateOpenKeys = ({ key, isOpen }: any) => {
-    let openingKeys = [] as any;
-    if (key !== "/connections" && routeData[0]) {
-      openingKeys = [routeData[0].next] as any;
-    }
+    let _openingKeys = openingKeys;
     if (isOpen) {
-      openingKeys = openingKeys.concat(allKeyMenus.filter((menuKey) => menuKey.startsWith(key)));
+      _openingKeys = _openingKeys.concat(allKeyMenus.filter((menuKey) => menuKey.startsWith(key)));
     } else {
-      openingKeys = openingKeys.concat(allKeyMenus.filter((menuKey) => !menuKey.startsWith(key)));
+      _openingKeys = openingKeys.filter((menuKey) => !menuKey.startsWith(key));
     }
-    setOpenKeyMenus(openingKeys);
+    setOpenningKeys(_openingKeys);
   };
 
   const getKeyMenus = () => {
@@ -455,10 +454,6 @@ export const MenuSidebar = () => {
     getSupervisorsMenu();
   }, [routeData]);
 
-  useEffect(() => {
-    eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
-  }, [allKeyMenus]);
-
   return (
     <Sider
       id="sidebarMenu"
@@ -486,7 +481,7 @@ export const MenuSidebar = () => {
             items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
-            openKeys={openKeyMenus}
+            openKeys={openingKeys}
             onOpenChange={onOpenChange}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
