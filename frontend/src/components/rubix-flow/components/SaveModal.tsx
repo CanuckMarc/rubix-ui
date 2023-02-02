@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { FlowFactory } from "../factory";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Modal } from "./Modal";
+import { flowcli } from "../../../../wailsjs/go/models";
 
 export type SaveModalProps = {
   open?: boolean;
@@ -19,7 +20,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = !!connUUID && !!hostUUID;
   const nodes = useNodes();
-
+  const nodeIDs = flowcli.NodesList;
   const handleCopy = () => {
     if (ref.current) {
       ref.current.select();
@@ -49,10 +50,12 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const handleNodeRender = async () => {
     try {
       const selectedNodeIds: string[] = nodes.filter((item: NodeInterface) => item.selected).map((item) => item.id);
+      let n = new flowcli.NodesList
+      n.nodes = selectedNodeIds
       const data = await (window.selectedNodeForExport
         ? factory.GetSubFlow(connUUID, hostUUID, window.selectedNodeForExport.id, isRemote)
         : selectedNodeIds.length > 0
-        ? factory.GetFlowList(connUUID, hostUUID, { nodes: selectedNodeIds }, isRemote)
+        ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
         : factory.GetFlow(connUUID, hostUUID, isRemote));
 
       setNodeRender(JSON.stringify(data, null, 2));
