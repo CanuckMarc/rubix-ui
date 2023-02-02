@@ -35,6 +35,7 @@ export const CreateEditModal = (props: any) => {
     network.flow_https = false;
     network.flow_https_local = false;
     network.is_token_auth = true;
+    network.is_master_slave = false;
     try {
       setConfirmLoading(true);
       if (currentItem.uuid) {

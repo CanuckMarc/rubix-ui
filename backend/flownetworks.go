@@ -3,7 +3,6 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
-	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/nils"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 )
@@ -67,10 +66,6 @@ func (inst *App) GetFlowNetworks(connUUID, hostUUID string, withStream bool) []m
 func (inst *App) addFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwork) (*model.FlowNetwork, error) {
 	if body.Name == "" {
 		body.Name = fmt.Sprintf("flow-%s", uuid.ShortUUID("")[5:10])
-	}
-
-	if nils.StringNilCheck(body.FlowToken) {
-		body.IsTokenAuth = nils.NewTrue()
 	}
 
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
