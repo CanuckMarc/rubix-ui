@@ -3,12 +3,15 @@ import { useState, useEffect } from "react";
 import { model } from "../../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { PointTableType } from '../../../App';
+// import { generateUuid } from "../../rubix-flow/lib/generateUuid";
+import { AddedPointType } from "../map";
 
 export const PointsPane = (props: any) => {
-    const {title, pointList, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
+    const {title, pointList, pairToAdd, pairToRemove, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [ownSelection, setOwnSelection] = useState<PointTableType | undefined>(undefined);
-    const [tableData, setTableData] = useState<PointTableType[]>([])
+    const [removedItem, setRemovedItem] = useState<PointTableType[]>([]);
+    const [tableData, setTableData] = useState<PointTableType[]>([]);
 
     useEffect(() => {
         let mappedList: PointTableType[] = []
@@ -32,6 +35,48 @@ export const PointsPane = (props: any) => {
             setClearSelection(false);
         }
     }, [clearSelection])
+
+    useEffect(() => {
+        let temp: PointTableType[] = []
+        if (pairToRemove !== undefined) {
+            const updatedTableData = tableData.filter(item => {
+                if (item.uuid !== pairToRemove[0].uuid && item.uuid !== pairToRemove[1].uuid) {
+                    return true
+                } else {
+                    temp.push(item)
+                    return false
+                }
+            })
+
+            setTableData(updatedTableData);
+            setRemovedItem([...removedItem, ...temp]);
+        }
+    }, [pairToRemove])
+
+    useEffect(() => {
+        const rowsToAddBack: PointTableType[] = []
+        if (pairToAdd !== undefined) {
+            pairToAdd.forEach((item: AddedPointType) => {
+                removedItem.forEach(el => {
+                    if (el.name === item.pointOneName || el.name === item.pointTwoName) {
+                        rowsToAddBack.push(el);
+                    }
+                })
+            });
+            setTableData([...tableData, ...rowsToAddBack])
+
+            const temp = removedItem.filter(item => {
+                let flag = true;
+                rowsToAddBack.forEach(el => {
+                    if (item.uuid === el.uuid) {
+                        flag = false;
+                    }
+                })
+                return flag
+            })
+            setRemovedItem(temp)
+        }
+    }, [pairToAdd])
 
     const columns: ColumnsType<PointTableType> = [
         {

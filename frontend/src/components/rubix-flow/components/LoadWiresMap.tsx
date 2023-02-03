@@ -41,12 +41,33 @@ export const LoadWiresMap = () => {
       let localNodes: NodeInterface[] = [];
       let localEdges: Edge[] = [];
       if (wiresMapNodes.length !== 0) {
+        const x = getRandomArbitrary(-200, 200)
+        const y = getRandomArbitrary(-200, 200)
+
+        const parentNode = generateNodes({
+          type: 'flow/flow-network',
+          name: '',
+          isParent: true,
+          parentId: undefined,
+          x: x,
+          y: y
+        })
+        // console.log('wiresMapNodes are: ', wiresMapNodes)
+
+        const check = wiresMapNodes.some(item => {
+          return item.existingFlowNet === undefined
+        })
+
         wiresMapNodes.forEach(item => {
-          const resObj = addNewNodesEdges(item, item.existingFlowNet);
+          const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode);
           localNodes = [...localNodes, ...resObj.nodes]
           localEdges = [...localEdges, ...resObj.edges]
         })
-        setNewNodes(localNodes);
+        if (check) {
+          setNewNodes([...localNodes, parentNode]);
+        } else {
+          setNewNodes(localNodes);
+        }
         setNewEdges(localEdges);
       }
     }, [])
@@ -74,28 +95,14 @@ export const LoadWiresMap = () => {
     //   }, 4000)
     // }
 
-    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined) => {
+    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined, parentNode: NodeInterface) => {
       const nodes: NodeInterface[] = [];
       const edges: Edge[] = [];
-      let parentNode: NodeInterface = {} as NodeInterface;
 
       const x = getRandomArbitrary(-200, 200)
       const y = getRandomArbitrary(-200, 200)
 
       // generate new nodes
-      // only add new flow-network when no existing one selected
-      if (existingFlowNet === undefined) {
-        parentNode = generateNodes({
-          type: 'flow/flow-network',
-          name: '',
-          isParent: true,
-          parentId: undefined,
-          x: x,
-          y: y
-        })
-        nodes.push(parentNode)
-      }
-
       const nodeSpecs: NodeGenInputType[] = [
         {
           type: 'flow/flow-point',
