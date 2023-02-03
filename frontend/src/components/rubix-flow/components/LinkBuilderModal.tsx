@@ -80,7 +80,15 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
               ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
               : null
           )
-          .filter(Boolean);
+          .filter(Boolean)
+          .map((node: NodeInterface & { pin: string }) => {
+            const topic = node.info!!.nodeName!!.split(" ");
+            if (topic.length && topic[topic.length - 1] === node.pin) {
+              topic.pop();
+            }
+            node.data.topic = topic.join(" ");
+            return node;
+          });
         allNodes.push(...[...newNodesInput, ...newNodesOutput]);
 
         newNodesInput.forEach((nodeItem: NodeInterface & { pin: string }) => {
@@ -165,6 +173,8 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
       );
     }
   }, [open]);
+
+  console.log("nodes", nodes);
 
   return (
     <Modal

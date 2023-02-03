@@ -56,7 +56,7 @@ export const generateNodeFromBuilder = (
     isParent: false,
     style: null,
     type: item.type,
-    info: { nodeName: item.nodeName.trim() },
+    info: { nodeName: item.nodeName.trim() || "" },
     position: {
       x: isOut ? item.node.position.x + item.node.width!! + 50 : item.node.position.x - item.node.width!! - 50,
       y: item.node.position.y + (index - 1) * item.node.height!! + 50,
@@ -126,9 +126,9 @@ export const RenderNodeBuilder = ({
     (item: OutputNodeValueTypeWithExpose, itemIndex: number) => {
       const isExist = edges.some((edge) => {
         if (isInput) {
-          return edge.target === nodeId && edge.targetHandle === item.pin;
+          return edge.target === nodeId && edge.targetHandle === item?.pin;
         }
-        return edge.source === nodeId && edge.sourceHandle === item.pin;
+        return edge.source === nodeId && edge.sourceHandle === item?.pin;
       });
 
       return (
@@ -141,7 +141,7 @@ export const RenderNodeBuilder = ({
           </td>
           <td className="px-2 py-1 flex-1">
             <div className="flex gap-2">
-              <span className="flex-1">{item.pin}</span>
+              <span className="flex-1 whitespace-nowrap">{item.pin}</span>
               <input
                 className="border-b border-gray-300 px-2 align-top flex-1"
                 placeholder="New node name"
@@ -161,23 +161,30 @@ export const RenderNodeBuilder = ({
       );
     };
 
+  const renderTable = (label: string, items: any[], isInput: boolean) => (
+    <table className="w-full h-auto">
+      <thead className="pl-4">
+        <tr>
+          <th></th>
+          <th className="pl-2">{label}</th>
+          <th className="text-right whitespace-nowrap" style={{ width: 106 }}>
+            Use node name
+          </th>
+        </tr>
+      </thead>
+      <tbody>{items.map(renderRow(node.id, index, isInput))}</tbody>
+    </table>
+  );
+
   return (
     <div className={`w-full mt-${index > 0 ? 8 : 0}`}>
-      <table className="w-full">
-        <thead className="pl-4">
-          <tr>
-            <th></th>
-            <th className="pl-2">{node.info?.nodeName || [name.toLocaleUpperCase(), type].join(" | ")}</th>
-            <th className="text-right" style={{ width: 106 }}>
-              Use node name
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {node.data.inputs.map(renderRow(node.id, index, true))}
-          {node.data.out.map(renderRow(node.id, index, false))}
-        </tbody>
-      </table>
+      <p className="mb-0" style={{ fontWeight: 700 }}>
+        {(node.info?.nodeName || [name, type].join(" | ")).toUpperCase()}
+      </p>
+      <div className="flex">
+        {renderTable("Inputs", node.data.inputs, true)}
+        {renderTable("Outputs", node.data.out, false)}
+      </div>
     </div>
   );
 };
@@ -345,7 +352,7 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
             />
           ))
         ) : (
-          <p>All node connected</p>
+          <p className="text-center">All node connected</p>
         )}
       </div>
     </Modal>
