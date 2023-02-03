@@ -153,7 +153,6 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   }, [currentConnection]);
 
   useEffect(() => {
-    setFilteredData(data);
     if (isObjectEmpty(connectionSchema)) {
       getSchema();
     }

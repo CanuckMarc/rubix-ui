@@ -1,5 +1,7 @@
 import { Input } from "antd";
+import { log } from "loglevel";
 import { ChangeEvent, useEffect, useState } from "react";
+import Log from "../components/rubix-flow/lib/Nodes/Generic/Actions/Log";
 
 export const RbSearchInput = (props: any) => {
   const { originData = [], setFilteredData } = props.config;
@@ -14,12 +16,7 @@ export const RbSearchInput = (props: any) => {
     const _filteredData =
       keyword.length > 0 ? originData.filter((item: any) => item.name?.toLowerCase().includes(keyword)) : originData;
     setFilteredData(_filteredData);
-  }, [search]);
-
-  useEffect(() => {
-    setSearch("");
-    setFilteredData(originData);
-  }, [originData]); //when user add, delete item, search-text will be clear
+  }, [search, originData]);
 
   return <Input placeholder="Search name..." {...props} allowClear value={search} onChange={handleChangeSearch} />;
 };

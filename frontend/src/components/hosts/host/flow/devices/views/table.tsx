@@ -120,8 +120,8 @@ export const FlowDeviceTable = (props: any) => {
         title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
-        sorter: (a: any, b: any) => ('' + a[key] ?? '').localeCompare('' + b[key] ?? ''),
-        render: (a: any) => '' + (a ?? ''), // boolean values doesn't display on the table
+        sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
+        render: (a: any) => "" + (a ?? ""), // boolean values doesn't display on the table
       };
     });
 
@@ -219,10 +219,6 @@ export const FlowDeviceTable = (props: any) => {
   useEffect(() => {
     getSchema();
   }, [pluginName]);
-
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
 
   return (
     <>
