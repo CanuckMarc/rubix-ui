@@ -6,17 +6,43 @@ import { PointTableType } from '../../../App';
 // import { generateUuid } from "../../rubix-flow/lib/generateUuid";
 import { AddedPointType } from "../map";
 
+interface MenuItemsType {
+    text: string;
+    value: string;
+}
+
+const addNameToArray = (name: string, array: MenuItemsType[], type: string) => {
+    const item: MenuItemsType = {
+        text: name,
+        value: `${type}:${name}`
+    }
+    if(!array.some((item: MenuItemsType) => {
+        return item.text === name
+    })) {
+        array.push(item)
+    }
+}
+
 export const PointsPane = (props: any) => {
     const {title, pointList, pairToAdd, pairToRemove, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [ownSelection, setOwnSelection] = useState<PointTableType | undefined>(undefined);
     const [removedItem, setRemovedItem] = useState<PointTableType[]>([]);
     const [tableData, setTableData] = useState<PointTableType[]>([]);
+    const [allNames, setAllNames] = useState<Array<Array<MenuItemsType>>>([]);
+
+    const types = ['plugin', 'network', 'device', 'point']
 
     useEffect(() => {
         let mappedList: PointTableType[] = []
+        let localAllNames: Array<Array<MenuItemsType>> = [[], [], [], []]
         if(pointList.length > 0) {
             mappedList = pointList.map((item: model.Point) => {
+                const nameArray = item.name.split(':');
+                nameArray.forEach((name: string, index: number) => {
+                    addNameToArray(name, localAllNames[index], types[index])
+                })
+
                 return {
                     key: item.uuid,
                     name: item.name,
@@ -24,7 +50,8 @@ export const PointsPane = (props: any) => {
                 }
             })
         }
-        setTableData(mappedList)
+        setTableData(mappedList);
+        setAllNames(localAllNames);
     }, [pointList])
 
     useEffect(() => {
@@ -83,7 +110,40 @@ export const PointsPane = (props: any) => {
             title: title,
             dataIndex: 'name',
             key: 'name',
-            fixed: 'left'
+            fixed: 'left',
+            filters: [
+                {
+                    text: 'Plugin name',
+                    value: 'Plugin name',
+                    children: allNames[0]
+                },
+                {
+                    text: 'Network name',
+                    value: 'Network name',
+                    children: allNames[1]
+                },
+                {
+                    text: 'Device name',
+                    value: 'Device name',
+                    children: allNames[2]
+                },
+                {
+                    text: 'Point name',
+                    value: 'Point name',
+                    children: allNames[3]
+                },
+              ],
+              filterMode: 'tree',
+              filterSearch: true,
+              onFilter: (value: any, record: PointTableType) => {
+                let flag = false
+                const [type, name] = value.split(':');
+                const index = types.indexOf(type);
+                if (record.name.split(':')[index] === name) {
+                    flag = true
+                }
+                return flag
+              }
         },
         {
             title: 'uuid',

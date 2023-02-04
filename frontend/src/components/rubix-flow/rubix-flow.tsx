@@ -1139,7 +1139,7 @@ export const RubixFlow = () => {
           handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
-        <Spin />
+        <Spin tip="Loading" size="large" style={{ height: '100%', position: 'absolute', top: "50%", left: "60%" }}/>
       )}
     </>
   );
