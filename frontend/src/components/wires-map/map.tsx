@@ -42,10 +42,10 @@ export const WiresMap = () => {
     const [tableData, setTableData] = useState<AddedPointType[]>([]);
     const [pointList, setPointList] = useState<PointTableType[]>([]);
     const [flowNetList, setFlowNetList] = useState<node.Schema[]>([]);
-    // const [selectValue, setSelectValue] = useState<string | null>(null);
+    const [selectValue, setSelectValue] = useState<string | null>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [flowNetOptionList, setFlowNetOptionList] = useState<FlowNetOptionType[]>([]);
-    // const [selectedFlowNet, setSelectedFlowNet] = useState<node.Schema | undefined>(undefined);
+    const [selectedFlowNet, setSelectedFlowNet] = useState<node.Schema | undefined>(undefined);
     const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType | undefined>(undefined);
     const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType | undefined>(undefined);
     const [pairToRemove, setPairToRemove] = useState<PointTableType[] | undefined>(undefined);
@@ -102,13 +102,13 @@ export const WiresMap = () => {
             const newId = generateUuid()
             resObj['pointOne'] = filterForFullObj(pointList, selectedPointsOne)
             resObj['pointTwo'] = filterForFullObj(pointList, selectedPointsTwo)
-            resObj['existingFlowNet'] = undefined
+            resObj['existingFlowNet'] = selectedFlowNet
             resObj['id'] = newId
     
             setWiresMapNodes([...wiresMapNodes, resObj])
             setTableData([...tableData, {
-                // existingFlowNetName: resObj.existingFlowNet?.nodeName ? resObj.existingFlowNet?.nodeName : resObj.existingFlowNet?.id,
-                existingFlowNetName: undefined,
+                existingFlowNetName: resObj.existingFlowNet?.nodeName ? resObj.existingFlowNet?.nodeName : resObj.existingFlowNet?.id,
+                // existingFlowNetName: undefined,
                 pointOneName: resObj.pointOne.name,
                 pointTwoName: resObj.pointTwo.name,
                 key: newId
@@ -157,53 +157,54 @@ export const WiresMap = () => {
         nav(ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID))
     }
 
-    const handleChange = (value: string, record: AddedPointType) => {
-        record.existingFlowNetName = value
-        let updatedArray: PointTableTypeRecord[] = []
-        wiresMapNodes.forEach((el: PointTableTypeRecord) => {
-            if (el.id === record.key) {
-                el.existingFlowNet = flowNetList.find((item: node.Schema) => {
-                    return item.id === value
-                })
-            }
-            updatedArray.push(el)
-        });
+    const handleChange = (value: string) => {
+        // record.existingFlowNetName = value
+        // let updatedArray: PointTableTypeRecord[] = []
+        // wiresMapNodes.forEach((el: PointTableTypeRecord) => {
+        //     if (el.id === record.key) {
+        //         el.existingFlowNet = flowNetList.find((item: node.Schema) => {
+        //             return item.id === value
+        //         })
+        //     }
+        //     updatedArray.push(el)
+        // });
 
-        setWiresMapNodes(updatedArray);
-        // setSelectValue(value);
-        // setSelectedFlowNet(flowNetList.find((item: node.Schema) => {
-        //     return item.id === value
-        // } ));
+        // setWiresMapNodes(updatedArray);
+
+        setSelectValue(value);
+        setSelectedFlowNet(flowNetList.find((item: node.Schema) => {
+            return item.id === value
+        } ));
     };
 
     const columns: ColumnsType<AddedPointType> = [
         {
             title: 'Flow network',
-            // dataIndex: 'existingFlowNetName',
-            // key: 'existingFlowNetName',
+            dataIndex: 'existingFlowNetName',
+            key: 'existingFlowNetName',
             fixed: 'left',
-            render: (text, record: AddedPointType, index) => {
-                return (
-                    <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
-                        <Select
-                            showSearch
-                            allowClear
-                            // value={selectValue}
-                            style={{ width: '100%' }}
-                            placeholder="Will create a new flow network if left blank"
-                            onChange={(value) => handleChange(value, record)}
-                            options={flowNetOptionList}
-                        />
-                    </div>
-                )
-            }
             // render: (text, record: AddedPointType, index) => {
-            //     if (record.existingFlowNetName === undefined) {
-            //         return 'Flow network unselected, generating new one.'
-            //     } else {
-            //         return record.existingFlowNetName
-            //     }
+            //     return (
+            //         <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
+            //             <Select
+            //                 showSearch
+            //                 allowClear
+            //                 // value={selectValue}
+            //                 style={{ width: '100%' }}
+            //                 placeholder="Will create a new flow network if left blank"
+            //                 onChange={(value) => handleChange(value, record)}
+            //                 options={flowNetOptionList}
+            //             />
+            //         </div>
+            //     )
             // }
+            render: (text, record: AddedPointType, index) => {
+                if (record.existingFlowNetName === undefined) {
+                    return 'Flow network unselected, generating new one.'
+                } else {
+                    return record.existingFlowNetName
+                }
+            }
         },
         {
             title: 'Point one',
@@ -239,7 +240,7 @@ export const WiresMap = () => {
 
                     <Card bordered={true}>
                         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-                            {/* <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
+                            <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
                                 <Title level={5}>Select flow network: </Title>
                                 <Select
                                     showSearch
@@ -250,7 +251,7 @@ export const WiresMap = () => {
                                     onChange={handleChange}
                                     options={flowNetOptionList}
                                 />
-                            </div> */}
+                            </div>
                             <Spin spinning={isFetching} style={{ width: '100%' }}>
                                 <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center', justifyContent: 'space-around'}}>
                                     <PointsPane title={'Point one'} pointList={pointList} pairToAdd={pairToAdd} pairToRemove={pairToRemove} clearSelection={clearSelection} setClearSelection={setClearSelection} selectedPoints={selectedPointsTwo} setSelectedPoints={setSelectedPointsOne}/>
