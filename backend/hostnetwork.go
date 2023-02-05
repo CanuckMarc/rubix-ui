@@ -1,11 +1,9 @@
 package backend
 
 import (
-	"errors"
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/rubix-assist/amodel"
-	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
@@ -40,9 +38,9 @@ func (inst *App) GetHostNetworks(connUUID string) (resp []amodel.Network) {
 		inst.uiErrorMessage(err)
 		return nil
 	}
-	data, res := client.GetHostNetworks()
-	if data == nil {
-		inst.uiErrorMessage(fmt.Sprintf("issue in getting host networks %s", res.Message))
+	data, err := client.GetHostNetworks()
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("issue in getting host networks %s", err))
 	}
 	return data
 }
@@ -53,10 +51,9 @@ func (inst *App) GetHostNetwork(connUUID string, uuid string) *amodel.Network {
 		inst.uiErrorMessage(err)
 		return nil
 	}
-	data, res := client.GetHostNetwork(uuid)
-	if res.StatusCode > 299 {
-		inst.uiErrorMessage(fmt.Sprintf("issue in getting host network %s", res.Message))
-	} else {
+	data, err := client.GetHostNetwork(uuid)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("issue in getting host network %s", err))
 	}
 	return data
 }
@@ -83,41 +80,35 @@ func (inst *App) UpdateHostsStatus(connUUID, uuid string) *amodel.Network {
 	return data
 }
 
-func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) interface{} {
+func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) bool {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return true
+	}
 	for _, item := range uuids {
-		msg, err := inst.deleteHostNetwork(connUUID, item.UUID)
+		err := client.DeleteHostNetwork(item.UUID)
 		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("delete network %s %s", item.Name, msg.Message))
+			inst.uiErrorMessage(fmt.Sprintf("delete network %s %s", item.Name, err))
+			return false
 		} else {
 			inst.uiSuccessMessage(fmt.Sprintf("deleted network: %s", item.Name))
 		}
 	}
-	return "deleted successfully"
+	return true
 }
 
-func (inst *App) deleteHostNetwork(connUUID string, uuid string) (*assistcli.Response, error) {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		return nil, err
-	}
-	res := client.DeleteHostNetwork(uuid)
-	if res.StatusCode > 299 {
-		return nil, errors.New(fmt.Sprintf("issue in deleting host network %s", res.Message))
-	}
-	return res, nil
-}
-
-func (inst *App) DeleteHostNetwork(connUUID string, uuid string) *assistcli.Response {
+func (inst *App) DeleteHostNetwork(connUUID string, uuid string) bool {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(err)
-		return nil
+		return false
 	}
-	res := client.DeleteHostNetwork(uuid)
-	if res.StatusCode > 299 {
-		inst.uiErrorMessage(fmt.Sprintf("issue in deleting host network %s", res.Message))
+	err = client.DeleteHostNetwork(uuid)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("issue in deleting host network %s", err))
+		return false
 	} else {
 		inst.uiSuccessMessage(fmt.Sprintf("delete ok"))
+		return true
 	}
-	return res
 }
