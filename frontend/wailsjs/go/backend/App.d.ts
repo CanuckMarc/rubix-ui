@@ -17,8 +17,8 @@ import {networking} from '../models';
 import {datelib} from '../models';
 import {streamlog} from '../models';
 import {flowcli} from '../models';
-import {store} from '../models';
 import {node} from '../models';
+import {store} from '../models';
 import {nodes} from '../models';
 
 export function AddConnection(arg1:storage.RubixConnection):Promise<rumodel.Response>;
@@ -251,7 +251,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -355,13 +355,13 @@ export function GetNetworksWithPoints(arg1:string,arg2:string):Promise<Array<mod
 
 export function GetNetworksWithPointsDisplay(arg1:string,arg2:string):Promise<Array<backend.NetworksList>>;
 
-export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Schema>>;
 
 export function GetNodesAllFlowNetworksChildren(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetNodesByCategory(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
-export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<node.Schema>>;
 
 export function GetPcGetNetworks():Promise<any>;
 
@@ -491,13 +491,13 @@ export function SetGitToken(arg1:string):Promise<rumodel.Response>;
 
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<rumodel.Response>;
 
+export function UpdateHostsStatus(arg1:string,arg2:string):Promise<amodel.Network>;
+
 export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStorageFlowNetwork):Promise<model.LocalStorageFlowNetwork>;
 
 export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<rumodel.Response>;
 
 export function UpdateSettings(arg1:storage.Settings):Promise<rumodel.Response>;
-
-export function UpdateStatus(arg1:string):Promise<Array<amodel.Host>>;
 
 export function UpdateWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:string,arg5:db.Connection):Promise<db.Connection>;
 

@@ -65,12 +65,3 @@ func (inst *Client) GetHostSchema() string {
 	}
 	return string(resp.Body())
 }
-
-func (inst *Client) UpdateStatus() (data []amodel.Host, response *Response) {
-	path := fmt.Sprintf("%s/%s", Paths.Hosts.Path, "update-status")
-	response = &Response{}
-	resp, err := inst.Rest.R().
-		SetResult(&[]amodel.Host{}).
-		Get(path)
-	return *resp.Result().(*[]amodel.Host), response.buildResponse(resp, err)
-}

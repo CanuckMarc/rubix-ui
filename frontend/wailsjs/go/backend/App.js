@@ -942,6 +942,10 @@ export function UpdateConnection(arg1, arg2) {
   return window['go']['backend']['App']['UpdateConnection'](arg1, arg2);
 }
 
+export function UpdateHostsStatus(arg1, arg2) {
+  return window['go']['backend']['App']['UpdateHostsStatus'](arg1, arg2);
+}
+
 export function UpdateLocalStorage(arg1, arg2, arg3) {
   return window['go']['backend']['App']['UpdateLocalStorage'](arg1, arg2, arg3);
 }
@@ -952,10 +956,6 @@ export function UpdateLocation(arg1, arg2, arg3) {
 
 export function UpdateSettings(arg1) {
   return window['go']['backend']['App']['UpdateSettings'](arg1);
-}
-
-export function UpdateStatus(arg1) {
-  return window['go']['backend']['App']['UpdateStatus'](arg1);
 }
 
 export function UpdateWiresConnection(arg1, arg2, arg3, arg4, arg5) {

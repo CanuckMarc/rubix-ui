@@ -189,7 +189,7 @@ export const HostsTable = (props: any) => {
   const onUpdateStatus = async () => {
     setLoadingUpdateStatus(true);
     try {
-      await factory.UpdateStatus();
+      await factory.UpdateHostsStatus(netUUID);
       await refreshList();
     } catch (error) {
       openNotificationWithIcon("error", error);
