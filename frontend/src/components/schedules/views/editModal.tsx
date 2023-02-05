@@ -19,17 +19,14 @@ export const EditModal = (props: any) => {
             min_payload: currentItem.min_payload,
             max_payload: currentItem.max_payload
         })
+        currentItem.enable_payload ? setShowPayloadOpts(true) : setShowPayloadOpts(false)
     }
   }, [currentItem])
 
   useEffect(() => form.resetFields(), [initData]);
 
   const handlePayloadEnableChange = (value: boolean | null) => {
-    if (value) {
-        setShowPayloadOpts(true)
-    } else {
-        setShowPayloadOpts(false)
-    }
+    value ? setShowPayloadOpts(true) : setShowPayloadOpts(false)
   } 
 
   return (
@@ -128,7 +125,7 @@ export const EditModal = (props: any) => {
                                 name="min_payload"
                                 rules={[{ required: true, message: 'Please input minimum payload number!' }]}
                                 >
-                                    <InputNumber />
+                                    <InputNumber style={{width: '20vw'}} />
                             </Form.Item>
                             
                             <Form.Item
@@ -136,7 +133,7 @@ export const EditModal = (props: any) => {
                                 name="max_payload"
                                 rules={[{ required: true, message: 'Please input maximum payload number!' }]}
                                 >
-                                    <InputNumber />
+                                    <InputNumber style={{width: '20vw'}} />
                             </Form.Item>
                         </>
                     )}
