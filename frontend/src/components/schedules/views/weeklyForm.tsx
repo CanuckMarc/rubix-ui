@@ -75,7 +75,7 @@ export const WeeklyForm = (props: any) => {
             name="start"
             rules={[{ required: true, message: 'Please input start time!' }]}
         >
-            <TimePicker style={{ width: '20vw' }} />
+            <TimePicker format={'HH:mm'} style={{ width: '20vw' }} />
         </Form.Item>
         
         <Form.Item
@@ -83,7 +83,7 @@ export const WeeklyForm = (props: any) => {
             name="end"
             rules={[{ required: true, message: 'Please input end time!' }]}
         >
-            <TimePicker style={{ width: '20vw' }} />
+            <TimePicker format={'HH:mm'} style={{ width: '20vw' }} />
         </Form.Item>
 
         <button ref={innerRef} type="submit" style={{ display: 'none' }} />

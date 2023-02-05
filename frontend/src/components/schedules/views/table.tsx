@@ -109,7 +109,8 @@ export const SchedulesTable = (props: any) => {
       name: value.schedule_name,
       enable: value.enable,
       is_active: value.is_active,
-      timeZone: value.timeZone
+      timeZone: value.timeZone,
+      enable_payload: value.enable_payload
     }
 
     await props.factory.EditSchedule(props.connUUID, props.hostUUID, currentItem.uuid, opts)

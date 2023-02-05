@@ -1,35 +1,46 @@
-import { Input, Modal, Form, Select } from "antd";
+import { Input, Modal, Form, Select, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 import moment from 'moment-timezone'
 
 export const EditModal = (props: any) => {
   const { currentItem, moreOptions } = props;
   const [form] = Form.useForm();
-  const [initData, setInitData] = useState({})
+  const [initData, setInitData] = useState({});
+  const [showPayloadOpts, setShowPayloadOpts] = useState(false);
 
   useEffect(() => {
     if (currentItem) {
-    setInitData({
-        schedule_name: currentItem.name,
-        enable: currentItem.enable,
-        is_global: currentItem.is_global,
-        timeZone: currentItem.timezone ?? moment.tz.guess()
-    })
+        setInitData({
+            schedule_name: currentItem.name,
+            enable: currentItem.enable,
+            is_global: currentItem.is_global,
+            timeZone: currentItem.timezone ?? moment.tz.guess(),
+            enable_payload: currentItem.enable_payload,
+            min_payload: currentItem.min_payload,
+            max_payload: currentItem.max_payload
+        })
     }
   }, [currentItem])
 
   useEffect(() => form.resetFields(), [initData]);
 
+  const handlePayloadEnableChange = (value: boolean | null) => {
+    if (value) {
+        setShowPayloadOpts(true)
+    } else {
+        setShowPayloadOpts(false)
+    }
+  } 
+
   return (
     <Modal forceRender title={props.title} visible={props.createModal} onOk={form.submit} onCancel={props.handleCancel} bodyStyle={{maxHeight: '50vh'}} width='35vw'>
         <Form
             form={form}
-            name="basic"
             autoComplete="off"
-            style={{maxHeight: '40vh', overflowX: 'auto'}}
+            style={{maxHeight: '40vh', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}
             initialValues={initData}
             labelCol={{
-                span: 4
+                span: 7
             }}
             wrapperCol={{
                 span: 4
@@ -80,10 +91,55 @@ export const EditModal = (props: any) => {
                                 {
                                     value: null,
                                     label: 'null'
-                                },
+                                }
                             ]}
                         />
                     </Form.Item>
+
+                    <Form.Item
+                        label="Enable payload:"
+                        name="enable_payload"
+                        rules={[{ required: true, message: 'Please select a payload option!' }]}
+                        >
+                            <Select
+                                style={{width: '20vw'}}
+                                onChange={handlePayloadEnableChange}
+                                options={[
+                                    {
+                                        value: true,
+                                        label: 'true'
+                                    },
+                                    {
+                                        value: false,
+                                        label: 'false'
+                                    },
+                                    {
+                                        value: null,
+                                        label: 'null'
+                                    }
+                                ]}
+                            />
+                    </Form.Item>
+
+                    {showPayloadOpts && (
+                        <>
+                            <Form.Item
+                                label="Payload minimum:"
+                                name="min_payload"
+                                rules={[{ required: true, message: 'Please input minimum payload number!' }]}
+                                >
+                                    <InputNumber />
+                            </Form.Item>
+                            
+                            <Form.Item
+                                label="Payload maximum:"
+                                name="max_payload"
+                                rules={[{ required: true, message: 'Please input maximum payload number!' }]}
+                                >
+                                    <InputNumber />
+                            </Form.Item>
+                        </>
+                    )}
                 </>
             )}
 
