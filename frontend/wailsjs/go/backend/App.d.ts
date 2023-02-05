@@ -95,9 +95,9 @@ export function DeleteHost(arg1:string,arg2:string):Promise<assistcli.Response>;
 
 export function DeleteHostBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<any>;
 
-export function DeleteHostNetwork(arg1:string,arg2:string):Promise<assistcli.Response>;
+export function DeleteHostNetwork(arg1:string,arg2:string):Promise<boolean>;
 
-export function DeleteHostNetworkBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<any>;
+export function DeleteHostNetworkBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<boolean>;
 
 export function DeleteLocation(arg1:string,arg2:string):Promise<assistcli.Response>;
 

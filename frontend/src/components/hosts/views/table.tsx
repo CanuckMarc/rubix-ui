@@ -205,12 +205,12 @@ export const HostsTable = (props: any) => {
       <RbAddButton handleClick={(e: any) => showModal({} as Host, e)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
-      {hosts.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {hosts?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={hosts.length > 0 ? filteredData : []}
+        dataSource={hosts?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
         expandable={{
