@@ -14,4 +14,5 @@ type Plugin struct {
 type AvailablePlugin struct {
 	Name        string `json:"name"`
 	IsInstalled bool   `json:"is_installed"`
+	Description string `json:"description"`
 }
