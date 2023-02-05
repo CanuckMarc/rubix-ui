@@ -2,6 +2,7 @@ package backend
 
 import (
 	"fmt"
+	"github.com/NubeIO/lib-systemctl-go/systemctl"
 	"github.com/NubeIO/rubix-assist/amodel"
 	"github.com/NubeIO/rubix-edge/service/system"
 	log "github.com/sirupsen/logrus"
@@ -68,4 +69,12 @@ func (inst *App) edgeSystemCtlAction(connUUID, hostUUID, serviceName string, act
 		return nil, err
 	}
 	return client.EdgeSystemCtlAction(hostUUID, serviceName, action)
+}
+
+func (inst *App) edgeSystemCtlStatus(connUUID, hostUUID, serviceName string) (*systemctl.SystemState, error) {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return nil, err
+	}
+	return client.EdgeSystemCtlState(hostUUID, serviceName)
 }
