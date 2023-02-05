@@ -47,6 +47,42 @@ func (inst *App) GetHostNetworks(connUUID string) (resp []amodel.Network) {
 	return data
 }
 
+func (inst *App) GetHostNetwork(connUUID string, uuid string) *amodel.Network {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(err)
+		return nil
+	}
+	data, res := client.GetHostNetwork(uuid)
+	if res.StatusCode > 299 {
+		inst.uiErrorMessage(fmt.Sprintf("issue in getting host network %s", res.Message))
+	} else {
+	}
+	return data
+}
+
+func (inst *App) EditHostNetwork(connUUID string, hostUUID string, host *amodel.Network) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	res, err := client.UpdateHostNetwork(hostUUID, host)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse(res)
+}
+
+func (inst *App) UpdateHostsStatus(connUUID, uuid string) *amodel.Network {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	data, _ := client.UpdateHostsStatus(uuid)
+	return data
+}
+
 func (inst *App) DeleteHostNetworkBulk(connUUID string, uuids []UUIDs) interface{} {
 	for _, item := range uuids {
 		msg, err := inst.deleteHostNetwork(connUUID, item.UUID)
@@ -84,30 +120,4 @@ func (inst *App) DeleteHostNetwork(connUUID string, uuid string) *assistcli.Resp
 		inst.uiSuccessMessage(fmt.Sprintf("delete ok"))
 	}
 	return res
-}
-
-func (inst *App) GetHostNetwork(connUUID string, uuid string) *amodel.Network {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		inst.uiErrorMessage(err)
-		return nil
-	}
-	data, res := client.GetHostNetwork(uuid)
-	if res.StatusCode > 299 {
-		inst.uiErrorMessage(fmt.Sprintf("issue in getting host network %s", res.Message))
-	} else {
-	}
-	return data
-}
-
-func (inst *App) EditHostNetwork(connUUID string, hostUUID string, host *amodel.Network) *rumodel.Response {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		return rumodel.FailResponse(err)
-	}
-	res, err := client.UpdateHostNetwork(hostUUID, host)
-	if err != nil {
-		return rumodel.FailResponse(err)
-	}
-	return rumodel.SuccessResponse(res)
 }

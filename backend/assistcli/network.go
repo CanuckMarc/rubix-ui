@@ -48,6 +48,17 @@ func (inst *Client) UpdateHostNetwork(uuid string, body *amodel.Network) (*amode
 	return resp.Result().(*amodel.Network), nil
 }
 
+func (inst *Client) UpdateHostsStatus(uuid string) (*amodel.Network, error) {
+	path := fmt.Sprintf("%s/%s/%s", Paths.HostNetwork.Path, uuid, "update-hosts-status")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(&amodel.Network{}).
+		Get(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*amodel.Network), nil
+}
+
 func (inst *Client) DeleteHostNetwork(uuid string) (response *Response) {
 	path := fmt.Sprintf("%s/%s", Paths.HostNetwork.Path, uuid)
 	response = &Response{}
