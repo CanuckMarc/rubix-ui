@@ -28,6 +28,7 @@ export const StreamClonesTable = () => {
   const factory = new FlowStreamCloneFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+  factory.flowNetworkCloneUUID = flNetworkCloneUUID;
 
   const columns = [
     {
@@ -71,8 +72,8 @@ export const StreamClonesTable = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetAll();
-      setStreamClones(res);
-      setFilteredData(res);
+      setStreamClones(res?.stream_clones || []);
+      setFilteredData(res?.stream_clones || []);
     } catch (error) {
       console.log(error);
     } finally {

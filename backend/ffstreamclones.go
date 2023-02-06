@@ -2,23 +2,8 @@ package backend
 
 import (
 	"fmt"
-	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
-
-func (inst *App) GetStreamClones(connUUID, hostUUID string) []model.StreamClone {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return []model.StreamClone{}
-	}
-	streams, err := client.GetStreamClones(hostUUID)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return []model.StreamClone{}
-	}
-	return streams
-}
 
 func (inst *App) GetStreamClone(connUUID, hostUUID, streamCloneUUID string, withConsumer, withWriters bool) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
