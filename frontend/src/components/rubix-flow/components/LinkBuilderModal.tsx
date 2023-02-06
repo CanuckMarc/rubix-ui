@@ -87,7 +87,7 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
             if (topic.length && topic[topic.length - 1] === node.pin) {
               topic.pop();
             }
-            node.data.topic = topic.join(" ");
+            node.data['[topic]'] = topic.join(" ");
             return node;
           });
         allNodes.push(...[...newNodesInput, ...newNodesOutput]);
