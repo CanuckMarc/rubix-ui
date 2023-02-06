@@ -3,20 +3,15 @@ import {
   AddStream,
   DeleteStream,
   DeleteStreamBulk,
-  EditStream,
-  GetStreams, GetStreamsByFlowNetwork,
+  EditStream, GetFlowNetwork,
 } from "../../../../../../../wailsjs/go/backend/App";
 
 export class FlowStreamFactory {
   hostUUID!: string;
   connectionUUID!: string;
 
-  async GetAll(): Promise<Array<model.Stream>> {
-    return GetStreams(this.connectionUUID, this.hostUUID);
-  }
-
-  async GetAllByFlowNetwork(flowNetworkUUID: string): Promise<Array<model.Stream>> {
-    return GetStreamsByFlowNetwork(this.connectionUUID, this.hostUUID, flowNetworkUUID);
+  async GetAll(flowNetworkUUID: string): Promise<model.FlowNetwork> {
+    return GetFlowNetwork(this.connectionUUID, this.hostUUID, flowNetworkUUID, true);
   }
 
   async Add(flowNetworkUUID: string, body: model.Stream): Promise<model.Stream> {

@@ -29,21 +29,6 @@ func (inst *Client) AddStreamToExistingFlow(hostIDName, flowNetworkUUID string, 
 	return resp.Result().(*model.Stream), nil
 }
 
-// GetStreamsByFlowNetwork all stream under a flow network
-func (inst *Client) GetStreamsByFlowNetwork(hostIDName, flowUUID string) ([]*model.Stream, error) {
-	url := fmt.Sprintf("proxy/ff/api/flow_networks/%s?with_streams=true", flowUUID)
-	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host-uuid", hostIDName).
-		SetHeader("host-name", hostIDName).
-		SetResult(&model.FlowNetwork{}).
-		Get(url))
-	if err != nil {
-		return nil, err
-	}
-	streams := resp.Result().(*model.FlowNetwork)
-	return streams.Streams, nil
-}
-
 func (inst *Client) GetStreams(hostIDName string) ([]model.Stream, error) {
 	url := fmt.Sprintf("proxy/ff/api/streams/")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().

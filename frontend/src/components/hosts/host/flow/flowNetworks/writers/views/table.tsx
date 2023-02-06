@@ -19,7 +19,6 @@ export const WritersTable = () => {
   const { connUUID = "", hostUUID = "", consumerUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [writers, setWriters] = useState([] as Writer[]);
-  const [thingClass, setThingClass] = useState<any>();
   const [currentItem, setCurrentItem] = useState({} as Writer);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -34,6 +33,7 @@ export const WritersTable = () => {
   const consumerFactory = new FlowConsumerFactory();
   factory.connectionUUID = consumerFactory.connectionUUID = connUUID;
   factory.hostUUID = consumerFactory.hostUUID = hostUUID;
+  factory.consumerUUID = consumerUUID;
 
   const columns = [
     {
@@ -60,12 +60,7 @@ export const WritersTable = () => {
   };
 
   const showModal = async (item: Writer) => {
-    if (!thingClass && (!item || !item.uuid)) {
-      await setNewItem();
-    } else {
-      item.writer_thing_class = item.writer_thing_class ?? thingClass;
-      setCurrentItem(item);
-    }
+    setCurrentItem(item);
     setIsModalVisible(true);
   };
 
@@ -78,8 +73,8 @@ export const WritersTable = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetAll();
-      setWriters(res);
-      setFilteredData(res);
+      setWriters(res?.writers || []);
+      setFilteredData(res?.writers || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -90,14 +85,6 @@ export const WritersTable = () => {
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
-  };
-
-  const setNewItem = async () => {
-    const item = new Writer();
-    const consumer = await consumerFactory.GetOne(consumerUUID);
-    item.writer_thing_class = consumer.producer_thing_class;
-    setThingClass(consumer.producer_thing_class); //avoid calling get consumer endpoint again
-    setCurrentItem(item);
   };
 
   useEffect(() => {

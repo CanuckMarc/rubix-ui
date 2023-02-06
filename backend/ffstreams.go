@@ -28,20 +28,6 @@ func (inst *App) AddStream(connUUID, hostUUID string, flowNetworkUUID string, bo
 	return streams
 }
 
-func (inst *App) GetStreamsByFlowNetwork(connUUID, hostUUID, flowUUID string) []*model.Stream {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil
-	}
-	streams, err := client.GetStreamsByFlowNetwork(hostUUID, flowUUID)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	return streams
-}
-
 func (inst *App) GetStreams(connUUID, hostUUID string) []model.Stream {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)

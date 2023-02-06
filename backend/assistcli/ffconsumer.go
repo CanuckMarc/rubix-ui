@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/utils/urls"
 )
 
 func (inst *Client) AddConsumer(hostIDName string, body *model.Consumer) (*model.Consumer, error) {
@@ -34,8 +35,11 @@ func (inst *Client) GetConsumers(hostIDName string) ([]model.Consumer, error) {
 	return out, nil
 }
 
-func (inst *Client) GetConsumer(hostIDName, uuid string) (*model.Consumer, error) {
+func (inst *Client) GetConsumer(hostIDName, uuid string, withWriters bool) (*model.Consumer, error) {
 	url := fmt.Sprintf("proxy/ff/api/consumers/%s", uuid)
+	if withWriters {
+		url = urls.AttachQueryParams(url, "with_writers=true")
+	}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).

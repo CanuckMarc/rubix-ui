@@ -19,7 +19,6 @@ func (inst *App) addFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwo
 	if err != nil {
 		return nil, err
 	}
-
 	return networks, nil
 }
 
@@ -47,16 +46,14 @@ func (inst *App) GetFlowNetworks(connUUID, hostUUID string, withStream bool) []m
 }
 
 func (inst *App) GetFlowNetwork(connUUID, hostUUID, uuid string, withStreams bool) *model.FlowNetwork {
-	client, err := inst.getAssistClient(&AssistClient{
-		ConnUUID: connUUID,
-	})
-	err = inst.errMsg(err)
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	resp, err := client.GetFlowNetwork(hostUUID, uuid, withStreams)
-	err = inst.errMsg(err)
 	if err != nil {
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -64,8 +61,8 @@ func (inst *App) GetFlowNetwork(connUUID, hostUUID, uuid string, withStreams boo
 
 func (inst *App) EditFlowNetwork(connUUID, hostUUID, networkUUID string, body *model.FlowNetwork) *model.FlowNetwork {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
 	if err != nil {
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	networks, err := client.EditFlowNetwork(hostUUID, networkUUID, body)
@@ -78,13 +75,13 @@ func (inst *App) EditFlowNetwork(connUUID, hostUUID, networkUUID string, body *m
 
 func (inst *App) DeleteFlowNetwork(connUUID, hostUUID, networkUUID string) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
 	if err != nil {
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	_, err = client.DeleteFlowNetwork(hostUUID, networkUUID)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return err
 	}
 	return "delete ok"
@@ -92,8 +89,8 @@ func (inst *App) DeleteFlowNetwork(connUUID, hostUUID, networkUUID string) inter
 
 func (inst *App) DeleteFlowNetworkBulk(connUUID, hostUUID string, uuids []UUIDs) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
 	if err != nil {
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	var addedCount int
@@ -102,7 +99,7 @@ func (inst *App) DeleteFlowNetworkBulk(connUUID, hostUUID string, uuids []UUIDs)
 		_, err := client.DeleteFlowNetwork(hostUUID, item.UUID)
 		if err != nil {
 			errorCount++
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			inst.uiErrorMessage(err)
 		} else {
 			addedCount++
 		}
