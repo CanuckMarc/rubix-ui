@@ -62,7 +62,7 @@ export const LoadWiresMap = () => {
         // new nodes will be placed to the right of the existing nodes
         let xTemp: number = 0
         let yTemp: number = 0
-        if (window.allFlow && window.allFlow.nodes) {
+        if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
           let largeX = 0
           window.allFlow.nodes.forEach((item: NodeInterface) => {
             if (item.position.x > largeX) {
