@@ -42,14 +42,16 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     newInputsPar = switchIndex(index, index - 1, newInputsPar).map((item: any, index: number) => ({
       ...item,
       position: index,
-      overridePosition: true,
     }));
     const keyOrderIn = Object.keys(orderIn);
-
     const newOrderInput: any = {};
 
     switchIndex(index, index - 1, keyOrderIn).forEach((item: any, index: number) => {
-      newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+
+      if (item.position !== index) {
+        newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      }
+      newOrderInput[item] = { ...orderIn[item], position: index };
     });
 
     setOrderIn(newOrderInput);
@@ -63,14 +65,15 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     newInputsPar = switchIndex(index, index + 1, newInputsPar).map((item: any, index: number) => ({
       ...item,
       position: index,
-      overridePosition: true,
     }));
     const keyOrderIn = Object.keys(orderIn);
-    
     const newOrderInput: any = {};
 
     switchIndex(index, index + 1, keyOrderIn).forEach((item: any, index: number) => {
-      newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      if (item.position !== index) {
+        newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      }
+      newOrderInput[item] = { ...orderIn[item], position: index };
     });
 
     setOrderIn(newOrderInput);
@@ -109,17 +112,17 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
       <div className="flex flex-row justify-between gap-8 relative my-3 px-4 py-3 bg-white">
         <div className="flex flex-col">
           {inPutsPar?.map((item: any, index: number) => (
-                <div key={index} className="mb-2 flex justify-between">
-                  <div>
-                    <Switch size="small" className="mr-5" />
-                    <label className="pr-6 mb-0 mr-16 pt-1 capitalize">{item.pin}</label>
-                  </div>
-                  <div>
-                    <UpCircleOutlined className="mr-2" onClick={() => onClickUpInNode(item, index)} />
-                    <DownCircleOutlined onClick={() => onClickDownInNode(item, index)} />
-                  </div>
-                </div>
-              ))}
+            <div key={index} className="mb-2 flex justify-between">
+              <div>
+                <Switch size="small" className="mr-5" />
+                <label className="pr-6 mb-0 mr-16 pt-1 capitalize">{item.pin}</label>
+              </div>
+              <div>
+                <UpCircleOutlined className="mr-2" onClick={() => onClickUpInNode(item, index)} />
+                <DownCircleOutlined onClick={() => onClickDownInNode(item, index)} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </Modal>

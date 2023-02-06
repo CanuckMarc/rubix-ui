@@ -165,12 +165,23 @@ const Flow = (props: FlowProps) => {
       closeNodePicker();
       const nodeSettings = await handleGetSettingType(connUUID, hostUUID, isRemote, nodeType);
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
+      const newOrder = spec.inputs?.reduce(
+        (result, item, index) => ({
+          ...result,
+          [item.name]: {
+            position: index,
+            overridePosition: false,
+          },
+        }),
+        {}
+      );
       const newNode = {
         id: generateUuid(),
         isParent,
         style,
         type: nodeType,
         position,
+        orderInput: newOrder,
         data: {
           inputs: convertDataSpec(spec.inputs || []),
           out: convertDataSpec(spec.outputs || []),
@@ -608,14 +619,10 @@ const Flow = (props: FlowProps) => {
     return prevNodes.map((node: NodeInterface) => {
       const data = outputNodes.find((item) => item.nodeId === node.id);
       if (data) {
-        const dataInputs = data?.inputs.map((item: any) => ({...item, ...node?.orderInput?.[item?.pin]}))
-        
-        node.data.inputs = !node.data.inputs
-          ? dataInputs
-          : handleBeforeAddOutput(node.data.inputs, dataInputs);
-        node.data.out = !node.data.out
-          ? data?.outputs
-          : handleBeforeAddOutput(node.data.out, data?.outputs);
+        const dataInputs = data?.inputs.map((item: any) => ({ ...item, ...node?.orderInput?.[item?.pin] }));
+
+        node.data.inputs = !node.data.inputs ? dataInputs : handleBeforeAddOutput(node.data.inputs, dataInputs);
+        node.data.out = !node.data.out ? data?.outputs : handleBeforeAddOutput(node.data.out, data?.outputs);
         node.status = data?.status;
         node.info = { ...node.info, ...data?.info };
       }
