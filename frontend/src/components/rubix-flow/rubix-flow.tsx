@@ -57,6 +57,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 // this is save all nodes
 declare global {
   interface Window {
+    nodesCopied?: NodeInterface[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
