@@ -518,12 +518,8 @@ export function GetConnections() {
   return window['go']['backend']['App']['GetConnections']();
 }
 
-export function GetConsumer(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetConsumer'](arg1, arg2, arg3);
-}
-
-export function GetConsumerClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetConsumerClones'](arg1, arg2);
+export function GetConsumer(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetConsumer'](arg1, arg2, arg3, arg4);
 }
 
 export function GetConsumers(arg1, arg2) {
@@ -722,16 +718,16 @@ export function GetPointsForDevice(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPointsForDevice'](arg1, arg2, arg3);
 }
 
-export function GetProducer(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3);
-}
-
-export function GetProducerClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetProducerClones'](arg1, arg2);
+export function GetProducer(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3, arg4);
 }
 
 export function GetProducers(arg1, arg2) {
   return window['go']['backend']['App']['GetProducers'](arg1, arg2);
+}
+
+export function GetProducersUnderStreamClone(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetProducersUnderStreamClone'](arg1, arg2, arg3);
 }
 
 export function GetRcNetworkSchema(arg1, arg2) {
@@ -770,20 +766,16 @@ export function GetSettings() {
   return window['go']['backend']['App']['GetSettings']();
 }
 
-export function GetStream(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetStream'](arg1, arg2, arg3);
+export function GetStream(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['GetStream'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStreamClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetStreamClones'](arg1, arg2);
+export function GetStreamClone(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['GetStreamClone'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetStreams(arg1, arg2) {
   return window['go']['backend']['App']['GetStreams'](arg1, arg2);
-}
-
-export function GetStreamsByFlowNetwork(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetStreamsByFlowNetwork'](arg1, arg2, arg3);
 }
 
 export function GetSubFlow(arg1, arg2, arg3, arg4) {

@@ -251,7 +251,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -279,9 +279,7 @@ export function GetConnectionSchema():Promise<backend.ConnectionSchema>;
 
 export function GetConnections():Promise<Array<storage.RubixConnection>>;
 
-export function GetConsumer(arg1:string,arg2:string,arg3:string):Promise<model.Consumer>;
-
-export function GetConsumerClones(arg1:string,arg2:string):Promise<Array<model.Consumer>>;
+export function GetConsumer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Consumer>;
 
 export function GetConsumers(arg1:string,arg2:string):Promise<Array<model.Consumer>>;
 
@@ -381,11 +379,11 @@ export function GetPoints(arg1:string,arg2:string):Promise<Array<model.Point>>;
 
 export function GetPointsForDevice(arg1:string,arg2:string,arg3:string):Promise<Array<model.Point>>;
 
-export function GetProducer(arg1:string,arg2:string,arg3:string):Promise<model.Producer>;
-
-export function GetProducerClones(arg1:string,arg2:string):Promise<Array<model.Producer>>;
+export function GetProducer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Producer>;
 
 export function GetProducers(arg1:string,arg2:string):Promise<Array<model.Producer>>;
+
+export function GetProducersUnderStreamClone(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function GetRcNetworkSchema(arg1:string,arg2:string):Promise<any>;
 
@@ -405,13 +403,11 @@ export function GetServerTime(arg1:string):Promise<any>;
 
 export function GetSettings():Promise<rumodel.Response>;
 
-export function GetStream(arg1:string,arg2:string,arg3:string):Promise<model.Stream>;
+export function GetStream(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<model.Stream>;
 
-export function GetStreamClones(arg1:string,arg2:string):Promise<Array<model.StreamClone>>;
+export function GetStreamClone(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<rumodel.Response>;
 
 export function GetStreams(arg1:string,arg2:string):Promise<Array<model.Stream>>;
-
-export function GetStreamsByFlowNetwork(arg1:string,arg2:string,arg3:string):Promise<Array<model.Stream>>;
 
 export function GetSubFlow(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
