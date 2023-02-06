@@ -215,22 +215,34 @@ func (inst *App) nodeHelpByName(connUUID, hostUUID, nodeName string) (*node.Help
 	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
 }
 
-func (inst *App) NodeHelpByName(connUUID, hostUUID string, isRemote bool, nodeName string) *node.Help {
+type Help struct {
+	NodeName string `json:"name"`
+	Help     string `json:"help"`
+}
+
+func (inst *App) NodeHelpByName(connUUID, hostUUID string, isRemote bool, nodeName string) *Help {
+	out := &Help{}
 	if isRemote {
 		resp, err := inst.nodeHelpByName(connUUID, hostUUID, nodeName)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-			return resp
+			return out
 		}
-		return resp
+		return &Help{
+			NodeName: resp.NodeName,
+			Help:     resp.Help,
+		}
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.NodeHelpByName(nodeName)
 	if err != nil {
 		inst.uiErrorMessage("download the node first to edit the settings")
-		return resp
+		return out
 	}
-	return resp
+	return &Help{
+		NodeName: resp.NodeName,
+		Help:     resp.Help,
+	}
 }
 
 func (inst *App) getFlow(connUUID, hostUUID string) (interface{}, error) {

@@ -14,7 +14,7 @@ import {
   NodeValues,
   UpdateWiresConnection,
 } from "../../../wailsjs/go/backend/App";
-import {db, flowcli, node} from "../../../wailsjs/go/models";
+import { backend, db, flowcli, node } from "../../../wailsjs/go/models";
 
 export class FlowFactory {
   // arg1 is the connectionUUID
@@ -133,7 +133,7 @@ export class FlowFactory {
     hostUUID: string,
     isRemote: boolean,
     nodeName: string,
-  ): Promise<node.Help> {
+  ): Promise<backend.Help> {
     return await NodeHelpByName(connUUID, hostUUID, isRemote, nodeName);
   }
 
