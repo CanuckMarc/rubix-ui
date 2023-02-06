@@ -11,6 +11,10 @@ import {
   UploadOutlined,
   PlayCircleOutlined,
   SettingOutlined,
+  LinkOutlined,
+  BuildOutlined,
+  RollbackOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
@@ -157,80 +161,31 @@ const Controls = ({
     handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
   };
 
+  const renderIconBtn = (title: string, Icon: any, onClick: () => void, id = "") => {
+    return (
+      <div id={id} className="cursor-pointer border-r bg-white hover:bg-gray-100" title={title} onClick={onClick}>
+        <Icon className="p-2 text-gray-700 align-middle" />
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-          title="Link Builder"
-          onClick={onLinkBuilder}
-        >
-          Link Builder
-        </div>
+        {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
           <>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Connection Builder"
-              onClick={onConnectionBuilder}
-            >
-              Connection Builder
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Back to Main"
-              onClick={onBackToMain}
-            >
-              Back to Main
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Close sub flow"
-              onClick={onCloseSubFlow}
-            >
-              Close Sub Flow
-            </div>
+            {renderIconBtn("Connection Builder", BuildOutlined, onConnectionBuilder)}
+            {renderIconBtn("Back to Main", RollbackOutlined, onBackToMain)}
+            {renderIconBtn("Close sub flow", CloseCircleOutlined, onCloseSubFlow)}
           </>
         )}
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Settings refresh value"
-          onClick={() => setSettingRefreshModalOpen(true)}
-        >
-          <SettingOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Help"
-          onClick={() => setHelpModalOpen(true)}
-        >
-          <QuestionCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Load"
-          onClick={() => setLoadModalOpen(true)}
-        >
-          <UploadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Save"
-          id="exportButton"
-          onClick={() => setSaveModalOpen(true)}
-        >
-          <DownloadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Clear"
-          onClick={() => setClearModalOpen(true)}
-        >
-          <RestOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div className="cursor-pointer border-r bg-white hover:bg-gray-100" title="Run" onClick={onHandelSaveFlow}>
-          <PlayCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
+        {renderIconBtn("Settings", SettingOutlined, () => setSettingRefreshModalOpen(true))}
+        {renderIconBtn("Help", QuestionCircleOutlined, () => setHelpModalOpen(true))}
+        {renderIconBtn("Import", UploadOutlined, () => setLoadModalOpen(true))}
+        {renderIconBtn("Export", DownloadOutlined, () => setSaveModalOpen(true), "exportButton")}
+        {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
+        {renderIconBtn("Download", PlayCircleOutlined, onHandelSaveFlow)}
       </div>
       <LoadModal
         open={loadModalOpen}
