@@ -112,7 +112,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <span style={{ padding: "10px 0" }}>
+        <span style={{ padding: "10px 0" }} className="supervisors-menu">
           <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
           {item.name}
         </span>
@@ -125,7 +125,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset", display: "flex" }}>
+        <NavLink to={next} style={{ color: "unset", display: "flex" }} className="supervisors-menu">
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
           <span style={{ width: "100%" }}>
             {item.name}
@@ -222,6 +222,7 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.HOSTS),
                   children: null,
+                  className: "supervisors-menu",
                 },
                 {
                   ...objectMap(
@@ -271,6 +272,7 @@ export const getTreeDataIterative = (connections: any) => {
                       children: null,
                     },
                   ],
+                  className: "supervisors-menu",
                 },
                 {
                   ...objectMap(
@@ -284,11 +286,16 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
+                  className: "supervisors-menu",
                 },
               ],
+              className: "supervisors-menu",
             })),
+            className: "supervisors-menu",
           })),
+          className: "supervisors-menu",
         })),
+        className: "supervisors-menu",
       })),
     },
   ];

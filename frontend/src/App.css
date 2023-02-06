@@ -191,3 +191,9 @@ hr.solid {
     color: #c92020;
     font-weight: 200;
 }
+
+.supervisors-menu>.ant-menu-submenu-title,
+.supervisors-menu>.ant-menu-sub>.ant-menu-item {
+    height: 28px !important;
+    line-height: 28px !important;
+}
