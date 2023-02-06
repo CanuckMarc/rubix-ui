@@ -60,14 +60,20 @@ export const LoadWiresMap = () => {
 
         // check for the largest x value among existing nodes
         // new nodes will be placed to the right of the existing nodes
-        let largeX = 0
-        window.allFlow.nodes.forEach((item: NodeInterface) => {
-          if (item.position.x > largeX) {
-            largeX = item.position.x
-          }
-        })
-        let xTemp: number = largeX
+        let xTemp: number = 0
         let yTemp: number = 0
+        if (window.allFlow && window.allFlow.nodes) {
+          let largeX = 0
+          window.allFlow.nodes.forEach((item: NodeInterface) => {
+            if (item.position.x > largeX) {
+              largeX = item.position.x
+            }
+          })
+          xTemp = largeX
+        } else {
+          xTemp = x
+          yTemp = y
+        }
         wiresMapNodes.forEach(item => {
           xTemp = xTemp + 200
           yTemp = yTemp + 200
