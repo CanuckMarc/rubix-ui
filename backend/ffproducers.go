@@ -54,21 +54,21 @@ func (inst *App) GetProducers(connUUID, hostUUID string) []model.Producer {
 	return resp
 }
 
-func (inst *App) getProducer(connUUID, hostUUID, streamUUID string) (*model.Producer, error) {
+func (inst *App) getProducer(connUUID, hostUUID, uuid string, withWriterClones bool) (*model.Producer, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil, err
 	}
-	producers, err := client.GetProducer(hostUUID, streamUUID)
+	producers, err := client.GetProducer(hostUUID, uuid, withWriterClones)
 	if err != nil {
 		return nil, err
 	}
 	return producers, nil
 }
 
-func (inst *App) GetProducer(connUUID, hostUUID, streamUUID string) *model.Producer {
-	producers, err := inst.getProducer(connUUID, hostUUID, streamUUID)
+func (inst *App) GetProducer(connUUID, hostUUID, uuid string, withWriterClones bool) *model.Producer {
+	producers, err := inst.getProducer(connUUID, hostUUID, uuid, withWriterClones)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil

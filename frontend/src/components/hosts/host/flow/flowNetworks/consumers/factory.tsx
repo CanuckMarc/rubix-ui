@@ -4,7 +4,6 @@ import {
   DeleteConsumer,
   DeleteConsumerBulk,
   EditConsumer,
-  GetConsumer,
   GetProducersUnderStreamClone,
   GetStreamClone,
 } from "../../../../../../../wailsjs/go/backend/App";
@@ -20,10 +19,6 @@ export class FlowConsumerFactory {
 
   async GetProducersUnderStreamClone(): Promise<rumodel.Response> {
     return GetProducersUnderStreamClone(this.connectionUUID, this.hostUUID, this.streamCloneUUID);
-  }
-
-  async GetOne(uuid: string): Promise<model.Consumer> {
-    return GetConsumer(this.connectionUUID, this.hostUUID, uuid)
   }
 
   async Add(body: model.Consumer): Promise<model.Consumer> {

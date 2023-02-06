@@ -122,7 +122,7 @@ export const ConsumersTable = () => {
       <RbAddButton handleClick={() => showModal({} as Consumer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
 
-      {consumers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {consumers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}

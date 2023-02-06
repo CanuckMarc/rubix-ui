@@ -13,7 +13,7 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 import UUIDs = backend.UUIDs;
 import FlowNetworkClone = model.FlowNetworkClone;
 
-export const NetworkClonesTable = (props: any) => {
+export const NetworkClonesTable = () => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Array<UUIDs>);
@@ -93,12 +93,12 @@ export const NetworkClonesTable = (props: any) => {
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {networks?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={networks.length > 0 ? filteredData : []}
+        dataSource={networks?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

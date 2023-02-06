@@ -13,7 +13,7 @@ import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
 
-export const ProducersTable = (props: any) => {
+export const ProducersTable = () => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "", streamUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [producers, setProducers] = useState([] as Producer[]);
@@ -108,7 +108,7 @@ export const ProducersTable = (props: any) => {
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as Producer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {producers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {producers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"

@@ -89,7 +89,7 @@ export const StreamClonesTable = () => {
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {streamClones.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {streamClones?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
