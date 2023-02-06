@@ -454,6 +454,20 @@ export namespace backend {
 		}
 	}
 	
+	export class Help {
+	    name: string;
+	    help: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Help(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.help = source["help"];
+	    }
+	}
 	
 	export class NetworksList {
 	    name: string;
