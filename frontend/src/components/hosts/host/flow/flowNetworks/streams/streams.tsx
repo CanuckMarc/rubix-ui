@@ -12,13 +12,7 @@ import Stream = model.Stream;
 const { Title } = Typography;
 
 export const Streams = () => {
-  const {
-    connUUID = "",
-    locUUID = "",
-    netUUID = "",
-    hostUUID = "",
-    flNetworkUUID = "",
-  } = useParams();
+  const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "" } = useParams();
   const [streams, setStreams] = useState([] as Stream[]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -36,24 +30,21 @@ export const Streams = () => {
       breadcrumbName: "Location",
     },
     {
-      path: ROUTES.LOCATION_NETWORKS.replace(
-        ":connUUID",
-        connUUID || ""
-      ).replace(":locUUID", locUUID || ""),
+      path: ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", locUUID || ""),
       breadcrumbName: "Group",
     },
     {
       path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
     {
       path: ROUTES.HOST.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID || "")
         .replace(":hostUUID", hostUUID || ""),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
     {
       breadcrumbName: "Streams",
@@ -82,11 +73,7 @@ export const Streams = () => {
         Flow Network Streams
       </Title>
       <RbxBreadcrumb routes={routes} />
-      <StreamsTable
-        data={streams}
-        isFetching={isFetching}
-        refreshList={fetch}
-      />
+      <StreamsTable data={streams} isFetching={isFetching} refreshList={fetch} />
     </>
   );
 };

@@ -6,7 +6,7 @@ import {
   LaptopOutlined,
   ClusterOutlined,
   MenuOutlined,
-  ToolOutlined
+  ToolOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { useState } from "react";
@@ -42,7 +42,12 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
       .replace(":hostUUID", hostUUID),
-  [ObjectType.APP_DETAILS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "", hostUUID: string = "") =>
+  [ObjectType.APP_DETAILS]: (
+    connUUID: string = "",
+    locUUID: string = "",
+    netUUID: string = "",
+    hostUUID: string = ""
+  ) =>
     ROUTES.APP_DETAILS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
@@ -180,7 +185,7 @@ export const getTreeDataIterative = (connections: any) => {
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...objectMap(
               getTreeObject(
-                network,
+                { ...network, name: network.name + " (devices)" },
                 ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
                 "",
                 <LaptopOutlined />
@@ -197,7 +202,12 @@ export const getTreeDataIterative = (connections: any) => {
                   <ClusterOutlined />
                 )
               ),
-              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](connection.uuid, location.uuid, network.uuid, host.uuid),
+              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](
+                connection.uuid,
+                location.uuid,
+                network.uuid,
+                host.uuid
+              ),
               value: getItemValue(host, ObjectType.APP_DETAILS),
               children: [
                 {
@@ -274,7 +284,7 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
-                }
+                },
               ],
             })),
           })),
