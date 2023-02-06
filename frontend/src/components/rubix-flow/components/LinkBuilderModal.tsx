@@ -174,7 +174,7 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
     }
   }, [open]);
 
-  console.log("nodes", nodes);
+  // console.log("nodes", nodes);
 
   return (
     <Modal

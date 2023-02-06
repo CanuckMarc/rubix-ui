@@ -10,6 +10,8 @@ import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { generateUuid } from "../rubix-flow/lib/generateUuid";
+import { openNotificationWithIcon } from "../../utils/utils";
+
 
 const { Title } = Typography;
 
@@ -97,7 +99,18 @@ export const WiresMap = () => {
     }, [connUUID, hostUUID]);
 
     const addPoints = () => {
-        if (selectedPointsOne && selectedPointsTwo) {
+        if (!selectedPointsOne || 
+            !selectedPointsTwo || 
+            !selectedFlowNet || 
+            Object.keys(selectedPointsOne).length === 0 ||
+            Object.keys(selectedPointsTwo).length === 0
+        ) openNotificationWithIcon("warning", 'Please select a flow network and both points!');
+        if (selectedPointsOne && 
+            selectedPointsTwo && 
+            selectedFlowNet && 
+            Object.keys(selectedPointsOne).length !== 0 && 
+            Object.keys(selectedPointsTwo).length !== 0
+        ){
             const resObj = {} as PointTableTypeRecord
             const newId = generateUuid()
             resObj['pointOne'] = filterForFullObj(pointList, selectedPointsOne)
@@ -108,7 +121,6 @@ export const WiresMap = () => {
             setWiresMapNodes([...wiresMapNodes, resObj])
             setTableData([...tableData, {
                 existingFlowNetName: resObj.existingFlowNet?.nodeName ? resObj.existingFlowNet?.nodeName : resObj.existingFlowNet?.id,
-                // existingFlowNetName: undefined,
                 pointOneName: resObj.pointOne.name,
                 pointTwoName: resObj.pointTwo.name,
                 key: newId
@@ -117,8 +129,6 @@ export const WiresMap = () => {
             setPairToRemove([resObj['pointOne'], resObj['pointTwo']])
     
             // clear inputs after adding a pair of points
-            // setSelectedFlowNet(undefined);
-            // setSelectValue(null);
             setClearSelection(true);
         }
     }
@@ -153,24 +163,10 @@ export const WiresMap = () => {
     }
 
     const recordPoints = () => {
-        // console.log(wiresMapNodes)
         nav(ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID))
     }
 
     const handleChange = (value: string) => {
-        // record.existingFlowNetName = value
-        // let updatedArray: PointTableTypeRecord[] = []
-        // wiresMapNodes.forEach((el: PointTableTypeRecord) => {
-        //     if (el.id === record.key) {
-        //         el.existingFlowNet = flowNetList.find((item: node.Schema) => {
-        //             return item.id === value
-        //         })
-        //     }
-        //     updatedArray.push(el)
-        // });
-
-        // setWiresMapNodes(updatedArray);
-
         setSelectValue(value);
         setSelectedFlowNet(flowNetList.find((item: node.Schema) => {
             return item.id === value
@@ -183,24 +179,9 @@ export const WiresMap = () => {
             dataIndex: 'existingFlowNetName',
             key: 'existingFlowNetName',
             fixed: 'left',
-            // render: (text, record: AddedPointType, index) => {
-            //     return (
-            //         <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
-            //             <Select
-            //                 showSearch
-            //                 allowClear
-            //                 // value={selectValue}
-            //                 style={{ width: '100%' }}
-            //                 placeholder="Will create a new flow network if left blank"
-            //                 onChange={(value) => handleChange(value, record)}
-            //                 options={flowNetOptionList}
-            //             />
-            //         </div>
-            //     )
-            // }
             render: (text, record: AddedPointType, index) => {
                 if (record.existingFlowNetName === undefined) {
-                    return 'Flow network unselected, generating new one.'
+                    return 'Flow network unselected, please select one.'
                 } else {
                     return record.existingFlowNetName
                 }
@@ -237,7 +218,6 @@ export const WiresMap = () => {
             </Title>
             <Card bordered={false}>
                 <div style={{display: 'flex', flexDirection: 'column', gap: '2vw'}}>
-
                     <Card bordered={true}>
                         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
                             <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
@@ -282,13 +262,11 @@ export const WiresMap = () => {
                                         pageSizeOptions: [5, 10, 50, 100, 1000],
                                         locale: { items_per_page: "" },
                                     }}
-                                    // scroll={{ x: 'max-content', y: '50vh' }}
                                 />
                                 <Button type="primary" icon={<UploadOutlined />} onClick={recordPoints} size={'large'} disabled={tableData.length === 0} style={{width: '15vw'}}>Generate point connections</Button>
                             </div>
                         </Card>
-                    </div>
-                    
+                    </div>  
                 </div>
             </Card>
         </>

@@ -9,6 +9,7 @@ import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../use-nodes-s
 import { NodeSpecJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
 import { node } from "../../../../wailsjs/go/models";
+import { openNotificationWithIcon } from "../../../utils/utils";
 
 type NodeGenInputType = {
   type: string;
@@ -22,6 +23,9 @@ type NodeGenInputType = {
 function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
+
+const x = getRandomArbitrary(-200, 200)
+const y = getRandomArbitrary(-200, 200)
 
 export const LoadWiresMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
@@ -41,9 +45,6 @@ export const LoadWiresMap = () => {
       let localNodes: NodeInterface[] = [];
       let localEdges: Edge[] = [];
       if (wiresMapNodes.length !== 0) {
-        const x = getRandomArbitrary(-200, 200)
-        const y = getRandomArbitrary(-200, 200)
-
         const parentNode = generateNodes({
           type: 'flow/flow-network',
           name: '',
@@ -52,14 +53,25 @@ export const LoadWiresMap = () => {
           x: x,
           y: y
         })
-        // console.log('wiresMapNodes are: ', wiresMapNodes)
-
+  
         const check = wiresMapNodes.some(item => {
           return item.existingFlowNet === undefined
         })
 
+        // check for the largest x value among existing nodes
+        // new nodes will be placed to the right of the existing nodes
+        let largeX = 0
+        window.allFlow.nodes.forEach((item: NodeInterface) => {
+          if (item.position.x > largeX) {
+            largeX = item.position.x
+          }
+        })
+        let xTemp: number = largeX
+        let yTemp: number = 0
         wiresMapNodes.forEach(item => {
-          const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode);
+          xTemp = xTemp + 200
+          yTemp = yTemp + 200
+          const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode, xTemp, yTemp);
           localNodes = [...localNodes, ...resObj.nodes]
           localEdges = [...localEdges, ...resObj.edges]
         })
@@ -73,34 +85,20 @@ export const LoadWiresMap = () => {
     }, [])
 
     useEffect(() => {
-      // console.log('is loading is: ', refreshCounter)
       // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
       // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
-      if (refreshCounter === 2) {
-        // deBounce(refreshCounter)
-        renderPointsToFlowEditor(newNodes, newEdges);
-        setWiresMapNodes([]);
+      if (refreshCounter === 2) {     
+        openNotificationWithIcon("success", 'Rubix flow loading complete!');
+        if (wiresMapNodes.length !== 0) {
+          renderPointsToFlowEditor(newNodes, newEdges);
+          setWiresMapNodes([]);
+        }
       }
     }, [refreshCounter])
 
-    // const deBounce = (currentVal: Number) => {
-    //   setTimeout(() => {
-    //     if (refreshCounter === currentVal) {
-    //       console.log('accessed!!! new nodes are: ', newNodes)
-    //       renderPointsToFlowEditor(newNodes, newEdges);
-    //       setWiresMapNodes([]);
-    //     } else {
-    //       deBounce(refreshCounter);
-    //     }
-    //   }, 4000)
-    // }
-
-    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined, parentNode: NodeInterface) => {
+    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined, parentNode: NodeInterface, x: number, y: number) => {
       const nodes: NodeInterface[] = [];
       const edges: Edge[] = [];
-
-      const x = getRandomArbitrary(-200, 200)
-      const y = getRandomArbitrary(-200, 200)
 
       // generate new nodes
       const nodeSpecs: NodeGenInputType[] = [
@@ -145,7 +143,7 @@ export const LoadWiresMap = () => {
     const renderPointsToFlowEditor = (newNodes: NodeInterface[], newEdges: Edge[]) => {
       // set new nodes and edges into flow editor
       setTimeout(() => {
-        let oldNodes = flowInstance.getNodes();
+        const oldNodes = flowInstance.getNodes();
         flowInstance.setNodes([...oldNodes, ...newNodes]);
         window.allFlow.nodes = [...window.allFlow.nodes, ...newNodes]
         
