@@ -21,6 +21,7 @@ export const behaveToFlow = (graph: GraphJSON): [Node[], Edge[]] => {
             ? Number(nodeJson.metadata?.positionY)
             : 0,
         },
+        orderInput: nodeJson.inputs || {},
         data: nodeJson.data || ({} as { [key: string]: any }),
         style: nodeJson.style || ({} as CSSProperties),
         settings: nodeJson?.settings || {},

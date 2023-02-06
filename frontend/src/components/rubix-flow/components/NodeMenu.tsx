@@ -6,6 +6,7 @@ import { SettingsModal } from "./SettingsModal";
 import { SetPayloadModal } from "./SetPayloadModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { SetNameModal } from "./Modals";
+import { SettingNode } from "./SettingNode";
 import { NodeHelpModal } from "./NodeHelpModal";
 
 type NodeMenuProps = {
@@ -47,6 +48,7 @@ const NodeMenu = ({
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowPayload, setIsShowPayload] = useState(false);
   const [isShowSetName, setIsShowSetName] = useState(false);
+  const [isShowSetNode, setIsShowSetNode] = useState(false);
   const [nodeType, setNodeType] = useState<NodeSpecJSON>(DEFAULT_NODE_SPEC_JSON);
 
   const ref = useRef(null);
@@ -90,6 +92,13 @@ const NodeMenu = ({
 
   const handleToggleSetName = () => {
     setIsShowSetName(!isShowSetName);
+  };
+  const handleToggleSetNode = () => {
+    setIsShowSetNode(!isShowSetNode);
+  };
+  const handleCloseSetNodeModal = () => {
+    setIsShowSetNode(false);
+    onClose();
   };
 
   const handleCloseSetNameModal = () => {
@@ -193,6 +202,13 @@ const NodeMenu = ({
           >
             Set Name
           </div>
+          <div
+            key="Sett Node"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
+            onClick={handleToggleSetNode}
+          >
+            Settings Node
+          </div>
           {node.isParent && (
             <>
               <div
@@ -265,6 +281,7 @@ const NodeMenu = ({
         <SetPayloadModal node={node} nodeType={nodeType} open={isShowPayload} onClose={() => setIsShowPayload(false)} />
       )}
       <SetNameModal node={node} open={isShowSetName} onClose={handleCloseSetNameModal} />
+      <SettingNode node={node} open={isShowSetNode} onClose={handleCloseSetNodeModal}/>
     </>
   );
 };

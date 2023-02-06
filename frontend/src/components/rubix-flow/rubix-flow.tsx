@@ -606,16 +606,18 @@ const Flow = (props: FlowProps) => {
     if (outputNodes && outputNodes.length === 0) return prevNodes;
 
     return prevNodes.map((node: NodeInterface) => {
-      const index = outputNodes.findIndex((item) => item.nodeId === node.id);
-      if (index > -1) {
+      const data = outputNodes.find((item) => item.nodeId === node.id);
+      if (data) {
+        const dataInputs = data?.inputs.map((item: any) => ({...item, ...node?.orderInput?.[item?.pin]}))
+        
         node.data.inputs = !node.data.inputs
-          ? outputNodes[index]?.inputs
-          : handleBeforeAddOutput(node.data.inputs, outputNodes[index]?.inputs);
+          ? dataInputs
+          : handleBeforeAddOutput(node.data.inputs, dataInputs);
         node.data.out = !node.data.out
-          ? outputNodes[index]?.outputs
-          : handleBeforeAddOutput(node.data.out, outputNodes[index]?.outputs);
-        node.status = outputNodes[index]?.status;
-        node.info = { ...node.info, ...outputNodes[index]?.info };
+          ? data?.outputs
+          : handleBeforeAddOutput(node.data.out, data?.outputs);
+        node.status = data?.status;
+        node.info = { ...node.info, ...data?.info };
       }
 
       return node;

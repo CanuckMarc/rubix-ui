@@ -28,6 +28,7 @@ export interface NodeInterface<T = any> {
   selectable?: boolean;
   connectable?: boolean;
   dragHandle?: string;
+  orderInput?: any;
   width?: number | null;
   height?: number | null;
   originalHeight?: number | null;
