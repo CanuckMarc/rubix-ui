@@ -9,10 +9,9 @@ import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const ProducersTable = (props: any) => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "", streamUUID = "" } = useParams();
@@ -85,7 +84,7 @@ export const ProducersTable = (props: any) => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll();
+      const res = await factory.GetAll(true, false);
       setProducers(res);
       setFilteredData(res);
     } catch (error) {

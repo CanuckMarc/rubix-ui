@@ -9,12 +9,13 @@ import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 import UUIDs = backend.UUIDs;
 import Consumer = model.Consumer;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
-export const ConsumersTable = (props: any) => {
+export const ConsumersTable = () => {
   const {
     connUUID = "",
     hostUUID = "",
@@ -33,6 +34,7 @@ export const ConsumersTable = (props: any) => {
   const factory = new FlowConsumerFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+  factory.streamCloneUUID = streamCloneUUID;
 
   const config = {
     originData: consumers,
@@ -95,9 +97,13 @@ export const ConsumersTable = (props: any) => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll(false);
-      setConsumers(res);
-      setFilteredData(res);
+      const res = await factory.GetAll(true, false);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+        return;
+      }
+      setConsumers(res?.data?.consumers || []);
+      setFilteredData(res?.data?.consumers || []);
     } catch (error) {
       console.log(error);
     } finally {

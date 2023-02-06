@@ -12,8 +12,8 @@ export class FlowProducerFactory {
   connectionUUID!: string;
   streamUUID!: string;
 
-  async GetAll(): Promise<Array<model.Producer>> {
-    const res = await GetStream(this.connectionUUID, this.hostUUID, this.streamUUID);
+  async GetAll(withProducers: boolean, withWriterClones: boolean): Promise<Array<model.Producer>> {
+    const res = await GetStream(this.connectionUUID, this.hostUUID, this.streamUUID, withProducers, withWriterClones);
     return res.producers || [];
   }
 

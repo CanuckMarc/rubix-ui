@@ -19,20 +19,6 @@ func (inst *Client) AddProducer(hostIDName string, body *model.Producer) (*model
 	return resp.Result().(*model.Producer), nil
 }
 
-func (inst *Client) EditProducer(hostIDName, uuid string, body *model.Producer) (*model.Producer, error) {
-	url := fmt.Sprintf("proxy/ff/api/producers/%s", uuid)
-	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host-uuid", hostIDName).
-		SetHeader("host-name", hostIDName).
-		SetResult(&model.Producer{}).
-		SetBody(body).
-		Patch(url))
-	if err != nil {
-		return nil, err
-	}
-	return resp.Result().(*model.Producer), nil
-}
-
 func (inst *Client) GetProducers(hostIDName string) ([]model.Producer, error) {
 	url := fmt.Sprintf("proxy/ff/api/producers")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
@@ -55,6 +41,20 @@ func (inst *Client) GetProducer(hostIDName, uuid string) (*model.Producer, error
 		SetHeader("host-name", hostIDName).
 		SetResult(&model.Producer{}).
 		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*model.Producer), nil
+}
+
+func (inst *Client) EditProducer(hostIDName, uuid string, body *model.Producer) (*model.Producer, error) {
+	url := fmt.Sprintf("proxy/ff/api/producers/%s", uuid)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&model.Producer{}).
+		SetBody(body).
+		Patch(url))
 	if err != nil {
 		return nil, err
 	}

@@ -19,20 +19,6 @@ func (inst *Client) AddConsumer(hostIDName string, body *model.Consumer) (*model
 	return resp.Result().(*model.Consumer), nil
 }
 
-func (inst *Client) EditConsumer(hostIDName, uuid string, body *model.Consumer) (*model.Consumer, error) {
-	url := fmt.Sprintf("proxy/ff/api/consumers/%s", uuid)
-	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetHeader("host-uuid", hostIDName).
-		SetHeader("host-name", hostIDName).
-		SetResult(&model.Consumer{}).
-		SetBody(body).
-		Patch(url))
-	if err != nil {
-		return nil, err
-	}
-	return resp.Result().(*model.Consumer), nil
-}
-
 func (inst *Client) GetConsumers(hostIDName string) ([]model.Consumer, error) {
 	url := fmt.Sprintf("proxy/ff/api/consumers")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
@@ -55,6 +41,20 @@ func (inst *Client) GetConsumer(hostIDName, uuid string) (*model.Consumer, error
 		SetHeader("host-name", hostIDName).
 		SetResult(&model.Consumer{}).
 		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*model.Consumer), nil
+}
+
+func (inst *Client) EditConsumer(hostIDName, uuid string, body *model.Consumer) (*model.Consumer, error) {
+	url := fmt.Sprintf("proxy/ff/api/consumers/%s", uuid)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&model.Consumer{}).
+		SetBody(body).
+		Patch(url))
 	if err != nil {
 		return nil, err
 	}
