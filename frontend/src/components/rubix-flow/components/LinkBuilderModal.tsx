@@ -16,7 +16,7 @@ import {
 } from "./ConnectionBuilderModal";
 
 type LinkBuilderModalProps = {
-  parentNode: NodeInterface;
+  parentNode?: NodeInterface;
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   open?: boolean;
   onClose: () => void;
@@ -57,6 +57,7 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
     if (nodesBuilder.length > 0) {
       const allNodes: NodeInterface[] = [];
       const allEdges: Edge[] = [];
+      const parentId = parentNode?.id || null;
 
       nodesBuilder.forEach((node) => {
         let newNodesInput = node.data.inputs
@@ -70,14 +71,14 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
         newNodesInput = newNodesInput
           .map((item: NodeSpecJSONWithName, idx: number) =>
             item.type
-              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx)
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentId, item, idx)
               : null
           )
           .filter(Boolean);
         newNodesOutput = newNodesOutput
           .map((item: NodeSpecJSONWithName, idx: number) =>
             item.type
-              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentNode.id, item, idx, true)
+              ? generateNodeFromBuilder(connUUID, hostUUID, nodesSpec as NodeSpecJSON[], parentId, item, idx, true)
               : null
           )
           .filter(Boolean)
@@ -103,12 +104,13 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
         });
 
         newNodesOutput.forEach((nodeItem: NodeInterface & { pin: string }) => {
+          const pinTarget = nodeItem.data?.inputs?.find((item: { name: string }) => item.name !== "topic");
           const newEdge = {
             id: generateUuid(),
             source: node.id,
             sourceHandle: nodeItem.pin,
             target: nodeItem.id,
-            targetHandle: "in",
+            targetHandle: pinTarget?.name || "in",
           };
           allEdges.push(newEdge);
         });
@@ -133,7 +135,12 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
 
   useEffect(() => {
     if (open) {
-      const childNodes = nodes.filter((nodeItem: NodeWithExpose) => nodeItem.parentId === parentNode.id);
+      const childNodes = nodes.filter((nodeItem: NodeWithExpose) => {
+        if (parentNode) {
+          return nodeItem.parentId === parentNode.id;
+        }
+        return !nodeItem.parentId;
+      });
       const childNodesSelected = childNodes.filter((item) => item.selected);
 
       const newNodeBuilder = (childNodesSelected.length > 0 ? childNodesSelected : childNodes).filter(
@@ -173,8 +180,6 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
       );
     }
   }, [open]);
-
-  console.log("nodes", nodes);
 
   return (
     <Modal

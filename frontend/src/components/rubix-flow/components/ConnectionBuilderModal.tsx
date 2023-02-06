@@ -43,7 +43,7 @@ export const generateNodeFromBuilder = (
   connUUID: string,
   hostUUID: string,
   nodesSpec: NodeSpecJSON[],
-  parentId: string,
+  parentId: string | null,
   item: NodeSpecJSONWithName,
   index: number,
   isOut = false
@@ -150,12 +150,13 @@ export const RenderNodeBuilder = ({
               />
             </div>
           </td>
-          <td className="flex">
-            <Checkbox
-              className="m-auto mt-1"
-              onChange={onChangeSetting(nodeIndex, isInput, itemIndex, "isUseNodeName")}
-              checked={item.isUseNodeName}
-            />
+          <td>
+            <div className="flex justify-center items-center">
+              <Checkbox
+                onChange={onChangeSetting(nodeIndex, isInput, itemIndex, "isUseNodeName")}
+                checked={item.isUseNodeName}
+              />
+            </div>
           </td>
         </tr>
       );
@@ -182,8 +183,8 @@ export const RenderNodeBuilder = ({
         {(node.info?.nodeName || [name, type].join(" | ")).toUpperCase()}
       </p>
       <div className="flex">
-        {renderTable("Inputs", node.data.inputs, true)}
-        {renderTable("Outputs", node.data.out, false)}
+        {node.data.inputs?.length > 0 && renderTable("Inputs", node.data.inputs, true)}
+        {node.data.out?.length > 0 && renderTable("Outputs", node.data.out, false)}
       </div>
     </div>
   );

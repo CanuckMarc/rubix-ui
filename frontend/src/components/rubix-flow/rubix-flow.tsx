@@ -210,14 +210,17 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow(node);
   };
 
-  const handleConnectionBuilderFlow = (node: NodeInterface, isConnection = true) => {
+  const handleConnectionBuilderFlow = (node: NodeInterface) => {
     setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
     setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
     if (node.id !== selectedNodeForSubFlow?.id) {
       handlePushSelectedNodeForSubFlow(node);
     }
-    setIsConnectionBuilder(isConnection);
-    setIsLinkBuilder(!isConnection);
+    setIsConnectionBuilder(true);
+  };
+
+  const handleLinkBuilder = () => {
+    setIsLinkBuilder(true);
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
@@ -1042,7 +1045,7 @@ const Flow = (props: FlowProps) => {
               onCloseSubFlow={onCloseSubFlow}
               onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
-              isConnectionBuilder={isConnectionBuilder}
+              onLinkBuilder={handleLinkBuilder}
               handleConnectionBuilderFlow={handleConnectionBuilderFlow}
               handleLoadNodesAndEdges={handleLoadNodesAndEdges}
             />
@@ -1071,21 +1074,19 @@ const Flow = (props: FlowProps) => {
               />
             )}
             {!!selectedNodeForSubFlow && (
-              <>
-                <ConnectionBuilderModal
-                  parentNode={selectedNodeForSubFlow}
-                  open={isConnectionBuilder}
-                  onClose={onCloseBuilderModal}
-                  nodesSpec={nodesSpec}
-                />
-                <LinkBuilderModal
-                  parentNode={selectedNodeForSubFlow}
-                  open={isLinkBuilder}
-                  onClose={onCloseBuilderModal}
-                  nodesSpec={nodesSpec}
-                />
-              </>
+              <ConnectionBuilderModal
+                parentNode={selectedNodeForSubFlow}
+                open={isConnectionBuilder}
+                onClose={onCloseBuilderModal}
+                nodesSpec={nodesSpec}
+              />
             )}
+            <LinkBuilderModal
+              parentNode={selectedNodeForSubFlow}
+              open={isLinkBuilder}
+              onClose={onCloseBuilderModal}
+              nodesSpec={nodesSpec}
+            />
           </ReactFlow>
         </ReactFlowProvider>
       </div>

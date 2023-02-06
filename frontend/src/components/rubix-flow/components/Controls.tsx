@@ -20,7 +20,6 @@ import { Edge } from "react-flow-renderer";
 type ControlProps = {
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
-  isConnectionBuilder: boolean;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
@@ -31,13 +30,13 @@ type ControlProps = {
   onBackToMain: () => void;
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
-  handleConnectionBuilderFlow: (node: NodeInterface, isConnection?: boolean) => void;
+  handleConnectionBuilderFlow: (node: NodeInterface) => void;
+  onLinkBuilder: () => void;
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
 const Controls = ({
   settings,
-  isConnectionBuilder,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
   onCopyNodes,
@@ -46,6 +45,7 @@ const Controls = ({
   onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
+  onLinkBuilder,
   onClearAllNodes,
   onCloseSubFlow,
   onBackToMain,
@@ -157,22 +157,18 @@ const Controls = ({
     handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
   };
 
-  const onLinkBuilder = () => {
-    handleConnectionBuilderFlow(selectedNodeForSubFlow!!, false);
-  };
-
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        <div
+          className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
+          title="Link Builder"
+          onClick={onLinkBuilder}
+        >
+          Link Builder
+        </div>
         {!!selectedNodeForSubFlow && (
           <>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Link Builder"
-              onClick={onLinkBuilder}
-            >
-              Link Builder
-            </div>
             <div
               className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
               title="Connection Builder"
