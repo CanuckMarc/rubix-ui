@@ -251,7 +251,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<Error>;
+export function ExportConnection(arg1:Array<string>):Promise<void>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -441,7 +441,7 @@ export function NewTab(arg1:string):Promise<void>;
 
 export function NodeHelp(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Help>>;
 
-export function NodeHelpByName(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<node.Help>;
+export function NodeHelpByName(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<backend.Help>;
 
 export function NodePallet(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<nodes.PalletNode>>;
 
