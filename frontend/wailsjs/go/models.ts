@@ -2653,6 +2653,7 @@ export namespace rumodel {
 	    app_name?: string;
 	    min_version?: string;
 	    max_version?: string;
+	    description?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppsAvailableForInstall(source);
@@ -2663,6 +2664,7 @@ export namespace rumodel {
 	        this.app_name = source["app_name"];
 	        this.min_version = source["min_version"];
 	        this.max_version = source["max_version"];
+	        this.description = source["description"];
 	    }
 	}
 	export class RunningServices {

@@ -72,7 +72,7 @@ func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.
 			availablePlugins = append(availablePlugins, rumodel.AvailablePlugin{
 				Name:        pluginName,
 				IsInstalled: isInstalled,
-				Description: pluginHelp(pluginName),
+				Description: pluginDescriptions(pluginName),
 			})
 		}
 	}
@@ -334,32 +334,3 @@ const influxDBPlg = "edgeinflux"
 const influx2Plg = "influx"
 const postgresPlg = "postgres"
 const historyPlg = "history"
-
-func pluginHelp(pluginName string) string {
-
-	switch pluginName {
-	case bacnetMasterPlg:
-		return "bacnet master: is used to read and write to bacnet devices on an ethernet network"
-	case loraPlg:
-		return "LoRa protocol: (use serial port /data/socat/LoRa1) The LoRa plugin allows the Rubix Compute controller to receive data from Nube-iO LoRa Raw sensors (Droplets, and MicroEdge)"
-	case modbusPlg:
-		return "Modbus protocol: Modbus devices can be connected via RS485 (wired), TCP/IP (networked), or LoRa (wireless via Rubix iO Modules use serial port /data/socat/serialBridge1)"
-	case systemPlg:
-		return "system plugin: is used for running time schedules, and proxy points (generic non protocol points. For example share points between two or more rubix-computes"
-	case rubixIOPlg:
-		return "rubixio plugin: used to read/write the io on nube device rubix-compute-io"
-	case edge28Plg:
-		return "edge28 plugin: used to read/write the io on nube device edge-28"
-	case influxDBPlg:
-		return "influx db 1: used to read/write the influx database (history plugin is needed to use the influx plugin)"
-	case influx2Plg:
-		return "influx db 2: used to read/write the influx database (history plugin is needed to use the influx plugin)"
-	case postgresPlg:
-		return "postgres db: used for edge to cloud histories for points (history plugin is needed to use the postgres plugin)"
-	case historyPlg:
-		return "history: used for point histories"
-	default:
-		return ""
-	}
-
-}

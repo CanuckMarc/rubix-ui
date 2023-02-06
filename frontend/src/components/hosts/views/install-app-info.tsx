@@ -122,6 +122,9 @@ export const EdgeAppInfo = (props: any) => {
                 title={<span>{item.app_name}</span>}
                 description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
               />
+              <List.Item.Meta
+                description={`${item.description}`}
+              />
             </List.Item>
           )}
         />
