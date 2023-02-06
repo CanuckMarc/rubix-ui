@@ -21,7 +21,6 @@ import RubixFlow from "./components/rubix-flow/rubix-flow";
 import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
-import { LogTable } from "./components/hosts/host/flow/networks/views/logTable";
 import { AppDetails } from "./components/hosts/views/appDetails"
 
 function AppRoutes() {

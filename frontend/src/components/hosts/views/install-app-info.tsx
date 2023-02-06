@@ -106,144 +106,129 @@ export const EdgeAppInfo = (props: any) => {
   };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
-      
-      <div>
-        <RbRefreshButton refreshList={() => fetchAppInfo()} />
-      </div>
-        
-      
-      {/* <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          padding: "10px 0",
-          borderBottom: "1px solid #dfdfdf",
-        }}
-      >
-        <Title level={5}>App details</Title>
-      </div> */}
-      
-      <List
-        itemLayout="horizontal"
-        loading={isLoading}
-        bordered={true}
-        dataSource={availableApps}
-        header={<strong>Available Apps</strong>}
-        renderItem={(item) => (
-          <List.Item style={{ padding: "0 16px" }}>
-            <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
-            <List.Item.Meta
-              title={<span>{item.app_name}</span>}
-              description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
-            />
-          </List.Item>
-        )}
-      />
-
-      <List
-        itemLayout="horizontal"
-        loading={isLoading}
-        bordered={true}
-        dataSource={installedApps}
-        header={<strong>Installed Apps</strong>}
-        renderItem={(item) => (
-          <List.Item style={{ padding: "8px 16px" }}>
-            <span className="mr-6">
-              <Dropdown trigger={["click"]}
-                        overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
-                <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
-              </Dropdown>
-            </span>
-
-            <span style={{ width: "250px" }}>{item.app_name}</span>
-            <span style={{ width: 100, float: "right" }}>
-              <RbVersion
-                state={
-                  item.downgrade_required
-                    ? VERSION_STATES.DOWNGRADE
-                    : item.upgrade_required
-                      ? VERSION_STATES.UPGRADE
-                      : VERSION_STATES.NONE
-                }
-                version={item.version}
+    <div style={{display: 'flex', flexDirection: 'column'}}>
+      <RbRefreshButton style={{width: '6vw'}} refreshList={() => fetchAppInfo()} />
+      <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
+        <List
+          itemLayout="horizontal"
+          loading={isLoading}
+          bordered={true}
+          dataSource={availableApps}
+          header={<strong>Available Apps</strong>}
+          renderItem={(item) => (
+            <List.Item style={{textAlign: 'start'}}>
+              <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
+              <List.Item.Meta
+                title={<span>{item.app_name}</span>}
+                description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
               />
-            </span>
-            <span
-              className="flex-1"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                borderLeft: "1px solid #dfdfdf",
-                padding: "0 2rem",
-              }}
-            >
-              <span>
-                <RbTag state={item.state} />
-                <RbTag state={item.sub_state} />
-                <RbTag state={item.active_state} />
+            </List.Item>
+          )}
+        />
+
+        <List
+          itemLayout="horizontal"
+          loading={isLoading}
+          bordered={true}
+          dataSource={installedApps}
+          header={<strong>Installed Apps</strong>}
+          renderItem={(item) => (
+            <List.Item style={{ padding: "8px 16px" }}>
+              <span className="mr-6">
+                <Dropdown trigger={["click"]}
+                          overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
+                  <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
+                </Dropdown>
               </span>
 
-              <Text style={{ paddingTop: 5 }} type="secondary" italic>
-                {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
-              </Text>
-            </span>
-          </List.Item>
-        )}
-      />
-      
+              <span style={{ width: "250px" }}>{item.app_name}</span>
+              <span style={{ width: 100, float: "right" }}>
+                <RbVersion
+                  state={
+                    item.downgrade_required
+                      ? VERSION_STATES.DOWNGRADE
+                      : item.upgrade_required
+                        ? VERSION_STATES.UPGRADE
+                        : VERSION_STATES.NONE
+                  }
+                  version={item.version}
+                />
+              </span>
+              <span
+                className="flex-1"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  borderLeft: "1px solid #dfdfdf",
+                  padding: "0 2rem",
+                }}
+              >
+                <span>
+                  <RbTag state={item.state} />
+                  <RbTag state={item.sub_state} />
+                  <RbTag state={item.active_state} />
+                </span>
 
-      <List
-        itemLayout="horizontal"
-        loading={isLoading}
-        bordered={true}
-        dataSource={runningServices}
-        header={<strong>Running Services</strong>}
-        renderItem={(item) => (
-          <List.Item style={{ padding: "8px 16px" }}>
-            <span className="mr-6">
-              <Dropdown trigger={["click"]}
-                        overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={false} />}>
-                <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
-              </Dropdown>
-            </span>
-
-            <span style={{ width: "350px" }}>{item.name}</span>
-            <span
-              className="flex-1"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                borderLeft: "1px solid #dfdfdf",
-                padding: "0 2rem",
-              }}
-            >
-              <span>
-                <RbTag state={item.state} />
-                <RbTag state={item.sub_state} />
-                <RbTag state={item.active_state} />
+                <Text style={{ paddingTop: 5 }} type="secondary" italic>
+                  {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
+                </Text>
+              </span>
+            </List.Item>
+          )}
+        />
+        
+        <List
+          itemLayout="horizontal"
+          loading={isLoading}
+          bordered={true}
+          dataSource={runningServices}
+          header={<strong>Running Services</strong>}
+          renderItem={(item) => (
+            <List.Item style={{ padding: "8px 16px" }}>
+              <span className="mr-6">
+                <Dropdown trigger={["click"]}
+                          overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={false} />}>
+                  <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
+                </Dropdown>
               </span>
 
-              <Text style={{ paddingTop: 5 }} type="secondary" italic>
-                {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
-              </Text>
-            </span>
-          </List.Item>
-        )}
-      />
+              <span style={{ width: "350px" }}>{item.name}</span>
+              <span
+                className="flex-1"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  borderLeft: "1px solid #dfdfdf",
+                  padding: "0 2rem",
+                }}
+              >
+                <span>
+                  <RbTag state={item.state} />
+                  <RbTag state={item.sub_state} />
+                  <RbTag state={item.active_state} />
+                </span>
 
-      <InstallRubixAppModal
-        isModalVisible={isInstallRubixAppModalVisible}
-        onCloseModal={onCloseRubixAppInstallModal}
-        installFactory={installAppFactory}
-        host={host}
-        app={selectedApp}
-        installedVersion={installedVersion}
-        fetchAppInfo={fetchAppInfo}
-      />
-      
+                <Text style={{ paddingTop: 5 }} type="secondary" italic>
+                  {tagMessageStateResolver(item.state, item.sub_state, item.active_state)}
+                </Text>
+              </span>
+            </List.Item>
+          )}
+        />
+
+        <InstallRubixAppModal
+          isModalVisible={isInstallRubixAppModalVisible}
+          onCloseModal={onCloseRubixAppInstallModal}
+          installFactory={installAppFactory}
+          host={host}
+          app={selectedApp}
+          installedVersion={installedVersion}
+          fetchAppInfo={fetchAppInfo}
+        />
+        
+      </div>
     </div>
   );
 };
