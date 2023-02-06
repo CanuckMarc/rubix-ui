@@ -20,6 +20,7 @@ export const CreateEditModal = (props: any) => {
   const flowNetworkFactory = new FlowNetworkFactory();
   factory.connectionUUID = flowNetworkFactory.connectionUUID = connUUID;
   factory.hostUUID = flowNetworkFactory.hostUUID = hostUUID;
+  factory.consumerUUID = consumerUUID;
 
   useEffect(() => {
     if (!isModalVisible) return;
@@ -44,15 +45,15 @@ export const CreateEditModal = (props: any) => {
             readOnly: true,
             title: "thing class",
             type: "string",
-            default: currentItem.writer_thing_class,
+            default: currentItem.writer_thing_class || "point",
           },
           writer_thing_uuid: {
             title: "Point",
             type: "string",
-            anyOf: res.map((n) => {
+            anyOf: res?.map((n) => {
               return { type: "string", enum: [n.point_uuid], title: n.name };
             }),
-            default: res[0].point_uuid,
+            default: res.length && res[0].point_uuid,
           },
         },
       };

@@ -7,46 +7,6 @@ import (
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 
-func (inst *App) DeleteProducerBulk(connUUID, hostUUID string, uuids []UUIDs) interface{} {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil
-	}
-	var addedCount int
-	var errorCount int
-	for _, item := range uuids {
-		_, err := client.DeleteProducer(hostUUID, item.UUID)
-		if err != nil {
-			errorCount++
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		} else {
-			addedCount++
-		}
-	}
-	if addedCount > 0 {
-		inst.uiSuccessMessage(fmt.Sprintf("delete count: %d", addedCount))
-	}
-	if errorCount > 0 {
-		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
-	}
-	return nil
-}
-
-func (inst *App) GetProducerClones(connUUID, hostUUID string) []model.Producer {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil
-	}
-	producers, err := client.GetProducers(hostUUID)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return []model.Producer{}
-	}
-	return producers
-}
-
 func (inst *App) AddProducer(connUUID, hostUUID string, body *model.Producer) *model.Producer {
 	if body.ProducerThingUUID == "" {
 		inst.uiErrorMessage(fmt.Sprintf("producer uuid can not be empty"))
@@ -80,33 +40,6 @@ func (inst *App) AddProducer(connUUID, hostUUID string, body *model.Producer) *m
 	return producers
 }
 
-func (inst *App) EditProducer(connUUID, hostUUID, streamUUID string, body *model.Producer) *model.Producer {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil
-	}
-	producers, err := client.EditProducer(hostUUID, streamUUID, body)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	return producers
-}
-func (inst *App) DeleteProducer(connUUID, hostUUID, streamUUID string) interface{} {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
-	if err != nil {
-		return nil
-	}
-	_, err = client.DeleteProducer(hostUUID, streamUUID)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return err
-	}
-	return "delete ok"
-}
-
 func (inst *App) GetProducers(connUUID, hostUUID string) []model.Producer {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
@@ -121,24 +54,78 @@ func (inst *App) GetProducers(connUUID, hostUUID string) []model.Producer {
 	return resp
 }
 
-func (inst *App) getProducer(connUUID, hostUUID, streamUUID string) (*model.Producer, error) {
+func (inst *App) getProducer(connUUID, hostUUID, uuid string, withWriterClones bool) (*model.Producer, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil, err
 	}
-	producers, err := client.GetProducer(hostUUID, streamUUID)
+	producers, err := client.GetProducer(hostUUID, uuid, withWriterClones)
 	if err != nil {
 		return nil, err
 	}
 	return producers, nil
 }
 
-func (inst *App) GetProducer(connUUID, hostUUID, streamUUID string) *model.Producer {
-	producers, err := inst.getProducer(connUUID, hostUUID, streamUUID)
+func (inst *App) GetProducer(connUUID, hostUUID, uuid string, withWriterClones bool) *model.Producer {
+	producers, err := inst.getProducer(connUUID, hostUUID, uuid, withWriterClones)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
 	return producers
+}
+
+func (inst *App) EditProducer(connUUID, hostUUID, streamUUID string, body *model.Producer) *model.Producer {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	producers, err := client.EditProducer(hostUUID, streamUUID, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return producers
+}
+
+func (inst *App) DeleteProducer(connUUID, hostUUID, streamUUID string) interface{} {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	_, err = client.DeleteProducer(hostUUID, streamUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return err
+	}
+	return "delete ok"
+}
+
+func (inst *App) DeleteProducerBulk(connUUID, hostUUID string, uuids []UUIDs) interface{} {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	var addedCount int
+	var errorCount int
+	for _, item := range uuids {
+		_, err := client.DeleteProducer(hostUUID, item.UUID)
+		if err != nil {
+			errorCount++
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		} else {
+			addedCount++
+		}
+	}
+	if addedCount > 0 {
+		inst.uiSuccessMessage(fmt.Sprintf("delete count: %d", addedCount))
+	}
+	if errorCount > 0 {
+		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
+	}
+	return nil
 }

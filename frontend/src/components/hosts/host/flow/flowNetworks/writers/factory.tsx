@@ -1,17 +1,13 @@
 import { backend, model } from "../../../../../../../wailsjs/go/models";
-import {
-  CreateWriter,
-  DeleteWritersBulk,
-  EditWriter,
-  GetWriters,
-} from "../../../../../../../wailsjs/go/backend/App";
+import { CreateWriter, DeleteWritersBulk, EditWriter, GetConsumer } from "../../../../../../../wailsjs/go/backend/App";
 
 export class WritersFactory {
-  hostUUID!: string;
   connectionUUID!: string;
+  hostUUID!: string;
+  consumerUUID!: string;
 
-  async GetAll(): Promise<Array<model.Writer>> {
-    return await GetWriters(this.connectionUUID, this.hostUUID);
+  async GetAll(): Promise<model.Consumer> {
+    return await GetConsumer(this.connectionUUID, this.hostUUID, this.consumerUUID, true);
   }
 
   async Add(body: model.Writer): Promise<model.Writer> {

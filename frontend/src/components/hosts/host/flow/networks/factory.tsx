@@ -21,33 +21,15 @@ export class FlowNetworkFactory {
   connectionUUID!: string;
 
   async GetAll(withDevice: boolean): Promise<Array<model.Network>> {
-    let resp: Promise<Array<model.Network>> = {} as Promise<
-      Array<model.Network>
-    >;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await GetNetworks(this.connectionUUID, this.hostUUID, withDevice)
-      .then((res) => {
-        resp = res as unknown as Promise<Array<model.Network>>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return GetNetworks(this.connectionUUID, this.hostUUID, withDevice)
   }
 
   async GetOne(uuid: string, withDevice: boolean): Promise<model.Network> {
-    let resp: model.Network = {} as model.Network;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await GetNetwork(this.connectionUUID, this.hostUUID, uuid, withDevice)
-      .then((res) => {
-        resp = res as model.Network;
-      })
-      .catch((resp) => {
-        return resp;
-      });
-    return resp;
+    return GetNetwork(this.connectionUUID, this.hostUUID, uuid, withDevice)
   }
 
   async GetNetworkWithPoints(uuid: string): Promise<model.Network> {
@@ -63,69 +45,33 @@ export class FlowNetworkFactory {
   }
 
   async Add(body: model.Network): Promise<model.Network> {
-    let resp: model.Network = {} as model.Network;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await AddNetwork(this.connectionUUID, this.hostUUID, body)
-      .then((res) => {
-        resp = res as model.Network;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return AddNetwork(this.connectionUUID, this.hostUUID, body)
   }
 
   async Update(uuid: string, body: model.Network): Promise<model.Network> {
-    let resp: model.Network = {} as model.Network;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await EditNetwork(this.connectionUUID, this.hostUUID, uuid, body)
-      .then((res) => {
-        resp = res as model.Network;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return EditNetwork(this.connectionUUID, this.hostUUID, uuid, body);
   }
 
   async Delete(uuid: string): Promise<model.Network> {
-    let resp: model.Network = {} as model.Network;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await DeleteNetwork(this.connectionUUID, this.hostUUID, uuid)
-      .then((res) => {
-        resp = res as model.Network;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return DeleteNetwork(this.connectionUUID, this.hostUUID, uuid);
   }
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
-    let resp: Promise<any> = {} as Promise<any>;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await DeleteNetworkBulk(this.connectionUUID, this.hostUUID, uuids)
-      .then((res) => {
-        resp = res as Promise<any>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return DeleteNetworkBulk(this.connectionUUID, this.hostUUID, uuids);
   }
 
   async BulkImport(backupUUID: string): Promise<backend.BulkAddResponse> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    return await ImportNetworksBulk(
-      this.connectionUUID,
-      this.hostUUID,
-      backupUUID
-    );
+    return await ImportNetworksBulk(this.connectionUUID, this.hostUUID, backupUUID);
   }
 
   async BulkExport(
