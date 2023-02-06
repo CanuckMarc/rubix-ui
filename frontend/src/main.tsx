@@ -1,12 +1,8 @@
-import { HashRouter } from "react-router-dom";
-import App from "./App";
 import "./style.css";
 
 import { createRoot } from "react-dom/client";
+import SplitScreenApp from "./SplitScreenApp";
+
 const container = document.getElementById("root");
 const root = createRoot(container!);
-root.render(
-  <HashRouter>
-    <App />
-  </HashRouter>
-);
+root.render(<SplitScreenApp />);
