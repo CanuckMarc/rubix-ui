@@ -5,7 +5,7 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
-  RadarChartOutlined
+  RadarChartOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
