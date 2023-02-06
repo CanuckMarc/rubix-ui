@@ -6,22 +6,26 @@ import (
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 )
 
-func (inst *Client) GetHostNetworks() (data []amodel.Network, response *Response) {
+func (inst *Client) GetHostNetworks() ([]amodel.Network, error) {
 	path := fmt.Sprintf(Paths.HostNetwork.Path)
-	response = &Response{}
 	resp, err := inst.Rest.R().
 		SetResult(&[]amodel.Network{}).
 		Get(path)
-	return *resp.Result().(*[]amodel.Network), response.buildResponse(resp, err)
+	if err != nil {
+		return nil, err
+	}
+	return *resp.Result().(*[]amodel.Network), nil
 }
 
-func (inst *Client) GetHostNetwork(uuid string) (data *amodel.Network, response *Response) {
+func (inst *Client) GetHostNetwork(uuid string) (*amodel.Network, error) {
 	path := fmt.Sprintf("%s/%s", Paths.HostNetwork.Path, uuid)
-	response = &Response{}
-	resp, err := inst.Rest.R().
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetResult(&amodel.Network{}).
-		Get(path)
-	return resp.Result().(*amodel.Network), response.buildResponse(resp, err)
+		Get(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*amodel.Network), nil
 }
 
 func (inst *Client) AddHostNetwork(body *amodel.Network) (*amodel.Network, error) {
@@ -48,12 +52,25 @@ func (inst *Client) UpdateHostNetwork(uuid string, body *amodel.Network) (*amode
 	return resp.Result().(*amodel.Network), nil
 }
 
-func (inst *Client) DeleteHostNetwork(uuid string) (response *Response) {
+func (inst *Client) UpdateHostsStatus(uuid string) (*amodel.Network, error) {
+	path := fmt.Sprintf("%s/%s/%s", Paths.HostNetwork.Path, uuid, "update-hosts-status")
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(&amodel.Network{}).
+		Get(path))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*amodel.Network), nil
+}
+
+func (inst *Client) DeleteHostNetwork(uuid string) error {
 	path := fmt.Sprintf("%s/%s", Paths.HostNetwork.Path, uuid)
-	response = &Response{}
-	resp, err := inst.Rest.R().
-		Delete(path)
-	return response.buildResponse(resp, err)
+	_, err := nresty.FormatRestyResponse(inst.Rest.R().
+		Delete(path))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (inst *Client) GetNetworkSchema() string {

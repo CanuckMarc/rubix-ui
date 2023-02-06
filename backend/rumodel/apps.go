@@ -17,9 +17,10 @@ type InstalledApps struct {
 }
 
 type AppsAvailableForInstall struct {
-	AppName    string `json:"app_name,omitempty"`
-	MinVersion string `json:"min_version,omitempty"`
-	MaxVersion string `json:"max_version,omitempty"`
+	AppName     string `json:"app_name,omitempty"`
+	MinVersion  string `json:"min_version,omitempty"`
+	MaxVersion  string `json:"max_version,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 type RunningServices struct {

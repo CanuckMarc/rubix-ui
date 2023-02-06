@@ -41,7 +41,8 @@ func (inst *FlowClient) GetSubFlow(subFlowID string) (*nodes.NodesList, error) {
 }
 
 type NodesList struct {
-	Nodes []string `json:"nodes"`
+	Nodes     []string `json:"nodes"`
+	GetChilds bool     `json:"get_childs"`
 }
 
 func (inst *FlowClient) GetFlowList(nodesIds *NodesList) (*nodes.NodesList, error) {

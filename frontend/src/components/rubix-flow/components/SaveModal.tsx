@@ -1,22 +1,26 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { Edge, useEdges, useNodes } from "react-flow-renderer/nocss";
-import { NodeJSON } from "../lib";
+import { FC, useEffect, useRef, useState } from "react";
+import { useNodes } from "react-flow-renderer/nocss";
+import { useParams } from "react-router-dom";
+
+import { FlowFactory } from "../factory";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import { flowToBehave } from "../transformers/flowToBehave";
 import { Modal } from "./Modal";
+import { flowcli } from "../../../../wailsjs/go/models";
 
 export type SaveModalProps = {
   open?: boolean;
-  selectedNodeForSubFlow?: NodeInterface;
   onClose: () => void;
 };
 
-export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSubFlow, onClose }) => {
+export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
+  const factory = new FlowFactory();
+  const { connUUID = "", hostUUID = "" } = useParams();
+  const isRemote = !!connUUID && !!hostUUID;
   const nodes = useNodes();
-
+  const nodeIDs = flowcli.NodesList;
   const handleCopy = () => {
     if (ref.current) {
       ref.current.select();
@@ -43,40 +47,32 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, selectedNodeForSub
     return allNodes;
   };
 
-  const handleNodeRender = () => {
-    let selectedNodes: NodeInterface[] = nodes.filter((item: NodeInterface) => item.selected);
-    let isInSubFlow = false;
-    const allNodes: NodeInterface[] = [];
+  const handleNodeRender = async () => {
+    try {
+      const selectedNodeIds: string[] = nodes.filter((item: NodeInterface) => item.selected).map((item) => item.id);
+      let n = new flowcli.NodesList
+      n.nodes = selectedNodeIds
+      const data = await (window.selectedNodeForExport
+        ? factory.GetSubFlow(connUUID, hostUUID, window.selectedNodeForExport.id, isRemote)
+        : selectedNodeIds.length > 0
+        ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
+        : factory.GetFlow(connUUID, hostUUID, isRemote));
 
-    if (selectedNodes.length === 0 && selectedNodeForSubFlow) {
-      selectedNodes = [selectedNodeForSubFlow];
-      isInSubFlow = true;
+      setNodeRender(JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.log("error", error);
+      setNodeRender(JSON.stringify({ nodes: [] }, null, 2));
     }
-
-    selectedNodes.forEach((item) => {
-      if (isInSubFlow && item.id !== selectedNodeForSubFlow!!.id) {
-        allNodes.push(item);
-      }
-      if (!isInSubFlow) {
-        allNodes.push(item);
-      }
-      if (item.isParent) {
-        allNodes.push(...findAllNodes(item.id));
-      }
-    });
-
-    const finalNodes: NodeInterface[] = isInSubFlow ? allNodes : allNodes.length > 0 ? allNodes : nodes;
-    const newNodes: NodeJSON[] = flowToBehave(finalNodes, window.allFlow.edges).nodes;
-    setNodeRender(JSON.stringify({ nodes: newNodes }, null, 2));
   };
 
   useEffect(() => {
     if (open) {
       handleNodeRender();
     } else {
+      window.selectedNodeForExport = undefined;
       setNodeRender("");
     }
-  }, [open, selectedNodeForSubFlow]);
+  }, [open]);
 
   return (
     <Modal

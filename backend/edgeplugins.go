@@ -14,14 +14,6 @@ import (
 	"strings"
 )
 
-const bacnetServerPlg = "bacnetserver"
-const bacnetMasterPlg = "bacnetmaster"
-const loraPlg = "lora"
-const modbusPlg = "modbus"
-const systemPlg = "system"
-const rubixIOPlg = "rubixio"
-const edge28Plg = "edge28"
-
 func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.Response {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
@@ -80,6 +72,7 @@ func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.
 			availablePlugins = append(availablePlugins, rumodel.AvailablePlugin{
 				Name:        pluginName,
 				IsInstalled: isInstalled,
+				Description: pluginDescriptions(pluginName),
 			})
 		}
 	}
@@ -329,3 +322,15 @@ func (inst *App) edgeEnablePlugin(assistClient *assistcli.Client, hostUUID strin
 	}
 	return resp, nil
 }
+
+const bacnetServerPlg = "bacnetserver"
+const bacnetMasterPlg = "bacnetmaster"
+const loraPlg = "lora"
+const modbusPlg = "modbus"
+const systemPlg = "system"
+const rubixIOPlg = "rubixio"
+const edge28Plg = "edge28"
+const influxDBPlg = "edgeinflux"
+const influx2Plg = "influx"
+const postgresPlg = "postgres"
+const historyPlg = "history"

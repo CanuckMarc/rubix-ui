@@ -46,7 +46,7 @@ func (inst *App) DeleteHostBulk(connUUID string, uuids []UUIDs) interface{} {
 	return "deleted successfully"
 }
 
-func (inst *App) deleteHost(connUUID string, uuid string) (*assistcli.Response, error) {
+func (inst *App) deleteHost(connUUID, uuid string) (*assistcli.Response, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (inst *App) deleteHost(connUUID string, uuid string) (*assistcli.Response, 
 	return res, nil
 }
 
-func (inst *App) DeleteHost(connUUID string, uuid string) *assistcli.Response {
+func (inst *App) DeleteHost(connUUID, uuid string) *assistcli.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -68,7 +68,7 @@ func (inst *App) DeleteHost(connUUID string, uuid string) *assistcli.Response {
 	return res
 }
 
-func (inst *App) getHost(connUUID string, uuid string) (*amodel.Host, error) {
+func (inst *App) getHost(connUUID, uuid string) (*amodel.Host, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (inst *App) getHost(connUUID string, uuid string) (*amodel.Host, error) {
 	return host, nil
 }
 
-func (inst *App) GetHost(connUUID string, uuid string) *amodel.Host {
+func (inst *App) GetHost(connUUID, uuid string) *amodel.Host {
 	host, err := inst.getHost(connUUID, uuid)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
@@ -91,7 +91,7 @@ func (inst *App) GetHost(connUUID string, uuid string) *amodel.Host {
 	return host
 }
 
-func (inst *App) EditHost(connUUID string, uuid string, host *amodel.Host) *rumodel.Response {
+func (inst *App) EditHost(connUUID, uuid string, host *amodel.Host) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return rumodel.FailResponse(err)
@@ -111,16 +111,5 @@ func (inst *App) GetHosts(connUUID string) (resp []amodel.Host) {
 		return nil
 	}
 	data, _ := client.GetHosts()
-	return data
-}
-
-func (inst *App) UpdateStatus(connUUID string) (resp []amodel.Host) {
-	resp = []amodel.Host{}
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	data, _ := client.UpdateStatus()
 	return data
 }

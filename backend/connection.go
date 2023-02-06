@@ -123,13 +123,11 @@ func (inst *App) AddConnection(conn *storage.RubixConnection) *rumodel.Response 
 	if err != nil {
 		return rumodel.FailResponse(err)
 	}
-	_, _ = inst.forceGetAssistClient(conn.UUID)
 	return rumodel.SuccessResponse(conn)
 }
 
 func (inst *App) updateConnection(uuid string, conn *storage.RubixConnection) (*storage.RubixConnection, error) {
 	conn, err := inst.DB.Update(uuid, conn)
-	_, _ = inst.forceGetAssistClient(uuid)
 	if err != nil {
 		return nil, err
 	}

@@ -100,8 +100,8 @@ export const FlowPointsTable = (props: any) => {
         title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
-        sorter: (a: any, b: any) => ('' + a[key] ?? '').localeCompare('' + b[key] ?? ''),
-        render: (a: any) => '' + (a ?? ''), // boolean values doesn't display on the table
+        sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
+        render: (a: any) => "" + (a ?? ""), // boolean values doesn't display on the table
       };
     });
 
@@ -211,10 +211,6 @@ export const FlowPointsTable = (props: any) => {
   useEffect(() => {
     getSchema(pluginName);
   }, [pluginName]);
-
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
 
   return (
     <>

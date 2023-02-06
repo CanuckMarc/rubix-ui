@@ -10,14 +10,7 @@ import Network = amodel.Network;
 
 export const CreateEditModal = (props: any) => {
   const { connUUID = "", locUUID = "" } = useParams();
-  const {
-    schema,
-    currentNetwork,
-    isModalVisible,
-    isLoadingForm,
-    refreshList,
-    onCloseModal,
-  } = props;
+  const { schema, currentNetwork, isModalVisible, isLoadingForm, refreshList, onCloseModal } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [validationError, setValidationError] = useState(true);
   const [formData, setFormData] = useState(currentNetwork);
@@ -30,7 +23,6 @@ export const CreateEditModal = (props: any) => {
   }, [currentNetwork]);
 
   useEffect(() => {
-    console.log("here i am...")
     if (currentNetwork.uuid) {
       setValidationError(true);
     } else {
@@ -86,9 +78,7 @@ export const CreateEditModal = (props: any) => {
   return (
     <>
       <Modal
-        title={
-          currentNetwork.uuid ? "Edit " + currentNetwork.name : "New Network"
-        }
+        title={currentNetwork.uuid ? "Edit " + currentNetwork.name : "New Network"}
         visible={isModalVisible}
         onOk={() => handleSubmit(formData)}
         onCancel={handleClose}

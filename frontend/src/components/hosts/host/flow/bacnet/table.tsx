@@ -31,10 +31,6 @@ export const BacnetWhoIsTable = (props: any) => {
     handleAdd(selectedUUIDs);
   };
 
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
   return (
     <>
       <RbAddButton handleClick={Add} text={addBtnText} />

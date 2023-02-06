@@ -704,6 +704,7 @@ export namespace flowcli {
 	
 	export class NodesList {
 	    nodes: string[];
+	    get_childs: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new NodesList(source);
@@ -712,6 +713,7 @@ export namespace flowcli {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nodes = source["nodes"];
+	        this.get_childs = source["get_childs"];
 	    }
 	}
 	export class SchemaBody {
@@ -2651,6 +2653,7 @@ export namespace rumodel {
 	    app_name?: string;
 	    min_version?: string;
 	    max_version?: string;
+	    description?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppsAvailableForInstall(source);
@@ -2661,6 +2664,7 @@ export namespace rumodel {
 	        this.app_name = source["app_name"];
 	        this.min_version = source["min_version"];
 	        this.max_version = source["max_version"];
+	        this.description = source["description"];
 	    }
 	}
 	export class RunningServices {
