@@ -1,4 +1,4 @@
-import { Button, Dropdown, List, Menu, Modal, Typography } from "antd";
+import { Button, Divider, Dropdown, List, Menu, Modal, Typography, Skeleton } from "antd";
 import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -41,22 +41,24 @@ export const EdgeAppInfo = (props: any) => {
     return () => {
       timeout = null;
     };
-  }, []);
+  }, [host]);
 
   const fetchAppInfo = async () => {
     updateAppInfoMsg("");
     updateIsLoading(true);
     try {
-      const response = await releaseFactory.EdgeAppsInfo(connUUID, host.uuid);
-      if (response?.code === 0) {
-        const _installed_apps = orderBy(response?.data?.installed_apps, "app_name");
-        const _apps_available_for_install = orderBy(response?.data?.apps_available_for_install, "app_name");
-        const _running_services = orderBy(response?.data?.running_services, "name");
-        updateInstalledApps(_installed_apps);
-        updateAvailableApps(_apps_available_for_install);
-        updateRunningServices(_running_services);
-      } else {
-        updateAppInfoMsg(response?.msg || "fetch edge apps info gone wrong");
+      if (host) {
+        const response = await releaseFactory.EdgeAppsInfo(connUUID, host.uuid);
+        if (response?.code === 0) {
+          const _installed_apps = orderBy(response?.data?.installed_apps, "app_name");
+          const _apps_available_for_install = orderBy(response?.data?.apps_available_for_install, "app_name");
+          const _running_services = orderBy(response?.data?.running_services, "name");
+          updateInstalledApps(_installed_apps);
+          updateAvailableApps(_apps_available_for_install);
+          updateRunningServices(_running_services);
+        } else {
+          updateAppInfoMsg(response?.msg || "fetch edge apps info gone wrong");
+        }
       }
     } finally {
       updateIsLoading(false);
@@ -104,8 +106,14 @@ export const EdgeAppInfo = (props: any) => {
   };
 
   return (
-    <div>
-      <div
+    <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
+      
+      <div>
+        <RbRefreshButton refreshList={() => fetchAppInfo()} />
+      </div>
+        
+      
+      {/* <div
         style={{
           display: "flex",
           alignItems: "center",
@@ -114,12 +122,12 @@ export const EdgeAppInfo = (props: any) => {
         }}
       >
         <Title level={5}>App details</Title>
-        <RbRefreshButton style={{ marginLeft: 10 }} refreshList={() => fetchAppInfo()} />
-      </div>
-
+      </div> */}
+      
       <List
         itemLayout="horizontal"
         loading={isLoading}
+        bordered={true}
         dataSource={availableApps}
         header={<strong>Available Apps</strong>}
         renderItem={(item) => (
@@ -136,6 +144,7 @@ export const EdgeAppInfo = (props: any) => {
       <List
         itemLayout="horizontal"
         loading={isLoading}
+        bordered={true}
         dataSource={installedApps}
         header={<strong>Installed Apps</strong>}
         renderItem={(item) => (
@@ -183,10 +192,12 @@ export const EdgeAppInfo = (props: any) => {
           </List.Item>
         )}
       />
+      
 
       <List
         itemLayout="horizontal"
         loading={isLoading}
+        bordered={true}
         dataSource={runningServices}
         header={<strong>Running Services</strong>}
         renderItem={(item) => (
@@ -232,6 +243,7 @@ export const EdgeAppInfo = (props: any) => {
         installedVersion={installedVersion}
         fetchAppInfo={fetchAppInfo}
       />
+      
     </div>
   );
 };
