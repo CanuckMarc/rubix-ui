@@ -104,7 +104,7 @@ export const LinkBuilderModal: FC<LinkBuilderModalProps> = memo(({ parentNode, o
         });
 
         newNodesOutput.forEach((nodeItem: NodeInterface & { pin: string }) => {
-          const pinTarget = nodeItem.data?.inputs?.find((item: { name: string }) => item.name !== "topic");
+          const pinTarget = nodeItem.data?.inputs?.find((item: { name: string }) => item.name !== "[topic]");
           const newEdge = {
             id: generateUuid(),
             source: node.id,
