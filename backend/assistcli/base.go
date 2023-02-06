@@ -47,12 +47,12 @@ func New(cli *Client) *Client {
 		log.Fatal("assist client cli can not be empty")
 		return nil
 	}
-	cli.Rest = resty.New()
 	baseURL := getBaseUrl(cli)
 	if client, found := clients[baseURL]; found {
 		client.SetTokenHeader(cli.ExternalToken)
 		return client
 	}
+	cli.Rest = resty.New()
 	cli.Rest.SetBaseURL(baseURL)
 	cli.SetTokenHeader(cli.ExternalToken)
 	clients[baseURL] = cli
