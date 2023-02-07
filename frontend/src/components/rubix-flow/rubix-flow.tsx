@@ -984,8 +984,13 @@ const Flow = (props: FlowProps) => {
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className={`rubix-flow__wrapper ${nodesParent.length > 0 ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
-        <SubFlowTabs nodes={nodesParent} selectedSubflow={selectedNodeForSubFlow} goSubFlow={handleAddSubFlow} />
+      <div className={`rubix-flow__wrapper ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
+        <SubFlowTabs
+          nodes={nodesParent}
+          selectedSubflow={selectedNodeForSubFlow}
+          goSubFlow={handleAddSubFlow}
+          onBackToMain={onBackToMain}
+        />
         <ReactFlowProvider>
           <ReactFlow
             onContextMenu={() => setMenuOpenFromNodeTree(false)}
