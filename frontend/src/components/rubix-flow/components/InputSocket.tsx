@@ -48,7 +48,7 @@ const getNumberOptions = (value: boolean | string | null) => {
     case "null":
       return -1;
     default:
-      return 1;
+      return 0;
   }
 };
 

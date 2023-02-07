@@ -253,12 +253,12 @@ export const Node = memo((props: NodeProps) => {
       {pairs.map(([input, output], ix) => {
         if (
           input &&
-          !data[input.name] &&
-          data[input.name] !== null &&
-          ((input.valueType === "number" && data[input.name] !== 0) ||
-            (input.valueType === "boolean" && data[input.name] === undefined))
+          !newData[input.name] &&
+          newData[input.name] !== null &&
+          ((input.valueType === "number" && newData[input.name] !== 0) ||
+            (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          data[input.name] = input.defaultValue;
+          newData[input.name] = input.defaultValue;
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";
