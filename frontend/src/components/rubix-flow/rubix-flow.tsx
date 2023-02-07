@@ -738,16 +738,18 @@ const Flow = (props: FlowProps) => {
     setUndoable({ edges: edgesUniq, nodes: nodesUniq });
   };
   const handleAlignLeft = (position: { x: number; y: number }) => {
-    const selectAlign = nodes.map((item) => item.selected === true);
-    if (selectAlign) {
-      return nodes.forEach((item) => (item.position.x = position.x));
-    }
+    nodes.forEach((item) => {
+      if(item.selected === true){
+        item.position.x = position.x
+      }
+    })
   };
   const handleAlignRight = (position: { x: number; y: number }, width: any) => {
-    const selectAlign = nodes.map((item) => item.selected === true);
-    if (selectAlign) {
-      return nodes.forEach((item: any) => (item.position.x = position.x + (width - item.width)));
-    }
+    nodes.forEach((item: any) => {
+      if(item.selected === true){
+        item.position.x = position.x + (width - item.width)
+      }
+    })
   };
   const handleRefreshValues = async () => {
     const _outputNodes = (await fetchOutput()) || [];
