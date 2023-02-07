@@ -210,6 +210,17 @@ hr.solid {
     margin-left: -22px !important;
 }
 
+.disconnect-menu>.ant-menu-submenu-title,
+.disconnect-menu>.ant-menu-sub>.ant-menu-item {
+    color: #d46b08;
+}
+
+.disconnect-menu>.ant-menu-submenu-title:hover,
+.disconnect-menu>.ant-menu-sub>.ant-menu-item:hover {
+    color: #fa8c16 !important;
+}
+
+
 /* width */
 ::-webkit-scrollbar {
     width: 5px;

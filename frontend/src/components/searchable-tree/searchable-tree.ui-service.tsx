@@ -9,10 +9,11 @@ import {
   ToolOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import eventEmit from "../rubix-flow/util/evenEmit";
+
+let className = "supervisors-menu";
 
 let ObjectType = {
   CONNECTIONS: "Connections",
@@ -225,7 +226,6 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.HOSTS),
                   children: null,
-                  className: "supervisors-menu",
                 },
                 {
                   ...objectMap(
@@ -275,7 +275,7 @@ export const getTreeDataIterative = (connections: any) => {
                       children: null,
                     },
                   ],
-                  className: "supervisors-menu",
+                  className,
                 },
                 {
                   ...objectMap(
@@ -289,16 +289,16 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
-                  className: "supervisors-menu",
                 },
               ],
-              className: "supervisors-menu",
+              className,
             })),
-            className: "supervisors-menu",
+            className,
           })),
-          className: "supervisors-menu",
+          className,
         })),
-        className: "supervisors-menu",
+        className:
+          !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,
       })),
     },
   ];
