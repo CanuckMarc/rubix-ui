@@ -87,7 +87,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
       } as InputSocketSpecJSON);
     }
     newInputs.sort(
-      (a:any,b:any) => (nodeInputsObj[a.name].position - nodeInputsObj[b.name].position)
+      (a:any,b:any) => (nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position)
     )
   });
 
