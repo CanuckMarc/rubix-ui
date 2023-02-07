@@ -26,7 +26,11 @@ func (inst *App) GetProducersUnderStreamClone(connUUID, hostUUID, streamCloneUUI
 	if err != nil {
 		return rumodel.FailResponse(err)
 	}
-	resp, err := client.GetStream(hostUUID, streamClone.SourceUUID, true, false)
+	fnc, err := client.GetFlowNetworkClone(hostUUID, streamClone.FlowNetworkCloneUUID, false)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	resp, err := client.GetStreamFromFNC(hostUUID, fnc.UUID, streamClone.SourceUUID, true, false)
 	if err != nil {
 		return rumodel.FailResponse(err)
 	}
