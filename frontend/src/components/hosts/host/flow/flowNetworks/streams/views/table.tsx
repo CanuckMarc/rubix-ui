@@ -80,11 +80,6 @@ export const StreamsTable = (props: any) => {
           type: "boolean",
           default: true,
         },
-        uuid: {
-          readOnly: true,
-          title: "uuid",
-          type: "string",
-        },
       },
     };
     setSchema(schema);

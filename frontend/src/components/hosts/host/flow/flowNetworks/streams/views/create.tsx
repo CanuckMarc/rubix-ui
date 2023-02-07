@@ -8,8 +8,7 @@ import Stream = model.Stream;
 import { FlowStreamFactory } from "../factory";
 
 export const CreateEditModal = (props: any) => {
-  const { schema, currentItem, isModalVisible, refreshList, onCloseModal } =
-    props;
+  const { schema, currentItem, isModalVisible, refreshList, onCloseModal } = props;
   const { connUUID = "", hostUUID = "", flNetworkUUID = "" } = useParams();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentItem);

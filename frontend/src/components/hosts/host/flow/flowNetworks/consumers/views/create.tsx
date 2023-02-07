@@ -40,11 +40,6 @@ export const CreateEditModal = (props: any) => {
       }
       const jsonSchema = {
         properties: {
-          uuid: {
-            readOnly: true,
-            title: "uuid",
-            type: "string",
-          },
           name: {
             maxLength: 50,
             minLength: 2,
