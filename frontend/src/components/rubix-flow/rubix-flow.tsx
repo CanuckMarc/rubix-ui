@@ -46,6 +46,7 @@ import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
+import { SubFlowTabs } from "./components/SubFlowTabs";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -969,6 +970,8 @@ const Flow = (props: FlowProps) => {
     };
   }, [flowSettings.refreshTimeout]);
 
+  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
+
   return (
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
@@ -981,7 +984,8 @@ const Flow = (props: FlowProps) => {
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
+      <div className={`rubix-flow__wrapper ${nodesParent.length > 0 ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
+        <SubFlowTabs nodes={nodesParent} selectedSubflow={selectedNodeForSubFlow} goSubFlow={handleAddSubFlow} />
         <ReactFlowProvider>
           <ReactFlow
             onContextMenu={() => setMenuOpenFromNodeTree(false)}
