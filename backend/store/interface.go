@@ -12,4 +12,8 @@ type IAppStore interface {
 	GetBackupPath() string
 	SaveBackup(fileName string, data interface{}) error
 	StoreCheckAppAndVersionExists(app App) error
+
+	DownloadIO16Firmware(token, version string) (string, error)
+	ListIO16Builds() ([]string, error)
+	ListIO16BuildFiles(version string, includeDebug bool) ([]string, error)
 }

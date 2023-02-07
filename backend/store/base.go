@@ -26,6 +26,8 @@ type Store struct {
 	UserTmpPath       string `json:"user_tmp_path"`        // ~/rubix/tmp
 	Owner             string `json:"owner"`                // NubeIO
 	BackupsDir        string `json:"backups_dir"`          // ~/backups
+	FirmwareDir       string `json:"firmware_dir"`         // ~/backups
+	IO16FirmwareDir   string `json:"io_16_firmware_dir"`   // ~/io 16 dir
 }
 
 type AppStore struct {
@@ -61,6 +63,12 @@ func New(store *Store) (*AppStore, error) {
 	if store.BackupsDir == "" {
 		store.BackupsDir = path.Join(store.UserPath, "backups")
 	}
+	if store.FirmwareDir == "" {
+		store.FirmwareDir = path.Join(store.UserPath, "firmware")
+	}
+	if store.IO16FirmwareDir == "" {
+		store.IO16FirmwareDir = path.Join(store.FirmwareDir, "io16")
+	}
 	err := store.initMakeAllDirs()
 	if err != nil {
 		return nil, err
@@ -88,6 +96,9 @@ func (inst *Store) initMakeAllDirs() error {
 		return err
 	}
 	if err := os.MkdirAll(inst.BackupsDir, os.FileMode(FilePerm)); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(inst.FirmwareDir, os.FileMode(FilePerm)); err != nil {
 		return err
 	}
 	return nil

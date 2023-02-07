@@ -46,12 +46,21 @@ type Services struct {
 	Arch        []string `json:"arch"`
 }
 
+type Firmware struct {
+	Name        string `json:"name"`
+	Repo        string `json:"repo"`
+	Description string `json:"description"`
+	MinVersion  string `json:"min_version"`
+	MaxVersion  string `json:"max_version"`
+}
+
 type Release struct {
 	Uuid     string     `json:"uuid"`
 	Release  string     `json:"release"`
 	Apps     []Apps     `json:"apps"`
 	Plugins  []Plugins  `json:"plugins"`
 	Services []Services `json:"services"`
+	Firmware []Firmware `json:"firmware"`
 }
 
 type ReleaseList struct {
