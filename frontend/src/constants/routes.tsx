@@ -17,10 +17,9 @@ export const ROUTES: ROUTE = {
   CONNECTIONS: "/connections",
   LOCATIONS: "/connections/:connUUID/locations",
   LOCATION_NETWORKS: "/connections/:connUUID/locations/:locUUID/networks",
-  LOCATION_NETWORK_HOSTS:
-    "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts",
+  LOCATION_NETWORK_HOSTS: "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts",
   HOST: "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID",
-  APP_DETAILS: "/connections/app-details/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID",
+  APP_DETAILS: "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID/app-details",
   DEVICES:
     "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID/plugins/:pluginName/rf-networks/:networkUUID/rf-devices",
   POINTS:
@@ -40,10 +39,9 @@ export const ROUTES: ROUTE = {
   RUBIX_FLOW: "/rubix-flow",
   RUBIX_FLOW_REMOTE: "/rubix-flow/connections/:connUUID/hosts/:hostUUID",
   WIRES_CONNECTIONS: "/wires-connections",
-  WIRES_CONNECTIONS_REMOTE:
-    "/wires-connections/connections/:connUUID/hosts/:hostUUID",
+  WIRES_CONNECTIONS_REMOTE: "/wires-connections/connections/:connUUID/hosts/:hostUUID",
   USER_GUIDE: "/user-guide",
   USER_GUIDE_REMOTE: "/user-guide/connections/:connUUID/hosts/:hostUUID",
   SCHEDULES: "/schedules",
-  SCHEDULES_REMOTE: "/schedules/connections/:connUUID/hosts/:hostUUID"
+  SCHEDULES_REMOTE: "/schedules/connections/:connUUID/hosts/:hostUUID",
 };
