@@ -91,10 +91,10 @@ export const FlowPointsTable = (props: any) => {
   const getTableHeaders = (schema: any) => {
     if (!schema) return;
 
-    const columns = [...FLOW_POINT_HEADERS] as any;
+    const stylingColumns = [...FLOW_POINT_HEADERS];
 
-    delete schema.plugin_name; //prevent mass edit on plugin_name
-    const columnKeys = columns.map((c: any) => c.key);
+    delete schema.plugin_name; // prevent mass edit on plugin_name
+    const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
         title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
@@ -107,10 +107,8 @@ export const FlowPointsTable = (props: any) => {
 
     //styling columns
     headers = headers.map((header: any) => {
-      if (columnKeys.includes(header.key)) {
-        const headerFromColumns = columns.find((col: any) => col.key === header.key);
-        headerFromColumns.title = header.title;
-        return headerFromColumns;
+      if (stylingColumnKeys.includes(header.key)) {
+        return stylingColumns.find((col: any) => col.key === header.key);
       } else {
         return header;
       }
@@ -118,7 +116,7 @@ export const FlowPointsTable = (props: any) => {
 
     const headerWithActions = [
       {
-        title: "actions",
+        title: "Actions",
         key: "actions",
         fixed: "left",
         render: (_: any, point: Point) => (
@@ -139,7 +137,7 @@ export const FlowPointsTable = (props: any) => {
       ...headers,
       ...FLOW_POINT_HEADERS_TABLE,
       {
-        title: "plugin name",
+        title: "Plugin Name",
         key: "plugin_name",
         dataIndex: "plugin_name",
         render() {

@@ -103,18 +103,10 @@ export const FlowDeviceTable = (props: any) => {
   const getTableHeaders = (schema: any) => {
     if (!schema) return;
 
-    const columns = [
-      {
-        title: "name",
-        dataIndex: "name",
-        key: "name",
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      },
-      ...FLOW_DEVICE_HEADERS,
-    ];
+    const stylingColumns = [...FLOW_DEVICE_HEADERS];
 
-    delete schema.plugin_name; //prevent mass edit on plugin_name
-    const columnKeys = columns.map((c: any) => c.key);
+    delete schema.plugin_name; // prevent mass edit on plugin_name
+    const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
         title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
@@ -125,12 +117,10 @@ export const FlowDeviceTable = (props: any) => {
       };
     });
 
-    //styling columns
+    // styling columns
     headers = headers.map((header: any) => {
-      if (columnKeys.includes(header.key)) {
-        const headerFromColumns = columns.find((col: any) => col.key === header.key);
-        if (headerFromColumns) headerFromColumns.title = header.title;
-        return headerFromColumns;
+      if (stylingColumnKeys.includes(header.key)) {
+        return stylingColumns.find((col: any) => col.key === header.key);
       } else {
         return header;
       }
@@ -138,7 +128,7 @@ export const FlowDeviceTable = (props: any) => {
 
     const headerWithActions = [
       {
-        title: "actions",
+        title: "Actions",
         key: "actions",
         fixed: "left",
         render: (_: any, device: Device) => (
@@ -158,7 +148,7 @@ export const FlowDeviceTable = (props: any) => {
       },
       ...headers,
       {
-        title: "plugin name",
+        title: "Plugin Name",
         key: "plugin_name",
         dataIndex: "plugin_name",
         render() {

@@ -486,8 +486,14 @@ const sortIps = (a: string, b: string) => {
 
 export const NETWORK_HEADERS = [
   {
-    title: "network",
+    dataIndex: "name",
+    title: "Name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
     key: "plugin_name",
+    title: "Network",
     dataIndex: "plugin_name",
     render(name: string) {
       let image = pluginLogo(name);
@@ -495,8 +501,8 @@ export const NETWORK_HEADERS = [
     },
   },
   {
-    title: "network-type",
     key: "plugin_name",
+    title: "Network Type",
     dataIndex: "plugin_name",
     render(plugin_name: string) {
       let colour = "#4d4dff";
@@ -506,17 +512,17 @@ export const NETWORK_HEADERS = [
     sorter: (a: any, b: any) => a.plugin_name.localeCompare(b.plugin_name),
   },
   {
-    title: "uuid",
     dataIndex: "uuid",
+    title: "UUID",
     key: "uuid",
   },
 ];
 
 export const FLOW_DEVICE_HEADERS = [
   {
-    title: "enable",
-    key: "enable",
+    title: "Enable",
     dataIndex: "enable",
+    key: "enable",
     render(enable: boolean) {
       let colour = "blue";
       let text = "disabled";
@@ -547,7 +553,7 @@ export const FLOW_DEVICE_HEADERS = [
 
 export const FLOW_POINT_HEADERS = [
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     render(name: string) {
@@ -559,7 +565,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
+    title: "Enable",
     key: "enable",
     dataIndex: "enable",
     render(enable: boolean) {
@@ -574,7 +580,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "object type",
+    title: "Object Type",
     dataIndex: "object_type",
     key: "object_type",
     render(object_type: string) {
@@ -587,7 +593,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.object_type.localeCompare(b.object_type),
   },
   {
-    title: "object id",
+    title: "Object Id",
     dataIndex: "object_id",
     key: "object_id",
     render(object_id: number) {
@@ -599,7 +605,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.object_id - b.object_id,
   },
   {
-    title: "io number",
+    title: "IO Number",
     dataIndex: "io_number",
     key: "io_number",
     render(io_number: string) {
@@ -612,7 +618,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.io_number - b.io_number,
   },
   {
-    title: "io type",
+    title: "IO Type",
     dataIndex: "io_type",
     key: "io_type",
     render(io_type: string) {
@@ -627,9 +633,8 @@ export const FLOW_POINT_HEADERS = [
 ];
 
 export const FLOW_POINT_HEADERS_TABLE = [
-  //will render in the table but not the form
   {
-    title: "present value",
+    title: "Present Value",
     dataIndex: "present_value",
     key: "present_value",
     render(present_value: number) {
@@ -641,7 +646,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.present_value - b.present_value,
   },
   {
-    title: "original value",
+    title: "Original Value",
     dataIndex: "original_value",
     key: "original_value",
     render(original_value: number) {
@@ -653,7 +658,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.original_value - b.original_value,
   },
   {
-    title: "write value",
+    title: "Write Value",
     dataIndex: "write_value",
     key: "write_value",
     render(write_value: number) {
@@ -665,7 +670,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.write_value - b.write_value,
   },
   {
-    title: "current_priority",
+    title: "Current Priority",
     dataIndex: "current_priority",
     key: "current_priority",
     render(current_priority: number) {
@@ -677,7 +682,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.current_priority - b.current_priority,
   },
   {
-    title: "message",
+    title: "Message",
     dataIndex: "message",
     key: "message",
   },
