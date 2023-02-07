@@ -739,17 +739,17 @@ const Flow = (props: FlowProps) => {
   };
   const handleAlignLeft = (position: { x: number; y: number }) => {
     nodes.forEach((item) => {
-      if(item.selected === true){
-        item.position.x = position.x
+      if (item.selected) {
+        item.position.x = position.x;
       }
-    })
+    });
   };
-  const handleAlignRight = (position: { x: number; y: number }, width: any) => {
-    nodes.forEach((item: any) => {
-      if(item.selected === true){
-        item.position.x = position.x + (width - item.width)
+  const handleAlignRight = (position: { x: number; y: number }, width: number) => {
+    nodes.forEach((item: NodeInterface) => {
+      if (item.selected) {
+        item.position.x = position.x + (width - item.width!!);
       }
-    })
+    });
   };
   const handleRefreshValues = async () => {
     const _outputNodes = (await fetchOutput()) || [];

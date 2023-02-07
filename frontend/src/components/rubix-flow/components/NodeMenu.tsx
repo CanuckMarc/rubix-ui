@@ -17,7 +17,7 @@ type NodeMenuProps = {
   selectedNodeForSubFlow?: NodeInterface;
   deleteNode: (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => void;
   handleAlignLefts: (position: { x: number; y: number }) => void;
-  handleAlignRights: (position: { x: number; y: number } ,width: number | null | undefined) => void;
+  handleAlignRights: (position: { x: number; y: number }, width: number) => void;
   duplicateNode: (_copied: { nodes: NodeInterface[]; edges: any }) => void;
   deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
@@ -121,14 +121,14 @@ const NodeMenu = ({
     duplicateNode({ nodes: [node], edges: [] });
     onClose();
   };
-  const handleAlignLeft = () =>{
-    handleAlignLefts(node.position)
-    onClose()
-  }
-  const handleAlignRight = () =>{
-    handleAlignRights(node.position, node?.width)
-    onClose()
-  }
+  const handleAlignLeft = () => {
+    handleAlignLefts(node.position);
+    onClose();
+  };
+  const handleAlignRight = () => {
+    handleAlignRights(node.position, node.width!!);
+    onClose();
+  };
   const deleteAllInputs =
     (isInputs = false) =>
     () => {
