@@ -1,9 +1,9 @@
-import { Button, Divider, Dropdown, List, Menu, Modal, Typography, Skeleton } from "antd";
+import { Button, Dropdown, List, Menu, Modal, Typography } from "antd";
 import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
-import { RbRefreshButton } from "../../../common/rb-table-actions";
+import { RbRefreshButton, RbSyncButton } from "../../../common/rb-table-actions";
 import RbTag from "../../../common/rb-tag";
 import RbVersion, { VERSION_STATES } from "../../../common/rb-version";
 import { orderBy } from "../../../utils/utils";
@@ -11,6 +11,8 @@ import { ReleasesFactory } from "../../release/factory";
 import { InstallAppFactory } from "./install-rubix-app/factory";
 import { InstallRubixAppModal } from "./install-rubix-app/install-rubix-app-modal";
 import { tagMessageStateResolver } from "./utils";
+import { openNotificationWithIcon } from "../../../utils/utils";
+import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
 import RunningServices = rumodel.RunningServices;
@@ -30,6 +32,7 @@ export const EdgeAppInfo = (props: any) => {
   const [appInfoMsg, updateAppInfoMsg] = useState("");
   const [selectedApp, updateSelectedApp] = useState({} as InstalledApps);
   const [installedVersion, updateInstalledVersion] = useState("");
+  const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
 
   let timeout;
@@ -105,9 +108,23 @@ export const EdgeAppInfo = (props: any) => {
     updateIsInstallRubixAppModalVisible(false);
   };
 
+  const onSyncReleases = async () => {
+    setLoadingSyncReleases(true);
+    try {
+      await GitDownloadReleases();
+    } catch (error) {
+      openNotificationWithIcon("error", error);
+    } finally {
+      setLoadingSyncReleases(false);
+    }
+  };
+
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
-      <RbRefreshButton style={{width: '100px'}} refreshList={() => fetchAppInfo()} />
+      <div style={{display: 'flex', flexDirection: 'row'}}>
+        <RbRefreshButton style={{width: '100px'}} refreshList={() => fetchAppInfo()} />
+        <RbSyncButton style={{width: '150px'}} onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
+      </div>
       <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
         <List
           itemLayout="horizontal"
