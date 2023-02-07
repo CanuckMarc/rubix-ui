@@ -107,24 +107,36 @@ export const EdgeAppInfo = (props: any) => {
 
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
-      <RbRefreshButton style={{width: '6vw'}} refreshList={() => fetchAppInfo()} />
+      <RbRefreshButton style={{width: '100px'}} refreshList={() => fetchAppInfo()} />
       <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
         <List
           itemLayout="horizontal"
           loading={isLoading}
           bordered={true}
           dataSource={availableApps}
-          header={<strong>Available Apps</strong>}
+          header={<div style={{textAlign: 'start'}}><strong>Available Apps</strong></div>}
           renderItem={(item) => (
-            <List.Item style={{textAlign: 'start'}}>
+            <List.Item style={{ padding: "8px 16px", textAlign: 'start'}}>
               <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
-              <List.Item.Meta
-                title={<span>{item.app_name}</span>}
-                description={`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}
-              />
-              <List.Item.Meta
-                description={`${item.description}`}
-              />
+              <span style={{ width: "350px" }}>
+                <div style={{display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
+                  <span>{item.app_name}</span>
+                  <span style={{color: 'grey'}}>{`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}</span>
+                </div>
+              </span>
+              <span
+                className="flex-1 italic"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  borderLeft: "1px solid #dfdfdf",
+                  padding: "0 2rem",
+                  color: 'grey'
+                }}
+              >
+                <span style={{paddingTop: '15px', paddingBottom: '15px'}}>{`${item.description}`}</span>
+              </span>
             </List.Item>
           )}
         />
@@ -134,9 +146,9 @@ export const EdgeAppInfo = (props: any) => {
           loading={isLoading}
           bordered={true}
           dataSource={installedApps}
-          header={<strong>Installed Apps</strong>}
+          header={<div style={{textAlign: 'start'}}><strong>Installed Apps</strong></div>}
           renderItem={(item) => (
-            <List.Item style={{ padding: "8px 16px" }}>
+            <List.Item style={{ padding: "8px 16px", textAlign: 'start' }}>
               <span className="mr-6">
                 <Dropdown trigger={["click"]}
                           overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
@@ -186,9 +198,9 @@ export const EdgeAppInfo = (props: any) => {
           loading={isLoading}
           bordered={true}
           dataSource={runningServices}
-          header={<strong>Running Services</strong>}
+          header={<div style={{textAlign: 'start'}}><strong>Running Services</strong></div>}
           renderItem={(item) => (
-            <List.Item style={{ padding: "8px 16px" }}>
+            <List.Item style={{ padding: "8px 16px", textAlign: 'start' }}>
               <span className="mr-6">
                 <Dropdown trigger={["click"]}
                           overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={false} />}>
