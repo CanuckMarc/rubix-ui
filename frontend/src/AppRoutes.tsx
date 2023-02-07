@@ -21,8 +21,8 @@ import RubixFlow from "./components/rubix-flow/rubix-flow";
 import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
-import { LogTable } from "./components/hosts/host/flow/networks/views/logTable";
 import { WiresMap } from "./components/wires-map/map";
+import { AppDetails } from "./components/hosts/views/appDetails"
 
 function AppRoutes() {
   return (
@@ -62,6 +62,11 @@ function AppRoutes() {
           key={routes.DEVICES}
           path={routes.DEVICES}
           element={<FlowDevices />}
+        />
+        <Route
+          key={routes.APP_DETAILS}
+          path={routes.APP_DETAILS}
+          element={<AppDetails />}
         />
         <Route
           key={routes.POINTS}

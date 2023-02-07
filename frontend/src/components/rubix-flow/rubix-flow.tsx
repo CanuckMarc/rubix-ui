@@ -48,6 +48,7 @@ import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 import { LoadWiresMap } from "./components/LoadWiresMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
+import { SubFlowTabs } from "./components/SubFlowTabs";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -59,6 +60,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 // this is save all nodes
 declare global {
   interface Window {
+    nodesCopied?: NodeInterface[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
@@ -216,14 +218,17 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow(node);
   };
 
-  const handleConnectionBuilderFlow = (node: NodeInterface, isConnection = true) => {
+  const handleConnectionBuilderFlow = (node: NodeInterface) => {
     setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
     setEdges((edges) => edges.map((e) => ({ ...e, selected: false })));
     if (node.id !== selectedNodeForSubFlow?.id) {
       handlePushSelectedNodeForSubFlow(node);
     }
-    setIsConnectionBuilder(isConnection);
-    setIsLinkBuilder(!isConnection);
+    setIsConnectionBuilder(true);
+  };
+
+  const handleLinkBuilder = () => {
+    setIsLinkBuilder(true);
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
@@ -973,6 +978,8 @@ const Flow = (props: FlowProps) => {
     };
   }, [flowSettings.refreshTimeout]);
 
+  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
+
   return (
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
@@ -985,7 +992,13 @@ const Flow = (props: FlowProps) => {
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
+      <div className={`rubix-flow__wrapper ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
+        <SubFlowTabs
+          nodes={nodesParent}
+          selectedSubflow={selectedNodeForSubFlow}
+          goSubFlow={handleAddSubFlow}
+          onBackToMain={onBackToMain}
+        />
         <ReactFlowProvider>
           <ReactFlow
             onContextMenu={() => setMenuOpenFromNodeTree(false)}
@@ -1051,7 +1064,7 @@ const Flow = (props: FlowProps) => {
               onCloseSubFlow={onCloseSubFlow}
               onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
-              isConnectionBuilder={isConnectionBuilder}
+              onLinkBuilder={handleLinkBuilder}
               handleConnectionBuilderFlow={handleConnectionBuilderFlow}
               handleLoadNodesAndEdges={handleLoadNodesAndEdges}
             />
@@ -1080,21 +1093,19 @@ const Flow = (props: FlowProps) => {
               />
             )}
             {!!selectedNodeForSubFlow && (
-              <>
-                <ConnectionBuilderModal
-                  parentNode={selectedNodeForSubFlow}
-                  open={isConnectionBuilder}
-                  onClose={onCloseBuilderModal}
-                  nodesSpec={nodesSpec}
-                />
-                <LinkBuilderModal
-                  parentNode={selectedNodeForSubFlow}
-                  open={isLinkBuilder}
-                  onClose={onCloseBuilderModal}
-                  nodesSpec={nodesSpec}
-                />
-              </>
+              <ConnectionBuilderModal
+                parentNode={selectedNodeForSubFlow}
+                open={isConnectionBuilder}
+                onClose={onCloseBuilderModal}
+                nodesSpec={nodesSpec}
+              />
             )}
+            <LinkBuilderModal
+              parentNode={selectedNodeForSubFlow}
+              open={isLinkBuilder}
+              onClose={onCloseBuilderModal}
+              nodesSpec={nodesSpec}
+            />
           </ReactFlow>
         </ReactFlowProvider>
       </div>

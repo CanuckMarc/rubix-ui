@@ -6,7 +6,7 @@ import { SELECTED_ITEMS } from "../components/rubix-flow/use-nodes-spec";
 import { openNotificationWithIcon } from "../utils/utils";
 
 const MassEdit = (props: any) => {
-  const { handleOk, fullSchema, keyName } = props;
+  const { fullSchema, title, keyName, handleOk } = props;
   const [formData, setFormData] = useState({});
   const [schema, setSchema] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -14,8 +14,7 @@ const MassEdit = (props: any) => {
 
   const openModal = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const selectedItems =
-      JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
+    const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
     if (selectedItems.length === 0) {
       return openNotificationWithIcon("warning", `please select at least one`);
     }
@@ -41,7 +40,7 @@ const MassEdit = (props: any) => {
   return (
     <>
       <div className="flex justify-between" style={{ alignItems: "center" }}>
-        {keyName.replaceAll("_", " ")}
+        {title}
         <Button
           icon={<HighlightOutlined />}
           onClick={openModal}

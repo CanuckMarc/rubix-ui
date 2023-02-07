@@ -1,46 +1,20 @@
 import { backend, model } from "../../../../../../../wailsjs/go/models";
 import {
-  GetStreamClones,
-  DeleteStreamBulkClones,
+  DeleteStreamBulkClones, GetFlowNetworkClone,
 } from "../../../../../../../wailsjs/go/backend/App";
-import { Helpers } from "../../../../../../helpers/checks";
 
-import StreamClone = model.StreamClone;
 import UUIDs = backend.UUIDs;
-
-function hasUUID(uuid: string): Error {
-  return Helpers.IsUndefined(uuid, "host or connection uuid") as Error;
-}
 
 export class FlowStreamCloneFactory {
   hostUUID!: string;
   connectionUUID!: string;
+  flowNetworkCloneUUID!: string;
 
-  async GetAll(): Promise<Array<StreamClone>> {
-    let resp: Promise<Array<StreamClone>> = {} as Promise<Array<StreamClone>>;
-    hasUUID(this.connectionUUID);
-    hasUUID(this.hostUUID);
-    await GetStreamClones(this.connectionUUID, this.hostUUID)
-      .then((res) => {
-        resp = res as unknown as Promise<Array<StreamClone>>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+  async GetAll(): Promise<model.FlowNetworkClone> {
+    return GetFlowNetworkClone(this.connectionUUID, this.hostUUID, this.flowNetworkCloneUUID, true)
   }
 
   async BulkDelete(uuids: Array<UUIDs>): Promise<any> {
-    hasUUID(this.connectionUUID);
-    hasUUID(this.hostUUID);
-    let resp: Promise<any> = {} as Promise<any>;
-    await DeleteStreamBulkClones(this.connectionUUID, this.hostUUID, uuids)
-      .then((res) => {
-        resp = res as Promise<any>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return DeleteStreamBulkClones(this.connectionUUID, this.hostUUID, uuids)
   }
 }

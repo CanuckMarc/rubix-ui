@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Modal, Spin } from "antd";
 import { FlowConsumerFactory } from "../factory";
-import { FlowProducerFactory } from "../../producers/factory";
 import { model } from "../../../../../../../../wailsjs/go/models";
 import { JsonForm } from "../../../../../../../common/json-schema-form";
-
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
+import { hasError } from "../../../../../../../utils/response";
 import Consumer = model.Consumer;
+import Producer = model.Producer;
 
 export const CreateEditModal = (props: any) => {
   const { currentItem, isModalVisible, refreshList, onCloseModal } = props;
@@ -17,9 +18,9 @@ export const CreateEditModal = (props: any) => {
   const [isFetching, setIsFetching] = useState(false);
 
   const factory = new FlowConsumerFactory();
-  const producerFactory = new FlowProducerFactory();
-  factory.connectionUUID = producerFactory.connectionUUID = connUUID;
-  factory.hostUUID = producerFactory.hostUUID = hostUUID;
+  factory.connectionUUID = connUUID;
+  factory.hostUUID = hostUUID;
+  factory.streamCloneUUID = streamCloneUUID;
 
   useEffect(() => {
     setFormData(currentItem);
@@ -32,14 +33,13 @@ export const CreateEditModal = (props: any) => {
   const getSchema = async () => {
     try {
       setIsFetching(true);
-      const res = await producerFactory.GetAll();
+      const res = await factory.GetProducersUnderStreamClone();
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res?.msg);
+        return;
+      }
       const jsonSchema = {
         properties: {
-          uuid: {
-            readOnly: true,
-            title: "uuid",
-            type: "string",
-          },
           name: {
             maxLength: 50,
             minLength: 2,
@@ -54,10 +54,10 @@ export const CreateEditModal = (props: any) => {
           producer_uuid: {
             title: "producer",
             type: "string",
-            anyOf: res.map((n) => {
+            anyOf: res?.data?.producers?.map((n: Producer) => {
               return { type: "string", enum: [n.uuid], title: n.name };
             }),
-            default: res[0].uuid,
+            default: (res?.data?.producers || []).length > 0 && res?.data?.producers[0].uuid || "",
           },
         },
       };

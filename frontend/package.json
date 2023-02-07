@@ -29,6 +29,7 @@
     "react-mui-fileuploader": "^0.2.0",
     "react-router-dom": "^6.3.0",
     "react-simple-code-editor": "^0.13.1",
+    "react-split-pane": "^0.1.92",
     "sass": "^1.52.1",
     "tailwindcss": "3.1.8",
     "use-undoable": "^3.3.11",

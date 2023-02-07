@@ -34,8 +34,8 @@ export const StreamsTable = (props: any) => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: Stream) => (
         <Space size="middle">
@@ -80,11 +80,6 @@ export const StreamsTable = (props: any) => {
           type: "boolean",
           default: true,
         },
-        uuid: {
-          readOnly: true,
-          title: "uuid",
-          type: "string",
-        },
       },
     };
     setSchema(schema);
@@ -115,7 +110,7 @@ export const StreamsTable = (props: any) => {
       <RbRefreshButton refreshList={refreshList} />
       <RbAddButton handleClick={() => showModal({} as Stream)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"

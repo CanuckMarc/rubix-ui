@@ -20,6 +20,7 @@ export const ROUTES: ROUTE = {
   LOCATION_NETWORK_HOSTS:
     "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts",
   HOST: "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID",
+  APP_DETAILS: "/connections/app-details/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID",
   DEVICES:
     "/connections/:connUUID/locations/:locUUID/networks/:netUUID/hosts/:hostUUID/plugins/:pluginName/rf-networks/:networkUUID/rf-devices",
   POINTS:

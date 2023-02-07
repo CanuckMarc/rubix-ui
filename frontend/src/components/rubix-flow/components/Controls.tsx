@@ -11,6 +11,10 @@ import {
   UploadOutlined,
   PlayCircleOutlined,
   SettingOutlined,
+  LinkOutlined,
+  BuildOutlined,
+  RollbackOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
@@ -20,7 +24,6 @@ import { Edge } from "react-flow-renderer";
 type ControlProps = {
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
-  isConnectionBuilder: boolean;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
@@ -31,13 +34,13 @@ type ControlProps = {
   onBackToMain: () => void;
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
-  handleConnectionBuilderFlow: (node: NodeInterface, isConnection?: boolean) => void;
+  handleConnectionBuilderFlow: (node: NodeInterface) => void;
+  onLinkBuilder: () => void;
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
 const Controls = ({
   settings,
-  isConnectionBuilder,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
   onCopyNodes,
@@ -46,6 +49,7 @@ const Controls = ({
   onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
+  onLinkBuilder,
   onClearAllNodes,
   onCloseSubFlow,
   onBackToMain,
@@ -119,8 +123,7 @@ const Controls = ({
     });
   }); */
 
-  /* Ctrl + D (key): Paste nodes */
-  useCtrlPressKey("KeyD", () => {
+  const handleDuplicatedNodes = () => {
     const nodesCopied = instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
     const edgesCopied = instance
@@ -131,110 +134,66 @@ const Controls = ({
       nodes: nodesCopied,
       edges: edgesCopied,
     });
-  });
+  };
+
+  /* Ctrl + D (key): Paste nodes */
+  useCtrlPressKey("KeyD", handleDuplicatedNodes);
 
   /* Ctrl + Z (key): Undo */
-  useCtrlPressKey("KeyZ", () => {
-    onUndo();
-  });
+  useCtrlPressKey("KeyZ", onUndo);
 
   /* Ctrl + Y (key): Redo */
-  useCtrlPressKey("KeyY", () => {
-    onRedo();
-  });
+  useCtrlPressKey("KeyY", onRedo);
 
   /* Ctrl + S (key): Download/deploy flow */
-  useCtrlPressKey("KeyS", () => {
-    onHandelSaveFlow();
-  });
+  useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", () => {
-    onRefreshValues();
+  useCtrlPressKey("KeyX", onRefreshValues);
+
+  useCtrlPressKey("KeyC", () => {
+    const nodesCopied = instance.getNodes().filter((node) => node.selected);
+    if (nodesCopied) {
+      window.nodesCopied = nodesCopied;
+    }
+  });
+
+  useCtrlPressKey("KeyV", () => {
+    if (window.nodesCopied && window.nodesCopied.length > 0) {
+      handleDuplicatedNodes();
+      window.nodesCopied = [];
+    }
   });
 
   const onConnectionBuilder = () => {
     handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
   };
 
-  const onLinkBuilder = () => {
-    handleConnectionBuilderFlow(selectedNodeForSubFlow!!, false);
+  const renderIconBtn = (title: string, Icon: any, onClick: () => void, id = "") => {
+    return (
+      <div id={id} className="cursor-pointer border-r bg-white hover:bg-gray-100" title={title} onClick={onClick}>
+        <Icon className="p-2 text-gray-700 align-middle" />
+      </div>
+    );
   };
 
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
           <>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Link Builder"
-              onClick={onLinkBuilder}
-            >
-              Link Builder
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Connection Builder"
-              onClick={onConnectionBuilder}
-            >
-              Connection Builder
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Back to Main"
-              onClick={onBackToMain}
-            >
-              Back to Main
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Close sub flow"
-              onClick={onCloseSubFlow}
-            >
-              Close Sub Flow
-            </div>
+            {renderIconBtn("Connection Builder", BuildOutlined, onConnectionBuilder)}
+            {renderIconBtn("Back to Main", RollbackOutlined, onBackToMain)}
+            {renderIconBtn("Close sub flow", CloseCircleOutlined, onCloseSubFlow)}
           </>
         )}
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Settings refresh value"
-          onClick={() => setSettingRefreshModalOpen(true)}
-        >
-          <SettingOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Help"
-          onClick={() => setHelpModalOpen(true)}
-        >
-          <QuestionCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Load"
-          onClick={() => setLoadModalOpen(true)}
-        >
-          <UploadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Save"
-          id="exportButton"
-          onClick={() => setSaveModalOpen(true)}
-        >
-          <DownloadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Clear"
-          onClick={() => setClearModalOpen(true)}
-        >
-          <RestOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div className="cursor-pointer border-r bg-white hover:bg-gray-100" title="Run" onClick={onHandelSaveFlow}>
-          <PlayCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
+        {renderIconBtn("Settings", SettingOutlined, () => setSettingRefreshModalOpen(true))}
+        {renderIconBtn("Help", QuestionCircleOutlined, () => setHelpModalOpen(true))}
+        {renderIconBtn("Import", UploadOutlined, () => setLoadModalOpen(true))}
+        {renderIconBtn("Export", DownloadOutlined, () => setSaveModalOpen(true), "exportButton")}
+        {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
+        {renderIconBtn("Download", PlayCircleOutlined, onHandelSaveFlow)}
       </div>
       <LoadModal
         open={loadModalOpen}

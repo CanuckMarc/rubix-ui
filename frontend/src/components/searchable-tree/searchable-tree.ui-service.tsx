@@ -7,6 +7,7 @@ import {
   ClusterOutlined,
   RadarChartOutlined,
   MenuOutlined,
+  ToolOutlined
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { useState } from "react";
@@ -19,6 +20,7 @@ let ObjectType = {
   LOCATIONS: "locations",
   NETWORKS: "networks",
   HOSTS: "hosts",
+  APP_DETAILS: "app-details",
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
@@ -39,6 +41,11 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
       .replace(":netUUID", netUUID),
   [ObjectType.HOSTS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "", hostUUID: string = "") =>
     ROUTES.HOST.replace(":connUUID", connUUID)
+      .replace(":locUUID", locUUID)
+      .replace(":netUUID", netUUID)
+      .replace(":hostUUID", hostUUID),
+  [ObjectType.APP_DETAILS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "", hostUUID: string = "") =>
+    ROUTES.APP_DETAILS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
       .replace(":hostUUID", hostUUID),
@@ -63,6 +70,7 @@ function getItemValue(item: any, type: string) {
       deleteProp = ObjectType.NETWORKS;
       break;
     case ObjectType.HOSTS:
+    case ObjectType.APP_DETAILS:
     case ObjectType.RUBIX_FLOW_REMOTE:
     case ObjectType.WIRES_CONNECTIONS_REMOTE:
     case ObjectType.SCHEDULES_REMOTE:
@@ -189,14 +197,27 @@ export const getTreeDataIterative = (connections: any) => {
               ...objectMap(
                 getTreeObject(
                   { ...host, name: host.name + " (device)" },
-                  ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                  ObjectTypesToRoutes[ObjectType.APP_DETAILS](connection.uuid, location.uuid, network.uuid, host.uuid),
                   "",
                   <ClusterOutlined />
                 )
               ),
-              next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
-              value: getItemValue(host, ObjectType.HOSTS),
+              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](connection.uuid, location.uuid, network.uuid, host.uuid),
+              value: getItemValue(host, ObjectType.APP_DETAILS),
               children: [
+                {
+                  ...objectMap(
+                    getTreeObject(
+                      { name: "drivers", uuid: "drivers_" + host.uuid },
+                      ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                      "",
+                      <ToolOutlined />
+                    )
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                  value: getItemValue(host, ObjectType.HOSTS),
+                  children: null,
+                },
                 {
                   ...objectMap(
                     getTreeObject(

@@ -9,19 +9,18 @@ export const getFlowSettings = () => {
   const config = JSON.parse(localStorage.getItem(FLOW_SETTINGS) || "{}");
   return {
     refreshTimeout: config?.refreshTimeout || 5,
+    showSubFlowTabs: config?.showSubFlowTabs === undefined ? true : config?.showSubFlowTabs,
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
     showNodesTree: config?.showNodesTree === undefined ? true : config?.showNodesTree,
     showNodesPallet: config?.showNodesPallet === undefined ? true : config?.showNodesPallet,
-    positionMiniMap:
-      config?.positionMiniMap === undefined
-        ? "bottom"
-        : config?.positionMiniMap,
+    positionMiniMap: config?.positionMiniMap === undefined ? "bottom" : config?.positionMiniMap,
   };
 };
 
 export type FlowSettings = {
   refreshTimeout: number | string;
   showMiniMap: boolean;
+  showSubFlowTabs: boolean;
   showNodesTree: boolean;
   showNodesPallet: boolean;
   positionMiniMap: string;
@@ -34,12 +33,7 @@ export type SettingsModalProps = {
   onSaveSettings: (settings: FlowSettings) => void;
 };
 
-export const FlowSettingsModal: FC<SettingsModalProps> = ({
-  open = false,
-  onClose,
-  settings,
-  onSaveSettings,
-}) => {
+export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClose, settings, onSaveSettings }) => {
   const [configs, setConfigs] = useState<FlowSettings>({
     ...settings,
   });
@@ -49,30 +43,10 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
   };
 
   const handleBlurValue = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = isNaN(+e.target.value)
-      ? 1
-      : Math.max(1, Math.min(60, Number(e.target.value)));
+    const value = isNaN(+e.target.value) ? 1 : Math.max(1, Math.min(60, Number(e.target.value)));
 
     setConfigs({ ...configs, refreshTimeout: value });
   };
-
-  const onChangeShowMiniMap = () => {
-    const newConfig = { ...configs, showMiniMap: !configs.showMiniMap };
-    setConfigs(newConfig);
-    onSaveSettings(newConfig);
-  };
-
-  const onChangeShowNodesTree = () => {
-    const newConfig = { ...configs, showNodesTree: !configs.showNodesTree };
-    setConfigs(newConfig);
-    onSaveSettings(newConfig);
-  }
-
-  const onChangeShowNodesPallet = () => {
-    const newConfig = { ...configs, showNodesPallet: !configs.showNodesPallet };
-    setConfigs(newConfig);
-    onSaveSettings(newConfig);
-  }
 
   const handleSave = () => {
     onSaveSettings(configs);
@@ -85,6 +59,19 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
     onSaveSettings(newConfig);
   };
 
+  const onChangeConfig = (keyConfig: keyof FlowSettings) => () => {
+    const newConfig = { ...configs, [keyConfig]: !configs[keyConfig] };
+    setConfigs(newConfig);
+    onSaveSettings(newConfig);
+  };
+
+  const renderConfigs = (label: string, keyConfig: keyof FlowSettings) => (
+    <Space direction="horizontal">
+      <label className="flow-setting-modal-labels mb-0 mt-1">{label}: </label>
+      <Switch checked={configs[keyConfig] as boolean} size="small" onChange={onChangeConfig(keyConfig)} />
+    </Space>
+  );
+
   return (
     <Modal
       title="Settings"
@@ -96,58 +83,32 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({
       onClose={onClose}
     >
       <Space direction="vertical" align="start">
-          <Space direction='horizontal'>
-            <label id="flow-setting-modal-labels">Show Mini Map: </label>
-            <Switch
-              checked={configs.showMiniMap}
-              size="small"
-              onChange={onChangeShowMiniMap}
-            />
-          </Space>
+        {renderConfigs("Show Mini Map", "showMiniMap")}
+        {renderConfigs("Show Nodes Tree", "showNodesTree")}
+        {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
+        {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
+        <Space direction="horizontal">
+          <label className="flow-setting-modal-labels mb-0">Mini Map Position: </label>
+          <Radio.Group onChange={handleChangePosition} value={configs.positionMiniMap}>
+            <Radio value="top" className="text-black">
+              Top
+            </Radio>
+            <Radio value="bottom" className="text-black">
+              Bottom
+            </Radio>
+          </Radio.Group>
+        </Space>
 
-          <Space direction='horizontal'>
-            <label id="flow-setting-modal-labels">Show Nodes Tree: </label>
-            <Switch
-              checked={configs.showNodesTree}
-              size="small"
-              onChange={onChangeShowNodesTree}
-            />
-          </Space>
-
-          <Space direction='horizontal'>
-            <label id="flow-setting-modal-labels">Show Nodes Pallet: </label>
-            <Switch
-              checked={configs.showNodesPallet}
-              size="small"
-              onChange={onChangeShowNodesPallet}
-            />
-          </Space>
-
-          <Space direction='horizontal'>
-            <label id="flow-setting-modal-labels">Mini Map Position: </label>
-            <Radio.Group
-              onChange={handleChangePosition}
-              value={configs.positionMiniMap}
-            >
-              <Radio value="top" className="text-black">
-                Top
-              </Radio>
-              <Radio value="bottom" className="text-black">
-                Bottom
-              </Radio>
-            </Radio.Group>
-          </Space>
-
-          <Space direction='horizontal'>
-            <label id="flow-setting-modal-labels">Refresh time (second): </label>
-            <input
-              type="number"
-              className="border border-gray-300 p-2"
-              value={configs.refreshTimeout}
-              onChange={onChangeTimeout}
-              onBlur={handleBlurValue}
-            />
-          </Space>
+        <Space direction="horizontal">
+          <label className="flow-setting-modal-labels">Refresh time (second): </label>
+          <input
+            type="number"
+            className="border border-gray-300 p-2"
+            value={configs.refreshTimeout}
+            onChange={onChangeTimeout}
+            onBlur={handleBlurValue}
+          />
+        </Space>
       </Space>
     </Modal>
   );

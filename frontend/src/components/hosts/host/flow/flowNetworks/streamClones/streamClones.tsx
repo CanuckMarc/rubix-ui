@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { Typography } from "antd";
-import { model } from "../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../constants/routes";
 import RbxBreadcrumb from "../../../../../breadcrumbs/breadcrumbs";
 import { StreamClonesTable } from "./views/table";
