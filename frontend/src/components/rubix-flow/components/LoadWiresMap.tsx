@@ -69,7 +69,7 @@ export const LoadWiresMap = () => {
               largeX = item.position.x
             }
           })
-          xTemp = largeX
+          xTemp = largeX + 200
         } else {
           xTemp = x
           yTemp = y
@@ -112,7 +112,7 @@ export const LoadWiresMap = () => {
           type: 'flow/flow-point',
           name: points.pointOne?.name || '',
           isParent: false,
-          parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
+          parentId: existingFlowNet?.id || parentNode.id,
           x: x,
           y: y
         }, 
@@ -137,7 +137,7 @@ export const LoadWiresMap = () => {
       const Edge: Edge = {
         id: generateUuid(),
         source: nodeIds[0],
-        sourceHandle: "out",
+        sourceHandle: "output",
         target: nodeIds[1],
         targetHandle: "in16"
       }
@@ -146,17 +146,17 @@ export const LoadWiresMap = () => {
       return {nodes: nodes, edges: edges}
     }
 
-    const renderPointsToFlowEditor = (newNodes: NodeInterface[], newEdges: Edge[]) => {
+    const renderPointsToFlowEditor = (inputNodes: NodeInterface[], inputEdges: Edge[]) => {
       // set new nodes and edges into flow editor
       setTimeout(() => {
         const oldNodes = flowInstance.getNodes();
-        flowInstance.setNodes([...oldNodes, ...newNodes]);
-        window.allFlow.nodes = [...window.allFlow.nodes, ...newNodes]
+        flowInstance.setNodes([...oldNodes, ...inputNodes]);
+        window.allFlow.nodes = [...window.allFlow.nodes, ...inputNodes];
         
         const oldEdges = flowInstance.getEdges();
-        flowInstance.setEdges([...oldEdges, ...newEdges]);
-        window.allFlow.edges = [...window.allFlow.edges, ...newEdges]
-      }, 50);
+        flowInstance.setEdges([...oldEdges, ...inputEdges]);
+        window.allFlow.edges = [...window.allFlow.edges, ...inputEdges];
+      }, 100);
 
     }
 
@@ -189,7 +189,5 @@ export const LoadWiresMap = () => {
       };
     }
 
-    return (
-        <></>
-    );
+    return null;
 }

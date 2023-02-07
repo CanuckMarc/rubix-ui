@@ -106,110 +106,110 @@ export const PointsPane = (props: any) => {
     }, [pairToAdd])
 
     const columns: ColumnsType<PointTableType> = [
-        {
-            title: title,
-            dataIndex: 'name',
-            key: 'name',
-            fixed: 'left',
-            filters: [
-                {
-                    text: 'Plugin name',
-                    value: 'Plugin name',
-                    children: allNames[0]
-                },
-                {
-                    text: 'Network name',
-                    value: 'Network name',
-                    children: allNames[1]
-                },
-                {
-                    text: 'Device name',
-                    value: 'Device name',
-                    children: allNames[2]
-                },
-                {
-                    text: 'Point name',
-                    value: 'Point name',
-                    children: allNames[3]
-                },
-              ],
-              filterMode: 'tree',
-              filterSearch: true,
-              onFilter: (value: any, record: PointTableType) => {
-                let flag = false
-                const [type, name] = value.split(':');
-                const index = types.indexOf(type);
-                if (record.name.split(':')[index] === name) {
-                    flag = true
-                }
-                return flag
-              }
-        },
-        {
-            title: 'uuid',
-            dataIndex: 'uuid',
-            key: 'uuid',
-            fixed: 'left'
-        }
+      {
+        title: title,
+        dataIndex: 'name',
+        key: 'name',
+        fixed: 'left',
+        filters: [
+          {
+            text: 'Plugin name',
+            value: 'Plugin name',
+            children: allNames[0]
+          },
+          {
+            text: 'Network name',
+            value: 'Network name',
+            children: allNames[1]
+          },
+          {
+            text: 'Device name',
+            value: 'Device name',
+            children: allNames[2]
+          },
+          {
+            text: 'Point name',
+            value: 'Point name',
+            children: allNames[3]
+          },
+          ],
+          filterMode: 'tree',
+          filterSearch: true,
+          onFilter: (value: any, record: PointTableType) => {
+            let flag = false
+            const [type, name] = value.split(':');
+            const index = types.indexOf(type);
+            if (record.name.split(':')[index] === name) {
+              flag = true
+            }
+            return flag
+          }
+      },
+      {
+        title: 'uuid',
+        dataIndex: 'uuid',
+        key: 'uuid',
+        fixed: 'left'
+      }
     ]
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        setSelectedRowKeys(newSelectedRowKeys);
-        let selectedItems: PointTableType = {} as PointTableType
-        newSelectedRowKeys.forEach(i => {
-            tableData.forEach(j => {
-                if (j.uuid === i) {
-                    selectedItems = j
-                }
-            })
+      setSelectedRowKeys(newSelectedRowKeys);
+      let selectedItems: PointTableType = {} as PointTableType
+      newSelectedRowKeys.forEach(i => {
+        tableData.forEach(j => {
+          if (j.uuid === i) {
+            selectedItems = j
+          }
         })
-        setSelectedPoints(selectedItems)
-        if (newSelectedRowKeys.length === 0) {
-            setOwnSelection(undefined)
-        } else {
-            setOwnSelection(selectedItems)
-        }
+      })
+      setSelectedPoints(selectedItems)
+      setOwnSelection(newSelectedRowKeys.length === 0 ? undefined : selectedItems)
+      // if (newSelectedRowKeys.length === 0) {
+      //   setOwnSelection(undefined)
+      // } else {
+      //   setOwnSelection(selectedItems)
+      // }
     };
 
     const rowSelection = {
-        hideSelectAll: true,
-        selectedRowKeys,
-        onChange: onSelectChange,
-        getCheckboxProps: (record: PointTableType) => {
-            if (ownSelection === undefined) {
-                if (selectedPoints && record.uuid === selectedPoints.uuid) {
-                    return {disabled: true}
-                } else {
-                    return {disabled: false}
-                }
-            } else {
-                if (record.uuid === ownSelection.uuid) {
-                    return {disabled: false}
-                } else {
-                    return {disabled: true}
-                }
-            }
+      hideSelectAll: true,
+      selectedRowKeys,
+      onChange: onSelectChange,
+      getCheckboxProps: (record: PointTableType) => {
+        if (ownSelection === undefined) {
+          return {disabled: !!selectedPoints && record.uuid === selectedPoints.uuid}
+            // if (selectedPoints && record.uuid === selectedPoints.uuid) {
+            //     return {disabled: true}
+            // } else {
+            //     return {disabled: false}
+            // }
+        } else {
+          return {disabled: record.uuid !== ownSelection.uuid}
+            // if (record.uuid === ownSelection.uuid) {
+            //     return {disabled: false}
+            // } else {
+            //     return {disabled: true}
+            // }
         }
+      }
     }
 
 
     return (
-        <>
-            <Table 
-                bordered={true}
-                columns={columns} 
-                dataSource={tableData} 
-                style={{ width: '45%' }}
-                rowSelection={rowSelection}
-                pagination={{
-                    position: ["bottomCenter"],
-                    showSizeChanger: true,
-                    pageSizeOptions: [5, 10, 50, 100, 1000],
-                    locale: { items_per_page: "" },
-                }}
-                // scroll={{ x: 'max-content', y: '50vh' }}
-            />
-        </>
+      <Table 
+          bordered={true}
+          columns={columns} 
+          dataSource={tableData} 
+          style={{ width: '45%' }}
+          rowSelection={rowSelection}
+          pagination={{
+              position: ["bottomCenter"],
+              showSizeChanger: true,
+              pageSizeOptions: [5, 10, 50, 100, 1000],
+              locale: { items_per_page: "" },
+          }}
+      />  
     );
 }
 export default PointsPane;
