@@ -115,7 +115,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <span style={{ padding: "10px 0" }} className="supervisors-menu">
+        <span style={{ padding: "10px 0" }}>
           <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
           {item.name}
         </span>
@@ -128,7 +128,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset" }} className="supervisors-menu" onClick={preventDropdown}>
+        <NavLink to={next} style={{ color: "unset" }} onClick={preventDropdown}>
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
           <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             {item.name}

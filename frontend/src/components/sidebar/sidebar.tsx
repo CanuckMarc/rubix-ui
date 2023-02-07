@@ -483,7 +483,6 @@ export const MenuSidebar = () => {
             activeKey={location.pathname}
             openKeys={openingKeys}
             onOpenChange={onOpenChange}
-            style={{ marginLeft: "-10px" }}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />
 
