@@ -3,7 +3,6 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
-	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/nils"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 
@@ -14,9 +13,6 @@ func (inst *App) AddConsumer(connUUID, hostUUID string, body *model.Consumer) *m
 	}
 	if body.Name == "" {
 		body.Name = fmt.Sprintf("con-%s", uuid.ShortUUID("")[5:10])
-	}
-	if nils.BoolIsNil(body.Enable) {
-		body.Enable = nils.NewFalse()
 	}
 	if body.ProducerThingType == "" {
 		body.ProducerThingType = "point"

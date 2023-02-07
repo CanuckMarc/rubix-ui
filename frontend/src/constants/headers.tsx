@@ -4,45 +4,45 @@ import imageRC5 from "../assets/images/RC5.png";
 import imageRCIO from "../assets/images/RC-IO.png";
 import imageEdge28 from "../assets/images/Edge-iO-28.png";
 
-export const FLOW_NETWORKS_HEADERS = [
+export const FLOW_NETWORK_HEADERS = [
   {
     key: "flow_ip",
-    title: "ip",
+    title: "IP",
     dataIndex: "flow_ip",
     sorter: (a: any, b: any) => sortIps(a.flow_ip ?? '', b.flow_ip ?? ''),
   },
   {
     key: "flow_port",
-    title: "port",
+    title: "Port",
     dataIndex: "flow_port",
     sorter: (a: any, b: any) => (a.flow_port ?? 0) - (b.flow_port ?? 0),
   },
   {
     key: "client_name",
-    title: "client name",
+    title: "Client Name",
     dataIndex: "client_name",
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
     key: "site_name",
-    title: "site name",
+    title: "Site Name",
     dataIndex: "site_name",
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
     key: "device_name",
-    title: "device name",
+    title: "Device Name",
     dataIndex: "device_name",
     sorter: (a: any, b: any) => a.device_name.localeCompare(b.device_name),
   },
   {
     key: "message",
-    title: "message",
+    title: "Message",
     dataIndex: "message",
   },
   {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];
@@ -50,13 +50,13 @@ export const FLOW_NETWORKS_HEADERS = [
 export const STREAM_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
     render(enable: boolean) {
       let colour = "blue";
@@ -71,21 +71,21 @@ export const STREAM_HEADERS = [
   },
   {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];
 
-export const CONSUMER_HEADERS = [
+export const STREAM_CLONE_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
     render(enable: boolean) {
       let colour = "blue";
@@ -100,24 +100,12 @@ export const CONSUMER_HEADERS = [
   },
   {
     key: "message",
-    title: "message",
+    title: "Message",
     dataIndex: "message",
   },
   {
-    key: "producer_thing_class",
-    title: "producer thing class",
-    dataIndex: "producer_thing_class",
-    sorter: (a: any, b: any) => a.producer_thing_class.localeCompare(b.producer_thing_class),
-  },
-  {
-    key: "producer_thing_name",
-    title: "producer thing name",
-    dataIndex: "producer_thing_name",
-    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
-  },
-  {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];
@@ -125,48 +113,13 @@ export const CONSUMER_HEADERS = [
 export const PRODUCER_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    key: "producer_application",
-    title: "application",
-    dataIndex: "producer_application",
-    sorter: (a: any, b: any) => a.producer_application.localeCompare(b.producer_application),
-  },
-  {
-    key: "producer_thing_class",
-    title: "thing class",
-    dataIndex: "producer_thing_class",
-    sorter: (a: any, b: any) => a.producer_thing_class.localeCompare(b.producer_thing_class),
-  },
-  {
-    key: "producer_thing_name",
-    title: "thing name",
-    dataIndex: "producer_thing_name",
-    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
-  },
-  {
-    key: "history_type",
-    title: "history type",
-    dataIndex: "history_type",
-    render(plugin_name: string) {
-      let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
-      return <Tag color={colour}>{text}</Tag>;
-    },
-    sorter: (a: any, b: any) => a.history_type.localeCompare(b.history_type),
-  },
-  {
-    key: "history_interval",
-    title: "history interval",
-    dataIndex: "history_interval",
-    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-  },
-  {
-    title: "enable",
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
     render(enabled: boolean) {
       let colour = "blue";
@@ -180,24 +133,146 @@ export const PRODUCER_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
+    key: "enable_history",
+    title: "Enable History",
+    dataIndex: "enable_history",
+    render(enabled: boolean) {
+      let colour = "blue";
+      let text = "disabled";
+      if (enabled) {
+        colour = "orange";
+        text = "enabled";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
+  },
+  {
+    key: "producer_thing_name",
+    title: "Thing Name",
+    dataIndex: "producer_thing_name",
+    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
+  },
+  {
+    key: "producer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "producer_thing_uuid",
+    sorter: (a: any, b: any) => a.producer_thing_uuid.localeCompare(b.producer_thing_uuid),
+  },
+  {
+    key: "history_type",
+    title: "History Type",
+    dataIndex: "history_type",
+    render(plugin_name: string) {
+      let colour = "#4d4dff";
+      let text = plugin_name.toUpperCase();
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.history_type.localeCompare(b.history_type),
+  },
+  {
+    key: "history_interval",
+    title: "History Interval",
+    dataIndex: "history_interval",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+];
+
+export const CONSUMER_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
+    key: "enable",
+    title: "Enable",
+    dataIndex: "enable",
+    render(enable: boolean) {
+      let colour = "blue";
+      let text = "disabled";
+      if (enable) {
+        colour = "orange";
+        text = "enabled";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
+  },
+  {
+    key: "producer_uuid",
+    title: "Producer UUID",
+    dataIndex: "producer_uuid",
+    sorter: (a: any, b: any) => a.producer_uuid.localeCompare(b.producer_uuid),
+  },
+  {
+    key: "producer_thing_name",
+    title: "Producer Thing Name",
+    dataIndex: "producer_thing_name",
+    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
+  },
+  {
+    key: "producer_thing_uuid",
+    title: "Producer Thing UUID",
+    dataIndex: "producer_thing_uuid",
+    sorter: (a: any, b: any) => a.producer_thing_uuid.localeCompare(b.producer_thing_uuid),
+  },
+  {
+    key: "message",
+    title: "Message",
+    dataIndex: "message",
+  },
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+];
+
+
+export const WRITER_HEADERS = [
+  {
+    key: "writer_thing_name",
+    title: "Thing Name",
+    dataIndex: "writer_thing_name",
+    sorter: (a: any, b: any) => a.writer_thing_name.localeCompare(b.writer_thing_name),
+  },
+  {
+    key: "writer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "writer_thing_uuid",
+    sorter: (a: any, b: any) => a.writer_thing_uuid.localeCompare(b.writer_thing_uuid),
+  },
+  {
     key: "uuid",
     title: "uuid",
     dataIndex: "uuid",
   },
 ];
 
-export const WRITER_HEADERS = [
-  {
-    key: "writer_thing_class",
-    title: "writer thing class",
-    dataIndex: "writer_thing_class",
-    sorter: (a: any, b: any) => a.writer_thing_class.localeCompare(b.writer_thing_class),
-  },
+export const WRITER_CLONE_HEADERS = [
   {
     key: "writer_thing_name",
-    title: "writer thing name",
+    title: "Thing Name",
     dataIndex: "writer_thing_name",
     sorter: (a: any, b: any) => a.writer_thing_name.localeCompare(b.writer_thing_name),
+  },
+  {
+    key: "writer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "writer_thing_uuid",
+    sorter: (a: any, b: any) => a.writer_thing_uuid.localeCompare(b.writer_thing_uuid),
+  },
+  {
+    key: "message",
+    title: "Message",
+    dataIndex: "message",
   },
   {
     key: "uuid",
@@ -235,10 +310,10 @@ export const CONNECTION_HEADERS = [
     key: "https",
     dataIndex: "https",
     render(enable: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enable) {
-        colour = "blue";
+        colour = "orange";
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
@@ -250,10 +325,10 @@ export const CONNECTION_HEADERS = [
     key: "enable",
     dataIndex: "enable",
     render(enable: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enable) {
-        colour = "blue";
+        colour = "orange";
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
@@ -411,8 +486,14 @@ const sortIps = (a: string, b: string) => {
 
 export const NETWORK_HEADERS = [
   {
-    title: "network",
+    dataIndex: "name",
+    title: "Name",
+    key: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
     key: "plugin_name",
+    title: "Network",
     dataIndex: "plugin_name",
     render(name: string) {
       let image = pluginLogo(name);
@@ -420,8 +501,8 @@ export const NETWORK_HEADERS = [
     },
   },
   {
-    title: "network-type",
     key: "plugin_name",
+    title: "Network Type",
     dataIndex: "plugin_name",
     render(plugin_name: string) {
       let colour = "#4d4dff";
@@ -431,17 +512,17 @@ export const NETWORK_HEADERS = [
     sorter: (a: any, b: any) => a.plugin_name.localeCompare(b.plugin_name),
   },
   {
-    title: "uuid",
-    dataIndex: "uuid",
+    title: "UUID",
     key: "uuid",
+    dataIndex: "uuid",
   },
 ];
 
 export const FLOW_DEVICE_HEADERS = [
   {
-    title: "enable",
-    key: "enable",
+    title: "Enable",
     dataIndex: "enable",
+    key: "enable",
     render(enable: boolean) {
       let colour = "blue";
       let text = "disabled";
@@ -454,7 +535,7 @@ export const FLOW_DEVICE_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "auto_mapping_enable",
+    title: "Auto Mapping Enable",
     key: "auto_mapping_enable",
     dataIndex: "auto_mapping_enable",
     render(enable: boolean) {
@@ -468,11 +549,16 @@ export const FLOW_DEVICE_HEADERS = [
     },
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
+  {
+    title: "UUID",
+    key: "uuid",
+    dataIndex: "uuid",
+  },
 ];
 
 export const FLOW_POINT_HEADERS = [
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
     render(name: string) {
@@ -484,7 +570,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
+    title: "Enable",
     key: "enable",
     dataIndex: "enable",
     render(enable: boolean) {
@@ -499,7 +585,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "object type",
+    title: "Object Type",
     dataIndex: "object_type",
     key: "object_type",
     render(object_type: string) {
@@ -512,7 +598,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.object_type.localeCompare(b.object_type),
   },
   {
-    title: "object id",
+    title: "Object Id",
     dataIndex: "object_id",
     key: "object_id",
     render(object_id: number) {
@@ -524,7 +610,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.object_id - b.object_id,
   },
   {
-    title: "io number",
+    title: "IO Number",
     dataIndex: "io_number",
     key: "io_number",
     render(io_number: string) {
@@ -537,7 +623,7 @@ export const FLOW_POINT_HEADERS = [
     sorter: (a: any, b: any) => a.io_number - b.io_number,
   },
   {
-    title: "io type",
+    title: "IO Type",
     dataIndex: "io_type",
     key: "io_type",
     render(io_type: string) {
@@ -549,12 +635,16 @@ export const FLOW_POINT_HEADERS = [
     },
     sorter: (a: any, b: any) => a.io_type.localeCompare(b.io_type),
   },
+  {
+    title: "UUID",
+    key: "uuid",
+    dataIndex: "uuid",
+  },
 ];
 
 export const FLOW_POINT_HEADERS_TABLE = [
-  //will render in the table but not the form
   {
-    title: "present value",
+    title: "Present Value",
     dataIndex: "present_value",
     key: "present_value",
     render(present_value: number) {
@@ -566,7 +656,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.present_value - b.present_value,
   },
   {
-    title: "original value",
+    title: "Original Value",
     dataIndex: "original_value",
     key: "original_value",
     render(original_value: number) {
@@ -578,7 +668,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.original_value - b.original_value,
   },
   {
-    title: "write value",
+    title: "Write Value",
     dataIndex: "write_value",
     key: "write_value",
     render(write_value: number) {
@@ -590,7 +680,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.write_value - b.write_value,
   },
   {
-    title: "current_priority",
+    title: "Current Priority",
     dataIndex: "current_priority",
     key: "current_priority",
     render(current_priority: number) {
@@ -602,7 +692,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
     sorter: (a: any, b: any) => a.current_priority - b.current_priority,
   },
   {
-    title: "message",
+    title: "Message",
     dataIndex: "message",
     key: "message",
   },
@@ -610,7 +700,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
 
 export const PLUGIN_HEADERS = [
   {
-    title: "name",
+    title: "Image",
     key: "name_image",
     dataIndex: "name",
     render(name: string) {
@@ -619,7 +709,7 @@ export const PLUGIN_HEADERS = [
     },
   },
   {
-    title: "name",
+    title: "Name",
     key: "name",
     dataIndex: "name",
     render(plugin_name: string) {
@@ -630,7 +720,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "tags",
+    title: "Tags",
     key: "has_network",
     dataIndex: "has_network",
     render(has_network: boolean) {
@@ -645,7 +735,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.has_network - b.has_network,
   },
   {
-    title: "status",
+    title: "Status",
     key: "enabled",
     dataIndex: "enabled",
     render(enabled: boolean) {
@@ -660,7 +750,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.enabled - b.enabled,
   },
   {
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
     key: "uuid",
   },

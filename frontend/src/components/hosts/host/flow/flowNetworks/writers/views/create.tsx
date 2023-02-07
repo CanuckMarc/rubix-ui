@@ -36,11 +36,6 @@ export const CreateEditModal = (props: any) => {
       const res = await flowNetworkFactory.GetNetworksWithPointsDisplay();
       const jsonSchema = {
         properties: {
-          uuid: {
-            readOnly: true,
-            title: "uuid",
-            type: "string",
-          },
           writer_thing_class: {
             readOnly: true,
             title: "thing class",
