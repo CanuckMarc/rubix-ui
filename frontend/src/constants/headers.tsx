@@ -690,7 +690,7 @@ export const FLOW_POINT_HEADERS_TABLE = [
 
 export const PLUGIN_HEADERS = [
   {
-    title: "name",
+    title: "Image",
     key: "name_image",
     dataIndex: "name",
     render(name: string) {
@@ -699,7 +699,7 @@ export const PLUGIN_HEADERS = [
     },
   },
   {
-    title: "name",
+    title: "Name",
     key: "name",
     dataIndex: "name",
     render(plugin_name: string) {
@@ -710,7 +710,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "tags",
+    title: "Tags",
     key: "has_network",
     dataIndex: "has_network",
     render(has_network: boolean) {
@@ -725,7 +725,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.has_network - b.has_network,
   },
   {
-    title: "status",
+    title: "Status",
     key: "enabled",
     dataIndex: "enabled",
     render(enabled: boolean) {
@@ -740,7 +740,7 @@ export const PLUGIN_HEADERS = [
     sorter: (a: any, b: any) => a.enabled - b.enabled,
   },
   {
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
     key: "uuid",
   },

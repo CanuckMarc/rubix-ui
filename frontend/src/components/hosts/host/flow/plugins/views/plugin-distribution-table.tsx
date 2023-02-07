@@ -27,17 +27,17 @@ export const PluginDistributionTable = () => {
 
   const columns = [
     {
-      title: "name",
+      title: "Name",
       key: "name",
       dataIndex: "name",
     },
     {
-      title: "description",
+      title: "Description",
       key: "description",
       dataIndex: "description",
     },
     {
-      title: "installed",
+      title: "Installed",
       key: "is_installed",
       dataIndex: "is_installed",
       render(is_installed: boolean, item: any) {
