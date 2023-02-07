@@ -16,6 +16,8 @@ type NodeMenuProps = {
   onClose: () => void;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNode: (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => void;
+  handleAlignLefts: (position: { x: number; y: number }) => void;
+  handleAlignRights: (position: { x: number; y: number } ,width: number | null | undefined) => void;
   duplicateNode: (_copied: { nodes: NodeInterface[]; edges: any }) => void;
   deleteAllInputOrOutputOfParentNode: (isInputs: boolean, nodeId: string) => void;
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
@@ -36,6 +38,8 @@ const NodeMenu = ({
   isDoubleClick,
   onClose,
   deleteNode,
+  handleAlignLefts,
+  handleAlignRights,
   duplicateNode,
   handleAddSubFlow,
   deleteAllInputOrOutputOfParentNode,
@@ -117,7 +121,14 @@ const NodeMenu = ({
     duplicateNode({ nodes: [node], edges: [] });
     onClose();
   };
-
+  const handleAlignLeft = () =>{
+    handleAlignLefts(node.position)
+    onClose()
+  }
+  const handleAlignRight = () =>{
+    handleAlignRights(node.position, node?.width)
+    onClose()
+  }
   const deleteAllInputs =
     (isInputs = false) =>
     () => {
@@ -252,6 +263,20 @@ const NodeMenu = ({
             onClick={handleNodeDuplication}
           >
             Duplicate node
+          </div>
+          <div
+            key="Align left"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
+            onClick={handleAlignLeft}
+          >
+            Align left
+          </div>
+          <div
+            key="Align right"
+            className="cursor-pointer border-b border-gray-600 ant-menu-item"
+            onClick={handleAlignRight}
+          >
+            Align right
           </div>
           <div key="help" className="cursor-pointer ant-menu-item" onClick={openModal}>
             Help

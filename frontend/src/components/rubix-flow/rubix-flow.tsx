@@ -737,7 +737,18 @@ const Flow = (props: FlowProps) => {
     setEdges(edgesUniq);
     setUndoable({ edges: edgesUniq, nodes: nodesUniq });
   };
-
+  const handleAlignLeft = (position: { x: number; y: number }) => {
+    const selectAlign = nodes.map((item) => item.selected === true);
+    if (selectAlign) {
+      return nodes.forEach((item) => (item.position.x = position.x));
+    }
+  };
+  const handleAlignRight = (position: { x: number; y: number }, width: any) => {
+    const selectAlign = nodes.map((item) => item.selected === true);
+    if (selectAlign) {
+      return nodes.forEach((item: any) => (item.position.x = position.x + (width - item.width)));
+    }
+  };
   const handleRefreshValues = async () => {
     const _outputNodes = (await fetchOutput()) || [];
     setNodes((prevNodes) => addOutputToNodes(_outputNodes, prevNodes));
@@ -1055,6 +1066,8 @@ const Flow = (props: FlowProps) => {
                 isOpenFromNodeTree={isMenuOpenFromNodeTree}
                 deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
                 deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
                 deleteNode={deleteNodesAndEdges}
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
