@@ -242,7 +242,7 @@ export const Node = memo((props: NodeProps) => {
       isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
-      nodeName={node?.info?.nodeName.replace('{parent.name}', '') || ""}
+      nodeName={node?.info?.nodeName?.replace('{parent.name}', '') || ""}
       category={spec.category}
       selected={selected}
       height={node?.height ?? 30}
