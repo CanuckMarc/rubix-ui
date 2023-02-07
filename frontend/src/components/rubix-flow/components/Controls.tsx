@@ -123,8 +123,7 @@ const Controls = ({
     });
   }); */
 
-  /* Ctrl + D (key): Paste nodes */
-  useCtrlPressKey("KeyD", () => {
+  const handleDuplicatedNodes = () => {
     const nodesCopied = instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
     const edgesCopied = instance
@@ -135,26 +134,35 @@ const Controls = ({
       nodes: nodesCopied,
       edges: edgesCopied,
     });
-  });
+  };
+
+  /* Ctrl + D (key): Paste nodes */
+  useCtrlPressKey("KeyD", handleDuplicatedNodes);
 
   /* Ctrl + Z (key): Undo */
-  useCtrlPressKey("KeyZ", () => {
-    onUndo();
-  });
+  useCtrlPressKey("KeyZ", onUndo);
 
   /* Ctrl + Y (key): Redo */
-  useCtrlPressKey("KeyY", () => {
-    onRedo();
-  });
+  useCtrlPressKey("KeyY", onRedo);
 
   /* Ctrl + S (key): Download/deploy flow */
-  useCtrlPressKey("KeyS", () => {
-    onHandelSaveFlow();
-  });
+  useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", () => {
-    onRefreshValues();
+  useCtrlPressKey("KeyX", onRefreshValues);
+
+  useCtrlPressKey("KeyC", () => {
+    const nodesCopied = instance.getNodes().filter((node) => node.selected);
+    if (nodesCopied) {
+      window.nodesCopied = nodesCopied;
+    }
+  });
+
+  useCtrlPressKey("KeyV", () => {
+    if (window.nodesCopied && window.nodesCopied.length > 0) {
+      handleDuplicatedNodes();
+      window.nodesCopied = [];
+    }
   });
 
   const onConnectionBuilder = () => {

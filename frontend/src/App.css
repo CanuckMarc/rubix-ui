@@ -2,7 +2,6 @@
 @import './assets/styles/bootstrap.css';
 @import './react-flow.css';
 
-
 #app {
     height: 100vh;
     text-align: center;
@@ -98,7 +97,8 @@ aside .active {
 }
 
 .settings-dropdown {
-    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
+    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%),
+        0 3px 14px 2px rgb(0 0 0 / 12%);
     border-radius: 4px;
     min-width: 220px !important;
     left: 24px !important;
@@ -177,14 +177,14 @@ svg {
     gap: 15px;
 }
 
-#flow-setting-modal-labels {
+.flow-setting-modal-labels {
     display: inline-block;
     width: 150px;
     text-align: right;
 }
 
 hr.solid {
-    border-top: 1px solid #DCDCDC;
+    border-top: 1px solid #dcdcdc;
 }
 
 .table-row-disconnected {

@@ -9,7 +9,7 @@ import {
   RbDeleteButton,
   RbMonitorButton,
   RbRefreshButton,
-  RbSyncButton
+  // RbSyncButton
 } from "../../../common/rb-table-actions";
 import { HOST_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
@@ -22,7 +22,7 @@ import { EdgeBiosTokenFactory } from "../../edgebios/token-factory";
 import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-modal";
 import { InstallFactory } from "./install-rubix-edge/factory";
 import { EdgeAppInfo } from "./install-app-info";
-import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
+// import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import { RbSearchInput } from "../../../common/rb-search-input";
 import { Ping } from "./ping/ping";
 import { ConfigureOpenVpn } from "./configure-open-vpn/configure-open-vpn";
@@ -48,7 +48,7 @@ export const HostsTable = (props: any) => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
-  const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
+  // const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
   const [loadingUpdateStatus, setLoadingUpdateStatus] = useState(false);
   const [tokenFactory, setTokenFactory] = useState(new EdgeBiosTokenFactory(connUUID));
   const [filteredData, setFilteredData] = useState(hosts);
@@ -175,16 +175,16 @@ export const HostsTable = (props: any) => {
     setTokenFactory(_tokenFactory);
   }, [currentHost]);
 
-  const onSyncReleases = async () => {
-    setLoadingSyncReleases(true);
-    try {
-      await GitDownloadReleases();
-    } catch (error) {
-      openNotificationWithIcon("error", error);
-    } finally {
-      setLoadingSyncReleases(false);
-    }
-  };
+  // const onSyncReleases = async () => {
+  //   setLoadingSyncReleases(true);
+  //   try {
+  //     await GitDownloadReleases();
+  //   } catch (error) {
+  //     openNotificationWithIcon("error", error);
+  //   } finally {
+  //     setLoadingSyncReleases(false);
+  //   }
+  // };
 
   const onUpdateStatus = async () => {
     setLoadingUpdateStatus(true);
@@ -201,10 +201,10 @@ export const HostsTable = (props: any) => {
   return (
     <div>
       <RbRefreshButton refreshList={refreshList} />
-      <RbMonitorButton onClick={onUpdateStatus} loading={loadingUpdateStatus} text="Update Status" />
       <RbAddButton handleClick={(e: any) => showModal({} as Host, e)} />
+      <RbMonitorButton onClick={onUpdateStatus} loading={loadingUpdateStatus} text="Update Status" />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
+      {/* <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" /> */}
       {hosts?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable

@@ -6,7 +6,6 @@ import { model } from "../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../constants/routes";
 import RbxBreadcrumb from "../../../../../breadcrumbs/breadcrumbs";
 import { StreamsTable } from "./views/table";
-
 import Stream = model.Stream;
 
 const { Title } = Typography;
@@ -58,8 +57,8 @@ export const Streams = () => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAllByFlowNetwork(flNetworkUUID);
-      setStreams(res);
+      const res = await factory.GetAll(flNetworkUUID);
+      setStreams(res?.streams || []);
     } catch (error) {
       console.log(error);
     } finally {

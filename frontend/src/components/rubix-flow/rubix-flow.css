@@ -23,3 +23,12 @@
 .node-help-modal > .ant-modal-content > .ant-modal-body > div > table {
   width: 100%;
 }
+
+.rubix-flow__wrapper.has-tabs .react-flow {
+  height: calc(100vh - 38px) !important;
+  top: 38px;
+}
+
+.subflow-tabs .ant-tabs-nav {
+  margin: 0 !important;
+}

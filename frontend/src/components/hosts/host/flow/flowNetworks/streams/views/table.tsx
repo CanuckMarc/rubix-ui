@@ -115,7 +115,7 @@ export const StreamsTable = (props: any) => {
       <RbRefreshButton refreshList={refreshList} />
       <RbAddButton handleClick={() => showModal({} as Stream)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"

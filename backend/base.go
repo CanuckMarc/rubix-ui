@@ -126,6 +126,25 @@ func (inst *App) getAssistClient(body *AssistClient) (*assistcli.Client, error) 
 	}
 }
 
+func (inst *App) forceGetAssistClient(uuid string) (*assistcli.Client, error) {
+	connection, err := inst.getRubixAssistConnection(uuid)
+	if err != nil {
+		return nil, err
+	}
+	client := &assistcli.Client{
+		Ip:            connection.IP,
+		Port:          connection.Port,
+		HTTPS:         connection.HTTPS,
+		ExternalToken: connection.ExternalToken,
+	}
+	cli := assistcli.ForceNew(client)
+	if cli != nil {
+		return cli, nil
+	} else {
+		return nil, errors.New("error on creating assist client cli")
+	}
+}
+
 func (inst *App) getRubixAssistConnection(connectionUuid string) (*storage.RubixConnection, error) {
 	if matchConnectionUUID(connectionUuid) {
 		connection, err := inst.DB.Select(connectionUuid)

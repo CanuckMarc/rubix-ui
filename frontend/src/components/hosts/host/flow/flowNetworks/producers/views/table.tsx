@@ -9,12 +9,11 @@ import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
-export const ProducersTable = (props: any) => {
+export const ProducersTable = () => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", flNetworkUUID = "", streamUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [producers, setProducers] = useState([] as Producer[]);
@@ -26,6 +25,7 @@ export const ProducersTable = (props: any) => {
   const factory = new FlowProducerFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+  factory.streamUUID = streamUUID;
 
   const config = {
     originData: producers,
@@ -84,7 +84,7 @@ export const ProducersTable = (props: any) => {
   const fetch = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll();
+      const res = await factory.GetAll(true, false);
       setProducers(res);
       setFilteredData(res);
     } catch (error) {
@@ -108,7 +108,7 @@ export const ProducersTable = (props: any) => {
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as Producer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {producers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {producers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
