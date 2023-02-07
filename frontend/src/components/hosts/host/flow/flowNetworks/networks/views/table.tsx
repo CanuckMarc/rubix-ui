@@ -5,7 +5,7 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
-import { FLOW_NETWORKS_HEADERS } from "../../../../../../../constants/headers";
+import { FLOW_NETWORK_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { CreateEditModal } from "./create";
@@ -57,7 +57,7 @@ export const FlowNetworksTable = (props: any) => {
       dataIndex: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
     },
-    ...FLOW_NETWORKS_HEADERS,
+    ...FLOW_NETWORK_HEADERS,
   ];
 
   const rowSelection = {

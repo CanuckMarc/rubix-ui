@@ -4,7 +4,7 @@ import imageRC5 from "../assets/images/RC5.png";
 import imageRCIO from "../assets/images/RC-IO.png";
 import imageEdge28 from "../assets/images/Edge-iO-28.png";
 
-export const FLOW_NETWORKS_HEADERS = [
+export const FLOW_NETWORK_HEADERS = [
   {
     key: "flow_ip",
     title: "IP",
@@ -50,13 +50,13 @@ export const FLOW_NETWORKS_HEADERS = [
 export const STREAM_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
     render(enable: boolean) {
       let colour = "blue";
@@ -71,21 +71,21 @@ export const STREAM_HEADERS = [
   },
   {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];
 
-export const CONSUMER_HEADERS = [
+export const STREAM_CLONE_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
     render(enable: boolean) {
       let colour = "blue";
@@ -100,24 +100,12 @@ export const CONSUMER_HEADERS = [
   },
   {
     key: "message",
-    title: "message",
+    title: "Message",
     dataIndex: "message",
   },
   {
-    key: "producer_thing_class",
-    title: "producer thing class",
-    dataIndex: "producer_thing_class",
-    sorter: (a: any, b: any) => a.producer_thing_class.localeCompare(b.producer_thing_class),
-  },
-  {
-    key: "producer_thing_name",
-    title: "producer thing name",
-    dataIndex: "producer_thing_name",
-    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
-  },
-  {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];
@@ -125,31 +113,55 @@ export const CONSUMER_HEADERS = [
 export const PRODUCER_HEADERS = [
   {
     key: "name",
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    key: "producer_application",
-    title: "application",
-    dataIndex: "producer_application",
-    sorter: (a: any, b: any) => a.producer_application.localeCompare(b.producer_application),
+    key: "enable",
+    title: "Enable",
+    dataIndex: "enable",
+    render(enabled: boolean) {
+      let colour = "orange";
+      let text = "disabled";
+      if (enabled) {
+        colour = "blue";
+        text = "enabled";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    key: "producer_thing_class",
-    title: "thing class",
-    dataIndex: "producer_thing_class",
-    sorter: (a: any, b: any) => a.producer_thing_class.localeCompare(b.producer_thing_class),
+    key: "enable_history",
+    title: "Enable History",
+    dataIndex: "enable_history",
+    render(enabled: boolean) {
+      let colour = "orange";
+      let text = "disabled";
+      if (enabled) {
+        colour = "blue";
+        text = "enabled";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
+    sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
     key: "producer_thing_name",
-    title: "thing name",
+    title: "Thing Name",
     dataIndex: "producer_thing_name",
     sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
   },
   {
+    key: "producer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "producer_thing_uuid",
+    sorter: (a: any, b: any) => a.producer_thing_uuid.localeCompare(b.producer_thing_uuid),
+  },
+  {
     key: "history_type",
-    title: "history type",
+    title: "History Type",
     dataIndex: "history_type",
     render(plugin_name: string) {
       let colour = "#4d4dff";
@@ -160,18 +172,32 @@ export const PRODUCER_HEADERS = [
   },
   {
     key: "history_interval",
-    title: "history interval",
+    title: "History Interval",
     dataIndex: "history_interval",
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
   },
   {
-    title: "enable",
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+];
+
+export const CONSUMER_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+    sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+  },
+  {
     key: "enable",
+    title: "Enable",
     dataIndex: "enable",
-    render(enabled: boolean) {
+    render(enable: boolean) {
       let colour = "blue";
       let text = "disabled";
-      if (enabled) {
+      if (enable) {
         colour = "orange";
         text = "enabled";
       }
@@ -180,24 +206,73 @@ export const PRODUCER_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
+    key: "producer_uuid",
+    title: "Producer UUID",
+    dataIndex: "producer_uuid",
+    sorter: (a: any, b: any) => a.producer_uuid.localeCompare(b.producer_uuid),
+  },
+  {
+    key: "producer_thing_name",
+    title: "Producer Thing Name",
+    dataIndex: "producer_thing_name",
+    sorter: (a: any, b: any) => a.producer_thing_name.localeCompare(b.producer_thing_name),
+  },
+  {
+    key: "producer_thing_uuid",
+    title: "Producer Thing UUID",
+    dataIndex: "producer_thing_uuid",
+    sorter: (a: any, b: any) => a.producer_thing_uuid.localeCompare(b.producer_thing_uuid),
+  },
+  {
+    key: "message",
+    title: "Message",
+    dataIndex: "message",
+  },
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+];
+
+
+export const WRITER_HEADERS = [
+  {
+    key: "writer_thing_name",
+    title: "Thing Name",
+    dataIndex: "writer_thing_name",
+    sorter: (a: any, b: any) => a.writer_thing_name.localeCompare(b.writer_thing_name),
+  },
+  {
+    key: "writer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "writer_thing_uuid",
+    sorter: (a: any, b: any) => a.writer_thing_uuid.localeCompare(b.writer_thing_uuid),
+  },
+  {
     key: "uuid",
     title: "uuid",
     dataIndex: "uuid",
   },
 ];
 
-export const WRITER_HEADERS = [
-  {
-    key: "writer_thing_class",
-    title: "writer thing class",
-    dataIndex: "writer_thing_class",
-    sorter: (a: any, b: any) => a.writer_thing_class.localeCompare(b.writer_thing_class),
-  },
+export const WRITER_CLONE_HEADERS = [
   {
     key: "writer_thing_name",
-    title: "writer thing name",
+    title: "Thing Name",
     dataIndex: "writer_thing_name",
     sorter: (a: any, b: any) => a.writer_thing_name.localeCompare(b.writer_thing_name),
+  },
+  {
+    key: "writer_thing_uuid",
+    title: "Thing UUID",
+    dataIndex: "writer_thing_uuid",
+    sorter: (a: any, b: any) => a.writer_thing_uuid.localeCompare(b.writer_thing_uuid),
+  },
+  {
+    key: "message",
+    title: "Message",
+    dataIndex: "message",
   },
   {
     key: "uuid",

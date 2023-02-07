@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { FlowStreamCloneFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../../constants/routes";
-import { STREAM_HEADERS } from "../../../../../../../constants/headers";
+import { STREAM_CLONE_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { ArrowRightOutlined } from "@ant-design/icons";
@@ -32,8 +32,8 @@ export const StreamClonesTable = () => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: StreamClone) => (
         <Space size="middle">
@@ -45,7 +45,7 @@ export const StreamClonesTable = () => {
         </Space>
       ),
     },
-    ...STREAM_HEADERS,
+    ...STREAM_CLONE_HEADERS,
   ];
 
   const rowSelection = {
