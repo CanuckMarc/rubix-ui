@@ -7,42 +7,42 @@ import imageEdge28 from "../assets/images/Edge-iO-28.png";
 export const FLOW_NETWORKS_HEADERS = [
   {
     key: "flow_ip",
-    title: "ip",
+    title: "IP",
     dataIndex: "flow_ip",
     sorter: (a: any, b: any) => sortIps(a.flow_ip ?? '', b.flow_ip ?? ''),
   },
   {
     key: "flow_port",
-    title: "port",
+    title: "Port",
     dataIndex: "flow_port",
     sorter: (a: any, b: any) => (a.flow_port ?? 0) - (b.flow_port ?? 0),
   },
   {
     key: "client_name",
-    title: "client name",
+    title: "Client Name",
     dataIndex: "client_name",
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
     key: "site_name",
-    title: "site name",
+    title: "Site Name",
     dataIndex: "site_name",
     sorter: (a: any, b: any) => a.client_name.localeCompare(b.client_name),
   },
   {
     key: "device_name",
-    title: "device name",
+    title: "Device Name",
     dataIndex: "device_name",
     sorter: (a: any, b: any) => a.device_name.localeCompare(b.device_name),
   },
   {
     key: "message",
-    title: "message",
+    title: "Message",
     dataIndex: "message",
   },
   {
     key: "uuid",
-    title: "uuid",
+    title: "UUID",
     dataIndex: "uuid",
   },
 ];

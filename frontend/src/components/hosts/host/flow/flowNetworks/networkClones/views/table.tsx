@@ -31,8 +31,8 @@ export const NetworkClonesTable = () => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, network: FlowNetworkClone) => (
         <Space size="middle">
@@ -46,7 +46,7 @@ export const NetworkClonesTable = () => {
     },
     {
       key: "name",
-      title: "name",
+      title: "Name",
       dataIndex: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
     },

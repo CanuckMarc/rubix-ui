@@ -33,8 +33,8 @@ export const FlowNetworksTable = (props: any) => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, network: FlowNetwork) => (
         <Space size="middle">
@@ -53,7 +53,7 @@ export const FlowNetworksTable = (props: any) => {
     },
     {
       key: "name",
-      title: "name",
+      title: "Name",
       dataIndex: "name",
       sorter: (a: any, b: any) => a.name.localeCompare(b.name),
     },
