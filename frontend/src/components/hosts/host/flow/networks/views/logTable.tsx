@@ -1,14 +1,25 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { Spin, Table, Button, Modal, Input, Typography } from "antd";
+import { Spin, Table, Button, Modal, Input, Typography, Tag, DatePicker, Form } from "antd";
+import { SearchOutlined } from '@ant-design/icons';
 import { FlowPluginFactory } from "../../plugins/factory";
 import { LogTablePropType } from "./table";
+import type { ColumnsType, ColumnType } from 'antd/es/table';
+import type { FilterConfirmProps } from 'antd/es/table/interface';
 
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
+
+export interface LogTableType {
+    key: number;
+    time: string;
+    level: string;
+    msg: string;
+}
 
 export const LogTable = (props: LogTablePropType) => {
     let { connUUID, hostUUID, pluginName, isLogTableOpen, setIsLogTableOpen} = props
     const [isFetching, setIsFetching] = useState(false);
-    const [allLogs, setAllLogs] = useState<object[]>([]);
+    const [allLogs, setAllLogs] = useState<LogTableType[]>([]);
     const [duration, setDuration] = useState<number | undefined>(undefined);
 
     const flowPluginFactory = new FlowPluginFactory();
@@ -23,10 +34,14 @@ export const LogTable = (props: LogTablePropType) => {
                 let i = 0;
                 setAllLogs(logs.message.map((item: any) => {
                     i++;
-                    return {
-                        message: item,
-                        key: i
-                    }
+                    let tableItem: any = {};
+                    const remainderMsg = item.split(' ').splice(3, item.split(' ').length).join(' ')
+                    item.split(' ').splice(0, 3).forEach((el: string, index: number) => {
+                        const [name, value] = el.split('=')
+                        tableItem['key'] = i
+                        index === 2 ? tableItem[name] = value + ' ' + remainderMsg : tableItem[name] = value
+                    });
+                    return tableItem
                 }))
             }
         } catch (error) {
@@ -38,9 +53,26 @@ export const LogTable = (props: LogTablePropType) => {
 
     const columns = [
         {
-          title: "Logs",
-          dataIndex: "message",
+          title: "Time",
+          dataIndex: "time",
+          key: "time"
+        },
+        {
+          title: "Level",
+          dataIndex: "level",
           key: "key",
+          render: (level: any) => {
+            let colour = "blue";
+            if (level === 'error') {
+              colour = "red";
+            }
+            return <Tag color={colour}>{level}</Tag>;
+          }
+        },
+        {
+          title: "Message",
+          dataIndex: "msg",
+          key: "msg"
         },
     ];
 
