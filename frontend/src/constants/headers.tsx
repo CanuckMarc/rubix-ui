@@ -512,9 +512,9 @@ export const NETWORK_HEADERS = [
     sorter: (a: any, b: any) => a.plugin_name.localeCompare(b.plugin_name),
   },
   {
-    dataIndex: "uuid",
     title: "UUID",
     key: "uuid",
+    dataIndex: "uuid",
   },
 ];
 
@@ -535,7 +535,7 @@ export const FLOW_DEVICE_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "auto_mapping_enable",
+    title: "Auto Mapping Enable",
     key: "auto_mapping_enable",
     dataIndex: "auto_mapping_enable",
     render(enable: boolean) {
@@ -548,6 +548,11 @@ export const FLOW_DEVICE_HEADERS = [
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.enable - b.enable,
+  },
+  {
+    title: "UUID",
+    key: "uuid",
+    dataIndex: "uuid",
   },
 ];
 
@@ -629,6 +634,11 @@ export const FLOW_POINT_HEADERS = [
       }
     },
     sorter: (a: any, b: any) => a.io_type.localeCompare(b.io_type),
+  },
+  {
+    title: "UUID",
+    key: "uuid",
+    dataIndex: "uuid",
   },
 ];
 

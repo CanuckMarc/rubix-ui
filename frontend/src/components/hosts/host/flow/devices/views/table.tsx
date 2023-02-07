@@ -1,19 +1,19 @@
 import { Space, Spin, Tag, Tooltip } from "antd";
-import { FormOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { model, backend } from "../../../../../../../wailsjs/go/models";
+import { Link, useParams } from "react-router-dom";
+import { backend, model } from "../../../../../../../wailsjs/go/models";
 import RbTable from "../../../../../../common/rb-table";
 import {
+  RbAddButton,
+  RbDeleteButton,
   RbExportButton,
   RbImportButton,
-  RbDeleteButton,
-  RbAddButton,
   RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
 import { FLOW_DEVICE_HEADERS } from "../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../constants/routes";
-import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import { openNotificationWithIcon, titleCase } from "../../../../../../utils/utils";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { FlowDeviceFactory } from "../factory";
 import { CreateModal } from "./create";
@@ -21,10 +21,9 @@ import { EditModal } from "./edit";
 import { ExportModal, ImportModal } from "./import-export";
 import MassEdit from "../../../../../../common/mass-edit";
 import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
-
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import Device = model.Device;
 import UUIDs = backend.UUIDs;
-import { RbSearchInput } from "../../../../../../common/rb-search-input";
 
 export const FlowDeviceTable = (props: any) => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", networkUUID = "", pluginName = "" } = useParams();
@@ -109,7 +108,7 @@ export const FlowDeviceTable = (props: any) => {
     const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
+        title: ["name", "uuid", "description"].includes(key) ? titleCase(schema[key]?.title) : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
         sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
@@ -163,7 +162,8 @@ export const FlowDeviceTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} keyName={key} handleOk={handleMassEdit} />;
+    return <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key}
+                     handleOk={handleMassEdit} />;
   };
 
   const handleMassEdit = async (updateData: any) => {

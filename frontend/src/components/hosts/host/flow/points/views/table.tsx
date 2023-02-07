@@ -1,28 +1,27 @@
 import { FormOutlined, GoldOutlined, ImportOutlined } from "@ant-design/icons";
-import { Tag, Space, Tooltip, Spin, MenuProps, Menu, Dropdown, Button } from "antd";
-import { useState, useEffect } from "react";
+import { Button, Dropdown, Menu, MenuProps, Space, Spin, Tag, Tooltip } from "antd";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { model, backend } from "../../../../../../../wailsjs/go/models";
+import { backend, model } from "../../../../../../../wailsjs/go/models";
 import MassEdit from "../../../../../../common/mass-edit";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../common/rb-table";
 import {
-  RbRestartButton,
   RbAddButton,
   RbDeleteButton,
   RbExportButton,
+  RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
 import { FLOW_POINT_HEADERS, FLOW_POINT_HEADERS_TABLE } from "../../../../../../constants/headers";
-import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import { openNotificationWithIcon, titleCase } from "../../../../../../utils/utils";
 import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
 import { FlowNetworkFactory } from "../../networks/factory";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { FlowPointFactory } from "../factory";
-import { CreateModal, CreateBulkModal } from "./create";
+import { CreateBulkModal, CreateModal } from "./create";
 import { EditModal } from "./edit";
-import { ExportModal, ImportJsonModal, ImportExcelModal } from "./import-export";
+import { ExportModal, ImportExcelModal, ImportJsonModal } from "./import-export";
 import { WritePointValueModal } from "./write-point-value";
-
 import Point = model.Point;
 import UUIDs = backend.UUIDs;
 
@@ -97,7 +96,7 @@ export const FlowPointsTable = (props: any) => {
     const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: key === "name" || key === "uuid" ? key.replaceAll("_", " ") : MassEditTitle(key, schema),
+        title: ["name", "uuid"].includes(key) ? titleCase(schema[key]?.title) : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
         sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
@@ -151,7 +150,8 @@ export const FlowPointsTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} keyName={key} handleOk={handleMassEdit} />;
+    return <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key}
+                     handleOk={handleMassEdit} />;
   };
 
   const handleMassEdit = async (updateData: any) => {
