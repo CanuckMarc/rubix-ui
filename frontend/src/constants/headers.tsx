@@ -122,10 +122,10 @@ export const PRODUCER_HEADERS = [
     title: "Enable",
     dataIndex: "enable",
     render(enabled: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enabled) {
-        colour = "blue";
+        colour = "orange";
         text = "enabled";
       }
       return <Tag color={colour}>{text}</Tag>;
@@ -137,10 +137,10 @@ export const PRODUCER_HEADERS = [
     title: "Enable History",
     dataIndex: "enable_history",
     render(enabled: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enabled) {
-        colour = "blue";
+        colour = "orange";
         text = "enabled";
       }
       return <Tag color={colour}>{text}</Tag>;
@@ -310,10 +310,10 @@ export const CONNECTION_HEADERS = [
     key: "https",
     dataIndex: "https",
     render(enable: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enable) {
-        colour = "blue";
+        colour = "orange";
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
@@ -325,10 +325,10 @@ export const CONNECTION_HEADERS = [
     key: "enable",
     dataIndex: "enable",
     render(enable: boolean) {
-      let colour = "orange";
+      let colour = "blue";
       let text = "disabled";
       if (enable) {
-        colour = "blue";
+        colour = "orange";
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
