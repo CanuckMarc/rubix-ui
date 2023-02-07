@@ -42,7 +42,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
 
   if (!node.isParent) {
     /* Is check InputCount setting equals node inputs length? */
-    if (node.settings.inputCount !== nodeInputs.length) {
+    if (node.settings.inputCount && node.settings.inputCount !== nodeInputs.length) {
       let newData: any = [];
       for (let i = 1; i <= node.settings.inputCount; i++) {
         const item = {

@@ -32,8 +32,17 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     Arr[index2] = temp;
 
     return Arr;
-  };  
+  };
   // orderIn.sort((a: any, b: any) => a.position - b.position);
+  let sortable = [];
+  for (var vehicle in orderIn) {
+    sortable.push([vehicle, orderIn[vehicle]]);
+  }
+  sortable.sort(function (a, b) {
+    return a[1].position - b[1].position;
+  });
+  const orderInNew = Object.fromEntries(sortable);
+
   const onClickUpInNode = (item: any, index: number) => {
     if (index === 0) return;
     let newInputsPar = [...inPutsPar];
@@ -42,35 +51,36 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
       ...item,
       position: index,
     }));
-    const keyOrderIn = Object.keys(orderIn);
+    const keyOrderIn = Object.keys(orderInNew);
     const newOrderInput: any = {};
+
     switchIndex(index, index - 1, keyOrderIn).forEach((item: any, index: number) => {
-      if (orderIn[item].position !== index) {
-        newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      if (orderInNew[item].position !== index) {
+        newOrderInput[item] = { ...orderInNew[item], position: index, overridePosition: true };
       } else {
-        newOrderInput[item] = { ...orderIn[item], position: index };
+        newOrderInput[item] = { ...orderInNew[item], position: index };
       }
     });
     setOrderIn(newOrderInput);
     setInPutsPar(newInputsPar);
   };
- 
+
   const onClickDownInNode = (item: any, index: number) => {
     if (index === inPutsPar.length - 1) return;
-
     let newInputsPar = [...inPutsPar];
+
     newInputsPar = switchIndex(index, index + 1, newInputsPar).map((item: any, index: number) => ({
       ...item,
       position: index,
     }));
-    const keyOrderIn = Object.keys(orderIn);
+    const keyOrderIn = Object.keys(orderInNew);
     const newOrderInput: any = {};
 
     switchIndex(index, index + 1, keyOrderIn).forEach((item: any, index: number) => {
-      if (orderIn[item].position !== index) {
-        newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      if (orderInNew[item].position !== index) {
+        newOrderInput[item] = { ...orderInNew[item], position: index, overridePosition: true };
       } else {
-        newOrderInput[item] = { ...orderIn[item], position: index };
+        newOrderInput[item] = { ...orderInNew[item], position: index };
       }
     });
 
