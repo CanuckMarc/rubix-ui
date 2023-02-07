@@ -67,7 +67,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
       nodeInputs.forEach((item: any) => nodeInputsObj[item.pin] = item)
       newInputs = [...specInputs];
       newInputs.sort(
-        (a:any,b:any) => (nodeInputsObj[a.name].position - nodeInputsObj[b.name].position)
+        (a:any,b:any) => (nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position)
       )
     }
   }

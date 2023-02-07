@@ -32,11 +32,10 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     Arr[index2] = temp;
 
     return Arr;
-  };
-
+  };  
+  // orderIn.sort((a: any, b: any) => a.position - b.position);
   const onClickUpInNode = (item: any, index: number) => {
     if (index === 0) return;
-
     let newInputsPar = [...inPutsPar];
 
     newInputsPar = switchIndex(index, index - 1, newInputsPar).map((item: any, index: number) => ({
@@ -45,19 +44,17 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     }));
     const keyOrderIn = Object.keys(orderIn);
     const newOrderInput: any = {};
-
     switchIndex(index, index - 1, keyOrderIn).forEach((item: any, index: number) => {
-
-      if (item.position !== index) {
+      if (orderIn[item].position !== index) {
         newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      } else {
+        newOrderInput[item] = { ...orderIn[item], position: index };
       }
-      newOrderInput[item] = { ...orderIn[item], position: index };
     });
-
     setOrderIn(newOrderInput);
     setInPutsPar(newInputsPar);
   };
-
+ 
   const onClickDownInNode = (item: any, index: number) => {
     if (index === inPutsPar.length - 1) return;
 
@@ -70,10 +67,11 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     const newOrderInput: any = {};
 
     switchIndex(index, index + 1, keyOrderIn).forEach((item: any, index: number) => {
-      if (item.position !== index) {
+      if (orderIn[item].position !== index) {
         newOrderInput[item] = { ...orderIn[item], position: index, overridePosition: true };
+      } else {
+        newOrderInput[item] = { ...orderIn[item], position: index };
       }
-      newOrderInput[item] = { ...orderIn[item], position: index };
     });
 
     setOrderIn(newOrderInput);
@@ -81,8 +79,6 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
   };
 
   const handleSubmit = () => {
-    console.log("orderIn", orderIn);
-
     const newNodes = instance.getNodes().map((item: NodeInterface) => {
       if (item.id === node.id) {
         return {
@@ -93,7 +89,6 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
       }
       return item;
     });
-    console.log("newNodes", newNodes);
 
     instance.setNodes(newNodes);
     onClose();
