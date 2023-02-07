@@ -8,6 +8,7 @@ import type { FilterConfirmProps } from 'antd/es/table/interface';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
+const { Search } = Input;
 
 export interface LogTableType {
     key: number;
@@ -20,11 +21,20 @@ export const LogTable = (props: LogTablePropType) => {
     let { connUUID, hostUUID, pluginName, isLogTableOpen, setIsLogTableOpen} = props
     const [isFetching, setIsFetching] = useState(false);
     const [allLogs, setAllLogs] = useState<LogTableType[]>([]);
+    const [tableData, setTableData] = useState<LogTableType[]>([]);
     const [duration, setDuration] = useState<number | undefined>(undefined);
+    const [search, setSearch] = useState('')
 
     const flowPluginFactory = new FlowPluginFactory();
     flowPluginFactory.connectionUUID = connUUID;
     flowPluginFactory.hostUUID = hostUUID;
+
+    useEffect(() => {
+        setDuration(undefined)
+        setSearch('')
+        setAllLogs([])
+        setTableData([])
+    }, [])
 
     const fetch = async (duration: number) => {
         try {
@@ -32,7 +42,7 @@ export const LogTable = (props: LogTablePropType) => {
             const logs = await flowPluginFactory.FlowNetworkNewLog(connUUID, hostUUID, pluginName!, duration)
             if (logs) {
                 let i = 0;
-                setAllLogs(logs.message.map((item: any) => {
+                const temp = logs.message.map((item: any) => {
                     i++;
                     let tableItem: any = {};
                     const remainderMsg = item.split(' ').splice(3, item.split(' ').length).join(' ')
@@ -42,7 +52,9 @@ export const LogTable = (props: LogTablePropType) => {
                         index === 2 ? tableItem[name] = value + ' ' + remainderMsg : tableItem[name] = value
                     });
                     return tableItem
-                }))
+                })
+                setAllLogs(temp);
+                setTableData(temp);
             }
         } catch (error) {
             console.log('error fetching logs: ', error)
@@ -78,18 +90,19 @@ export const LogTable = (props: LogTablePropType) => {
 
     const handleLoadButtonClicked = () => {
         if (duration) {
-            setAllLogs([]);
             fetch(duration);
         }
     }
 
     const handleOk = () => {
         setAllLogs([])
+        setTableData([])
         setIsLogTableOpen(false)
     }
 
     const handleCancel = () => {
         setAllLogs([])
+        setTableData([])
         setIsLogTableOpen(false)
     }
 
@@ -98,6 +111,27 @@ export const LogTable = (props: LogTablePropType) => {
             setDuration(parseInt(event.target.value))
         } else {
             setDuration(undefined)
+        }
+    }
+
+    const onSearchBarChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value)
+        if (event.target.value === '') {
+            setTableData(allLogs)
+        }
+    }
+
+    const handleOnSearch = () => {
+        if (search !== '') {
+            let temp: LogTableType[] = []
+            allLogs.forEach((item: LogTableType) => {
+                if (item.msg.includes(search)) {
+                    temp.push(item)
+                }
+            })
+            setTableData(temp)
+        } else {
+            setTableData(allLogs)
         }
     }
 
@@ -111,9 +145,10 @@ export const LogTable = (props: LogTablePropType) => {
                             <Input value={duration} onChange={handleInputChange} style={{width: '6vw'}}/>
                             <Button type="primary" style={{width: '6vw'}} disabled={duration === undefined} onClick={handleLoadButtonClicked}>Load Logs</Button>
                         </div>
+                        <Search placeholder="Search log by message" enterButton="Search" disabled={tableData.length === 0} allowClear={true} value={search} onChange={onSearchBarChange} onSearch={handleOnSearch}/>
                         <Table
                             rowKey="uuid"
-                            dataSource={allLogs}
+                            dataSource={tableData}
                             columns={columns}
                             pagination={{
                                 position: ["bottomLeft"],
