@@ -96,14 +96,17 @@ interface RubixObjectI {
 const isActionLoading = {} as any;
 
 const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); //prevent navigate
   if (next === "/connections") {
     for (const key in isActionLoading) {
       isActionLoading[key] = isActionLoading["Supervisors"];
     }
   }
   eventEmit.dispatch("openAllMenus", { key: next, isOpen });
+};
+
+const preventDropdown = (e: React.MouseEvent) => {
+  e.stopPropagation();
 };
 
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
@@ -125,7 +128,7 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset" }} className="supervisors-menu">
+        <NavLink to={next} style={{ color: "unset" }} className="supervisors-menu" onClick={preventDropdown}>
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
           <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             {item.name}
