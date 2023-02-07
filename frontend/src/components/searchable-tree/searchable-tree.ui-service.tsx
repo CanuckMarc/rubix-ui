@@ -125,13 +125,13 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset", display: "flex" }} className="supervisors-menu">
+        <NavLink to={next} style={{ color: "unset" }} className="supervisors-menu">
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
-          <span style={{ width: "100%" }}>
+          <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             {item.name}
             {isFromSupervisor && (
               <MenuOutlined
-                style={{ float: "right", marginTop: "13px", marginRight: "12px" }}
+                style={{ float: "right", marginRight: "12px" }}
                 onClick={(e) => handleOpenAllMenus(e, next, (isActionLoading[item.name] = !isActionLoading[item.name]))}
               />
             )}
