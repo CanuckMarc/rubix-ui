@@ -159,10 +159,15 @@ const Controls = ({
   });
 
   useCtrlPressKey("KeyV", () => {
-    if (window.nodesCopied && window.nodesCopied.length > 0) {
+    const activeElement = document.activeElement;
+    if (
+      !["input", "textarea"].includes(activeElement?.tagName?.toLowerCase() || "") &&
+      window.nodesCopied &&
+      window.nodesCopied.length > 0
+    ) {
       handleDuplicatedNodes();
-      window.nodesCopied = [];
     }
+    window.nodesCopied = [];
   });
 
   const onConnectionBuilder = () => {
