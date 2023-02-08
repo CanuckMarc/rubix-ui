@@ -85,10 +85,15 @@ export const EdgeAppInfo = (props: any) => {
         {appInfoMsg}
         <span className="ml-3">
           {/* <a onClick={() => fetchAppInfo()}>Click here to refresh</a> */}
-          <a onClick={() => {
+          {/* <a onClick={() => {
             onSyncReleases();
             fetchAppInfo();
-          }}>Click here to refresh</a>
+          }}>Click here to refresh</a> */}
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <RbRefreshButton style={{width: '100px'}} refreshList={() => fetchAppInfo()} />
+            <RbSyncButton style={{width: '150px'}} onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
+            <strong>App information unavailable, please re-synchronise releases before refresh app information. </strong>
+          </div>
         </span>
       </span>
     );
