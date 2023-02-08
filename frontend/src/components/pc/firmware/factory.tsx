@@ -24,7 +24,7 @@ export class Firmware {
     return ListIO16BuildFiles(version, includeDebug);
   }
 
-  private FlashIO162(version: string): Promise<string> {
+  private FlashIO16(version: string): Promise<string> {
     return FlashIO16(version);
   }
 
