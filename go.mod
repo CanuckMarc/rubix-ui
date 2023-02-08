@@ -10,7 +10,7 @@ go 1.18
 
 require (
 	github.com/NubeDev/flow-eng v0.7.5
-	github.com/NubeIO/git v0.0.9
+	github.com/NubeIO/git v0.1.0
 	github.com/NubeIO/lib-date v0.0.6
 	github.com/NubeIO/lib-dhcpd v0.0.2
 	github.com/NubeIO/lib-dirs v0.0.8
@@ -42,7 +42,7 @@ require (
 	github.com/stretchr/objx v0.4.0
 	github.com/tidwall/buntdb v1.2.9
 	github.com/tidwall/gjson v1.14.3
-	github.com/wailsapp/wails/v2 v2.3.1
+	github.com/wailsapp/wails/v2 v2.2.0
 	github.com/xuri/excelize/v2 v2.7.0
 	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.21.0
