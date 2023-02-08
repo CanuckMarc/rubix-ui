@@ -68,13 +68,27 @@ export const EdgeAppInfo = (props: any) => {
     }
   };
 
+  const onSyncReleases = async () => {
+    setLoadingSyncReleases(true);
+    try {
+      await GitDownloadReleases();
+    } catch (error) {
+      openNotificationWithIcon("error", error);
+    } finally {
+      setLoadingSyncReleases(false);
+    }
+  };
+
   if (appInfoMsg) {
     return (
       <span>
         {appInfoMsg}
         <span className="ml-3">
           {/* <a onClick={() => fetchAppInfo()}>Click here to refresh</a> */}
-          <a onClick={() => onSyncReleases()}>Click here to refresh</a>
+          <a onClick={() => {
+            onSyncReleases();
+            fetchAppInfo();
+          }}>Click here to refresh</a>
         </span>
       </span>
     );
@@ -107,17 +121,6 @@ export const EdgeAppInfo = (props: any) => {
 
   const onCloseRubixAppInstallModal = () => {
     updateIsInstallRubixAppModalVisible(false);
-  };
-
-  const onSyncReleases = async () => {
-    setLoadingSyncReleases(true);
-    try {
-      await GitDownloadReleases();
-    } catch (error) {
-      openNotificationWithIcon("error", error);
-    } finally {
-      setLoadingSyncReleases(false);
-    }
   };
 
   return (
