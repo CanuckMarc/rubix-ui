@@ -57,7 +57,7 @@ func (inst *App) ListIO16Builds() []string {
 	return resp
 }
 
-func (inst *App) listIO16BuildFiles(version string, includeDebug bool) []string {
+func (inst *App) ListIO16BuildFiles(version string, includeDebug bool) []string {
 	resp, err := inst.appStore.ListIO16BuildFiles(version, includeDebug)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
