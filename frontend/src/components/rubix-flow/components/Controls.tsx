@@ -123,8 +123,8 @@ const Controls = ({
     });
   }); */
 
-  const handleDuplicatedNodes = () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
+  const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
+    const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
     const edgesCopied = instance
       .getEdges()
@@ -137,7 +137,7 @@ const Controls = ({
   };
 
   /* Ctrl + D (key): Paste nodes */
-  useCtrlPressKey("KeyD", handleDuplicatedNodes);
+  useCtrlPressKey("KeyD", () => handleDuplicatedNodes());
 
   /* Ctrl + Z (key): Undo */
   useCtrlPressKey("KeyZ", onUndo);
@@ -165,7 +165,7 @@ const Controls = ({
       window.nodesCopied &&
       window.nodesCopied.length > 0
     ) {
-      handleDuplicatedNodes();
+      handleDuplicatedNodes(window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id })));
     }
     window.nodesCopied = [];
   });
