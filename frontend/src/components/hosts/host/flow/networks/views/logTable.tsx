@@ -3,6 +3,7 @@ import { Spin, Table, Button, Input, Typography, Tag, DatePicker } from "antd";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { LogTablePropType } from "./table";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import type { ColumnsType } from 'antd/es/table';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -14,12 +15,18 @@ export interface LogTableType {
   msg: string;
 }
 
+interface FilterItemType {
+  text: string;
+  value: string;
+}
+
 export const LogTable = (props: LogTablePropType) => {
   let { connUUID, hostUUID, pluginName, resetLogTableData, setResetLogTableData } = props;
   const [isFetching, setIsFetching] = useState(false);
   const [allLogs, setAllLogs] = useState<LogTableType[]>([]);
   const [tableData, setTableData] = useState<LogTableType[]>([]);
   const [duration, setDuration] = useState<number | undefined>(undefined);
+  const [filterItem, setFilterItem] = useState<FilterItemType[]>([]);
   const [search, setSearch] = useState("");
 
   const flowPluginFactory = new FlowPluginFactory();
@@ -53,6 +60,7 @@ export const LogTable = (props: LogTablePropType) => {
       const logs = await flowPluginFactory.FlowNetworkNewLog(connUUID, hostUUID, pluginName!, duration);
       if (logs) {
         let i = 0;
+        let tempFilterItems: FilterItemType[] = []
         const temp = logs.message.map((item: any) => {
           i++;
           let tableItem: any = {};
@@ -63,12 +71,23 @@ export const LogTable = (props: LogTablePropType) => {
             .forEach((el: string, index: number) => {
               const [name, value] = el.split("=");
               tableItem["key"] = i;
-              index === 2 ? (tableItem[name] = value + " " + remainderMsg) : (tableItem[name] = value);
+              switch (index) {
+                case 1:
+                  tableItem[name] = value
+                  if (!tempFilterItems.some(item => item.text === value)) tempFilterItems.push({text: value, value: value});
+                  break;
+                case 2: 
+                  tableItem[name] = value + " " + remainderMsg
+                  break;
+                default:
+                  tableItem[name] = value
+              }
             });
           return tableItem;
         });
         setAllLogs(temp);
         setTableData(temp);
+        setFilterItem(tempFilterItems)
       }
     } catch (error) {
       console.log("error fetching logs: ", error);
@@ -77,7 +96,7 @@ export const LogTable = (props: LogTablePropType) => {
     }
   };
 
-  const columns = [
+  const columns: ColumnsType<LogTableType> = [
     {
       title: "Time",
       dataIndex: "time",
@@ -87,6 +106,9 @@ export const LogTable = (props: LogTablePropType) => {
       title: "Level",
       dataIndex: "level",
       key: "key",
+      filters: filterItem,
+      filterSearch: true,
+      onFilter: (value: any, record: LogTableType) => record.level === value ? true : false,
       render: (level: any) => {
         let colour = "blue";
         if (level === "error") {
