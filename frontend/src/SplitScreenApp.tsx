@@ -18,6 +18,7 @@ const SplitScreenApp: React.FC = () => {
       split="vertical"
       size={showSplit ? "50%" : "100%"}
       allowResize
+      style={{ overflowY: 'auto' }}
     >
       <TabSplitContent showSplit={!showSplit} toggleSplit={toggleSplit} />
       {showSplit && <TabSplitContent showSplit isRightPane toggleSplit={toggleSplit} />}

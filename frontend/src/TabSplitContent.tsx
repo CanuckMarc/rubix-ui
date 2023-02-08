@@ -129,7 +129,7 @@ export function TabSplitContent({
     tabBarStyle={{ margin: 0 }}
     tabBarExtraContent={showSplit && togglePaneBtn}
   >
-    {!isRightPane && <TabPane tab={homeIcon} key={defaultKey} closable={false}>
+    {!isRightPane && <TabPane tab={homeIcon} key={defaultKey} closable={false} >
       {child}
     </TabPane>}
     {items.map((tab: TabsBuilder) =>
