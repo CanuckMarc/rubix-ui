@@ -47,24 +47,24 @@ export const AppDetails = () => {
     },
   ];
 
+  const fetchList = async () => {
+      try {
+        setIsFetching(true);
+        const res = await GetHostNetwork(connUUID, netUUID)
+        const filteredHost = res.hosts.filter((item: amodel.Host) => {
+          if (item.uuid === hostUUID) return true
+        })
+        setHosts(filteredHost);  
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsFetching(false);
+      }
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
-
-  const fetchList = async () => {
-    try {
-      setIsFetching(true);
-      const res = await GetHostNetwork(connUUID, netUUID);
-      const filteredHost = res.hosts.filter((item: amodel.Host) => {
-        if (item.uuid === hostUUID) return true;
-      });
-      setHosts(filteredHost);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
 
   return (
     <>

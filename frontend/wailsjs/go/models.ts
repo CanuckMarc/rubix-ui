@@ -3114,6 +3114,26 @@ export namespace store {
 	        this.move_one_level_inside_file_to_outside = source["move_one_level_inside_file_to_outside"];
 	    }
 	}
+	export class Firmware {
+	    name: string;
+	    repo: string;
+	    description: string;
+	    min_version: string;
+	    max_version: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Firmware(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.repo = source["repo"];
+	        this.description = source["description"];
+	        this.min_version = source["min_version"];
+	        this.max_version = source["max_version"];
+	    }
+	}
 	export class Plugins {
 	    name: string;
 	    plugin: string;
@@ -3174,6 +3194,7 @@ export namespace store {
 	    apps: Apps[];
 	    plugins: Plugins[];
 	    services: Services[];
+	    firmware: Firmware[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Release(source);
@@ -3186,6 +3207,7 @@ export namespace store {
 	        this.apps = this.convertValues(source["apps"], Apps);
 	        this.plugins = this.convertValues(source["plugins"], Plugins);
 	        this.services = this.convertValues(source["services"], Services);
+	        this.firmware = this.convertValues(source["firmware"], Firmware);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
