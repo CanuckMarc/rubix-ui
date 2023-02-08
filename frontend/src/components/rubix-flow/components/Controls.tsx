@@ -104,25 +104,6 @@ const Controls = ({
     instance.setEdges(newEdges);
   });
 
-  /* Ctrl + C (key): Copy nodes
-  useCtrlPressKey("KeyC", () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
-    const nodeIdCopied = nodesCopied.map((item) => item.id);
-    const edgesCopied = instance
-      .getEdges()
-      .filter(
-        (item) =>
-          item.selected &&
-          nodeIdCopied.includes(item.source) &&
-          nodeIdCopied.includes(item.target)
-      );
-
-    setCopied({
-      nodes: nodesCopied,
-      edges: edgesCopied,
-    });
-  }); */
-
   const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
     const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
