@@ -1,4 +1,4 @@
-import { Space, Spin, Tooltip } from "antd";
+import { Space, Spin, Tooltip, Modal } from "antd";
 import { ArrowRightOutlined, FormOutlined, BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -26,17 +26,17 @@ import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { LogTable } from "./logTable";
 
 export interface LogTablePropType {
-  pluginName: string | undefined
-  connUUID: string
-  hostUUID: string
-  isLogTableOpen: boolean
-  setIsLogTableOpen: Function
+  pluginName: string | undefined;
+  connUUID: string;
+  hostUUID: string;
+  resetLogTableData: boolean;
+  setResetLogTableData: Function;
 }
 
 export interface ExternalWindowParamType {
-  connUUID: string
-  hostUUID: string
-  logNetwork: string | undefined
+  connUUID: string;
+  hostUUID: string;
+  logNetwork: string | undefined;
 }
 
 export const FlowNetworkTable = () => {
@@ -55,6 +55,7 @@ export const FlowNetworkTable = () => {
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [logNetwork, setLogNetwork] = useState<model.Network>();
   const [isLogTableOpen, setIsLogTableOpen] = useState(false);
+  const [resetLogTableData, setResetLogTableData] = useState(false);
 
   const config = {
     originData: networks,
@@ -177,11 +178,21 @@ export const FlowNetworkTable = () => {
     fetchNetworks();
   }, []);
 
+  const handleOk = () => {
+    setIsLogTableOpen(false);
+    setResetLogTableData(true);
+  };
+
+  const handleCancel = () => {
+    setIsLogTableOpen(false);
+    setResetLogTableData(true);
+  };
+
   return (
     <>
       <RbRefreshButton refreshList={fetchNetworks} />
-      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={() => setIsCreateModalVisible(true)} />
+      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
@@ -217,7 +228,9 @@ export const FlowNetworkTable = () => {
         onClose={() => setIsImportModalVisible(false)}
         refreshList={fetchNetworks}
       />
-      <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} isLogTableOpen={isLogTableOpen} setIsLogTableOpen={setIsLogTableOpen}/>
+      <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
+        <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData}/>
+      </Modal>
     </>
   );
 };
