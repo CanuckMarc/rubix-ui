@@ -142,7 +142,11 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
 };
 
 const objectMap = (treeObj: TreeObj) => {
-  treeObj.label = (
+  const isDisabledTooltip =
+    treeObj.key && treeObj.key.split("/").length < 5 && treeObj.key.split("/")[1] === "connections";
+  treeObj.label = isDisabledTooltip ? (
+    <>{treeObj.label}</>
+  ) : (
     <Tooltip placement="right" title={treeObj.name}>
       {treeObj.label}
     </Tooltip>
@@ -151,7 +155,7 @@ const objectMap = (treeObj: TreeObj) => {
 };
 
 const displayLabel = (name: string, prependName: string | undefined, link: string) => {
-  const isFromSupervisor = link.split("/").length < 5 && link.split("/")[1] === "connections";
+  const allowOpenAll = link.split("/").length < 5 && link.split("/")[1] === "connections";
   const splittedName = name.split("(device");
   if (splittedName.length < 2) {
     return (
@@ -159,7 +163,7 @@ const displayLabel = (name: string, prependName: string | undefined, link: strin
         {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
         <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {name}
-          {isFromSupervisor && (
+          {allowOpenAll && (
             <MenuOutlined
               style={{ float: "right", marginRight: "12px" }}
               onClick={(e) => handleOpenAllMenus(e, link, (isActionLoading[name] = !isActionLoading[name]))}
