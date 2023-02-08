@@ -210,6 +210,9 @@ const Flow = (props: FlowProps) => {
 
   const handleAddSubFlow = (node: NodeInterface) => {
     handlePushSelectedNodeForSubFlow(node);
+    setTimeout(() => {
+      rubixFlowInstance?.fitView();
+    }, 100);
   };
 
   const handleConnectionBuilderFlow = (node: NodeInterface) => {
@@ -914,7 +917,7 @@ const Flow = (props: FlowProps) => {
     handleRefreshValues();
     setTimeout(() => {
       rubixFlowInstance?.fitView();
-    }, 30);
+    }, 50);
   }, [selectedNodeForSubFlow, setNodes, setEdges]);
 
   useEffect(() => {
