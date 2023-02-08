@@ -81,7 +81,7 @@ export const NodeSideBar = memo(({ nodesSpec }: NodeSiderBarProps) => {
             onChange={onChangeSearch}
           />
         </div>
-        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 70px)" }}>
+        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
           <Collapse
             activeKey={activeKeyPanel}
             expandIconPosition="right"
