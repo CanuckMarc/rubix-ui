@@ -35,11 +35,6 @@ export const CreateEditModal = (props: any) => {
       const res = await flowNetworkFactory.GetNetworksWithPointsDisplay();
       const jsonSchema = {
         properties: {
-          uuid: {
-            readOnly: true,
-            title: "uuid",
-            type: "string",
-          },
           name: {
             maxLength: 50,
             minLength: 2,
@@ -58,7 +53,7 @@ export const CreateEditModal = (props: any) => {
           },
           producer_thing_class: {
             type: "string",
-            enum: ["point", "schedule"],
+            enum: ["point"],
             default: "point",
           },
           producer_application: {

@@ -34,8 +34,8 @@ export const ProducersTable = () => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: Producer) => (
         <Space size="middle">

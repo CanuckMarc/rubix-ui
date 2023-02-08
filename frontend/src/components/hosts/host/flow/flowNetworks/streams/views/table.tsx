@@ -34,8 +34,8 @@ export const StreamsTable = (props: any) => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: Stream) => (
         <Space size="middle">
@@ -79,11 +79,6 @@ export const StreamsTable = (props: any) => {
           title: "enable",
           type: "boolean",
           default: true,
-        },
-        uuid: {
-          readOnly: true,
-          title: "uuid",
-          type: "string",
         },
       },
     };

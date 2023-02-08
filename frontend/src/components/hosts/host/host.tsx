@@ -22,8 +22,6 @@ export const Host = () => {
   let {
     connUUID = "",
     hostUUID = "",
-    locUUID = "",
-    netUUID = "",
   } = useParams();
   const { prefixedTitle, addPrefix } = useTitlePrefix("Controller");
   hostFactory.uuid = hostUUID;

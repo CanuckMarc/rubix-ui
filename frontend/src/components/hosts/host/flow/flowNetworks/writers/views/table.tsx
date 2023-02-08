@@ -8,11 +8,10 @@ import { WRITER_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
-import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
+import { FormOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import Writer = model.Writer;
-import Consumer = model.Consumer;
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const WritersTable = () => {
@@ -37,8 +36,8 @@ export const WritersTable = () => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: Writer) => (
         <Space size="middle">

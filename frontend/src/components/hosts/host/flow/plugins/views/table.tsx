@@ -34,7 +34,7 @@ export const FlowPluginsTable = () => {
 
   const columns = [
     {
-      title: "config",
+      title: "Config",
       dataIndex: "config",
       key: "config",
       render: (_: any, item: any) => (
