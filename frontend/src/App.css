@@ -62,11 +62,6 @@
     background-color: rgba(255, 255, 255, 1);
 }
 
-
-.ant-layout-sider-children>ul {
-    margin-left: -10px;
-}
-
 .ant-layout-sider-children>ul,
 .ant-layout-sider-children>ul>li>ul {
     max-height: calc(100vh - 220px);

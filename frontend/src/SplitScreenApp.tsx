@@ -21,7 +21,7 @@ const SplitScreenApp: React.FC = () => {
       style={{ overflowY: 'auto' }}
     >
       <TabSplitContent showSplit={!showSplit} toggleSplit={toggleSplit} />
-      {showSplit && <TabSplitContent showSplit isRightPane toggleSplit={toggleSplit} />}
+      {showSplit ? <TabSplitContent showSplit isRightPane toggleSplit={toggleSplit} /> : <div></div>}
     </SplitPane>
   );
 };
