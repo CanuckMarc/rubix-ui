@@ -51,12 +51,10 @@ export const AppDetails = () => {
       try {
         setIsFetching(true);
         const res = await GetHostNetwork(connUUID, netUUID)
-        if (res) {
-          const filteredHost = res.hosts.filter((item: amodel.Host) => {
-            if (item.uuid === hostUUID) return true
-          })
-          setHosts(filteredHost);
-        }
+        const filteredHost = res.hosts.filter((item: amodel.Host) => {
+          if (item.uuid === hostUUID) return true
+        })
+        setHosts(filteredHost);  
       } catch (error) {
         console.log(error);
       } finally {
