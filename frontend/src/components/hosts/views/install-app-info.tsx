@@ -73,7 +73,8 @@ export const EdgeAppInfo = (props: any) => {
       <span>
         {appInfoMsg}
         <span className="ml-3">
-          <a onClick={() => fetchAppInfo()}>Click here to refresh</a>
+          {/* <a onClick={() => fetchAppInfo()}>Click here to refresh</a> */}
+          <a onClick={() => onSyncReleases()}>Click here to refresh</a>
         </span>
       </span>
     );
