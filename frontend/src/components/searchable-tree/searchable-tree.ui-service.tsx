@@ -6,13 +6,14 @@ import {
   LaptopOutlined,
   ClusterOutlined,
   MenuOutlined,
-  ToolOutlined
+  ToolOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import eventEmit from "../rubix-flow/util/evenEmit";
+
+let className = "supervisors-menu";
 
 let ObjectType = {
   CONNECTIONS: "Connections",
@@ -42,7 +43,12 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
       .replace(":hostUUID", hostUUID),
-  [ObjectType.APP_DETAILS]: (connUUID: string = "", locUUID: string = "", netUUID: string = "", hostUUID: string = "") =>
+  [ObjectType.APP_DETAILS]: (
+    connUUID: string = "",
+    locUUID: string = "",
+    netUUID: string = "",
+    hostUUID: string = ""
+  ) =>
     ROUTES.APP_DETAILS.replace(":connUUID", connUUID)
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
@@ -91,14 +97,17 @@ interface RubixObjectI {
 const isActionLoading = {} as any;
 
 const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); //prevent navigate
   if (next === "/connections") {
     for (const key in isActionLoading) {
       isActionLoading[key] = isActionLoading["Supervisors"];
     }
   }
   eventEmit.dispatch("openAllMenus", { key: next, isOpen });
+};
+
+const preventDropdown = (e: React.MouseEvent) => {
+  e.stopPropagation();
 };
 
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
@@ -120,13 +129,13 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
     return {
       name: item.name,
       label: (
-        <NavLink to={next} style={{ color: "unset", display: "flex" }}>
+        <NavLink to={next} style={{ color: "unset" }} onClick={preventDropdown}>
           {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
-          <span style={{ width: "100%" }}>
+          <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             {item.name}
             {isFromSupervisor && (
               <MenuOutlined
-                style={{ float: "right", marginTop: "13px", marginRight: "12px" }}
+                style={{ float: "right", marginRight: "12px" }}
                 onClick={(e) => handleOpenAllMenus(e, next, (isActionLoading[item.name] = !isActionLoading[item.name]))}
               />
             )}
@@ -180,7 +189,7 @@ export const getTreeDataIterative = (connections: any) => {
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...objectMap(
               getTreeObject(
-                network,
+                { ...network, name: network.name + " (devices)" },
                 ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
                 "",
                 <LaptopOutlined />
@@ -197,7 +206,12 @@ export const getTreeDataIterative = (connections: any) => {
                   <ClusterOutlined />
                 )
               ),
-              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](connection.uuid, location.uuid, network.uuid, host.uuid),
+              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](
+                connection.uuid,
+                location.uuid,
+                network.uuid,
+                host.uuid
+              ),
               value: getItemValue(host, ObjectType.APP_DETAILS),
               children: [
                 {
@@ -261,6 +275,7 @@ export const getTreeDataIterative = (connections: any) => {
                       children: null,
                     },
                   ],
+                  className,
                 },
                 {
                   ...objectMap(
@@ -274,11 +289,16 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
-                }
+                },
               ],
+              className,
             })),
+            className,
           })),
+          className,
         })),
+        className:
+          !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,
       })),
     },
   ];

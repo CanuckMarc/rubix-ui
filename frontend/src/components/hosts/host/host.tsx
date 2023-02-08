@@ -21,13 +21,8 @@ const flowNetworkClonesKey = "Flow Network Clones";
 const hostFactory = new HostsFactory();
 
 export const Host = () => {
-  let {
-    connUUID = "",
-    hostUUID = "",
-    locUUID = "", 
-    netUUID = ""
-  } = useParams();
-  const { prefixedTitle, addPrefix } = useTitlePrefix("Controller");
+  const { connUUID = "", hostUUID = "", locUUID = "", netUUID = "" } = useParams();
+  const { prefixedTitle, addPrefix } = useTitlePrefix("Device");
   hostFactory.uuid = hostUUID;
   hostFactory.connectionUUID = connUUID;
 
@@ -62,7 +57,7 @@ export const Host = () => {
         .replace(":netUUID", netUUID || "")
         .replace(":hostUUID", hostUUID || ""),
       breadcrumbName: "Controller",
-    }
+    },
   ];
 
   return (

@@ -24,24 +24,21 @@ export const Writers = () => {
       breadcrumbName: "Location",
     },
     {
-      path: ROUTES.LOCATION_NETWORKS.replace(
-        ":connUUID",
-        connUUID || ""
-      ).replace(":locUUID", locUUID || ""),
+      path: ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", locUUID || ""),
       breadcrumbName: "Group",
     },
     {
       path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
     {
       path: ROUTES.HOST.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID || "")
         .replace(":hostUUID", hostUUID || ""),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
     {
       path: ROUTES.STREAMCLONES.replace(":connUUID", connUUID || "")
