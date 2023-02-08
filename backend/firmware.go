@@ -65,3 +65,8 @@ func (inst *App) listIO16BuildFiles(version string, includeDebug bool) []string 
 	}
 	return resp
 }
+
+func (inst *App) FlashIO16(version string) string {
+
+	return ""
+}
