@@ -179,11 +179,6 @@ export const WiresMap = () => {
       fixed: 'left',
       render: (text, record: AddedPointType, index) => {
         return record?.existingFlowNetName || 'Flow network unselected, please select one.'
-        // if (record.existingFlowNetName === undefined) {
-        //   return 'Flow network unselected, please select one.'
-        // } else {
-        //   return record.existingFlowNetName
-        // }
       }
     },
     {

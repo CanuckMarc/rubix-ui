@@ -165,11 +165,6 @@ export const PointsPane = (props: any) => {
       })
       setSelectedPoints(selectedItems)
       setOwnSelection(newSelectedRowKeys.length === 0 ? undefined : selectedItems)
-      // if (newSelectedRowKeys.length === 0) {
-      //   setOwnSelection(undefined)
-      // } else {
-      //   setOwnSelection(selectedItems)
-      // }
     };
 
     const rowSelection = {
@@ -179,22 +174,11 @@ export const PointsPane = (props: any) => {
       getCheckboxProps: (record: PointTableType) => {
         if (ownSelection === undefined) {
           return {disabled: !!selectedPoints && record.uuid === selectedPoints.uuid}
-            // if (selectedPoints && record.uuid === selectedPoints.uuid) {
-            //     return {disabled: true}
-            // } else {
-            //     return {disabled: false}
-            // }
         } else {
           return {disabled: record.uuid !== ownSelection.uuid}
-            // if (record.uuid === ownSelection.uuid) {
-            //     return {disabled: false}
-            // } else {
-            //     return {disabled: true}
-            // }
         }
       }
     }
-
 
     return (
       <Table 
