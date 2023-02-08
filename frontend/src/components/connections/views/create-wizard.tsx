@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { Modal, Spin, Steps } from "antd";
+import { Modal, Spin, Steps, Button } from "antd";
 import { CreateConnectionForm } from "./create-form";
+
+import { openNotificationWithIcon } from "../../../utils/utils";
+import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
 
 const { Step } = Steps;
 
@@ -23,14 +26,19 @@ export const CreateConnectionWizard = (props: any) => {
   const { currentConnection, connectionSchema, isLoadingForm, refreshList, isWizardModalVisible, setIsWizardModalVisible } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  
-  // useEffect(() => {
-  //   setCurrentStep(0)
-  //   return () => {
-  //     setCurrentStep(0)
-  //   }
-  // }, [])
 
+  const pingConnection = (uuid: string) => {
+    PingRubixAssist(uuid).then((ok) => {
+      if (ok) {
+        openNotificationWithIcon("success", "rubix assist server accessible");
+        setCurrentStep(currentStep + 1)
+      } else {
+        openNotificationWithIcon("error", "check rubix assist server");
+      }
+    });
+    // fetch().catch(console.error);
+  };
+  
   const data = [
     { id: "1", name: "Step 1", text: 'Create connection', content: (
       <div style={{width: '35vw'}}>
@@ -44,7 +52,11 @@ export const CreateConnectionWizard = (props: any) => {
         />
       </div>
     ) },
-    { id: "2", name: "Step 2",  text: 'Ping connection', content: (<span>Yo</span>) },
+    { id: "2", name: "Step 2", text: 'Ping connection', content: (
+      <div>
+        <Button onClick={() => pingConnection(currentConnection.uuid)}>Ping connection</Button>
+      </div>
+    ) },
     { id: "3", name: "Step 3", text: 'Configurate tokens', content: (<span>WHAT</span>) }
   ];
 
