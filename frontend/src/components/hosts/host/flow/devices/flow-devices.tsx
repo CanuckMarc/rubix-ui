@@ -18,11 +18,13 @@ import useTitlePrefix from "../../../../../hooks/usePrefixedTitle";
 import { setDataLocalStorage } from "../flow-service";
 import Device = model.Device;
 import { HostNetworkingFactory } from "../../../../edge/system/networking/factory";
+import { LogTable } from "../networks/views/logTable";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
 
 const devices = "DEVICES";
+const logs = "LOGS";
 const bacnet = "BACNET";
 
 export const FlowDevices = () => {
@@ -39,6 +41,7 @@ export const FlowDevices = () => {
   const [low, setLow] = useState(0);
   const [high, setHigh] = useState(0);
   const [netNum, setNetNum] = useState(0);
+  const [resetLogTableData, setResetLogTableData] = useState(false);
   const { prefixedTitle, addPrefix } = useTitlePrefix("Flow Devices");
 
   const bacnetFactory = new BacnetFactory();
@@ -194,6 +197,9 @@ export const FlowDevices = () => {
           <TabPane tab={devices} key={devices}>
             <RbRefreshButton refreshList={fetch} />
             <FlowDeviceTable data={data} pluginUUID={pluginUUID} isFetching={isFetching} refreshList={fetch} />
+          </TabPane>
+          <TabPane tab={logs} key={logs}>
+            <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={pluginName} resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData}/>
           </TabPane>
           {pluginName === PLUGINS.bacnetmaster ? (
             <TabPane tab={bacnet} key={bacnet}>

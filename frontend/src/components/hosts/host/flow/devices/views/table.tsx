@@ -212,8 +212,8 @@ export const FlowDeviceTable = (props: any) => {
 
   return (
     <>
-      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={() => showCreateModal()} />
+      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
