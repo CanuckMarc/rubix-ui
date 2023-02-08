@@ -67,8 +67,7 @@
     margin-left: -10px;
 }
 
-.ant-layout-sider-children>ul,
-.ant-layout-sider-children>ul>li>ul {
+.ant-layout-sider-children>ul {
     max-height: 75vh;
     overflow-y: auto;
 }
