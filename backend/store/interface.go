@@ -1,6 +1,9 @@
 package store
 
-import "github.com/NubeIO/rubix-ui/backend/helpers/builds"
+import (
+	"github.com/NubeIO/git/pkg/git"
+	"github.com/NubeIO/rubix-ui/backend/helpers/builds"
+)
 
 type IAppStore interface {
 	GitListReleases(token string) ([]ReleaseList, error)
@@ -12,6 +15,7 @@ type IAppStore interface {
 	GetBackupPath() string
 	SaveBackup(fileName string, data interface{}) error
 	StoreCheckAppAndVersionExists(app App) error
+	ListReleases(repo *git.AssetOptions, token string, pageOpts *git.ListOptions) ([]*git.RepositoryRelease, error)
 
 	DownloadIO16Firmware(token, version string) (string, error)
 	ListIO16Builds() ([]string, error)
