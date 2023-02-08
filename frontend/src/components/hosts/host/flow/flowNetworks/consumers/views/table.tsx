@@ -43,8 +43,8 @@ export const ConsumersTable = () => {
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: Consumer) => (
         <Space size="middle">

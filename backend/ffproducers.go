@@ -3,7 +3,6 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
-	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/nils"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 )
 
@@ -20,12 +19,6 @@ func (inst *App) AddProducer(connUUID, hostUUID string, body *model.Producer) *m
 	}
 	if body.ProducerApplication == "" {
 		body.ProducerApplication = "mapping"
-	}
-	if nils.BoolIsNil(body.Enable) {
-		body.Enable = nils.NewFalse()
-	}
-	if nils.BoolIsNil(body.EnableHistory) {
-		body.EnableHistory = nils.NewFalse()
 	}
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)

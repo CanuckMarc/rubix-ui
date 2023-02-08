@@ -10,7 +10,7 @@ go 1.18
 
 require (
 	github.com/NubeDev/flow-eng v0.7.5
-	github.com/NubeIO/git v0.0.9
+	github.com/NubeIO/git v0.1.0
 	github.com/NubeIO/lib-date v0.0.6
 	github.com/NubeIO/lib-dhcpd v0.0.2
 	github.com/NubeIO/lib-dirs v0.0.8

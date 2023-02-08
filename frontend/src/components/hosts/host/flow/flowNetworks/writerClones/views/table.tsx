@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom";
 import { Spin } from "antd";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { WriterClonesFactory } from "../factory";
-import { WRITER_HEADERS } from "../../../../../../../constants/headers";
+import { WRITER_CLONE_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import UUIDs = backend.UUIDs;
 import WriterClone = model.WriterClone;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const WriterClonesTable = () => {
   const { connUUID = "", hostUUID = "", producerUUID = "" } = useParams();
@@ -27,8 +26,6 @@ export const WriterClonesTable = () => {
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
   factory.producerUUID = producerUUID;
-
-  const columns = WRITER_HEADERS;
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -68,7 +65,7 @@ export const WriterClonesTable = () => {
         rowKey="uuid"
         rowSelection={rowSelection}
         dataSource={filteredData}
-        columns={columns}
+        columns={WRITER_CLONE_HEADERS}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
     </>

@@ -1,10 +1,7 @@
 import Form from "@rjsf/core";
 
 export const JsonForm = (props: any) => {
-  const {
-    formData, setFormData, jsonSchema, uiSchema, setValidationError = () => {
-    }
-  } = props;
+  const { formData, setFormData, jsonSchema, uiSchema, setValidationError = () => {} } = props;
 
   const handleFormChange = (values: any) => {
     setFormData(values.formData);
