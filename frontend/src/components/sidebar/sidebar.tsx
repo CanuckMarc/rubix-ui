@@ -25,6 +25,7 @@ import { DataNode } from "antd/es/tree";
 import { storage } from "../../../wailsjs/go/models";
 import { getTreeDataIterative } from "../searchable-tree/searchable-tree.ui-service";
 import eventEmit from "../rubix-flow/util/evenEmit";
+import "./sidebar.css";
 
 import RubixConnection = storage.RubixConnection;
 
@@ -478,6 +479,7 @@ export const MenuSidebar = () => {
           <Menu
             mode="inline"
             theme="dark"
+            className="rubix-menu"
             items={menu}
             selectedKeys={[location.pathname]}
             activeKey={location.pathname}
