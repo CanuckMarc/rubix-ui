@@ -467,7 +467,6 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 			}
 			inst.uiSuccessMessage("restarted rubix-edge-wires ok")
 		}
-
 		return resp
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
@@ -513,7 +512,6 @@ func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload i
 		return resp
 	} else {
 		var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
-
 		resp, err := client.NodePayload(nodeId, p)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
