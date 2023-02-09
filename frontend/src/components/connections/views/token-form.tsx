@@ -10,7 +10,7 @@ import { LIGHT_THEME } from "../../../themes/use-theme";
 import ExternalToken = externaltoken.ExternalToken;
 
 export const TokenForm = (props: any) => {
-  const { factory, selectedItem } = props;
+  const { factory, selectedItem, hostOrConn } = props;
   const [settings] = useSettings();
   const [jwtToken, setJwtToken] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,8 @@ export const TokenForm = (props: any) => {
   const loginFormRef = createRef<FormInstance>();
 
   useEffect(() => {
-    factory.connectionUUID = selectedItem.uuid;
+    if (hostOrConn === 'host') factory.hostUUID = selectedItem.uuid;
+    if (hostOrConn === 'conn') factory.connectionUUID = selectedItem.uuid;
   }, [selectedItem])
 
   const handleClose = () => {
@@ -31,6 +32,12 @@ export const TokenForm = (props: any) => {
     setIsTokenGenerateModalVisible(false);
     loginFormRef?.current?.resetFields();
   };
+
+  // useEffect(() => {
+  //   return () => {
+  //     handleClose()
+  //   }
+  // }, [])
 
   const onCloseTokenGeneratorModal = () => {
     setIsTokenGenerateModalVisible(false);

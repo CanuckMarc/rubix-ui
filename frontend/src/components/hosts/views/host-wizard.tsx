@@ -1,62 +1,64 @@
 import { useEffect, useState } from "react";
 import { Modal, Spin, Steps, Button, StepsProps } from "antd";
-import { CreateConnectionForm } from "./create-form";
-import { TokenForm } from "./token-form";
-import { storage } from "../../../../wailsjs/go/models";
+import { CreateHostForm } from "./create-form";
+import { TokenForm } from "../../../components/connections/views/token-form";
 import { openNotificationWithIcon } from "../../../utils/utils";
-import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
-import RubixConnection = storage.RubixConnection;
-
+import { amodel } from "../../../../wailsjs/go/models";
+import Host = amodel.Host;
 const { Step } = Steps;
 
-export const CreateConnectionWizard = (props: any) => {
-  const { currentConnection, connectionSchema, isLoadingForm, refreshList, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } = props;
-  const [newConnection, setNewConnection] = useState({} as RubixConnection)
+export const CreateHostWizard = (props: any) => {
+  const { currentHost, hostSchema, isLoadingForm, refreshList, hostsFactory, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } = props;
+  const [newHost, setNewHost] = useState({} as Host)
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
   const [errorAtPing, setErrorAtPing] = useState(false);
 
-  const pingConnection = (conn: RubixConnection) => {
-    PingRubixAssist(conn.uuid).then((ok) => {
-      if (ok) {
-        openNotificationWithIcon("success", `new connection ${conn.name} is able to access rubix assist server!`);
+  const pingHost = async (newHost: Host) => {
+    hostsFactory.uuid = newHost.uuid;
+    try {
+      const res = await hostsFactory.PingHost();
+      if (res) {
+        openNotificationWithIcon("success", `successfully pinged the new host ${newHost.name}!`);
         setCurrentStep(currentStep + 1)
       } else {
-        openNotificationWithIcon("error", `new connection ${conn.name} cannot access rubix assist server!`);
+        openNotificationWithIcon("error", `failed to ping new host ${newHost.name}!`);
         setStepStatus('error');
         setErrorAtPing(true);
       }
-    });
+    } catch (err) {
+      console.error(err);
+    }
   };
   
   const data = [
-    { id: "1", name: "Step 1", text: 'Create connection', content: (
+    { id: "1", name: "Step 1", text: 'Create new host', content: (
       <div style={{width: '35vw'}}>
-        <CreateConnectionForm 
-          currentConnection={newConnection} 
-          connectionSchema={connectionSchema} 
+        <CreateHostForm 
+          currentHost={newHost}
+          hostSchema={hostSchema} 
           isLoadingForm={isLoadingForm} 
-          refreshList={refreshList}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
-          setNewConnection={setNewConnection}
+          refreshList={refreshList}
+          setNewHost={setNewHost}
         />
       </div>
     ) },
-    { id: "2", name: "Step 2", text: 'Ping connection', content: (
+    { id: "2", name: "Step 2", text: 'Ping new host', content: (
       <div style={{display: 'flex', flexDirection: 'column', rowGap: '20px', alignItems:'center'}}>
-        <Button type='primary' onClick={() => pingConnection(newConnection)} style={{width: '160px'}}>Ping new connection</Button>
-        {errorAtPing && (<strong style={{color: 'red'}}>Error accessing rubix assist server, go back to step one.</strong>)}
+        <Button type='primary' onClick={() => pingHost(newHost)} style={{width: '160px'}}>Ping new host</Button>
+        {errorAtPing && (<strong style={{color: 'red'}}>Error pinging newly created host, go back to step one.</strong>)}
       </div>
     ) },
     { id: "3", name: "Step 3", text: 'Configure tokens', content: (
       <div style={{width: '35vw', display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
-        {newConnection.external_token === '' ? (
-          <TokenForm 
-            factory={tokenFactory}
-            selectedItem={newConnection}
-            hostOrConn={'conn'}
-          />
+        {newHost.external_token === '' ? (
+            <TokenForm 
+              factory={tokenFactory}
+              selectedItem={newHost}
+              hostOrConn={'host'}
+            />
         ) : (
           <strong>Token already included!</strong>
         )}
@@ -74,14 +76,14 @@ export const CreateConnectionWizard = (props: any) => {
   };
 
   const handleWizardClose = () => {
-    setNewConnection({} as RubixConnection)
+    setNewHost({} as Host)
     setCurrentStep(0)
     setIsWizardModalVisible(false)
   }
   
   return (
     <Modal
-      title={'Create Connection'}
+      title={'Create Host'}
       visible={isWizardModalVisible}
       width={'50vw'}
       onCancel={handleWizardClose}
