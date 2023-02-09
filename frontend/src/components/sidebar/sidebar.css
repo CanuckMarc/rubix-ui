@@ -19,3 +19,7 @@
 .disconnect-menu>.ant-menu-sub>.ant-menu-item:hover {
     color: #fa8c16 !important;
 }
+
+.spin-wrapper {
+    padding: 12px
+}

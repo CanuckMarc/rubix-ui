@@ -242,6 +242,10 @@ export function DownloadFlow(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['DownloadFlow'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function DownloadIO16Firmware(arg1) {
+  return window['go']['backend']['App']['DownloadIO16Firmware'](arg1);
+}
+
 export function EdgeAppsInfo(arg1, arg2) {
   return window['go']['backend']['App']['EdgeAppsInfo'](arg1, arg2);
 }
@@ -480,6 +484,10 @@ export function ExportPointBulk(arg1, arg2, arg3, arg4, arg5) {
 
 export function FakeEdgeAppsInfoModelCreationOnUI() {
   return window['go']['backend']['App']['FakeEdgeAppsInfoModelCreationOnUI']();
+}
+
+export function FlashIO16(arg1) {
+  return window['go']['backend']['App']['FlashIO16'](arg1);
 }
 
 export function FlowNetworkNewLog(arg1, arg2, arg3, arg4) {
@@ -824,6 +832,18 @@ export function ImportNetworksBulk(arg1, arg2, arg3) {
 
 export function ImportPointBulk(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ImportPointBulk'](arg1, arg2, arg3, arg4);
+}
+
+export function ListIO16BuildFiles(arg1, arg2) {
+  return window['go']['backend']['App']['ListIO16BuildFiles'](arg1, arg2);
+}
+
+export function ListIO16Builds() {
+  return window['go']['backend']['App']['ListIO16Builds']();
+}
+
+export function ListIO16Releases() {
+  return window['go']['backend']['App']['ListIO16Releases']();
 }
 
 export function NewTab(arg1) {

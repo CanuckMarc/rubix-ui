@@ -953,7 +953,7 @@ const Flow = (props: FlowProps) => {
         /* Get output Nodes */
         handleRefreshValues();
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [connUUID, hostUUID]);
 
   useEffect(() => {

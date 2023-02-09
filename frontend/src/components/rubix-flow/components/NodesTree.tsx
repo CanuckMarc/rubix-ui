@@ -52,9 +52,9 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
     const filtered =
       key.length > 0
         ? nodes.filter((node) => {
-            const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
-            return nodeType.toLowerCase().includes(key);
-          })
+          const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
+          return nodeType.toLowerCase().includes(key);
+        })
         : nodes;
 
     const allNodes = [...filtered];
@@ -115,7 +115,7 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
             onChange={onChangeSearch}
           />
         </div>
-        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 70px)" }}>
+        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
           {nodesFiltered.nodesL1.map((node, index) => (
             <NodeTreeItem
               key={node.id}

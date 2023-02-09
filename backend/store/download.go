@@ -18,7 +18,7 @@ func (inst *AppStore) DownloadFlowPlugin(token string, app App) (*App, error) {
 		MatchName: true,
 		MatchArch: true,
 	}
-	resp, _, err := inst.gitDownloadZip(token, app, true, false, false, opts)
+	resp, _, err := inst.gitDownloadZip(token, app, false, true, false, opts)
 	return resp, err
 }
 

@@ -459,14 +459,16 @@ export const MenuSidebar = () => {
     <Sider
       id="sidebarMenu"
       width={280}
-      style={{ minHeight: "100vh" }}
+      style={{ height: "calc(100vh - 40px)" }}
       collapsed={collapsed}
       onClick={() => {
         if (collapsed && !collapseDisabled) handleCollapse(false);
       }}
     >
       {isFetching ? (
-        <Spin />
+        <div className="spin-wrapper">
+          <Spin />
+        </div>
       ) : (
         <>
           <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
