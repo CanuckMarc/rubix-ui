@@ -12,6 +12,7 @@ export const CreateConnectionForm = (props: any) => {
   // const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentConnection);
   const [validationError, setValidationError] = useState(true);
+  const [isUpdate, setIsUpdate] = useState(false);
   const factory = new ConnectionFactory();
 
   useEffect(() => {
@@ -20,8 +21,10 @@ export const CreateConnectionForm = (props: any) => {
 
   useEffect(() => {
     if (currentConnection.uuid) {
+      setIsUpdate(true);
       setValidationError(true);
     } else {
+      setIsUpdate(false);
       setValidationError(false);
     }
   }, [currentConnection.uuid]);
@@ -47,28 +50,29 @@ export const CreateConnectionForm = (props: any) => {
     // setConfirmLoading(true);
     factory.this = connection;
     let res: any;
+    let operation: string;
 
-    // if (currentConnection.uuid) {
-    //   connection.uuid = currentConnection.uuid;
-    //   res = await editConnection(connection);
-    //   operation = "updated";
-    //   console.log('used updated')
-    // } else {
-    // }
-    res = await addConnection(connection);
-    console.log('used added')
-    console.log('res is: ', res)
+    if (currentConnection.uuid) {
+      connection.uuid = currentConnection.uuid;
+      res = await editConnection(connection);
+      operation = "updated";
+      console.log('used updated')
+    } else {
+      res = await addConnection(connection);
+      operation = "created";
+      console.log('used added')
+      console.log(res)
+    }
 
     if (!hasError(res)) {
       setNewConnection(res.data)
-      openNotificationWithIcon("success", `added ${res.data.name} success`);
+      openNotificationWithIcon("success", `successfully ${operation} connection ${res.data.name}!`);
       setCurrentStep(currentStep + 1)
       handleClose();
     } else {
       openNotificationWithIcon("error", res.msg);
     }
     refreshList();
-    // setConfirmLoading(false);
   };
 
   const handleCreateButton = () => {
@@ -77,7 +81,7 @@ export const CreateConnectionForm = (props: any) => {
   }
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh'}}>
+    <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
       <Spin spinning={isLoadingForm}>
         <JsonForm
           formData={formData}
@@ -87,7 +91,7 @@ export const CreateConnectionForm = (props: any) => {
           style={{width: '100%'}}
         />
       </Spin>
-      <Button onClick={handleCreateButton}>Create</Button>
+      <Button type='primary' onClick={handleCreateButton} style={{width: '100px'}}>{isUpdate ? 'Update' : 'Create'}</Button>
     </div>
   );
 };

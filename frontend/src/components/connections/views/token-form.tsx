@@ -73,7 +73,7 @@ export const TokenForm = (props: any) => {
   return (
     <Card
       title="Tokens"
-      style={{ backgroundColor: settings.theme == LIGHT_THEME ? "fff" : "" }}
+      style={{ backgroundColor: settings.theme == LIGHT_THEME ? "fff" : "", width: '35vw' }}
       extra={
         jwtToken && <Button type="primary" icon={<PlusOutlined />} size="small" onClick={showTokenGenerateModal} />
       }
