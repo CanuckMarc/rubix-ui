@@ -10,7 +10,7 @@
 
 .rubix-flow__wrapper {
   flex-grow: 1;
-  height: 100vh;
+  height: calc(100vh - 40px);
 }
 
 .title-icon {
@@ -25,8 +25,8 @@
 }
 
 .rubix-flow__wrapper.has-tabs .react-flow {
-  height: calc(100vh - 80px) !important;
-  top: 38px;
+  height: calc(100vh - 77px) !important;
+  top: 36px;
 }
 
 .subflow-tabs .ant-tabs-nav {
