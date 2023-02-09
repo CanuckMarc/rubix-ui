@@ -182,6 +182,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         connectionSchema={connectionSchema}
         isLoadingForm={isLoadingForm}
         refreshList={fetch}
+        tokenFactory={tokenFactory}
         isWizardModalVisible={isWizardModalVisible}
         setIsWizardModalVisible={setIsWizardModalVisible}
       />

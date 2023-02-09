@@ -8,7 +8,7 @@ import RubixConnection = storage.RubixConnection;
 import { hasError } from "../../../utils/response";
 
 export const CreateConnectionForm = (props: any) => {
-  const { currentConnection, connectionSchema, isLoadingForm, refreshList, currentStep, setCurrentStep } = props;
+  const { currentConnection, connectionSchema, isLoadingForm, refreshList, currentStep, setCurrentStep, setNewConnection } = props;
   // const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentConnection);
   const [validationError, setValidationError] = useState(true);
@@ -47,21 +47,21 @@ export const CreateConnectionForm = (props: any) => {
     // setConfirmLoading(true);
     factory.this = connection;
     let res: any;
-    let operation: string;
 
-    if (currentConnection.uuid) {
-      connection.uuid = currentConnection.uuid;
-      res = await editConnection(connection);
-      operation = "updated";
-      console.log('used updated')
-    } else {
-      res = await addConnection(connection);
-      operation = "added";
-      console.log('used added')
-    }
+    // if (currentConnection.uuid) {
+    //   connection.uuid = currentConnection.uuid;
+    //   res = await editConnection(connection);
+    //   operation = "updated";
+    //   console.log('used updated')
+    // } else {
+    // }
+    res = await addConnection(connection);
+    console.log('used added')
+    console.log('res is: ', res)
 
     if (!hasError(res)) {
-      openNotificationWithIcon("success", `${operation} ${res.data.name} success`);
+      setNewConnection(res.data)
+      openNotificationWithIcon("success", `added ${res.data.name} success`);
       setCurrentStep(currentStep + 1)
       handleClose();
     } else {

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Modal, Spin, Steps, Button } from "antd";
 import { CreateConnectionForm } from "./create-form";
-
+import { TokenForm } from "./token-form";
+import { storage } from "../../../../wailsjs/go/models";
 import { openNotificationWithIcon } from "../../../utils/utils";
 import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
+import RubixConnection = storage.RubixConnection;
 
 const { Step } = Steps;
+
 
 // enum Status {
 //   wait = 'wait',
@@ -23,17 +26,18 @@ interface WizardDataType {
 }
 
 export const CreateConnectionWizard = (props: any) => {
-  const { currentConnection, connectionSchema, isLoadingForm, refreshList, isWizardModalVisible, setIsWizardModalVisible } = props;
+  const { currentConnection, connectionSchema, isLoadingForm, refreshList, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } = props;
   const [isLoading, setIsLoading] = useState(false);
+  const [newConnection, setNewConnection] = useState({} as RubixConnection)
   const [currentStep, setCurrentStep] = useState(0);
 
-  const pingConnection = (uuid: string) => {
-    PingRubixAssist(uuid).then((ok) => {
+  const pingConnection = (conn: RubixConnection) => {
+    PingRubixAssist(conn.uuid).then((ok) => {
       if (ok) {
-        openNotificationWithIcon("success", "rubix assist server accessible");
+        openNotificationWithIcon("success", `new connection ${conn.name} is able to access rubix assist server!`);
         setCurrentStep(currentStep + 1)
       } else {
-        openNotificationWithIcon("error", "check rubix assist server");
+        openNotificationWithIcon("error", `new connection ${conn.name} cannot access rubix assist server!`);
       }
     });
     // fetch().catch(console.error);
@@ -49,15 +53,23 @@ export const CreateConnectionWizard = (props: any) => {
           refreshList={refreshList}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
+          setNewConnection={setNewConnection}
         />
       </div>
     ) },
     { id: "2", name: "Step 2", text: 'Ping connection', content: (
       <div>
-        <Button onClick={() => pingConnection(currentConnection.uuid)}>Ping connection</Button>
+        <Button onClick={() => pingConnection(newConnection)}>Ping connection</Button>
       </div>
     ) },
-    { id: "3", name: "Step 3", text: 'Configurate tokens', content: (<span>WHAT</span>) }
+    { id: "3", name: "Step 3", text: 'Configure tokens', content: (
+      <div style={{width: '35vw'}}>
+        <TokenForm 
+          factory={tokenFactory}
+          selectedItem={newConnection}
+        />
+      </div>
+    ) }
   ];
 
   const onStepsChange = (value: number) => {
@@ -74,14 +86,12 @@ export const CreateConnectionWizard = (props: any) => {
     <Modal
       title={'Create Connection'}
       visible={isWizardModalVisible}
-      // onOk={() => setIsWizardModalVisible(false)}
       width={'50vw'}
       onCancel={handleWizardClose}
       footer={null}
       destroyOnClose={true}
       confirmLoading={isLoading}
-      // okButtonProps={{ disabled: validationError }}
-      maskClosable={false} // prevent modal from closing on click outside
+      maskClosable={false} 
       style={{ textAlign: "start" }}
   >
     <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
