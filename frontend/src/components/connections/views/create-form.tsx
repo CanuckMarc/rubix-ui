@@ -9,7 +9,6 @@ import { hasError } from "../../../utils/response";
 
 export const CreateConnectionForm = (props: any) => {
   const { currentConnection, connectionSchema, isLoadingForm, refreshList, currentStep, setCurrentStep, setNewConnection } = props;
-  // const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentConnection);
   const [validationError, setValidationError] = useState(true);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -47,7 +46,6 @@ export const CreateConnectionForm = (props: any) => {
     if (validationError) {
       return;
     }
-    // setConfirmLoading(true);
     factory.this = connection;
     let res: any;
     let operation: string;
@@ -59,7 +57,6 @@ export const CreateConnectionForm = (props: any) => {
     } else {
       res = await addConnection(connection);
       operation = "created";
-      console.log(res)
     }
 
     if (!hasError(res)) {
