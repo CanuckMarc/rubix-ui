@@ -1,0 +1,25 @@
+.ant-menu-submenu-title,
+.ant-menu-sub>.ant-menu-item {
+    height: 24px !important;
+    line-height: 24px !important;
+    font-size: small;
+}
+
+.supervisors-menu>.ant-menu-submenu-title>.ant-menu-item-icon,
+.supervisors-menu>.ant-menu-sub>.ant-menu-item>.ant-menu-item-icon {
+    margin-left: -22px !important;
+}
+
+.disconnect-menu>.ant-menu-submenu-title,
+.disconnect-menu>.ant-menu-sub>.ant-menu-item {
+    color: #d46b08;
+}
+
+.disconnect-menu>.ant-menu-submenu-title:hover,
+.disconnect-menu>.ant-menu-sub>.ant-menu-item:hover {
+    color: #fa8c16 !important;
+}
+
+.spin-wrapper {
+    padding: 12px
+}

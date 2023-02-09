@@ -7,6 +7,8 @@ import { Plugins } from "./flow/plugins/views/table";
 import useTitlePrefix from "../../../hooks/usePrefixedTitle";
 import { useEffect } from "react";
 import { HostsFactory } from "../factory";
+import { ROUTES } from "../../../constants/routes";
+import RbxBreadcrumb from "../../breadcrumbs/breadcrumbs";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -19,11 +21,8 @@ const flowNetworkClonesKey = "Flow Network Clones";
 const hostFactory = new HostsFactory();
 
 export const Host = () => {
-  let {
-    connUUID = "",
-    hostUUID = "",
-  } = useParams();
-  const { prefixedTitle, addPrefix } = useTitlePrefix("Controller");
+  const { connUUID = "", hostUUID = "", locUUID = "", netUUID = "" } = useParams();
+  const { prefixedTitle, addPrefix } = useTitlePrefix("Device");
   hostFactory.uuid = hostUUID;
   hostFactory.connectionUUID = connUUID;
 
@@ -33,12 +32,41 @@ export const Host = () => {
     });
   }, []);
 
+  const routes = [
+    {
+      path: ROUTES.CONNECTIONS,
+      breadcrumbName: "Supervisors",
+    },
+    {
+      path: ROUTES.LOCATIONS.replace(":connUUID", connUUID || ""),
+      breadcrumbName: "Location",
+    },
+    {
+      path: ROUTES.LOCATION_NETWORKS.replace(":connUUID", connUUID || "").replace(":locUUID", locUUID || ""),
+      breadcrumbName: "Group",
+    },
+    {
+      path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
+        .replace(":locUUID", locUUID || "")
+        .replace(":netUUID", netUUID),
+      breadcrumbName: "Devices",
+    },
+    {
+      path: ROUTES.HOST.replace(":connUUID", connUUID || "")
+        .replace(":locUUID", locUUID || "")
+        .replace(":netUUID", netUUID || "")
+        .replace(":hostUUID", hostUUID || ""),
+      breadcrumbName: "Device",
+    },
+  ];
+
   return (
     <>
       <Title level={3} style={{ textAlign: "left" }}>
         {prefixedTitle}
       </Title>
       <Card bordered={false}>
+        <RbxBreadcrumb routes={routes} />
         <Tabs defaultActiveKey={networksKey}>
           <TabPane tab={networksKey} key={networksKey}>
             <FlowNetworkTable />

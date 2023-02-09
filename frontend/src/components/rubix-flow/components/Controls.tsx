@@ -104,27 +104,8 @@ const Controls = ({
     instance.setEdges(newEdges);
   });
 
-  /* Ctrl + C (key): Copy nodes
-  useCtrlPressKey("KeyC", () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
-    const nodeIdCopied = nodesCopied.map((item) => item.id);
-    const edgesCopied = instance
-      .getEdges()
-      .filter(
-        (item) =>
-          item.selected &&
-          nodeIdCopied.includes(item.source) &&
-          nodeIdCopied.includes(item.target)
-      );
-
-    setCopied({
-      nodes: nodesCopied,
-      edges: edgesCopied,
-    });
-  }); */
-
-  const handleDuplicatedNodes = () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
+  const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
+    const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
     const edgesCopied = instance
       .getEdges()
@@ -137,7 +118,7 @@ const Controls = ({
   };
 
   /* Ctrl + D (key): Paste nodes */
-  useCtrlPressKey("KeyD", handleDuplicatedNodes);
+  useCtrlPressKey("KeyD", () => handleDuplicatedNodes());
 
   /* Ctrl + Z (key): Undo */
   useCtrlPressKey("KeyZ", onUndo);
@@ -159,10 +140,15 @@ const Controls = ({
   });
 
   useCtrlPressKey("KeyV", () => {
-    if (window.nodesCopied && window.nodesCopied.length > 0) {
-      handleDuplicatedNodes();
-      window.nodesCopied = [];
+    const activeElement = document.activeElement;
+    if (
+      !["input", "textarea"].includes(activeElement?.tagName?.toLowerCase() || "") &&
+      window.nodesCopied &&
+      window.nodesCopied.length > 0
+    ) {
+      handleDuplicatedNodes(window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id })));
     }
+    window.nodesCopied = [];
   });
 
   const onConnectionBuilder = () => {

@@ -37,7 +37,7 @@ export const Hosts = () => {
   const [hosts, setHosts] = useState([] as amodel.Host[]);
   const [networks, setNetworks] = useState([] as amodel.Network[]);
   const [isFetching, setIsFetching] = useState(false);
-  const { prefixedTitle, addPrefix } = useTitlePrefix("Controllers");
+  const { prefixedTitle, addPrefix } = useTitlePrefix("Devices");
 
   const networksFactory = new NetworksFactory();
   networksFactory.uuid = netUUID;
@@ -60,7 +60,7 @@ export const Hosts = () => {
       path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
   ];
 
@@ -73,7 +73,7 @@ export const Hosts = () => {
   const fetchList = async () => {
     try {
       setIsFetching(true);
-      const res = await GetHostNetwork(connUUID, netUUID)
+      const res = await GetHostNetwork(connUUID, netUUID);
       setHosts(res.hosts);
     } catch (error) {
       console.log(error);

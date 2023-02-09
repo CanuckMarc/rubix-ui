@@ -141,6 +141,8 @@ export function DoBackup(arg1:string,arg2:string,arg3:string,arg4:string,arg5:st
 
 export function DownloadFlow(arg1:string,arg2:string,arg3:boolean,arg4:any,arg5:boolean):Promise<flow.Message>;
 
+export function DownloadIO16Firmware(arg1:string):Promise<string>;
+
 export function EdgeAppsInfo(arg1:string,arg2:string):Promise<rumodel.Response>;
 
 export function EdgeBiosInstalledRubixEdgeVersion(arg1:string,arg2:string):Promise<ebmodel.Version>;
@@ -260,6 +262,8 @@ export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Arra
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
+
+export function FlashIO16(arg1:string):Promise<string>;
 
 export function FlowNetworkNewLog(arg1:string,arg2:string,arg3:string,arg4:number):Promise<streamlog.Log>;
 
@@ -432,6 +436,12 @@ export function ImportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ImportNetworksBulk(arg1:string,arg2:string,arg3:string):Promise<backend.BulkAddResponse>;
 
 export function ImportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string):Promise<backend.BulkAddResponse>;
+
+export function ListIO16BuildFiles(arg1:string,arg2:boolean):Promise<Array<string>>;
+
+export function ListIO16Builds():Promise<Array<string>>;
+
+export function ListIO16Releases():Promise<Array<string>>;
 
 export function NewTab(arg1:string):Promise<void>;
 
