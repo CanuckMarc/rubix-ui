@@ -102,8 +102,8 @@ export const WritePointValueModal = (props: any) => {
               stringMode
               placeholder={priorityKey}
               defaultValue={formData[priorityKey]}
-              onChange={(v: number) => {
-                onChange(v, priorityKey);
+              onChange={(v: number | null) => {
+                if (v) onChange(v, priorityKey);
               }}
               disabled={
                 pluginName === "bacnetmaster" && priorityKey !== "_14" && priorityKey !== "_15" && priorityKey !== "_16"

@@ -16,6 +16,7 @@ import { CreateEditModal } from "./create";
 import { RubixAssistTokenFactory } from "./token-factory";
 import { ImportJsonModal } from "../../../common/import-json-modal";
 import { ImportExcelModal } from "../../hosts/host/flow/points/views/import-export";
+import { CreateConnectionWizard } from "./create-wizard";
 
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;
@@ -28,6 +29,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [currentConnection, setCurrentConnection] = useState({} as RubixConnection);
   const [connectionSchema, setConnectionSchema] = useState<any>({});
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
 
@@ -161,7 +163,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   return (
     <div>
       <RbRefreshButton refreshList={fetch} />
-      <RbAddButton handleClick={() => showModal({} as RubixConnection)} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbExportButton handleExport={handleExport} />
       <ImportDropdownButton refreshList={fetch} schema={connectionSchema} handleSubmit={handleAddConnectionsBulk} />
@@ -174,6 +176,15 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         rowSelection={rowSelection}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
+      />
+      <CreateConnectionWizard 
+        currentConnection={currentConnection}
+        connectionSchema={connectionSchema}
+        isLoadingForm={isLoadingForm}
+        refreshList={fetch}
+        tokenFactory={tokenFactory}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
       />
       <CreateEditModal
         currentConnection={currentConnection}
