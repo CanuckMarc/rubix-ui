@@ -22,7 +22,7 @@ export const CreateBulkModal = (props: any) => {
     refreshList,
   } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [count, setCount] = useState<any>(undefined);
+  const [count, setCount] = useState<number | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [columns, setColumns] = useState<any[] | undefined>([]);
 
@@ -32,12 +32,12 @@ export const CreateBulkModal = (props: any) => {
 
   const handleClose = () => {
     setItems([]);
-    setCount(undefined);
+    setCount(null);
     onCloseModal();
     setConfirmLoading(false);
   };
 
-  const onCountChange = (count: number) => {
+  const onCountChange = (count: number | null) => {
     setCount(count);
   };
 
