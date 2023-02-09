@@ -49,14 +49,14 @@ export const Host = () => {
       path: ROUTES.LOCATION_NETWORK_HOSTS.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID),
-      breadcrumbName: "Controllers",
+      breadcrumbName: "Devices",
     },
     {
       path: ROUTES.HOST.replace(":connUUID", connUUID || "")
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID || "")
         .replace(":hostUUID", hostUUID || ""),
-      breadcrumbName: "Controller",
+      breadcrumbName: "Device",
     },
   ];
 
