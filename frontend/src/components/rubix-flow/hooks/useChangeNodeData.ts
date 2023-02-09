@@ -8,6 +8,7 @@ export const useChangeNodeData = (id: string) => {
 
   return useCallback(
     (key: string, value: any) => {
+      window.saveCurrentFlowForUndo();
       // this is applied when change input at parent node
       // key = name-id => split(SPLIT_KEY) at 1 will be node id of input node
       const isForChild = key.includes(SPLIT_KEY);
@@ -35,6 +36,7 @@ export const useChangeNodeProperties = (id: string) => {
 
   return useCallback(
     (key: string, value: any) => {
+      window.saveCurrentFlowForUndo();
       instance.setNodes((nodes => nodes.map(node => {
         if (node.id !== id) return node;
         return {
