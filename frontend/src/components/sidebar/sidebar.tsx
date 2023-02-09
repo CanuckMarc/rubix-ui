@@ -91,7 +91,7 @@ const HeaderSider = (props: any) => {
 const AvatarDropdown = (props: any) => {
   const menu = (
     <Menu
-      // _internalDisableMenuItemTitleTooltip
+      _internalDisableMenuItemTitleTooltip
       items={[
         {
           key: "1",
