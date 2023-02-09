@@ -74,7 +74,7 @@ export const FlowPoints = () => {
         .replace(":locUUID", locUUID || "")
         .replace(":netUUID", netUUID || "")
         .replace(":hostUUID", hostUUID || ""),
-      breadcrumbName: "Devices",
+      breadcrumbName: "Device",
     },
     {
       path: ROUTES.DEVICES.replace(":connUUID", connUUID || "")
