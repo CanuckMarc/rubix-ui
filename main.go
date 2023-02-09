@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"github.com/NubeIO/lib-files/fileutils"
-	"github.com/NubeIO/rubix-edge-wires/cmd"
 	"github.com/NubeIO/rubix-ui/backend"
 	"github.com/NubeIO/rubix-ui/backend/system/lora"
 	log "github.com/sirupsen/logrus"
@@ -58,7 +57,7 @@ func main() {
 	})
 	free := freePort("127.0.0.1", []string{"1665"})
 	if free {
-		go cmd.Execute()
+		// go cmd.Execute()
 	}
 	err = wails.Run(&options.App{
 		Title:  "rubix",
