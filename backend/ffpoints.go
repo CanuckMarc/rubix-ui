@@ -14,8 +14,12 @@ import (
 )
 
 type PointListPayload struct {
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
+	UUID        string `json:"uuid"`
+	Name        string `json:"name"`
+	PluginName  string `json:"plugin_name"`
+	NetworkName string `json:"network_name"`
+	DeviceName  string `json:"device_name"`
+	PointName   string `json:"point_name"`
 }
 
 func (inst *App) GetPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
