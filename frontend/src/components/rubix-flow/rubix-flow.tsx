@@ -44,6 +44,8 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+import { LoadWiresMap } from "./components/LoadWiresMap";
+import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 
@@ -116,6 +118,10 @@ const Flow = (props: FlowProps) => {
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
+
+  const [refreshCounter, incrementRefreshCounter] = useIsLoading(
+    (state) => [state.refreshCounter, state.incrementRefreshCounter]
+  )
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -1002,6 +1008,7 @@ const Flow = (props: FlowProps) => {
         setEdges(edgesL1);
         /* Get output Nodes */
         handleRefreshValues();
+        incrementRefreshCounter();
       })
       .catch(() => {});
   }, [connUUID, hostUUID]);
@@ -1075,6 +1082,7 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            <LoadWiresMap />
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
@@ -1163,7 +1171,7 @@ const Flow = (props: FlowProps) => {
 };
 
 export const RubixFlow = () => {
-  const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
@@ -1197,7 +1205,7 @@ export const RubixFlow = () => {
 
   return (
     <>
-      {isFetchingNodeSpec ? (
+      {!isFetchingNodeSpec ? (
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
@@ -1207,7 +1215,7 @@ export const RubixFlow = () => {
           handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
-        <Spin />
+        <Spin tip="Loading" size="large" style={{ height: '100%', position: 'absolute', top: "50%", left: "60%" }}/>
       )}
     </>
   );

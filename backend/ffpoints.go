@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
@@ -18,10 +19,6 @@ type PointListPayload struct {
 }
 
 func (inst *App) GetPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
-	return inst.GetPointListPayload(connUUID, hostUUID)
-}
-
-func (inst *App) getPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
 	var pointPayload []*PointListPayload
 	networks, err := inst.getNetworksWithPoints(connUUID, hostUUID)
 	if err != nil {
