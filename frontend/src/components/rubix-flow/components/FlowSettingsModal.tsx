@@ -13,6 +13,7 @@ export const getFlowSettings = () => {
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
     showNodesTree: config?.showNodesTree === undefined ? true : config?.showNodesTree,
     showNodesPallet: config?.showNodesPallet === undefined ? true : config?.showNodesPallet,
+    showCount: config?.showCount === undefined ? true : config?.showCount,
     positionMiniMap: config?.positionMiniMap === undefined ? "bottom" : config?.positionMiniMap,
   };
 };
@@ -22,6 +23,7 @@ export type FlowSettings = {
   showMiniMap: boolean;
   showSubFlowTabs: boolean;
   showNodesTree: boolean;
+  showCount:boolean
   showNodesPallet: boolean;
   positionMiniMap: string;
 };
@@ -87,6 +89,7 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
         {renderConfigs("Show Nodes Tree", "showNodesTree")}
         {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
         {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
+        {renderConfigs("Show Count", "showCount")}
         <Space direction="horizontal">
           <label className="flow-setting-modal-labels mb-0">Mini Map Position: </label>
           <Radio.Group onChange={handleChangePosition} value={configs.positionMiniMap}>
