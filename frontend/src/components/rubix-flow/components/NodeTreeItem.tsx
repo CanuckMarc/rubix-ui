@@ -1,6 +1,7 @@
 import { Collapse } from "antd";
 import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { FlowSettings } from "./FlowSettingsModal";
 
 const { Panel } = Collapse;
 
@@ -14,6 +15,7 @@ type NodeProps = {
   gotoNode: (node: NodeInterface) => void;
   selectedSubFlowId?: string;
   handleNodeContextMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
+  flowSettings: FlowSettings;
 };
 
 export const NodeTreeItem = ({
@@ -26,6 +28,7 @@ export const NodeTreeItem = ({
   gotoNode,
   selectedSubFlowId,
   handleNodeContextMenu,
+  flowSettings,
 }: NodeProps) => {
   const childNodes = allNodes.filter((item) => item.parentId === node.id);
   const type = node.type!!.split("/")[1] + (node.info?.nodeName ? ` (${node.info?.nodeName})` : "");
@@ -52,7 +55,7 @@ export const NodeTreeItem = ({
       {node.isParent ? (
         <Panel
           key={node.id}
-          header={`${type} - ${childNodes.length}`}
+          header={`${type} ${flowSettings.showCount ? " - " + childNodes.length : ""}`}
           className={`panel-no-padding border-gray-600 border-t border-b-0  relative ${
             node.id === selectedSubFlowId ? "tree-active" : ""
           }`}
@@ -78,6 +81,7 @@ export const NodeTreeItem = ({
                 selectedSubFlowId={selectedSubFlowId}
                 nodesSpec={nodesSpec}
                 handleNodeContextMenu={handleNodeContextMenu}
+                flowSettings={flowSettings}
               />
             ))}
           </div>

@@ -9,7 +9,7 @@ import {
   DownloadOutlined,
   RestOutlined,
   UploadOutlined,
-  PlayCircleOutlined,
+  VerticalAlignBottomOutlined,
   SettingOutlined,
   LinkOutlined,
   BuildOutlined,
@@ -38,6 +38,7 @@ type ControlProps = {
   onLinkBuilder: () => void;
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
+
 
 const Controls = ({
   settings,
@@ -176,10 +177,10 @@ const Controls = ({
         )}
         {renderIconBtn("Settings", SettingOutlined, () => setSettingRefreshModalOpen(true))}
         {renderIconBtn("Help", QuestionCircleOutlined, () => setHelpModalOpen(true))}
-        {renderIconBtn("Import", UploadOutlined, () => setLoadModalOpen(true))}
-        {renderIconBtn("Export", DownloadOutlined, () => setSaveModalOpen(true), "exportButton")}
+        {renderIconBtn("Import", DownloadOutlined, () => setLoadModalOpen(true))}
+        {renderIconBtn("Export", UploadOutlined, () => setSaveModalOpen(true), "exportButton")}
         {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
-        {renderIconBtn("Download", PlayCircleOutlined, onHandelSaveFlow)}
+        {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
       </div>
       <LoadModal
         open={loadModalOpen}

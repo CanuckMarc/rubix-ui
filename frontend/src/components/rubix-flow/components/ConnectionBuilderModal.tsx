@@ -248,10 +248,11 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
         allNodes.push(...[...newNodesInput, ...newNodesOutput]);
 
         newNodesInput.forEach((nodeItem: NodeInterface & { pin: string }) => {
+          const source = nodeItem.data?.out?.[0]?.name || "output";
           const newEdge = {
             id: generateUuid(),
             source: nodeItem.id,
-            sourceHandle: "out",
+            sourceHandle: source,
             target: node.id,
             targetHandle: nodeItem.pin,
           };
@@ -259,12 +260,13 @@ export const ConnectionBuilderModal: FC<ConnectionBuilderModalProps> = ({
         });
 
         newNodesOutput.forEach((nodeItem: NodeInterface & { pin: string }) => {
+          const target = nodeItem.data?.inputs?.[0]?.name || "input";
           const newEdge = {
             id: generateUuid(),
             source: node.id,
             sourceHandle: nodeItem.pin,
             target: nodeItem.id,
-            targetHandle: "in",
+            targetHandle: target,
           };
           allEdges.push(newEdge);
         });

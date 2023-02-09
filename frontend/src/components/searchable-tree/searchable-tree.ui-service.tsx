@@ -5,6 +5,7 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
+  RadarChartOutlined,
   MenuOutlined,
   ToolOutlined,
 } from "@ant-design/icons";
@@ -42,6 +43,7 @@ let ObjectType = {
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
+  WIRES_MAP_REMOTE: "wires-map"
 };
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
@@ -73,6 +75,8 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
     ROUTES.WIRES_CONNECTIONS_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.SCHEDULES_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.WIRES_MAP_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.WIRES_MAP_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
 const className = "supervisors-menu";
@@ -93,6 +97,7 @@ function getItemValue(item: any, type: string) {
     case ObjectType.RUBIX_FLOW_REMOTE:
     case ObjectType.WIRES_CONNECTIONS_REMOTE:
     case ObjectType.SCHEDULES_REMOTE:
+    case ObjectType.WIRES_MAP_REMOTE:
     default:
       deleteProp = "";
       break;
@@ -267,8 +272,8 @@ export const getTreeDataIterative = (connections: any) => {
                       <NodeIndexOutlined />
                     )
                   ),
-                  next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
+                  next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
+                  value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
                   children: [
                     {
                       ...objectMap(
@@ -294,6 +299,19 @@ export const getTreeDataIterative = (connections: any) => {
                       ),
                       next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
                       value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
+                      children: null,
+                    },
+                    {
+                      ...objectMap(
+                        getTreeObject(
+                          { name: "map", uuid: "wires_map_" + host.uuid },
+                          ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
+                          "",
+                          <RadarChartOutlined />
+                        )
+                      ),
+                      next: ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
+                      value: getItemValue(host, ObjectType.WIRES_MAP_REMOTE),
                       children: null,
                     },
                   ],

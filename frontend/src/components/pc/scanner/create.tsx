@@ -7,10 +7,10 @@ import { amodel, storage } from "../../../../wailsjs/go/models";
 import { ConnectionFactory } from "../../connections/factory";
 import { HostsFactory } from "../../hosts/factory";
 import { useParams } from "react-router-dom";
+import { hasError } from "../../../utils/response";
 
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
-import { hasError } from "../../../utils/response";
 
 const { Panel } = Collapse;
 
@@ -126,7 +126,9 @@ export const CreateConnectionsModal = (props: any) => {
 
 export const CreateHostsModal = (props: any) => {
   const { selectedIpPorts, isModalVisible, onclose, refreshList } = props;
-  const { connUUID = "" } = useParams();
+  if (!selectedIpPorts || selectedIpPorts.length === 0) return <></>;
+
+  const { connUUID = "", netUUID = "" } = useParams();
   const [formData, setFormData] = useState<Host[]>([]);
   const [hosts, setHosts] = useState<Host[]>([]);
   const [schema, setSchema] = useState({});
@@ -139,15 +141,13 @@ export const CreateHostsModal = (props: any) => {
   const getSchema = async () => {
     setIsLoadingForm(true);
     const res = await factory.Schema();
-    const jsonSchema = {
-      properties: res,
-    };
-    setSchema(jsonSchema);
+    setSchema(res);
     setIsLoadingForm(false);
   };
 
   const add = async (host: Host) => {
     factory.this = host;
+    host.network_uuid = netUUID;
     const res = await factory.Add();
     if (!hasError(res)) {
       openNotificationWithIcon("success", `added ${host.name} success`);
@@ -211,7 +211,7 @@ export const CreateHostsModal = (props: any) => {
       style={{ textAlign: "start" }}
     >
       <Spin spinning={isLoadingForm}>
-        <Collapse defaultActiveKey={["1"]}>
+        <Collapse defaultActiveKey={[1]}>
           {selectedIpPorts.map((i: any, index: number) => {
             return (
               <Panel header={i.ip} key={index + 1}>
