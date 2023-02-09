@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"github.com/NubeIO/lib-files/fileutils"
+	"github.com/NubeIO/rubix-edge-wires/cmd"
 	"github.com/NubeIO/rubix-ui/backend"
 	"github.com/NubeIO/rubix-ui/backend/system/lora"
 	log "github.com/sirupsen/logrus"
@@ -11,9 +12,11 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 //go:embed frontend/dist
@@ -47,16 +50,16 @@ func main() {
 	FileMenu.AddText("Reload", keys.Key("f5"), func(_ *menu.CallbackData) {
 		app.OnReload()
 	})
-	// FileMenu.AddText("New Tab", keys.CmdOrCtrl("t"), func(_ *menu.CallbackData) {
-	// 	app.NewTab(workingDir)
-	// })
 	FileMenu.AddText("Help", keys.CmdOrCtrl("h"), func(_ *menu.CallbackData) {
 		app.NubeHelp()
 	})
 	FileMenu.AddText("Quit", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
 		app.OnQuit()
 	})
-	// go cmd.Execute()
+	free := freePort("127.0.0.1", []string{"1665"})
+	if free {
+		go cmd.Execute()
+	}
 	err = wails.Run(&options.App{
 		Title:  "rubix",
 		Width:  1300,
@@ -81,4 +84,21 @@ func cleanPath(s string) string {
 	s = strings.Replace(s, `\\`, `\`, -1)
 	s = filepath.Clean(s)
 	return s
+}
+
+func freePort(host string, ports []string) bool {
+	for _, port := range ports {
+		timeout := time.Second
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), timeout)
+		if err != nil {
+			log.Infof("port is free: %s", port)
+			return true
+		}
+		if conn != nil {
+			defer conn.Close()
+			log.Infof("port is in use: %s", port)
+			return false
+		}
+	}
+	return false
 }
