@@ -16,6 +16,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [nodeRender, setNodeRender] = useState("");
+  const [countExport, setCountExport] = useState(0);
   const factory = new FlowFactory();
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = !!connUUID && !!hostUUID;
@@ -50,14 +51,14 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const handleNodeRender = async () => {
     try {
       const selectedNodeIds: string[] = nodes.filter((item: NodeInterface) => item.selected).map((item) => item.id);
-      let n = new flowcli.NodesList
-      n.nodes = selectedNodeIds
+      let n = new flowcli.NodesList();
+      n.nodes = selectedNodeIds;
       const data = await (window.selectedNodeForExport
         ? factory.GetSubFlow(connUUID, hostUUID, window.selectedNodeForExport.id, isRemote)
         : selectedNodeIds.length > 0
         ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
         : factory.GetFlow(connUUID, hostUUID, isRemote));
-
+      setCountExport(data.nodes.length);
       setNodeRender(JSON.stringify(data, null, 2));
     } catch (error) {
       console.log("error", error);
@@ -76,7 +77,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
 
   return (
     <Modal
-      title="Save Graph"
+      title={"Save Graph - Count: " + countExport}
       actions={[
         { label: "Cancel", onClick: onClose },
         { label: copied ? "Copied" : "Copy", onClick: handleCopy },
