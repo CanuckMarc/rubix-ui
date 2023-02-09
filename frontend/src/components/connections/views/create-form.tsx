@@ -56,11 +56,9 @@ export const CreateConnectionForm = (props: any) => {
       connection.uuid = currentConnection.uuid;
       res = await editConnection(connection);
       operation = "updated";
-      console.log('used updated')
     } else {
       res = await addConnection(connection);
       operation = "created";
-      console.log('used added')
       console.log(res)
     }
 

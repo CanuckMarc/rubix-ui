@@ -65,7 +65,6 @@ export const CreateConnectionWizard = (props: any) => {
   ];
 
   const onStepsChange = (value: number) => {
-    console.log('onChange:', value);
     if (stepStatus === 'error') {
       setStepStatus('process');
       setErrorAtPing(false);
