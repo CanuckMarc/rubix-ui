@@ -1,11 +1,13 @@
 package backend
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/mitchellh/mapstructure"
+	"sort"
 	"strings"
 )
 
@@ -63,4 +65,82 @@ func (inst *App) GetNodesByCategory(connUUID, hostUUID, category string, isRemot
 		}
 	}
 	return nodesByType
+}
+
+type BacnetPoints struct {
+	AVExisting []int `json:"av_existing"`
+	BVExisting []int `json:"bv_existing"`
+}
+
+func (inst *App) GetBacnetFreeAddress(connUUID, hostUUID string, isRemote bool) *BacnetPoints {
+	encodedNodes := inst.getBacnetNodes(connUUID, hostUUID, isRemote)
+	pointsList := &BacnetPoints{}
+	for _, schema := range encodedNodes {
+		_, nodeName, _ := decodeType(schema.Type)
+		if nodeName == "analog-variable" {
+			settings, err := getBacnetSettings(schema.Settings)
+			if err == nil {
+				pointsList.AVExisting = append(pointsList.AVExisting, settings.InstanceNumber)
+			}
+		}
+		if nodeName == "binary-variable" {
+			settings, err := getBacnetSettings(schema.Settings)
+			if err == nil {
+				pointsList.BVExisting = append(pointsList.BVExisting, settings.InstanceNumber)
+			}
+		}
+	}
+	return pointsList
+
+}
+
+func (inst *App) getBacnetNodes(connUUID, hostUUID string, isRemote bool) []*node.Schema {
+	encodedNodes := inst.GetNodesByCategory(connUUID, hostUUID, "bacnet", isRemote)
+	var nodeList []*node.Schema
+	var out []*node.Schema
+	marshal, err := json.Marshal(encodedNodes)
+	if err != nil {
+		return nodeList
+	}
+	err = json.Unmarshal(marshal, &nodeList)
+	if err != nil {
+		return nodeList
+	}
+	for _, schema := range nodeList {
+		_, nodeName, _ := decodeType(schema.Type)
+		if nodeName == "analog-variable" {
+			out = append(out, schema)
+		}
+		if nodeName == "binary-variable" {
+			out = append(out, schema)
+		}
+	}
+	return out
+}
+
+func (inst *App) NextFreeBacnetAddress(nums []int) int {
+	sort.Ints(nums[:])
+	var nextFree int
+	for i, num := range nums {
+		i++
+		if i != num {
+			nextFree = i
+			break
+		}
+	}
+	return nextFree
+}
+
+type bacnetPointSettings struct {
+	InstanceNumber int `json:"instance-number"`
+}
+
+func getBacnetSettings(body map[string]interface{}) (*bacnetPointSettings, error) {
+	settings := &bacnetPointSettings{}
+	marshal, err := json.Marshal(body)
+	if err != nil {
+		return settings, err
+	}
+	err = json.Unmarshal(marshal, &settings)
+	return settings, err
 }
