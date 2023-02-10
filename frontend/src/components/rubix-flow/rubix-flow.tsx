@@ -9,7 +9,6 @@ import ReactFlow, {
   useNodesState,
   XYPosition,
 } from "react-flow-renderer/nocss";
-import useUndoable from "use-undoable";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
 
@@ -45,11 +44,23 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+<<<<<<< HEAD
 import SelectMenu from "./components/SelectMenu";
+=======
+import { LoadWiresMap } from "./components/LoadWiresMap";
+import { useIsLoading } from "../../App";
+import { LinkBuilderModal } from "./components/LinkBuilderModal";
+import { SubFlowTabs } from "./components/SubFlowTabs";
+>>>>>>> master
 
 type SelectableBoxType = {
   edgeId: string;
   rect: DOMRect | null;
+};
+
+type UndoStateType = {
+  nodes: NodeInterface[];
+  edges: Edge[];
 };
 
 type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
@@ -57,10 +68,12 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 // this is save all nodes
 declare global {
   interface Window {
+    nodesCopied?: NodeInterface[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
     allFlow: { nodes: NodeInterface[]; edges: Edge[] }; // save all nodes and edges
+    saveCurrentFlowForUndo: () => void;
   }
 }
 
@@ -93,7 +106,6 @@ const Flow = (props: FlowProps) => {
   const [nodeMenuSelectVisibility, setNodeMenuSelectVisibility] = useState<XYPosition>();
   const [isMenuOpenFromNodeTree, setMenuOpenFromNodeTree] = useState(false);
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
-  const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] = useUndoable({ nodes: nodes, edges: edges });
   const [isDoubleClick, setIsDoubleClick] = useState(false);
   const [flowSettings, setFlowSettings] = useState(getFlowSettings());
   const [rubixFlowInstance, setRubixFlowInstance] = useState<ReactFlowInstance | any>(null);
@@ -104,9 +116,18 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [isLinkBuilder, setIsLinkBuilder] = useState(false);
+  const [undoState, setUndoState] = useState<{ past: UndoStateType[]; future: UndoStateType[] }>({
+    past: [],
+    future: [],
+  });
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
+
+  const [refreshCounter, incrementRefreshCounter] = useIsLoading(
+    (state) => [state.refreshCounter, state.incrementRefreshCounter]
+  )
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -185,8 +206,17 @@ const Flow = (props: FlowProps) => {
 
       onNodesChange([{ type: "add", item: newNode }]);
       window.allFlow.nodes = [...window.allFlow.nodes, newNode];
+      setUndoState((s) => {
+        s.past.push({ nodes, edges });
+        return {
+          ...s,
+          past: [...s.past],
+        };
+      });
       setTimeout(() => {
-        setNodes((newNodes) => newNodes.map((item) => ({ ...item, selected: false })));
+        setNodes((newNodes) => {
+          return newNodes.map((item) => ({ ...item, selected: false }));
+        });
       }, 100);
 
       if (lastConnectStart === undefined) return;
@@ -209,6 +239,9 @@ const Flow = (props: FlowProps) => {
 
   const handleAddSubFlow = (node: NodeInterface) => {
     handlePushSelectedNodeForSubFlow(node);
+    setTimeout(() => {
+      rubixFlowInstance?.fitView();
+    }, 100);
   };
 
   const handleConnectionBuilderFlow = (node: NodeInterface) => {
@@ -218,6 +251,10 @@ const Flow = (props: FlowProps) => {
       handlePushSelectedNodeForSubFlow(node);
     }
     setIsConnectionBuilder(true);
+  };
+
+  const handleLinkBuilder = () => {
+    setIsLinkBuilder(true);
   };
 
   const handleLoadNodesAndEdges = (newNodes: NodeInterface[], newEdges: Edge[]) => {
@@ -296,9 +333,11 @@ const Flow = (props: FlowProps) => {
 
   const onCloseBuilderModal = () => {
     setIsConnectionBuilder(false);
+    setIsLinkBuilder(false);
   };
 
   const onClearAllNodes = () => {
+    saveCurrentFlowForUndo();
     if (selectedNodeForSubFlow) {
       const nodeIdsCleared = nodes
         .filter((node: NodeInterface) => node.parentId === selectedNodeForSubFlow.id)
@@ -438,10 +477,10 @@ const Flow = (props: FlowProps) => {
           const newEdges = edges.map((item) => (item.id === edgeByTarget.id ? edgeByTarget : item));
           setEdges(newEdges);
           window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
-          setUndoable({
-            edges: newEdges,
-            nodes,
-          });
+          setUndoState((s) => ({
+            past: [...s.past, { edges, nodes }],
+            future: s.future,
+          }));
         }
         return;
       }
@@ -482,10 +521,10 @@ const Flow = (props: FlowProps) => {
         if (newEdges) {
           setEdges(newEdges);
           window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
-          setUndoable({
-            edges: newEdges,
-            nodes,
-          });
+          setUndoState((s) => ({
+            past: [...s.past, { edges, nodes }],
+            future: s.future,
+          }));
         }
       } else {
         const element = evt.target as HTMLElement;
@@ -503,6 +542,10 @@ const Flow = (props: FlowProps) => {
           };
 
           onEdgesChange([{ type: "add", item: newEdge }]);
+          setUndoState((s) => ({
+            past: [...s.past, { edges, nodes }],
+            future: s.future,
+          }));
           window.allFlow.edges = [...window.allFlow.edges, newEdge];
         }
       }
@@ -633,23 +676,53 @@ const Flow = (props: FlowProps) => {
   };
 
   const handleNodeDragStop = (e: React.MouseEvent, node: any) => {
-    const newNodes = nodes.map((item) => {
+    const newNodes = nodes.map((item: NodeInterface) => {
       if (item.id === node?.id) {
-        item.position = node.position;
+        return { ...item, position: { ...node.position } };
       }
-
       return item;
     });
+    setNodes(newNodes);
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes }],
+      future: [...s.future],
+    }));
+  };
 
-    setUndoable({
-      nodes: newNodes,
-      edges: edges,
-    });
+  const handleUndo = () => {
+    const lastPast = undoState.past.pop();
+    if (lastPast) {
+      undoState.future.push({ nodes, edges });
+      const nodeIdsDeleted = nodes.filter((n1) => !lastPast.nodes.some((n2) => n1.id === n2.id)).map(({ id }) => id);
+      const nodesAdded = lastPast.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
+      window.allFlow.nodes = [...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)), ...nodesAdded];
+
+      const edgeIdsDeleted = edges.filter((n1) => !lastPast.edges.some((n2) => n1.id === n2.id)).map(({ id }) => id);
+      const edgesAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
+      window.allFlow.edges = [...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)), ...edgesAdded];
+
+      setNodes(lastPast.nodes);
+      setEdges(lastPast.edges);
+      setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+    }
   };
 
   const handleRedo = () => {
-    redo();
-    if (undoable.nodes && undoable.nodes.length === 0) redo();
+    const lastFuture = undoState.future.pop();
+    if (lastFuture) {
+      undoState.past.push({ nodes, edges });
+      const nodesAdded = lastFuture.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
+      const nodeIdsDeleted = nodes.filter((n1) => !lastFuture.nodes.some((n2) => n1.id === n2.id)).map((n) => n.id);
+      window.allFlow.nodes = [...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)), ...nodesAdded];
+
+      const edgeAdded = lastFuture.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
+      const edgesDeleted = edges.filter((n1) => !lastFuture.edges.some((n2) => n1.id === n2.id)).map((n) => n.id);
+      window.allFlow.edges = [...window.allFlow.edges.filter(({ id }) => !edgesDeleted.includes(id)), ...edgeAdded];
+
+      setNodes([...lastFuture.nodes]);
+      setEdges([...lastFuture.edges]);
+      setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+    }
   };
 
   const getChildNodeIds = (parentId: string) => {
@@ -697,10 +770,10 @@ const Flow = (props: FlowProps) => {
     };
     setNodes(remainingNodes);
     setEdges(remainingEdges);
-    setUndoable({
-      nodes: remainingNodes,
-      edges: remainingEdges,
-    });
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes }],
+      future: s.future,
+    }));
   };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
@@ -745,7 +818,10 @@ const Flow = (props: FlowProps) => {
     window.allFlow = { nodes: newAllNodes, edges: newAllEdges };
     setNodes(nodesUniq);
     setEdges(edgesUniq);
-    setUndoable({ edges: edgesUniq, nodes: nodesUniq });
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes }],
+      future: s.future,
+    }));
   };
   const handleAlignLeft = (position: { x: number; y: number }) => {
     nodes.forEach((item) => {
@@ -928,7 +1004,8 @@ const Flow = (props: FlowProps) => {
     handleRefreshValues();
     setTimeout(() => {
       rubixFlowInstance?.fitView();
-    }, 30);
+    }, 50);
+    setUndoState({ past: [], future: [] });
   }, [selectedNodeForSubFlow, setNodes, setEdges]);
 
   useEffect(() => {
@@ -944,12 +1021,7 @@ const Flow = (props: FlowProps) => {
         const nodesL1 = newNodes.filter((node) => !node.parentId);
 
         newNodes.forEach((node1) => {
-          const hasParent = nodesL1.some(
-            (node2) =>
-              !!node1.parentId &&
-              node2.id === node1.parentId &&
-              (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!))
-          );
+          const hasParent = nodesL1.some((node2) => !!node1.parentId && node2.id === node1.parentId);
           if (hasParent) {
             nodesL1.push(node1);
           }
@@ -960,19 +1032,12 @@ const Flow = (props: FlowProps) => {
         window.allFlow = { nodes: newNodes, edges: _edges };
         setNodes(nodesL1);
         setEdges(edgesL1);
-        setUndoable({ nodes: nodesL1, edges: edgesL1 });
         /* Get output Nodes */
         handleRefreshValues();
+        incrementRefreshCounter();
       })
       .catch(() => {});
   }, [connUUID, hostUUID]);
-
-  useEffect(() => {
-    if (past && past.length !== 0 && undoable.nodes && undoable.nodes.length > 0) {
-      setNodes(undoable.nodes);
-      setEdges(undoable.edges);
-    }
-  }, [undoable]);
 
   useEffect(() => {
     if (refreshInterval.current) clearInterval(refreshInterval.current);
@@ -984,6 +1049,19 @@ const Flow = (props: FlowProps) => {
     };
   }, [flowSettings.refreshTimeout]);
 
+  const saveCurrentFlowForUndo = () => {
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes }],
+      future: [...s.future],
+    }));
+  };
+
+  useEffect(() => {
+    window.saveCurrentFlowForUndo = saveCurrentFlowForUndo;
+  }, [saveCurrentFlowForUndo]);
+
+  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
+
   return (
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
@@ -993,10 +1071,17 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
+          flowSettings = {flowSettings}
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
+      <div className={`rubix-flow__wrapper ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
+        <SubFlowTabs
+          nodes={nodesParent}
+          selectedSubflow={selectedNodeForSubFlow}
+          goSubFlow={handleAddSubFlow}
+          onBackToMain={onBackToMain}
+        />
         <ReactFlowProvider>
           <ReactFlow
             onContextMenu={(event: ReactMouseEvent) => {
@@ -1026,6 +1111,7 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+<<<<<<< HEAD
             {nodeMenuSelectVisibility && (
               <SelectMenu
                 isOpenFromNodeTree={isMenuOpenFromNodeTree}
@@ -1037,6 +1123,9 @@ const Flow = (props: FlowProps) => {
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
+=======
+            <LoadWiresMap />
+>>>>>>> master
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
@@ -1055,9 +1144,9 @@ const Flow = (props: FlowProps) => {
               />
             )}
             <ControlUndoable
-              canUndo={canUndo && past && past.length !== 0}
-              onUndo={undo}
-              canRedo={canRedo}
+              canUndo={undoState.past.length > 0}
+              onUndo={handleUndo}
+              canRedo={undoState.future.length > 0}
               onRedo={handleRedo}
             />
             <Controls />
@@ -1065,7 +1154,7 @@ const Flow = (props: FlowProps) => {
             <BehaveControls
               deleteNodesAndEdges={deleteNodesAndEdges}
               onCopyNodes={handleCopyNodes}
-              onUndo={undo}
+              onUndo={handleUndo}
               onRedo={handleRedo}
               onRefreshValues={handleRefreshValues}
               settings={flowSettings}
@@ -1075,7 +1164,7 @@ const Flow = (props: FlowProps) => {
               onCloseSubFlow={onCloseSubFlow}
               onBackToMain={onBackToMain}
               onHandelSaveFlow={onHandelSaveFlow}
-              isConnectionBuilder={isConnectionBuilder}
+              onLinkBuilder={handleLinkBuilder}
               handleConnectionBuilderFlow={handleConnectionBuilderFlow}
               handleLoadNodesAndEdges={handleLoadNodesAndEdges}
             />
@@ -1113,6 +1202,12 @@ const Flow = (props: FlowProps) => {
                 nodesSpec={nodesSpec}
               />
             )}
+            <LinkBuilderModal
+              parentNode={selectedNodeForSubFlow}
+              open={isLinkBuilder}
+              onClose={onCloseBuilderModal}
+              nodesSpec={nodesSpec}
+            />
           </ReactFlow>
         </ReactFlowProvider>
       </div>
@@ -1121,7 +1216,7 @@ const Flow = (props: FlowProps) => {
 };
 
 export const RubixFlow = () => {
-  const [nodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
@@ -1155,7 +1250,7 @@ export const RubixFlow = () => {
 
   return (
     <>
-      {isFetchingNodeSpec ? (
+      {!isFetchingNodeSpec ? (
         <Flow
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
@@ -1165,7 +1260,7 @@ export const RubixFlow = () => {
           handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
-        <Spin />
+        <Spin tip="Loading" size="large" style={{ height: '100%', position: 'absolute', top: "50%", left: "60%" }}/>
       )}
     </>
   );
