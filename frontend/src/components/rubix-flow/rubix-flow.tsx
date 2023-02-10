@@ -45,6 +45,7 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
+import SelectMenu from "./components/SelectMenu";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -86,8 +87,10 @@ const Flow = (props: FlowProps) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
+  const [nodeSelect, setNodeSelect] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
+  const [nodeMenuSelectVisibility, setNodeMenuSelectVisibility] = useState<XYPosition>();
   const [isMenuOpenFromNodeTree, setMenuOpenFromNodeTree] = useState(false);
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
   const [undoable, setUndoable, { past, undo, canUndo, redo, canRedo }] = useUndoable({ nodes: nodes, edges: edges });
@@ -512,6 +515,7 @@ const Flow = (props: FlowProps) => {
     setLastConnectStart(undefined);
     setNodePickerVisibility(undefined);
     setNodeMenuVisibility(undefined);
+    setNodeMenuSelectVisibility(undefined);
     setIsDoubleClick(false);
   };
 
@@ -559,6 +563,12 @@ const Flow = (props: FlowProps) => {
     const { x, y } = setMousePosition(event);
     setNodeMenuVisibility({ x, y });
     setSelectedNode(node);
+  };
+  const handleSelectContextMenu = (event: ReactMouseEvent) => {
+    const { x, y } = setMousePosition(event);
+    setNodeMenuSelectVisibility({ x, y });
+    const nodeSelect = nodes.filter((item) => item.selected === true);
+    setNodeSelect(nodeSelect);
   };
 
   const setMousePosition = useCallback(
@@ -989,7 +999,10 @@ const Flow = (props: FlowProps) => {
       <div className="rubix-flow__wrapper" ref={rubixFlowWrapper}>
         <ReactFlowProvider>
           <ReactFlow
-            onContextMenu={() => setMenuOpenFromNodeTree(false)}
+            onContextMenu={(event: ReactMouseEvent) => {
+              handleSelectContextMenu(event);
+              setMenuOpenFromNodeTree(false);
+            }}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}
@@ -1013,6 +1026,17 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            {nodeMenuSelectVisibility && (
+              <SelectMenu
+                isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
+                position={nodeMenuSelectVisibility}
+                node={nodeSelect}
+                onClose={closeNodePicker}
+                selectedNodeForSubFlow={selectedNodeForSubFlow}
+              />
+            )}
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap
