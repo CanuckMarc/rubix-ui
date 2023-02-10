@@ -118,6 +118,7 @@ const Flow = (props: FlowProps) => {
     past: [],
     future: [],
   });
+  const [isChangedFlow, setIsChangedFlow] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -183,6 +184,8 @@ const Flow = (props: FlowProps) => {
 
   const onMove = () => setShouldUpdateMiniMap((s) => !s);
 
+  const handleFlowChange = () => setIsChangedFlow(true);
+
   const handleAddNode = useCallback(
     async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
       closeNodePicker();
@@ -212,6 +215,7 @@ const Flow = (props: FlowProps) => {
           past: [...s.past],
         };
       });
+      handleFlowChange();
       setTimeout(() => {
         setNodes((newNodes) => {
           return newNodes.map((item) => ({ ...item, selected: false }));
@@ -232,8 +236,9 @@ const Flow = (props: FlowProps) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
+      
     },
-    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow]
+    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
@@ -323,6 +328,7 @@ const Flow = (props: FlowProps) => {
       nodes: [...window.allFlow.nodes, ...newNodesWithOldId],
       edges: [...window.allFlow.edges, ...finalEdges],
     };
+    handleFlowChange();
 
     // TODO better way to call fit vew after edges render
     setTimeout(() => {
@@ -337,6 +343,7 @@ const Flow = (props: FlowProps) => {
 
   const onClearAllNodes = () => {
     saveCurrentFlowForUndo();
+    handleFlowChange();
     if (selectedNodeForSubFlow) {
       const nodeIdsCleared = nodes
         .filter((node: NodeInterface) => node.parentId === selectedNodeForSubFlow.id)
@@ -417,6 +424,7 @@ const Flow = (props: FlowProps) => {
     setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
     window.allFlow = { nodes: nodesWithSetting, edges: window.allFlow.edges };
+    setIsChangedFlow(false);
     handleRefreshValues();
   };
 
@@ -480,6 +488,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
         }
         return;
       }
@@ -524,6 +533,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
         }
       } else {
         const element = evt.target as HTMLElement;
@@ -545,6 +555,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
           window.allFlow.edges = [...window.allFlow.edges, newEdge];
         }
       }
@@ -686,6 +697,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: [...s.future],
     }));
+    handleFlowChange();
   };
 
   const handleUndo = () => {
@@ -703,6 +715,7 @@ const Flow = (props: FlowProps) => {
       setNodes(lastPast.nodes);
       setEdges(lastPast.edges);
       setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+      handleFlowChange();
     }
   };
 
@@ -721,6 +734,7 @@ const Flow = (props: FlowProps) => {
       setNodes([...lastFuture.nodes]);
       setEdges([...lastFuture.edges]);
       setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+      handleFlowChange();
     }
   };
 
@@ -773,6 +787,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+    handleFlowChange();
   };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
@@ -821,6 +836,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+    handleFlowChange();
   };
 
   const handleAlignLeft = (position: { x: number; y: number }) => {
@@ -1056,6 +1072,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: [...s.future],
     }));
+    handleFlowChange();
   };
 
   useEffect(() => {
@@ -1151,6 +1168,7 @@ const Flow = (props: FlowProps) => {
             <Controls />
             <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
             <BehaveControls
+              isChangedFlow={isChangedFlow}
               deleteNodesAndEdges={deleteNodesAndEdges}
               onCopyNodes={handleCopyNodes}
               onUndo={handleUndo}

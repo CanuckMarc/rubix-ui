@@ -15,6 +15,7 @@ import {
   BuildOutlined,
   RollbackOutlined,
   CloseCircleOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
@@ -22,6 +23,7 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
+  isChangedFlow: boolean;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
@@ -42,6 +44,7 @@ type ControlProps = {
 
 const Controls = ({
   settings,
+  isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
   onCopyNodes,
@@ -167,6 +170,7 @@ const Controls = ({
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {isChangedFlow && renderIconBtn("Sync flow", SyncOutlined, onHandelSaveFlow)}
         {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
           <>
