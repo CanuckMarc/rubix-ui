@@ -1,7 +1,4 @@
-import { useRef } from "react";
 import { XYPosition } from "react-flow-renderer/nocss";
-import { useOnPressKey } from "../hooks/useOnPressKey";
-import { NodeSpecJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type MenuProps = {
@@ -14,12 +11,6 @@ type MenuProps = {
   isOpenFromNodeTree: boolean;
 };
 
-export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
-  allowSettings: false,
-  type: "",
-  category: "None",
-};
-
 const SelectMenu = ({
   position,
   node,
@@ -28,10 +19,6 @@ const SelectMenu = ({
   handleAlignRights,
   isOpenFromNodeTree = false,
 }: MenuProps) => {
-  const ref = useRef(null);
-
-  useOnPressKey("Escape", onClose);
-
   const handleAlignLeft = () => {
     handleAlignLefts(node[0].position);
     onClose();
@@ -41,39 +28,25 @@ const SelectMenu = ({
     onClose();
   };
   return (
-    <>
-      {(
-        <div
-          ref={ref}
-          className={`node-picker node-menu ${
-            isOpenFromNodeTree ? "fixed" : "absolute"
-          } z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark`}
-          style={{
-            top: position?.y,
-            left: position?.x,
-            width: "auto",
-            borderRight: "1px solid #303030",
-            minWidth: 120,
-          }}
-        >
-          <div
-            key="Align left"
-            className="cursor-pointer border-b border-gray-600 ant-menu-item"
-            onClick={handleAlignLeft}
-          >
-            Align left
-          </div>
-          <div
-            key="Align right"
-            className="cursor-pointer border-b border-gray-600 ant-menu-item"
-            onClick={handleAlignRight}
-          >
-            Align right
-          </div>
-        </div>
-      )}
-    </>
+    <div
+      className={`node-picker node-menu ${
+        isOpenFromNodeTree ? "fixed" : "absolute"
+      } z-10 text-white border rounded border-gray-500 ant-menu ant-menu-root ant-menu-inline ant-menu-dark`}
+      style={{
+        top: position?.y,
+        left: position?.x,
+        width: "auto",
+        borderRight: "1px solid #303030",
+        minWidth: 120,
+      }}
+    >
+      <div key="Align left" className="cursor-pointer border-b border-gray-600 ant-menu-item" onClick={handleAlignLeft}>
+        Align left
+      </div>
+      <div key="Align right" className="cursor-pointer ant-menu-item" onClick={handleAlignRight}>
+        Align right
+      </div>
+    </div>
   );
 };
 export default SelectMenu;
-

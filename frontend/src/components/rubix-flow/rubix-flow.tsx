@@ -150,6 +150,7 @@ const Flow = (props: FlowProps) => {
       });
       selectableBoxes.current = elemEdges;
     },
+
     onSelectionEnd: () => {
       // when draw area to select nodes
       // we will unselected node that is not show in current view
@@ -611,6 +612,7 @@ const Flow = (props: FlowProps) => {
     const nodeSelect = nodes.filter((item) => item.selected === true);
     setNodeSelect(nodeSelect);
   };
+
   const setMousePosition = useCallback(
     (event: React.MouseEvent, fromSidebar?: boolean) => {
       event.preventDefault();
@@ -820,6 +822,7 @@ const Flow = (props: FlowProps) => {
       future: s.future,
     }));
   };
+
   const handleAlignLeft = (position: { x: number; y: number }) => {
     nodes.forEach((item) => {
       if (item.selected) {
@@ -827,6 +830,7 @@ const Flow = (props: FlowProps) => {
       }
     });
   };
+
   const handleAlignRight = (position: { x: number; y: number }, width: number) => {
     nodes.forEach((item: NodeInterface) => {
       if (item.selected) {
