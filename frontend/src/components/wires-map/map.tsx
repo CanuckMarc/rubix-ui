@@ -70,6 +70,7 @@ export const WiresMap = () => {
     try {
         setIsFetching(true);
         const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
+        console.log('points list res is: ', res)
         setPointList(res.map(item => ({
             key: item.uuid,
             name: item.name,
