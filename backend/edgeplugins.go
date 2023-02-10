@@ -79,7 +79,7 @@ func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.
 	return inst.successResponse(availablePlugins)
 }
 
-func (inst *App) EdgeGetPlugins(connUUID, hostUUID string) *rumodel.Response {
+func (inst *App) EdgeGetPlugins(connUUID, hostUUID string, thatAreEnable bool) *rumodel.Response {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return inst.fail(err)
@@ -87,6 +87,15 @@ func (inst *App) EdgeGetPlugins(connUUID, hostUUID string) *rumodel.Response {
 	plugins, err := assistClient.EdgeGetPlugins(hostUUID)
 	if err != nil {
 		return inst.fail(err)
+	}
+	var out []rumodel.Plugin
+	if thatAreEnable {
+		for _, plugin := range plugins {
+			if plugin.Enabled {
+				out = append(out, plugin)
+			}
+		}
+		return inst.successResponse(out)
 	}
 	return inst.successResponse(plugins)
 }
