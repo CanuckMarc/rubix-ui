@@ -48,6 +48,7 @@ import { LoadWiresMap } from "./components/LoadWiresMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
+import SelectMenu from "./components/SelectMenu";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -96,8 +97,10 @@ const Flow = (props: FlowProps) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
+  const [nodeSelect, setNodeSelect] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
+  const [nodeMenuSelectVisibility, setNodeMenuSelectVisibility] = useState<XYPosition>();
   const [isMenuOpenFromNodeTree, setMenuOpenFromNodeTree] = useState(false);
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
   const [isDoubleClick, setIsDoubleClick] = useState(false);
@@ -119,9 +122,10 @@ const Flow = (props: FlowProps) => {
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
-  const [refreshCounter, incrementRefreshCounter] = useIsLoading(
-    (state) => [state.refreshCounter, state.incrementRefreshCounter]
-  )
+  const [refreshCounter, incrementRefreshCounter] = useIsLoading((state) => [
+    state.refreshCounter,
+    state.incrementRefreshCounter,
+  ]);
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -552,6 +556,7 @@ const Flow = (props: FlowProps) => {
     setLastConnectStart(undefined);
     setNodePickerVisibility(undefined);
     setNodeMenuVisibility(undefined);
+    setNodeMenuSelectVisibility(undefined);
     setIsDoubleClick(false);
   };
 
@@ -600,7 +605,12 @@ const Flow = (props: FlowProps) => {
     setNodeMenuVisibility({ x, y });
     setSelectedNode(node);
   };
-
+  const handleSelectContextMenu = (event: ReactMouseEvent) => {
+    const { x, y } = setMousePosition(event);
+    setNodeMenuSelectVisibility({ x, y });
+    const nodeSelect = nodes.filter((item) => item.selected === true);
+    setNodeSelect(nodeSelect);
+  };
   const setMousePosition = useCallback(
     (event: React.MouseEvent, fromSidebar?: boolean) => {
       event.preventDefault();
@@ -809,6 +819,20 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+  };
+  const handleAlignLeft = (position: { x: number; y: number }) => {
+    nodes.forEach((item) => {
+      if (item.selected) {
+        item.position.x = position.x;
+      }
+    });
+  };
+  const handleAlignRight = (position: { x: number; y: number }, width: number) => {
+    nodes.forEach((item: NodeInterface) => {
+      if (item.selected) {
+        item.position.x = position.x + (width - item.width!!);
+      }
+    });
   };
 
   const handleRefreshValues = async () => {
@@ -1045,7 +1069,7 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
-          flowSettings = {flowSettings}
+          flowSettings={flowSettings}
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
@@ -1058,7 +1082,10 @@ const Flow = (props: FlowProps) => {
         />
         <ReactFlowProvider>
           <ReactFlow
-            onContextMenu={() => setMenuOpenFromNodeTree(false)}
+            onContextMenu={(event: ReactMouseEvent) => {
+              handleSelectContextMenu(event);
+              setMenuOpenFromNodeTree(false);
+            }}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}
@@ -1082,6 +1109,17 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            {nodeMenuSelectVisibility && (
+              <SelectMenu
+                isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
+                position={nodeMenuSelectVisibility}
+                node={nodeSelect}
+                onClose={closeNodePicker}
+                selectedNodeForSubFlow={selectedNodeForSubFlow}
+              />
+            )}
             <LoadWiresMap />
             <DragSelection />
             {flowSettings.showMiniMap && (
@@ -1138,6 +1176,8 @@ const Flow = (props: FlowProps) => {
                 isOpenFromNodeTree={isMenuOpenFromNodeTree}
                 deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
                 deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
                 deleteNode={deleteNodesAndEdges}
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
@@ -1215,7 +1255,7 @@ export const RubixFlow = () => {
           handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
-        <Spin tip="Loading" size="large" style={{ height: '100%', position: 'absolute', top: "50%", left: "60%" }}/>
+        <Spin tip="Loading" size="large" style={{ height: "100%", position: "absolute", top: "50%", left: "60%" }} />
       )}
     </>
   );
