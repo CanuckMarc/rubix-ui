@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
@@ -14,25 +13,36 @@ import (
 )
 
 type PointListPayload struct {
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
+	UUID        string `json:"uuid"`
+	Name        string `json:"name"`
+	PluginName  string `json:"plugin_name"`
+	NetworkName string `json:"network_name"`
+	DeviceName  string `json:"device_name"`
+	PointName   string `json:"point_name"`
 }
 
-func (inst *App) GetPointListPayload(connUUID, hostUUID string) ([]*PointListPayload, error) {
+func (inst *App) GetPointListPayload(connUUID, hostUUID string) []*PointListPayload {
 	var pointPayload []*PointListPayload
 	networks, err := inst.getNetworksWithPoints(connUUID, hostUUID)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	for _, network := range networks {
 		for _, device := range network.Devices {
 			for _, point := range device.Points {
-				pointPayload = append(pointPayload, &PointListPayload{UUID: point.UUID,
-					Name: fmt.Sprintf("%s:%s:%s:%s", network.PluginPath, network.Name, device.Name, point.Name)})
+				p := &PointListPayload{
+					UUID:        point.UUID,
+					Name:        fmt.Sprintf("%s:%s:%s:%s", network.PluginPath, network.Name, device.Name, point.Name),
+					PluginName:  network.PluginPath,
+					NetworkName: network.Name,
+					DeviceName:  device.Name,
+					PointName:   point.Name,
+				}
+				pointPayload = append(pointPayload, p)
 			}
 		}
 	}
-	return pointPayload, nil
+	return pointPayload
 }
 
 func (inst *App) GetPointsForDevice(connUUID, hostUUID, deviceUUID string) []*model.Point {
