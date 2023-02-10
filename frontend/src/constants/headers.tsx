@@ -9,7 +9,7 @@ export const FLOW_NETWORK_HEADERS = [
     key: "flow_ip",
     title: "IP",
     dataIndex: "flow_ip",
-    sorter: (a: any, b: any) => sortIps(a.flow_ip ?? '', b.flow_ip ?? ''),
+    sorter: (a: any, b: any) => sortIps(a.flow_ip ?? "", b.flow_ip ?? ""),
   },
   {
     key: "flow_port",
@@ -235,7 +235,6 @@ export const CONSUMER_HEADERS = [
   },
 ];
 
-
 export const WRITER_HEADERS = [
   {
     key: "writer_thing_name",
@@ -335,11 +334,6 @@ export const CONNECTION_HEADERS = [
     },
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
-  {
-    title: "UUID",
-    dataIndex: "uuid",
-    key: "uuid",
-  },
 ];
 
 export const LOCATION_HEADERS = [
@@ -364,7 +358,7 @@ export const LOCATION_HEADERS = [
     dataIndex: "networks",
     key: "networks",
     render: (networks: []) => <a>{networks ? networks.length : 0}</a>,
-  }
+  },
 ];
 
 export const HOST_NETWORK_HEADERS = [
@@ -421,7 +415,7 @@ export const HOST_HEADERS = [
     title: "IP",
     dataIndex: "ip",
     key: "ip",
-    sorter: (a: any, b: any) => sortIps(a.ip ?? '', b.ip ?? ''),
+    sorter: (a: any, b: any) => sortIps(a.ip ?? "", b.ip ?? ""),
   },
   {
     title: "Description",
@@ -442,21 +436,21 @@ export const HOST_HEADERS = [
     title: "Is Online",
     dataIndex: "is_online",
     key: "is_online",
-    render: (a: any) => '' + (a ?? ''),
+    render: (a: any) => "" + (a ?? ""),
     sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
     title: "Is Valid Token",
     dataIndex: "is_valid_token",
     key: "is_valid_token",
-    render: (a: any) => '' + (a ?? ''),
+    render: (a: any) => "" + (a ?? ""),
     sorter: (a: any, b: any) => a.is_valid_token - b.is_valid_token,
   },
   {
     title: "Virtual IP",
     dataIndex: "virtual_ip",
     key: "virtual_ip",
-    sorter: (a: any, b: any) => sortIps(a.virtual_ip ?? '', b.virtual_ip ?? ''),
+    sorter: (a: any, b: any) => sortIps(a.virtual_ip ?? "", b.virtual_ip ?? ""),
   },
   {
     title: "Received Bytes",
@@ -474,14 +468,24 @@ export const HOST_HEADERS = [
     title: "Connected Since",
     dataIndex: "connected_since",
     key: "connected_since",
-    sorter: (a: any, b: any) => (a.connected_since ?? '').localeCompare(b.connected_since ?? ''),
+    sorter: (a: any, b: any) => (a.connected_since ?? "").localeCompare(b.connected_since ?? ""),
   },
 ];
 
 const sortIps = (a: string, b: string) => {
-  const num1 = Number(a.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
-  const num2 = Number(b.split(".").map((num) => (`000${num}`).slice(-3)).join(""));
-  return ('' + num1).localeCompare('' + num2);
+  const num1 = Number(
+    a
+      .split(".")
+      .map((num) => `000${num}`.slice(-3))
+      .join("")
+  );
+  const num2 = Number(
+    b
+      .split(".")
+      .map((num) => `000${num}`.slice(-3))
+      .join("")
+  );
+  return ("" + num1).localeCompare("" + num2);
 };
 
 export const NETWORK_HEADERS = [
@@ -958,7 +962,7 @@ export const SCHEDULES_HEADERS = [
     title: "time zone",
     dataIndex: "timezone",
     key: "timezone",
-    render: (text: any) => String(text)
+    render: (text: any) => String(text),
   },
   {
     title: "enable",
@@ -972,7 +976,7 @@ export const SCHEDULES_HEADERS = [
         text = "enable";
       }
       return <Tag color={colour}>{text}</Tag>;
-    }
+    },
   },
   {
     title: "is active",
@@ -986,7 +990,7 @@ export const SCHEDULES_HEADERS = [
         text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
-    }
+    },
   },
   {
     title: "active weekly",
@@ -1000,7 +1004,7 @@ export const SCHEDULES_HEADERS = [
         text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
-    }
+    },
   },
   {
     title: "active exception",
@@ -1014,7 +1018,7 @@ export const SCHEDULES_HEADERS = [
         text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
-    }
+    },
   },
   {
     title: "active event",
@@ -1028,45 +1032,43 @@ export const SCHEDULES_HEADERS = [
         text = "active";
       }
       return <Tag color={colour}>{text}</Tag>;
-    }
+    },
   },
   {
     title: "Payload",
     dataIndex: "payload",
     key: "payload",
-    render: (text: number) => String(text)
+    render: (text: number) => String(text),
   },
   {
     title: "Next start",
     dataIndex: "next_start_string",
     key: "next_start_string",
-    render: (text: string) => text
+    render: (text: string) => text,
   },
   {
     title: "Next stop",
     dataIndex: "next_stop_string",
     key: "next_stop_string",
-    render: (text: string) => text
+    render: (text: string) => text,
   },
   {
     title: "Period start",
     dataIndex: "period_start_string",
     key: "period_start_string",
-    render: (text: string) => text
+    render: (text: string) => text,
   },
   {
     title: "Period stop",
     dataIndex: "period_stop_string",
     key: "period_stop_string",
-    render: (text: string) => text
+    render: (text: string) => text,
   },
 ];
 
 //--------------schema-------------//
 export const LOCAL_FLOW_NETWORKS_SCHEMA = {
-  required: [
-    "name"
-  ],
+  required: ["name"],
   properties: {
     name: {
       title: "name",
@@ -1077,20 +1079,12 @@ export const LOCAL_FLOW_NETWORKS_SCHEMA = {
     is_remote: {
       type: "boolean",
       title: "is remote network",
-    }
-  }
+    },
+  },
 };
 
 export const REMOTE_FLOW_NETWORKS_SCHEMA = {
-  required: [
-    "name",
-    "flow_ip_local",
-    "flow_ip",
-    "flow_port_local",
-    "flow_port",
-    "flow_token_local",
-    "flow_token"
-  ],
+  required: ["name", "flow_ip_local", "flow_ip", "flow_port_local", "flow_port", "flow_token_local", "flow_token"],
   properties: {
     name: {
       title: "name",
@@ -1141,8 +1135,8 @@ export const REMOTE_FLOW_NETWORKS_SCHEMA = {
       type: "string",
       minLength: 60,
       maxLength: 60,
-    }
-  }
+    },
+  },
 };
 
 export const WIRES_CONNECTION_SCHEMA = {
@@ -1198,5 +1192,5 @@ export const SCHEDULES_SCHEMA = [
     readOnly: true,
     title: "active",
     type: "boolean",
-  }
+  },
 ];
