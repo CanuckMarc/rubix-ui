@@ -73,7 +73,11 @@ export const WiresMap = () => {
         setPointList(res.map(item => ({
             key: item.uuid,
             name: item.name,
-            uuid: item.uuid
+            uuid: item.uuid,
+            device_name: item.device_name,
+            network_name: item.network_name,
+            plugin_name: item.plugin_name,
+            point_name: item.point_name
         })));
         const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, isRemote)
         if (flowNetRes) {
