@@ -1,6 +1,7 @@
 import { Tooltip } from "antd";
 import { amodel } from "../../../../../wailsjs/go/models";
 import { LoadingOutlined, PhoneOutlined } from "@ant-design/icons";
+import { openNotificationWithIcon } from "../../../../utils/utils";
 import { useState } from "react";
 
 export const Ping = (props: IPing) => {
@@ -13,9 +14,11 @@ export const Ping = (props: IPing) => {
     e.stopPropagation();
     factory.uuid = host.uuid;
     try {
-      await factory.PingHost();
+      const res = await factory.PingHost();
+      if (res) openNotificationWithIcon("success", "successfully pinged host!");
     } catch (err) {
       console.error(err);
+      openNotificationWithIcon("error", "failed to ping host!");
     } finally {
       setLoading(false);
     }

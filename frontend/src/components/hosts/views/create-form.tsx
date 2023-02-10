@@ -1,67 +1,71 @@
 import { useEffect, useState } from "react";
 import { Button, Spin } from "antd";
-import { storage } from "../../../../wailsjs/go/models";
+import { useParams } from "react-router-dom";
 import { openNotificationWithIcon } from "../../../utils/utils";
-import { ConnectionFactory } from "../factory";
+import { AddHost, EditHost } from "../../../../wailsjs/go/backend/App";
 import { JsonForm } from "../../../common/json-schema-form";
-import RubixConnection = storage.RubixConnection;
+import { amodel } from "../../../../wailsjs/go/models";
 import { hasError } from "../../../utils/response";
+import Host = amodel.Host;
 
-export const CreateConnectionForm = (props: any) => {
-  const { currentConnection, connectionSchema, isLoadingForm, refreshList, currentStep, setCurrentStep, setNewConnection } = props;
-  const [formData, setFormData] = useState(currentConnection);
+export const CreateHostForm = (props: any) => {
+  const { connUUID = "", netUUID = "" } = useParams();
+  const {
+    currentHost,
+    hostSchema,
+    isLoadingForm,
+    currentStep,
+    setCurrentStep,
+    refreshList,
+    setNewHost
+  } = props;
+  const [formData, setFormData] = useState(currentHost);
   const [validationError, setValidationError] = useState(true);
   const [isUpdate, setIsUpdate] = useState(false);
-  const factory = new ConnectionFactory();
 
   useEffect(() => {
-    setFormData(currentConnection);
-  }, [currentConnection]);
+    setFormData(currentHost);
+  }, [currentHost]);
 
   useEffect(() => {
-    if (currentConnection.uuid) {
+    if (currentHost.uuid) {
       setIsUpdate(true);
       setValidationError(true);
     } else {
       setIsUpdate(false);
       setValidationError(false);
     }
-  }, [currentConnection.uuid]);
+  }, [currentHost.uuid]);
 
-  const addConnection = async (connection: RubixConnection) => {
-    factory.this = connection;
-    return await factory.Add();
+  const addHost = async (host: Host) => {
+    return await AddHost(connUUID, host);
   };
 
-  const editConnection = async (connection: RubixConnection) => {
-    factory.uuid = connection.uuid;
-    return await factory.Update();
+  const editHost = async (host: Host) => {
+    return EditHost(connUUID, host.uuid, host);
   };
 
   const handleClose = () => {
-    setFormData({} as RubixConnection);
+    setFormData({} as Host);
   };
 
-  const handleSubmit = async (connection: RubixConnection) => {
+  const handleSubmit = async (host: Host) => {
     if (validationError) {
       return;
     }
-    factory.this = connection;
+    host.network_uuid = netUUID;
     let res: any;
     let operation: string;
-
-    if (currentConnection.uuid) {
-      connection.uuid = currentConnection.uuid;
-      res = await editConnection(connection);
+    if (currentHost.uuid) {
+      res = await editHost(host);
       operation = "updated";
     } else {
-      res = await addConnection(connection);
-      operation = "created";
+      res = await addHost(host);
+      operation = "added";
     }
-
     if (!hasError(res)) {
-      setNewConnection(res.data)
-      openNotificationWithIcon("success", `successfully ${operation} connection ${res.data.name}!`);
+      setNewHost(res.data)
+      openNotificationWithIcon("success", `successfully ${operation} host ${res.data.name}!`);
       setCurrentStep(currentStep + 1)
       handleClose();
     } else {
@@ -72,7 +76,7 @@ export const CreateConnectionForm = (props: any) => {
 
   const handleCreateButton = () => {
     handleSubmit(formData)
-    setFormData({} as RubixConnection);
+    setFormData({} as Host);
   }
 
   return (
@@ -81,7 +85,7 @@ export const CreateConnectionForm = (props: any) => {
         <JsonForm
           formData={formData}
           setFormData={setFormData}
-          jsonSchema={connectionSchema}
+          jsonSchema={hostSchema}
           setValidationError={setValidationError}
           style={{width: '100%'}}
         />

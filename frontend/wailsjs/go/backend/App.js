@@ -514,6 +514,10 @@ export function GetBacnetDevicePoints(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['GetBacnetDevicePoints'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetBacnetFreeAddress(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetBacnetFreeAddress'](arg1, arg2, arg3);
+}
+
 export function GetConnection(arg1) {
   return window['go']['backend']['App']['GetConnection'](arg1);
 }
@@ -848,6 +852,10 @@ export function ListIO16Releases() {
 
 export function NewTab(arg1) {
   return window['go']['backend']['App']['NewTab'](arg1);
+}
+
+export function NextFreeBacnetAddress(arg1) {
+  return window['go']['backend']['App']['NextFreeBacnetAddress'](arg1);
 }
 
 export function NodeHelp(arg1, arg2, arg3) {

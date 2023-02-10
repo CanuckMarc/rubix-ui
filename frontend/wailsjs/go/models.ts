@@ -347,6 +347,20 @@ export namespace assistcli {
 
 export namespace backend {
 	
+	export class BacnetPoints {
+	    av_existing: number[];
+	    bv_existing: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new BacnetPoints(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.av_existing = source["av_existing"];
+	        this.bv_existing = source["bv_existing"];
+	    }
+	}
 	export class BulkAddResponse {
 	    message: string;
 	    added_count: number;
@@ -486,6 +500,10 @@ export namespace backend {
 	export class PointListPayload {
 	    uuid: string;
 	    name: string;
+	    plugin_name: string;
+	    network_name: string;
+	    device_name: string;
+	    point_name: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PointListPayload(source);
@@ -495,6 +513,10 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.uuid = source["uuid"];
 	        this.name = source["name"];
+	        this.plugin_name = source["plugin_name"];
+	        this.network_name = source["network_name"];
+	        this.device_name = source["device_name"];
+	        this.point_name = source["point_name"];
 	    }
 	}
 	export class RcNetworkBody {

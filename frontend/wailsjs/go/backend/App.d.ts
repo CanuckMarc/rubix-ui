@@ -277,6 +277,8 @@ export function GetBackupsNoData():Promise<Array<storage.Backup>>;
 
 export function GetBacnetDevicePoints(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<Array<model.Point>>;
 
+export function GetBacnetFreeAddress(arg1:string,arg2:string,arg3:boolean):Promise<backend.BacnetPoints>;
+
 export function GetConnection(arg1:string):Promise<storage.RubixConnection>;
 
 export function GetConnectionSchema():Promise<backend.ConnectionSchema>;
@@ -444,6 +446,8 @@ export function ListIO16Builds():Promise<Array<string>>;
 export function ListIO16Releases():Promise<Array<string>>;
 
 export function NewTab(arg1:string):Promise<void>;
+
+export function NextFreeBacnetAddress(arg1:Array<number>):Promise<number>;
 
 export function NodeHelp(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Help>>;
 
