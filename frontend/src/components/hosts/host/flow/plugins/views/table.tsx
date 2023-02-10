@@ -97,7 +97,7 @@ export const FlowPluginsTable = () => {
   const fetchPlugins = async () => {
     try {
       setIsFetching(true);
-      const res = await factory.GetAll();
+      const res = await factory.GetAll(false);
       setPlugins(res);
     } catch (error) {
       console.log(error);

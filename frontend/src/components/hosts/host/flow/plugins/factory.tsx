@@ -23,10 +23,10 @@ export class FlowPluginFactory {
     return await EdgeGetPluginsDistribution(connUUID, hostUUID);
   }
 
-  async GetAll(): Promise<any> {
+  async GetAll(thatAreEnable: boolean): Promise<any> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    const plugins = await EdgeGetPlugins(this.connectionUUID, this.hostUUID);
+    const plugins = await EdgeGetPlugins(this.connectionUUID, this.hostUUID, thatAreEnable);
     return plugins.data;
   }
 
