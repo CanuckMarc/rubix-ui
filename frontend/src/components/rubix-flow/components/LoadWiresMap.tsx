@@ -28,166 +28,167 @@ const x = getRandomArbitrary(-200, 200)
 const y = getRandomArbitrary(-200, 200)
 
 export const LoadWiresMap = () => {
-    let { connUUID = "", hostUUID = "" } = useParams();
-    const [newNodes, setNewNodes] = useState<NodeInterface[]>([]);
-    const [newEdges, setNewEdges] = useState<Edge[]>([]);
-    const [wiresMapNodes, setWiresMapNodes] = useStore(
-      (state) => [state.wiresMapNodes, state.setWiresMapNodes]
-    )
-    const [refreshCounter, reset, setIsLoadingRubixFlow] = useIsLoading(
-      (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
-    )
+  let { connUUID = "", hostUUID = "" } = useParams();
+  const [newNodes, setNewNodes] = useState<NodeInterface[]>([]);
+  const [newEdges, setNewEdges] = useState<Edge[]>([]);
+  const [wiresMapNodes, setWiresMapNodes] = useStore(
+    (state) => [state.wiresMapNodes, state.setWiresMapNodes]
+  )
+  const [refreshCounter, reset, setIsLoadingRubixFlow] = useIsLoading(
+    (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
+  )
 
-    const [nodesSpec] = useNodesSpec();
-    const flowInstance = useReactFlow();
+  const [nodesSpec] = useNodesSpec();
+  const flowInstance = useReactFlow();
 
-    useEffect(() => {
-      let localNodes: NodeInterface[] = [];
-      let localEdges: Edge[] = [];
-      if (wiresMapNodes.length !== 0) {
-        const parentNode = generateNodes({
-          type: 'flow/flow-network',
-          name: '',
-          isParent: true,
-          parentId: undefined,
-          x: x,
-          y: y
-        })
-  
-        const check = wiresMapNodes.some(item => {
-          return item.existingFlowNet === undefined
-        })
-
-        // check for the largest x value among existing nodes
-        // new nodes will be placed to the right of the existing nodes
-        let xTemp: number = 0
-        let yTemp: number = 0
-        if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
-          let largeX = 0
-          window.allFlow.nodes.forEach((item: NodeInterface) => {
-            if (item.position.x > largeX) {
-              largeX = item.position.x
-            }
-          })
-          xTemp = largeX + 200
-        } else {
-          xTemp = x
-          yTemp = y
-        }
-        wiresMapNodes.forEach(item => {
-          xTemp = xTemp + 200
-          yTemp = yTemp + 200
-          const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode, xTemp, yTemp);
-          localNodes = [...localNodes, ...resObj.nodes]
-          localEdges = [...localEdges, ...resObj.edges]
-        })
-        if (check) {
-          setNewNodes([...localNodes, parentNode]);
-        } else {
-          setNewNodes(localNodes);
-        }
-        setNewEdges(localEdges);
-      }
-    }, [])
-
-    useEffect(() => {
-      // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
-      // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
-      if (refreshCounter === 2) {     
-        openNotificationWithIcon("success", 'Rubix flow loading complete!');
-        if (wiresMapNodes.length !== 0) {
-          renderPointsToFlowEditor(newNodes, newEdges);
-          setWiresMapNodes([]);
-        }
-      }
-    }, [refreshCounter])
-
-    const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined, parentNode: NodeInterface, x: number, y: number) => {
-      const nodes: NodeInterface[] = [];
-      const edges: Edge[] = [];
-
-      // generate new nodes
-      const nodeSpecs: NodeGenInputType[] = [
-        {
-          type: 'flow/flow-point',
-          name: points.pointOne?.name || '',
-          isParent: false,
-          parentId: existingFlowNet?.id || parentNode.id,
-          x: x,
-          y: y
-        }, 
-        {
-          type: 'flow/flow-point-write',
-          name: points.pointTwo?.name || '',
-          isParent: false,
-          parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
-          x: x + 800,
-          y: y
-        }
-      ]
-
-      let nodeIds: string[] = []
-      nodeSpecs.forEach((item: NodeGenInputType) => {
-        const node = generateNodes(item)
-        nodeIds.push(node.id)
-        nodes.push(node)
+  useEffect(() => {
+    let localNodes: NodeInterface[] = [];
+    let localEdges: Edge[] = [];
+    if (wiresMapNodes.length !== 0) {
+      const parentNode = generateNodes({
+        type: 'flow/flow-network',
+        name: '',
+        isParent: true,
+        parentId: undefined,
+        x: x,
+        y: y
       })
 
-      // generate new edge
-      const Edge: Edge = {
-        id: generateUuid(),
-        source: nodeIds[0],
-        sourceHandle: "output",
-        target: nodeIds[1],
-        targetHandle: "in16"
+      const check = wiresMapNodes.some(item => {
+        return item.existingFlowNet === undefined
+      })
+
+      // check for the largest x value among existing nodes
+      // new nodes will be placed to the right of the existing nodes
+      let xTemp: number = 0
+      let yTemp: number = 0
+      if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
+        let largeX = 0
+        window.allFlow.nodes.forEach((item: NodeInterface) => {
+          if (item.position.x > largeX) {
+            largeX = item.position.x
+          }
+        })
+        xTemp = largeX + 200
+      } else {
+        xTemp = x
+        yTemp = y
       }
-      edges.push(Edge);
-
-      return {nodes: nodes, edges: edges}
+      wiresMapNodes.forEach(item => {
+        xTemp = xTemp + 200
+        yTemp = yTemp + 200
+        const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode, xTemp, yTemp);
+        localNodes = [...localNodes, ...resObj.nodes]
+        localEdges = [...localEdges, ...resObj.edges]
+      })
+      if (check) {
+        setNewNodes([...localNodes, parentNode]);
+      } else {
+        setNewNodes(localNodes);
+      }
+      setNewEdges(localEdges);
     }
+  }, [])
 
-    const renderPointsToFlowEditor = (inputNodes: NodeInterface[], inputEdges: Edge[]) => {
-      // set new nodes and edges into flow editor
-      setTimeout(() => {
-        const oldNodes = flowInstance.getNodes();
-        flowInstance.setNodes([...oldNodes, ...inputNodes]);
-        window.allFlow.nodes = [...window.allFlow.nodes, ...inputNodes];
-        
-        const oldEdges = flowInstance.getEdges();
-        flowInstance.setEdges([...oldEdges, ...inputEdges]);
-        window.allFlow.edges = [...window.allFlow.edges, ...inputEdges];
-      }, 100);
-
+  useEffect(() => {
+    // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
+    // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
+    if (refreshCounter === 2) {     
+      openNotificationWithIcon("success", 'Rubix flow loading complete!');
+      if (wiresMapNodes.length !== 0) {
+        renderPointsToFlowEditor(newNodes, newEdges);
+        setWiresMapNodes([]);
+      }
     }
+  }, [refreshCounter])
 
-    const generateNodes = (item: NodeGenInputType) => {
-      const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
-      const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
+  const addNewNodesEdges = (points: any, existingFlowNet: node.Schema | undefined, parentNode: NodeInterface, x: number, y: number) => {
+    const nodes: NodeInterface[] = [];
+    const edges: Edge[] = [];
 
-      return {
-        id: generateUuid(),
-        isParent: item.isParent,
-        type: item.type,
-        info: { nodeName: item.name },
-        position: {
-          x: item.x,
-          y: item.y,
-        },
-        positionAbsolute: {
-          x: item.x,
-          y: item.y,
-        },
-        data: {
-          inputs: convertDataSpec(spec.inputs || []),
-          out: convertDataSpec(spec.outputs || []),
-        },
-        style: {},
-        status: undefined,
-        parentId: item.parentId,
-        settings: nodeSettings,
-        selected: false,
-      };
+    // generate new nodes
+    const nodeSpecs: NodeGenInputType[] = [
+      {
+        type: 'flow/flow-point',
+        name: points.pointOne?.name || '',
+        isParent: false,
+        parentId: existingFlowNet?.id || parentNode.id,
+        x: x,
+        y: y
+      }, 
+      {
+        type: 'flow/flow-point-write',
+        name: points.pointTwo?.name || '',
+        isParent: false,
+        parentId: existingFlowNet === undefined ? parentNode.id : existingFlowNet.id,
+        x: x + 800,
+        y: y
+      }
+    ]
+
+    let nodeIds: string[] = []
+    nodeSpecs.forEach((item: NodeGenInputType) => {
+      const node = generateNodes(item)
+      nodeIds.push(node.id)
+      nodes.push(node)
+    })
+
+    // generate new edge
+    const Edge: Edge = {
+      id: generateUuid(),
+      source: nodeIds[0],
+      sourceHandle: "output",
+      target: nodeIds[1],
+      targetHandle: "in16"
     }
+    edges.push(Edge);
 
-    return null;
+    return {nodes: nodes, edges: edges}
+  }
+
+  const renderPointsToFlowEditor = (inputNodes: NodeInterface[], inputEdges: Edge[]) => {
+    // set new nodes and edges into flow editor
+    setTimeout(() => {
+      const oldNodes = flowInstance.getNodes();
+      flowInstance.setNodes([...oldNodes, ...inputNodes]);
+      window.allFlow.nodes = [...window.allFlow.nodes, ...inputNodes];
+      console.log('new nodes are: ', inputNodes);
+      
+      const oldEdges = flowInstance.getEdges();
+      flowInstance.setEdges([...oldEdges, ...inputEdges]);
+      window.allFlow.edges = [...window.allFlow.edges, ...inputEdges];
+    }, 100);
+
+  }
+
+  const generateNodes = (item: NodeGenInputType) => {
+    const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
+    const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
+
+    return {
+      id: generateUuid(),
+      isParent: item.isParent,
+      type: item.type,
+      info: { nodeName: item.name },
+      position: {
+        x: item.x,
+        y: item.y,
+      },
+      positionAbsolute: {
+        x: item.x,
+        y: item.y,
+      },
+      data: {
+        inputs: convertDataSpec(spec.inputs || []),
+        out: convertDataSpec(spec.outputs || []),
+      },
+      style: {},
+      status: undefined,
+      parentId: item.parentId,
+      settings: { ...nodeSettings, point: item.name },
+      selected: false,
+    };
+  }
+
+  return null;
 }
