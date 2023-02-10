@@ -76,9 +76,10 @@ export const CreateHostWizard = (props: any) => {
   };
 
   const handleWizardClose = () => {
-    setNewHost({} as Host)
-    setCurrentStep(0)
-    setIsWizardModalVisible(false)
+    setNewHost({} as Host);
+    setCurrentStep(0);
+    setIsWizardModalVisible(false);
+    refreshList();
   }
   
   return (

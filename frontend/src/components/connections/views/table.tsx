@@ -16,7 +16,7 @@ import { CreateEditModal } from "./create";
 import { RubixAssistTokenFactory } from "./token-factory";
 import { ImportJsonModal } from "../../../common/import-json-modal";
 import { ImportExcelModal } from "../../hosts/host/flow/points/views/import-export";
-import { CreateConnectionWizard } from "./create-wizard";
+import { CreateConnectionWizard } from "./connection-wizard";
 
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;

@@ -74,9 +74,10 @@ export const CreateConnectionWizard = (props: any) => {
   };
 
   const handleWizardClose = () => {
-    setNewConnection({} as RubixConnection)
-    setCurrentStep(0)
-    setIsWizardModalVisible(false)
+    setNewConnection({} as RubixConnection);
+    setCurrentStep(0);
+    setIsWizardModalVisible(false);
+    refreshList();
   }
   
   return (

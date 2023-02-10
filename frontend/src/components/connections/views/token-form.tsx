@@ -33,11 +33,11 @@ export const TokenForm = (props: any) => {
     loginFormRef?.current?.resetFields();
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     handleClose()
-  //   }
-  // }, [])
+  useEffect(() => {
+    return () => {
+      handleClose()
+    }
+  }, [])
 
   const onCloseTokenGeneratorModal = () => {
     setIsTokenGenerateModalVisible(false);
