@@ -96,36 +96,6 @@
     width: 70%;
 }
 
-aside .active {
-    font-weight: bolder;
-}
-
-.settings-dropdown {
-    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%),
-        0 3px 14px 2px rgb(0 0 0 / 12%);
-    border-radius: 4px;
-    min-width: 220px !important;
-    left: 24px !important;
-}
-
-.settings-dropdown>ul>li:first-child {
-    min-height: 50px;
-    border-top: unset;
-}
-
-.settings-dropdown>ul>li {
-    min-height: 50px;
-    border-top: 1px solid var(--nube-light-grey);
-}
-
-.avar {
-    margin-left: 24px !important;
-    margin-top: 10px !important;
-    display: block !important;
-    background-color: var(--nube-green) !important;
-    cursor: pointer;
-}
-
 .react-flow .react-flow__edges {
     overflow: visible;
     pointer-events: none;
