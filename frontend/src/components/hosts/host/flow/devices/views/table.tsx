@@ -108,7 +108,9 @@ export const FlowDeviceTable = (props: any) => {
     const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: ["name", "uuid", "description"].includes(key) ? titleCase(schema[key]?.title) : MassEditTitle(key, schema),
+        title: ["name", "uuid", "description"].includes(key)
+          ? titleCase(schema[key]?.title)
+          : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
         sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
@@ -162,8 +164,9 @@ export const FlowDeviceTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key}
-                     handleOk={handleMassEdit} />;
+    return (
+      <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key} handleOk={handleMassEdit} />
+    );
   };
 
   const handleMassEdit = async (updateData: any) => {

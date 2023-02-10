@@ -12,6 +12,21 @@ const MassEdit = (props: any) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const getDefaultInputValue = (type: string) => {
+    let defaultValue = null;
+    switch (type) {
+      case "string":
+        defaultValue = "";
+        break;
+      case "boolean":
+        defaultValue = false;
+        break;
+      default:
+        defaultValue = null;
+    }
+    return defaultValue;
+  };
+
   const openModal = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
@@ -19,10 +34,11 @@ const MassEdit = (props: any) => {
       return openNotificationWithIcon("warning", `please select at least one`);
     }
     const schema = { properties: { [keyName]: fullSchema[keyName] } };
-    const formData = { [keyName]: fullSchema[keyName].default || null };
+    const formData = { [keyName]: fullSchema[keyName].default ?? getDefaultInputValue(fullSchema[keyName].type) };
     setSchema(schema);
     setFormData(formData);
     setIsModalVisible(true);
+    setConfirmLoading(false);
   };
 
   const closeModal = async () => {
@@ -31,21 +47,22 @@ const MassEdit = (props: any) => {
   };
 
   const handleSubmit = async (formData: any) => {
-    setConfirmLoading(true);
-    await handleOk(formData);
-    setConfirmLoading(false);
-    closeModal();
+    try {
+      setConfirmLoading(true);
+      await handleOk(formData);
+      closeModal();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setConfirmLoading(false);
+    }
   };
 
   return (
     <>
       <div className="flex justify-between" style={{ alignItems: "center" }}>
         {title}
-        <Button
-          icon={<HighlightOutlined />}
-          onClick={openModal}
-          className="ml-2 mr-3"
-        />
+        <Button icon={<HighlightOutlined />} onClick={openModal} className="ml-2 mr-3" />
       </div>
 
       <Modal
@@ -57,12 +74,7 @@ const MassEdit = (props: any) => {
         confirmLoading={confirmLoading}
         maskClosable={false}
       >
-        <JsonForm
-          formData={formData}
-          setFormData={setFormData}
-          handleSubmit={handleSubmit}
-          jsonSchema={schema}
-        />
+        <JsonForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmit} jsonSchema={schema} />
       </Modal>
     </>
   );
