@@ -152,7 +152,6 @@ export const LoadWiresMap = () => {
       const oldNodes = flowInstance.getNodes();
       flowInstance.setNodes([...oldNodes, ...inputNodes]);
       window.allFlow.nodes = [...window.allFlow.nodes, ...inputNodes];
-      console.log('new nodes are: ', inputNodes);
       
       const oldEdges = flowInstance.getEdges();
       flowInstance.setEdges([...oldEdges, ...inputEdges]);
