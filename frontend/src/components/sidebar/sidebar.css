@@ -54,6 +54,8 @@ aside .active {
     cursor: pointer;
 }
 
-.ant-menu-submenu-active.ant-menu-submenu-selected>.ant-menu-submenu-title {
+.ant-menu-submenu-active.ant-menu-submenu-selected>.ant-menu-submenu-title,
+.ant-menu-submenu-active.ant-menu-submenu-selected>.ant-menu-submenu-title:hover {
     background-color: #177ddc;
+    font-weight: bolder;
 }
