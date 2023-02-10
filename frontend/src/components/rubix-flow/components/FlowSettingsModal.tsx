@@ -23,7 +23,7 @@ export type FlowSettings = {
   showMiniMap: boolean;
   showSubFlowTabs: boolean;
   showNodesTree: boolean;
-  showCount:boolean
+  showCount: boolean;
   showNodesPallet: boolean;
   positionMiniMap: string;
 };
@@ -71,6 +71,12 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
     <Space direction="horizontal">
       <label className="flow-setting-modal-labels mb-0 mt-1">{label}: </label>
       <Switch checked={configs[keyConfig] as boolean} size="small" onChange={onChangeConfig(keyConfig)} />
+      {configs[keyConfig] && keyConfig === "showNodesTree" && (
+        <>
+          <label className="flow-setting-modal-labels mb-0 mt-1">{"Show Count"}: </label>
+          <Switch checked={configs["showCount"] as boolean} size="small" onChange={onChangeConfig("showCount")} />
+        </>
+      )}
     </Space>
   );
 
@@ -89,7 +95,6 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
         {renderConfigs("Show Nodes Tree", "showNodesTree")}
         {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
         {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
-        {renderConfigs("Show Count", "showCount")}
         <Space direction="horizontal">
           <label className="flow-setting-modal-labels mb-0">Mini Map Position: </label>
           <Radio.Group onChange={handleChangePosition} value={configs.positionMiniMap}>
