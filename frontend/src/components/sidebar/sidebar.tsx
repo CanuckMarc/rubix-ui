@@ -457,8 +457,14 @@ export const MenuSidebar = () => {
   }, [routeData]);
 
   useEffect(() => {
-    if (location.pathname.includes("/plugins") && location.pathname.includes("/rf-networks")) {
-      const devicePath = location.pathname.split("/plugins")[0];
+    const isBelongToDevicePath =
+      (location.pathname.includes("/plugins") && location.pathname.includes("/rf-networks")) ||
+      location.pathname.includes("/fl-networks");
+    if (isBelongToDevicePath) {
+      ////use for Drivers/Flow Networks/Flow Network Clones routes
+      const devicePath = location.pathname.includes("/rf-networks")
+        ? location.pathname.split("/plugins")[0]
+        : location.pathname.split("/fl-networks")[0];
       setActiveMenu(devicePath);
     } else {
       setActiveMenu(location.pathname);
