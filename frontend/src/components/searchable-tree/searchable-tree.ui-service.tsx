@@ -43,7 +43,7 @@ let ObjectType = {
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
-  WIRES_MAP_REMOTE: "wires-map"
+  WIRES_MAP_REMOTE: "wires-map",
 };
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
@@ -81,31 +81,6 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
 
 const className = "supervisors-menu";
 const isActionLoading = {} as any;
-
-function getItemValue(item: any, type: string) {
-  let itemC = { ...item };
-  let deleteProp = "";
-  switch (type) {
-    case ObjectType.CONNECTIONS:
-      deleteProp = ObjectType.LOCATIONS;
-      break;
-    case ObjectType.LOCATIONS:
-      deleteProp = ObjectType.NETWORKS;
-      break;
-    case ObjectType.HOSTS:
-    case ObjectType.APP_DETAILS:
-    case ObjectType.RUBIX_FLOW_REMOTE:
-    case ObjectType.WIRES_CONNECTIONS_REMOTE:
-    case ObjectType.SCHEDULES_REMOTE:
-    case ObjectType.WIRES_MAP_REMOTE:
-    default:
-      deleteProp = "";
-      break;
-  }
-  if (deleteProp) delete itemC[deleteProp];
-
-  return itemC;
-}
 
 const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
   e.preventDefault(); //prevent navigate
@@ -201,7 +176,6 @@ export const getTreeDataIterative = (connections: any) => {
           getTreeObject(connection, ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid), "", <HomeOutlined />)
         ),
         next: ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
-        value: getItemValue(connection, ObjectType.CONNECTIONS),
         children: (connection.locations || []).map((location: RubixObjectI) => ({
           ...objectMap(
             getTreeObject(
@@ -212,7 +186,6 @@ export const getTreeDataIterative = (connections: any) => {
             )
           ),
           next: ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid),
-          value: getItemValue(location, ObjectType.LOCATIONS),
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...objectMap(
               getTreeObject(
@@ -223,7 +196,6 @@ export const getTreeDataIterative = (connections: any) => {
               )
             ),
             next: ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
-            value: getItemValue(network, ObjectType.NETWORKS),
             children: (network.hosts || []).map((host: RubixObjectI) => ({
               ...objectMap(
                 getTreeObject(
@@ -239,7 +211,6 @@ export const getTreeDataIterative = (connections: any) => {
                 network.uuid,
                 host.uuid
               ),
-              value: getItemValue(host, ObjectType.APP_DETAILS),
               children: [
                 {
                   ...objectMap(
@@ -251,7 +222,6 @@ export const getTreeDataIterative = (connections: any) => {
                     )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.HOSTS),
                   children: null,
                 },
                 {
@@ -273,7 +243,6 @@ export const getTreeDataIterative = (connections: any) => {
                     )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
                   children: [
                     {
                       ...objectMap(
@@ -285,7 +254,6 @@ export const getTreeDataIterative = (connections: any) => {
                         )
                       ),
                       next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                      value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
                       children: null,
                     },
                     {
@@ -298,7 +266,6 @@ export const getTreeDataIterative = (connections: any) => {
                         )
                       ),
                       next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
-                      value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
                       children: null,
                     },
                     {
@@ -311,7 +278,6 @@ export const getTreeDataIterative = (connections: any) => {
                         )
                       ),
                       next: ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
-                      value: getItemValue(host, ObjectType.WIRES_MAP_REMOTE),
                       children: null,
                     },
                   ],
@@ -327,7 +293,6 @@ export const getTreeDataIterative = (connections: any) => {
                     )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
                 },
               ],
@@ -335,7 +300,6 @@ export const getTreeDataIterative = (connections: any) => {
             })),
             className,
           })),
-          className,
         })),
         className:
           !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,

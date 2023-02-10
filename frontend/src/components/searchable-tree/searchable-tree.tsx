@@ -55,7 +55,7 @@ const SearchableTree: React.FC = () => {
         locations = await getLocations(c.uuid);
         c.locations = locations;
       }
-      updateData(getTreeDataIterative(connections));
+      updateData(getTreeDataIterative(connections, ""));
     } catch (error) {
       console.log(error);
     }
