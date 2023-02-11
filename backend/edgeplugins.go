@@ -335,6 +335,7 @@ func (inst *App) edgeEnablePlugin(assistClient *assistcli.Client, hostUUID strin
 const bacnetServerPlg = "bacnetserver"
 const bacnetMasterPlg = "bacnetmaster"
 const loraPlg = "lora"
+const loraWANPlg = "lorawan"
 const modbusPlg = "modbus"
 const systemPlg = "system"
 const rubixIOPlg = "rubixio"
