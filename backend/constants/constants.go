@@ -16,3 +16,6 @@ const RubixIOApp = "driver-rubix-compute-io"
 const RubixEdgeWires = "rubix-edge-wires"
 const RubixWires = "rubix-wires"
 const LoRaSerialApp = "driver-lora"
+
+const CSUname = "admin"
+const CSPassword = "Helensburgh2508"

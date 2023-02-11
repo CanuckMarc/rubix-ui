@@ -65,7 +65,6 @@ func (inst *ChirpClient) GetDeviceProfiles() (*DeviceProfiles, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(resp.String())
 	return resp.Result().(*DeviceProfiles), nil
 }
 

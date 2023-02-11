@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	mutex       = &sync.RWMutex{}
-	flowClients = map[string]*ChirpClient{}
+	mutex   = &sync.RWMutex{}
+	clients = map[string]*ChirpClient{}
 )
 
 type ChirpClient struct {
@@ -57,7 +57,7 @@ func New(conn *Connection) *ChirpClient {
 	}
 
 	url := fmt.Sprintf("http://%s:%d/api", ip, port)
-	if flowClient, found := flowClients[url]; found {
+	if flowClient, found := clients[url]; found {
 		return flowClient
 	}
 	client := resty.New()
@@ -67,7 +67,7 @@ func New(conn *Connection) *ChirpClient {
 	client.SetTransport(&transport)
 	client.SetHeader("Content-Type", "application/json")
 	flowClient := &ChirpClient{client: client}
-	flowClients[url] = flowClient
+	clients[url] = flowClient
 	return flowClient
 }
 
