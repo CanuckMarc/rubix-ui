@@ -2,17 +2,6 @@ package chirpstack
 
 import "time"
 
-//
-// type Device struct {
-// 	DevEUI      string `json:"devEUI"`
-// 	Name        string `json:"name"`
-// 	Description string `json:"description"`
-// }
-//
-// type Devices struct {
-// 	Result []Device `json:"result"`
-// }
-
 type DeviceAll struct {
 	Device Device `json:"device"`
 }
@@ -28,16 +17,18 @@ type BaseUplink struct {
 	Object map[string]interface{} `json:"object"`
 }
 
+type OrganizationsResult struct {
+	Id              string    `json:"id"`
+	Name            string    `json:"name"`
+	DisplayName     string    `json:"displayName"`
+	CanHaveGateways bool      `json:"canHaveGateways"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+}
+
 type Organizations struct {
-	TotalCount string `json:"totalCount"`
-	Result     []struct {
-		Id              string    `json:"id"`
-		Name            string    `json:"name"`
-		DisplayName     string    `json:"displayName"`
-		CanHaveGateways bool      `json:"canHaveGateways"`
-		CreatedAt       time.Time `json:"createdAt"`
-		UpdatedAt       time.Time `json:"updatedAt"`
-	} `json:"result"`
+	TotalCount string                `json:"totalCount"`
+	Result     []OrganizationsResult `json:"result"`
 }
 
 type DevicesResult struct {
@@ -61,18 +52,7 @@ type Devices struct {
 	Result     []DevicesResult `json:"result"`
 }
 
-// Device POST and PUT (put is edit)
-type Device struct {
-	Device struct {
-		DevEUI          string `json:"devEUI"`
-		Name            string `json:"name"`
-		ApplicationID   string `json:"applicationID"`
-		Description     string `json:"description"`
-		DeviceProfileID string `json:"deviceProfileID"`
-	} `json:"device"`
-}
-
-type GetDevice struct {
+type T struct {
 	Device struct {
 		DevEUI            string `json:"devEUI"`
 		Name              string `json:"name"`
@@ -87,6 +67,19 @@ type GetDevice struct {
 		} `json:"tags"`
 		IsDisabled bool `json:"isDisabled"`
 	} `json:"device"`
+}
+
+type DeviceBody struct {
+	DevEUI          string `json:"devEUI"`
+	Name            string `json:"name"`
+	ApplicationID   string `json:"applicationID"`
+	Description     string `json:"description"`
+	DeviceProfileID string `json:"deviceProfileID"`
+	IsDisabled      bool   `json:"isDisabled"`
+}
+
+type Device struct {
+	Device              *DeviceBody `json:"device"`
 	LastSeenAt          interface{} `json:"lastSeenAt"`
 	DeviceStatusBattery int         `json:"deviceStatusBattery"`
 	DeviceStatusMargin  int         `json:"deviceStatusMargin"`
@@ -149,74 +142,63 @@ type Applications struct {
 	Result     []ApplicationsResult `json:"result"`
 }
 
+type ServiceProfilesResult struct {
+	Id                string    `json:"id"`
+	Name              string    `json:"name"`
+	OrganizationID    string    `json:"organizationID"`
+	NetworkServerID   string    `json:"networkServerID"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
+	NetworkServerName string    `json:"networkServerName"`
+}
+
 type ServiceProfiles struct {
-	TotalCount string `json:"totalCount"`
-	Result     []struct {
-		Id                string    `json:"id"`
-		Name              string    `json:"name"`
-		OrganizationID    string    `json:"organizationID"`
-		NetworkServerID   string    `json:"networkServerID"`
-		CreatedAt         time.Time `json:"createdAt"`
-		UpdatedAt         time.Time `json:"updatedAt"`
-		NetworkServerName string    `json:"networkServerName"`
-	} `json:"result"`
+	TotalCount string                  `json:"totalCount"`
+	Result     []ServiceProfilesResult `json:"result"`
+}
+
+type GatewayProfilesResult struct {
+	Id                string    `json:"id"`
+	Name              string    `json:"name"`
+	NetworkServerID   string    `json:"networkServerID"`
+	NetworkServerName string    `json:"networkServerName"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
 }
 
 type GatewayProfiles struct {
-	TotalCount string `json:"totalCount"`
-	Result     []struct {
-		Id                string    `json:"id"`
-		Name              string    `json:"name"`
-		NetworkServerID   string    `json:"networkServerID"`
-		NetworkServerName string    `json:"networkServerName"`
-		CreatedAt         time.Time `json:"createdAt"`
-		UpdatedAt         time.Time `json:"updatedAt"`
-	} `json:"result"`
+	TotalCount string                  `json:"totalCount"`
+	Result     []GatewayProfilesResult `json:"result"`
+}
+
+type UsersResult struct {
+	Id         string      `json:"id"`
+	Email      string      `json:"email"`
+	SessionTTL int         `json:"sessionTTL"`
+	IsAdmin    interface{} `json:"isAdmin"`
+	IsActive   interface{} `json:"isActive"`
+	CreatedAt  time.Time   `json:"createdAt"`
+	UpdatedAt  time.Time   `json:"updatedAt"`
 }
 
 type Users struct {
-	TotalCount string `json:"totalCount"`
-	Result     []struct {
-		Id         string      `json:"id"`
-		Email      string      `json:"email"`
-		SessionTTL int         `json:"sessionTTL"`
-		IsAdmin    interface{} `json:"isAdmin"`
-		IsActive   interface{} `json:"isActive"`
-		CreatedAt  time.Time   `json:"createdAt"`
-		UpdatedAt  time.Time   `json:"updatedAt"`
-	} `json:"result"`
+	TotalCount string        `json:"totalCount"`
+	Result     []UsersResult `json:"result"`
+}
+
+type GatewaysResult struct {
+	Id              string    `json:"id"`
+	Name            string    `json:"name"`
+	Description     string    `json:"description"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+	FirstSeenAt     time.Time `json:"firstSeenAt"`
+	LastSeenAt      time.Time `json:"lastSeenAt"`
+	OrganizationID  string    `json:"organizationID"`
+	NetworkServerID string    `json:"networkServerID"`
 }
 
 type Gateways struct {
-	TotalCount string `json:"totalCount"`
-	Result     []struct {
-		Id              string    `json:"id"`
-		Name            string    `json:"name"`
-		Description     string    `json:"description"`
-		CreatedAt       time.Time `json:"createdAt"`
-		UpdatedAt       time.Time `json:"updatedAt"`
-		FirstSeenAt     time.Time `json:"firstSeenAt"`
-		LastSeenAt      time.Time `json:"lastSeenAt"`
-		OrganizationID  string    `json:"organizationID"`
-		NetworkServerID string    `json:"networkServerID"`
-		Location        struct {
-			Latitude  int    `json:"latitude"`
-			Longitude int    `json:"longitude"`
-			Altitude  int    `json:"altitude"`
-			Source    string `json:"source"`
-			Accuracy  int    `json:"accuracy"`
-		} `json:"location"`
-	} `json:"result"`
-}
-
-type Server struct {
-	Ip                string `json:"ip"`
-	Port              int    `json:"port"`
-	DeviceId          string `json:"device_id"`
-	LocalObjName      string `json:"local_obj_name"`
-	ModelName         string `json:"model_name"`
-	VendorId          string `json:"vendor_id"`
-	VendorName        string `json:"vendor_name"`
-	EnableIpByNicName bool   `json:"enable_ip_by_nic_name"`
-	IpByNicName       string `json:"ip_by_nic_name"` // eth0
+	TotalCount string           `json:"totalCount"`
+	Result     []GatewaysResult `json:"result"`
 }

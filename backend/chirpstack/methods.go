@@ -107,28 +107,28 @@ func (inst *ChirpClient) AddDevice(body Devices) (*Devices, error) {
 }
 
 // GetDevice get an object
-func (inst *ChirpClient) GetDevice(devEui string) (*GetDevice, error) {
+func (inst *ChirpClient) GetDevice(devEui string) (*Device, error) {
 	q := fmt.Sprintf("/devices/%s", devEui)
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
-		SetResult(GetDevice{}).
+		SetResult(Device{}).
 		Get(q))
 	if err != nil {
 		return nil, err
 	}
-	return resp.Result().(*GetDevice), nil
+	return resp.Result().(*Device), nil
 }
 
 // EditDevice edit object
-func (inst *ChirpClient) EditDevice(devEui string, body Device) (bool, error) {
+func (inst *ChirpClient) EditDevice(devEui string, body *Device) (*Device, error) {
 	q := fmt.Sprintf("/devices/%s", devEui)
-	_, err := nresty.FormatRestyResponse(inst.client.R().
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(Device{}).
 		SetBody(body).
 		Put(q))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, nil
+	return resp.Result().(*Device), nil
 }
 
 // DeleteDevice delete
