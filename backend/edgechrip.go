@@ -21,17 +21,17 @@ func (inst *App) csLogin(connUUID, hostUUID string) (*assistcli.Client, string, 
 	return assistClient, token, nil
 }
 
-func (inst *App) CSGetDevices(connUUID, hostUUID, applicationID string) *chirpstack.Devices {
+func (inst *App) CSGetApplications(connUUID, hostUUID string) *chirpstack.Applications {
 	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
 	if err != nil {
 		return nil
 	}
-	devices, err := assistClient.CSGetDevices(hostUUID, token, applicationID)
+	resp, err := assistClient.CSGetApplications(hostUUID, token)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	return devices
+	return resp
 }
 
 func (inst *App) CSGetDeviceProfiles(connUUID, hostUUID string) *chirpstack.DeviceProfiles {
@@ -45,4 +45,69 @@ func (inst *App) CSGetDeviceProfiles(connUUID, hostUUID string) *chirpstack.Devi
 		return nil
 	}
 	return devices
+}
+
+func (inst *App) CSGetDevices(connUUID, hostUUID, applicationID string) *chirpstack.Devices {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	devices, err := assistClient.CSGetDevices(hostUUID, token, applicationID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSGetDevice(connUUID, hostUUID, devEui string) *chirpstack.Device {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	devices, err := assistClient.CSGetDevice(hostUUID, token, devEui)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSAddDevice(connUUID, hostUUID string, body *chirpstack.Device) *chirpstack.Device {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	devices, err := assistClient.CSAddDevice(hostUUID, token, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSEditDevice(connUUID, hostUUID, devEui string, body *chirpstack.Device) *chirpstack.Device {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	devices, err := assistClient.CSEditDevice(hostUUID, token, devEui, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSDeleteDevice(connUUID, hostUUID, devEui string) bool {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return false
+	}
+	deleted, err := assistClient.CSDeleteDevice(hostUUID, token, devEui)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return deleted
+	}
+	return deleted
 }
