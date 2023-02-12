@@ -10,6 +10,25 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type LatestVersions struct {
+	LatestReleaseVersion     string
+	LatestRubixEdgeVersion   string
+	LatestRubixAssistVersion string
+}
+
+func (inst *App) LatestVersions() *LatestVersions {
+	return &LatestVersions{
+		LatestReleaseVersion:     inst.LatestReleaseVersion,
+		LatestRubixEdgeVersion:   inst.LatestRubixEdgeVersion,
+		LatestRubixAssistVersion: inst.LatestRubixAssistVersion,
+	}
+}
+
+func (inst *App) EdgeBiosRubixAssistVersions() []string {
+	const repo = "rubix-assist"
+	return inst.getRepoVersions(constants.GitHubOwner, repo)
+}
+
 func (inst *App) EdgeBiosRubixEdgeVersions() []string {
 	const repo = "rubix-edge"
 	return inst.getRepoVersions(constants.GitHubOwner, repo)

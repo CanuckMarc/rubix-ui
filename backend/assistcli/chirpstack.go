@@ -6,6 +6,8 @@ import (
 	"github.com/NubeIO/rubix-ui/backend/chirpstack"
 )
 
+// most nube supported sensors are now added as OTA devices
+
 const limit = "200"
 
 // CSLogin to CS with username and password to get token if not provided in config
@@ -161,4 +163,36 @@ func (inst *Client) CSDeleteDevice(hostIDName, token, devEui string) (bool, erro
 		return false, err
 	}
 	return true, nil
+}
+
+// CSDeviceKeys active a device
+func (inst *Client) CSDeviceKeys(hostIDName, token, devEui string, body *chirpstack.DeviceKey) (*chirpstack.DeviceKey, error) {
+	q := fmt.Sprintf("/devices/%s/keys", devEui)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(chirpstack.DeviceKey{}).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetHeader("cs-token", token).
+		SetBody(body).
+		Put(q))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*chirpstack.DeviceKey), nil
+}
+
+// CSActivateDevice active a device
+func (inst *Client) CSActivateDevice(hostIDName, token, devEui string, body *chirpstack.DeviceActivation) (*chirpstack.DeviceActivation, error) {
+	q := fmt.Sprintf("/devices/%s/activate", devEui)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(chirpstack.DeviceActivation{}).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetHeader("cs-token", token).
+		SetBody(body).
+		Put(q))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*chirpstack.DeviceActivation), nil
 }

@@ -8,7 +8,7 @@ import {
   GetRelease,
   GetReleases,
   GitDownloadRelease,
-  GitListReleases
+  GitListReleases, LatestVersions
 } from "../../../wailsjs/go/backend/App";
 
 export class ReleasesFactory {
@@ -71,4 +71,10 @@ export class ReleasesFactory {
     }
     return Promise.reject(null);
   }
+
+  // gets all the latest version of nube software, assist, edge and FF
+  async LatestVersions() {
+    return await LatestVersions();
+  }
+
 }

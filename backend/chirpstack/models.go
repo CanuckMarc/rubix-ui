@@ -86,6 +86,15 @@ type Device struct {
 	Location            interface{} `json:"location"`
 }
 
+type DeviceKey struct {
+	DeviceKeys struct {
+		DevEUI    string `json:"devEUI"`
+		NwkKey    string `json:"nwkKey"`
+		AppKey    string `json:"appKey"`
+		GenAppKey string `json:"genAppKey"`
+	} `json:"deviceKeys"`
+}
+
 type DeviceActivation struct {
 	DeviceActivation struct {
 		DevAddr     string `json:"devAddr"`
