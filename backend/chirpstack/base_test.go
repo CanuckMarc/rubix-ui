@@ -9,7 +9,7 @@ import (
 var ipAddr string = "192.168.15.17"
 var uName string = "admin"
 var pass string = "Helensburgh2508"
-var deviceEUI string = "9ce3cb7d914a5ef5"
+var deviceEUI string = "bd6324d827cc20b3"
 
 func TestChirpClient_Login(t *testing.T) {
 
@@ -83,6 +83,47 @@ func TestChirpClient_EditDevice(t *testing.T) {
 	dev.Device.Name = "new name"
 
 	respEdit, err := c.EditDevice(dev.Device.DevEUI, dev)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	pprint.PrintJOSN(respEdit)
+}
+
+func TestChirpClient_AddDevice(t *testing.T) {
+
+	c := New(&Connection{Ip: ipAddr})
+	err := c.Login(uName, pass)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dev, err := c.GetDevice(deviceEUI)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dev.Device.Name = "new name"
+	dev.Device.DevEUI = "ccc693d239c20422"
+	pprint.PrintJOSN(dev)
+
+	respEdit, err := c.AddDevice(dev)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	pprint.PrintJOSN(respEdit)
+}
+
+func TestChirpClient_DeleteDevice(t *testing.T) {
+
+	c := New(&Connection{Ip: ipAddr})
+	err := c.Login(uName, pass)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	respEdit, err := c.DeleteDevice(deviceEUI)
 	if err != nil {
 		fmt.Println(err)
 		return

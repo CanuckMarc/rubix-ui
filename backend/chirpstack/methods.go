@@ -93,16 +93,16 @@ func (inst *ChirpClient) GetGatewayProfiles() (*GatewayProfiles, error) {
 }
 
 // AddDevice add all
-func (inst *ChirpClient) AddDevice(body Devices) (*Devices, error) {
+func (inst *ChirpClient) AddDevice(body *Device) (*Device, error) {
 	q := fmt.Sprintf("/devices")
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
-		SetResult(Devices{}).
+		SetResult(Device{}).
 		SetBody(body).
 		Post(q))
 	if err != nil {
 		return nil, err
 	}
-	return resp.Result().(*Devices), nil
+	return resp.Result().(*Device), nil
 }
 
 // GetDevice get an object
@@ -139,4 +139,17 @@ func (inst *ChirpClient) DeleteDevice(devEui string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// ActivateDevice activate a device
+func (inst *ChirpClient) ActivateDevice(devEui string, body *DeviceActivation) (*DeviceActivation, error) {
+	q := fmt.Sprintf("/devices/%s/activate", devEui)
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(DeviceActivation{}).
+		SetBody(body).
+		Put(q))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*DeviceActivation), nil
 }

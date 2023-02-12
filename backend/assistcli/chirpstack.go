@@ -72,6 +72,21 @@ func (inst *Client) CSGetDevices(hostIDName, token, applicationID string) (*chir
 	return resp.Result().(*chirpstack.Devices), nil
 }
 
+// CSGetDevice get a device
+func (inst *Client) CSGetDevice(hostIDName, token, devEui string) (*chirpstack.Device, error) {
+	q := fmt.Sprintf("proxy/chirp/api/devices/%s", devEui)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(chirpstack.Device{}).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetHeader("cs-token", token).
+		Get(q))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*chirpstack.Device), nil
+}
+
 // CSGetDeviceProfiles get all
 func (inst *Client) CSGetDeviceProfiles(hostIDName, token string) (*chirpstack.DeviceProfiles, error) {
 	q := fmt.Sprintf("proxy/chirp/api/device-profiles?limit=%s", limit)
@@ -87,11 +102,26 @@ func (inst *Client) CSGetDeviceProfiles(hostIDName, token string) (*chirpstack.D
 	return resp.Result().(*chirpstack.DeviceProfiles), nil
 }
 
+// CSGetGateways get all gateways
+func (inst *Client) CSGetGateways(hostIDName, token string) (*chirpstack.Gateways, error) {
+	q := fmt.Sprintf("proxy/chirp/api/gateways?limit=%s", limit)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetResult(chirpstack.Gateways{}).
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetHeader("cs-token", token).
+		Get(q))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*chirpstack.Gateways), nil
+}
+
 // CSAddDevice add all
-func (inst *Client) CSAddDevice(hostIDName, token string, body *chirpstack.Devices) (*chirpstack.Devices, error) {
+func (inst *Client) CSAddDevice(hostIDName, token string, body *chirpstack.Device) (*chirpstack.Device, error) {
 	q := fmt.Sprintf("proxy/chirp/api/devices")
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
-		SetResult(chirpstack.Devices{}).
+		SetResult(chirpstack.Device{}).
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
 		SetHeader("cs-token", token).
@@ -100,11 +130,11 @@ func (inst *Client) CSAddDevice(hostIDName, token string, body *chirpstack.Devic
 	if err != nil {
 		return nil, err
 	}
-	return resp.Result().(*chirpstack.Devices), nil
+	return resp.Result().(*chirpstack.Device), nil
 }
 
 // CSEditDevice edit object
-func (inst *Client) CSEditDevice(devEui, hostIDName, token string, body *chirpstack.Device) (*chirpstack.Device, error) {
+func (inst *Client) CSEditDevice(hostIDName, token, devEui string, body *chirpstack.Device) (*chirpstack.Device, error) {
 	q := fmt.Sprintf("proxy/chirp/api/devices/%s", devEui)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetResult(chirpstack.Device{}).
@@ -120,7 +150,7 @@ func (inst *Client) CSEditDevice(devEui, hostIDName, token string, body *chirpst
 }
 
 // CSDeleteDevice delete
-func (inst *Client) CSDeleteDevice(devEui, hostIDName, token string) (bool, error) {
+func (inst *Client) CSDeleteDevice(hostIDName, token, devEui string) (bool, error) {
 	q := fmt.Sprintf("/devices/%s", devEui)
 	_, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
