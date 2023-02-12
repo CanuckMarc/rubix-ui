@@ -28,6 +28,20 @@ func (inst *App) CSGetDevices(connUUID, hostUUID, applicationID string) *chirpst
 	}
 	devices, err := assistClient.CSGetDevices(hostUUID, token, applicationID)
 	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSGetDeviceProfiles(connUUID, hostUUID string) *chirpstack.DeviceProfiles {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	devices, err := assistClient.CSGetDeviceProfiles(hostUUID, token)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
 	return devices

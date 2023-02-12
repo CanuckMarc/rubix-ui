@@ -86,9 +86,8 @@ type Device struct {
 	Location            interface{} `json:"location"`
 }
 
-// DeviceActivation used to GET Activation
 type DeviceActivation struct {
-	DA struct {
+	DeviceActivation struct {
 		DevAddr     string `json:"devAddr"`
 		NwkSEncKey  string `json:"nwkSEncKey"`
 		AppSKey     string `json:"appSKey"`
