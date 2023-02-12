@@ -23,9 +23,12 @@ func (inst *App) errMsg(err error) error {
 }
 
 type App struct {
-	ctx      context.Context
-	DB       storage.IStorage
-	appStore store.IAppStore
+	ctx                      context.Context
+	DB                       storage.IStorage
+	appStore                 store.IAppStore
+	LatestReleaseVersion     string
+	LatestRubixEdgeVersion   string
+	LatestRubixAssistVersion string
 }
 
 type AssistClient struct {
@@ -43,9 +46,44 @@ func NewApp() *App {
 	return app
 }
 
+func (inst *App) getLatestVersions() {
+	token, err := inst.DB.GetGitToken(false)
+	if err != nil {
+		log.Errorf("failed to get git token")
+		return
+	}
+	if token == "" {
+		log.Errorf("please contact nube support for a git token")
+		return
+	}
+	edgeVersions := inst.EdgeBiosRubixEdgeVersions()
+	if len(edgeVersions) > 0 {
+		inst.LatestRubixEdgeVersion = edgeVersions[0]
+	} else {
+		// assume the token was bad to don't try and get the other versions of assist and FF
+		return
+	}
+
+	listReleases := inst.GitListReleases(token)
+	if len(listReleases) > 0 {
+		inst.LatestReleaseVersion = listReleases[0].Name
+	}
+	assistVersions := inst.EdgeBiosRubixAssistVersions()
+	if len(assistVersions) > 0 {
+		inst.LatestRubixAssistVersion = assistVersions[0]
+	}
+
+	log.Infof("lastest rubix-edge version: %s", inst.LatestRubixEdgeVersion)
+	log.Infof("lastest rubix-assist version: %s", inst.LatestRubixAssistVersion)
+	log.Infof("lastest release version: %s", inst.LatestReleaseVersion)
+	log.Infof("lastest flow-framework version: %s", inst.LatestReleaseVersion)
+
+}
+
 // OnStartup is called when the app starts. The context is saved, so we can call the runtime methods
 func (inst *App) OnStartup(ctx context.Context) {
 	inst.ctx = ctx
+	go inst.getLatestVersions()
 }
 
 func (inst *App) OnReload() {
