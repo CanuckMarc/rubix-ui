@@ -11,16 +11,18 @@ import (
 )
 
 type LatestVersions struct {
-	LatestReleaseVersion     string
-	LatestRubixEdgeVersion   string
-	LatestRubixAssistVersion string
+	LatestFlowFrameworkVersion string
+	LatestReleaseVersion       string
+	LatestRubixEdgeVersion     string
+	LatestRubixAssistVersion   string
 }
 
 func (inst *App) LatestVersions() *LatestVersions {
 	return &LatestVersions{
-		LatestReleaseVersion:     inst.LatestReleaseVersion,
-		LatestRubixEdgeVersion:   inst.LatestRubixEdgeVersion,
-		LatestRubixAssistVersion: inst.LatestRubixAssistVersion,
+		LatestFlowFrameworkVersion: inst.LatestReleaseVersion,
+		LatestReleaseVersion:       inst.LatestReleaseVersion,
+		LatestRubixEdgeVersion:     inst.LatestRubixEdgeVersion,
+		LatestRubixAssistVersion:   inst.LatestRubixAssistVersion,
 	}
 }
 
