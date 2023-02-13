@@ -5,6 +5,7 @@ import (
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/chirpstack"
 	"github.com/NubeIO/rubix-ui/backend/constants"
+	log "github.com/sirupsen/logrus"
 )
 
 func (inst *App) csLogin(connUUID, hostUUID string) (*assistcli.Client, string, error) {
@@ -51,6 +52,26 @@ func (inst *App) CSGetDevices(connUUID, hostUUID, applicationID string) *chirpst
 	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
 	if err != nil {
 		return nil
+	}
+	if applicationID == "" {
+		apps, err := assistClient.CSGetApplications(hostUUID, token)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return nil
+		}
+		if apps == nil {
+			inst.uiErrorMessage("no application has been added, please add one before trying to add a device")
+			return nil
+		}
+		for _, result := range apps.Result {
+			applicationID = result.Id
+		}
+		if applicationID == "" {
+			inst.uiErrorMessage("no application has been added, please add one before trying to add a device")
+			return nil
+		} else {
+			log.Infof("lorawan-api: use application id: %s", applicationID)
+		}
 	}
 	devices, err := assistClient.CSGetDevices(hostUUID, token, applicationID)
 	if err != nil {
