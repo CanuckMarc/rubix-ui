@@ -13,7 +13,7 @@ func Test_EdgeGetPluginsDistribution(t *testing.T) {
 
 func Test_EdgeGetPlugins(t *testing.T) {
 	app := MockNewApp()
-	resp := app.EdgeGetPlugins("cloud", "rc")
+	resp := app.EdgeGetPlugins("cloud", "rc", false)
 	pprint.PrintJOSN(resp)
 }
 
