@@ -4,7 +4,7 @@ import {
   DeleteFlowNetwork,
   DeleteFlowNetworkBulk,
   EditFlowNetwork,
-  GetFlowNetwork,
+  FFSystemPing,
   GetFlowNetworks,
 } from "../../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../../helpers/checks";
@@ -18,88 +18,38 @@ export class FlowFrameworkNetworkFactory {
   connectionUUID!: string;
 
   async GetAll(withStream: boolean): Promise<Array<model.FlowNetwork>> {
-    let resp: Promise<Array<model.FlowNetwork>> = {} as Promise<
-      Array<model.FlowNetwork>
-    >;
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    await GetFlowNetworks(this.connectionUUID, this.hostUUID, withStream)
-      .then((res) => {
-        resp = res as unknown as Promise<Array<model.FlowNetwork>>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
-  }
-
-  async GetOne(uuid: string, withStream: boolean): Promise<model.FlowNetwork> {
-    hasUUID(this.connectionUUID);
-    hasUUID(this.hostUUID);
-    let resp: model.FlowNetwork = {} as model.FlowNetwork;
-    await GetFlowNetwork(this.connectionUUID, this.hostUUID, uuid, withStream)
-      .then((res) => {
-        resp = res as model.FlowNetwork;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return GetFlowNetworks(this.connectionUUID, this.hostUUID, withStream);
   }
 
   async Add(body: model.FlowNetwork): Promise<model.FlowNetwork> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    let resp: model.FlowNetwork = {} as model.FlowNetwork;
-    await AddFlowNetwork(this.connectionUUID, this.hostUUID, body)
-      .then((res) => {
-        resp = res as model.FlowNetwork;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return AddFlowNetwork(this.connectionUUID, this.hostUUID, body);
   }
 
   async Update(uuid: string, body: model.FlowNetwork): Promise<model.FlowNetwork> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    let resp: model.FlowNetwork = {} as model.FlowNetwork;
-    await EditFlowNetwork(this.connectionUUID, this.hostUUID, uuid, body)
-      .then((res) => {
-        resp = res as model.FlowNetwork;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return EditFlowNetwork(this.connectionUUID, this.hostUUID, uuid, body);
   }
 
   async Delete(uuid: string): Promise<model.FlowNetwork> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    let resp: model.FlowNetwork = {} as model.FlowNetwork;
-    await DeleteFlowNetwork(this.connectionUUID, this.hostUUID, uuid)
-      .then((res) => {
-        resp = res as model.FlowNetwork;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return DeleteFlowNetwork(this.connectionUUID, this.hostUUID, uuid);
   }
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    let resp: Promise<any> = {} as Promise<any>;
-    await DeleteFlowNetworkBulk(this.connectionUUID, this.hostUUID, uuids)
-      .then((res) => {
-        resp = res as Promise<any>;
-      })
-      .catch((err) => {
-        return resp;
-      });
-    return resp;
+    return DeleteFlowNetworkBulk(this.connectionUUID, this.hostUUID, uuids);
+  }
+
+  async FFSystemPing(hostUUID: string): Promise<any> {
+    hasUUID(this.connectionUUID);
+    hasUUID(hostUUID);
+    return FFSystemPing(this.connectionUUID, hostUUID);
   }
 }

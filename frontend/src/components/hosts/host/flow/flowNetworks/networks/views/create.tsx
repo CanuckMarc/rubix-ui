@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { model } from "../../../../../../../../wailsjs/go/models";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { useParams } from "react-router-dom";
-import { Checkbox, Form, Input, Modal } from "antd";
+import { Checkbox, Form, Input, Modal, Select } from "antd";
 import { DebounceInputForm } from "../../../../../../../common/debounce-form-input";
 import { TokenFormInput } from "../../../../../../../common/token-form-input";
 
@@ -18,6 +18,14 @@ export const CreateEditModal = (props: any) => {
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
+  useEffect(() => {
+    form.setFieldsValue(currentItem)
+    console.log("currentItem", currentItem)
+    console.log("form", form.getFieldValue("flow_token_local"))
+    console.log("is_remote", form.getFieldValue("is_remote"))
+    console.log("flow_token>>>", form.getFieldValue("flow_token"))
+  }, [currentItem]);
+
   const _onCloseModal = () => {
     form.resetFields();
     onCloseModal();
@@ -25,7 +33,8 @@ export const CreateEditModal = (props: any) => {
 
   const handleSubmit = async () => {
     const network = form.validateFields;
-    console.log("flow_token_local", form.getFieldValue("flow_token_local"));
+    console.log("network", form)
+    console.log("name", form.getFieldValue("name"))
     // network.flow_https = false;
     // network.flow_https_local = false;
     // network.is_token_auth = true;
@@ -46,12 +55,12 @@ export const CreateEditModal = (props: any) => {
     // }
   };
 
-  const showAdditionalFields = Form.useWatch('is_remote', form) == true;
+  const showAdditionalFields = Form.useWatch('is_remote', form);
 
   return (
     <>
       <Modal
-        title={currentItem.uuid ? "Edit " + currentItem.name : "Add"}
+        title={currentItem.uuid ? `Edit ${currentItem.name}` : "Add New Flow Network"}
         visible={isModalVisible}
         onOk={() => handleSubmit()}
         onCancel={_onCloseModal}
@@ -71,7 +80,7 @@ export const CreateEditModal = (props: any) => {
             rules={[
               {
                 required: true,
-                message: 'Please input the Name!',
+                message: 'Please input the Name',
               },
             ]}
           >
@@ -84,16 +93,19 @@ export const CreateEditModal = (props: any) => {
           {
             showAdditionalFields && <>
               <DebounceInputForm
-                name="flow_ip_remote"
+                name="flow_ip"
                 label="Flow IP Remote"
                 placeholder="1.1.1.1"
                 rules={[
                   {
                     required: true,
-                    message: 'Flow IP Remote is a required field.',
+                    message: 'Flow IP Remote is a required field',
                   }
                 ]}
-                onCall={(url: string) => Promise.resolve({ success: true })}
+                onCall={async (input: string) => {
+                  await factory.FFSystemPing(input)
+                  return Promise.resolve({ error: "Invalid IP", success: false })
+                }}
               />
               <TokenFormInput
                 form={form}
@@ -102,7 +114,7 @@ export const CreateEditModal = (props: any) => {
                 rules={[
                   {
                     required: true,
-                    message: 'Flow IP Remote is a required field.',
+                    message: 'Flow IP Remote is a required field',
                   }
                 ]}
                 onCall={(username: string, password: string) => Promise.resolve({
@@ -110,15 +122,14 @@ export const CreateEditModal = (props: any) => {
                   success: true
                 })}
               />
-
               <TokenFormInput
                 form={form}
-                name="flow_token_remote"
+                name="flow_token"
                 label="Flow Token Remote"
                 rules={[
                   {
                     required: true,
-                    message: 'Flow IP Remote is a required field.',
+                    message: 'Flow IP Remote is a required field',
                   }
                 ]}
                 onCall={(username: string, password: string) => Promise.resolve({

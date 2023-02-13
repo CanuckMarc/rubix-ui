@@ -1,11 +1,11 @@
 import { Button, Col, Form, Input, Row, Tooltip } from "antd";
 import { FormInstance, Rule, } from "antd/lib/form";
 import { ArrowLeftOutlined, ArrowRightOutlined, LoadingOutlined, ScanOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export interface TokenFormInputProps {
   name: string;
-  form: FormInstance<any>;
+  form: FormInstance;
   label?: string;
   placeholder?: string;
   rules?: Rule[];
@@ -20,7 +20,6 @@ export interface TokenFormLoginResponse {
 export const TokenFormInput = (props: TokenFormInputProps) => {
   const [useAuth, setUseAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState("");
 
   const [form] = Form.useForm();
   const [, forceUpdate] = useState({});
@@ -28,12 +27,6 @@ export const TokenFormInput = (props: TokenFormInputProps) => {
   const toggleAuth = () => {
     setUseAuth(!useAuth);
   };
-
-  useEffect(() => {
-    props.form.setFieldsValue({
-      [props.name]: token
-    });
-  }, [useAuth]);
 
   const onLogin = () => {
     setIsLoading(true);
@@ -43,7 +36,9 @@ export const TokenFormInput = (props: TokenFormInputProps) => {
     props.onCall(username, password).then((response) => {
       setIsLoading(false);
       if (response.success) {
-        setToken(response.token ?? "");
+        props.form.setFieldsValue({
+          [props.name]: response.token ?? ""
+        });
         setUseAuth(false);
       }
     });
@@ -124,7 +119,6 @@ export const TokenFormInput = (props: TokenFormInputProps) => {
           name={props.name}
           label={props.label}
           rules={props.rules}
-          initialValue={token}
           shouldUpdate={(prevValues, curValues) => {
             return prevValues.token !== curValues.token;
           }}

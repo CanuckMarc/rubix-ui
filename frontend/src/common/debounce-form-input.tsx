@@ -1,9 +1,7 @@
-import { Form, Input } from "antd";
+import { Form, Input, Select } from "antd";
 import { Rule } from "antd/lib/form";
 import debounce from "debounce-promise";
 import { useState } from "react";
-
-const { Search } = Input;
 
 export interface DebounceInputFormProps {
   name: string;
@@ -18,9 +16,8 @@ export interface DebounceInputResponse {
   success: boolean,
 }
 
-
-const onValidateUrl = debounce((url: string, onCall: (input: string) => Promise<DebounceInputResponse>) => {
-  return onCall(url);
+const onValidateInput = debounce((input: string, onCall: (input: string) => Promise<DebounceInputResponse>) => {
+  return onCall(input);
 }, 500);
 
 enum ValidateStatus {
@@ -52,14 +49,14 @@ export const DebounceInputForm = (props: DebounceInputFormProps) => {
             return Promise.resolve();
           } else {
             return new Promise((resolve, reject) => {
-              onValidateUrl(value, props.onCall).then(
+              onValidateInput(value, props.onCall).then(
                 (response: any) => {
-                  if (response) {
+                  if (response.success) {
                     setValidateStatus(ValidateStatus.success);
                     resolve(true);
                   } else {
                     setValidateStatus(ValidateStatus.error);
-                    reject("Invlaid url.");
+                    reject(response?.error || "Invalid");
                   }
                 }
               );
@@ -69,8 +66,8 @@ export const DebounceInputForm = (props: DebounceInputFormProps) => {
       })
     ]}
   >
-    <Input
-      placeholder={props.placeholder}
+    <Select
+      options={[{ value: 'lucy', label: 'Lucy' }]}
     />
   </Form.Item>;
 };
