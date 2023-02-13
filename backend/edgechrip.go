@@ -99,6 +99,32 @@ func (inst *App) CSAddDevice(connUUID, hostUUID string, body *chirpstack.Device)
 	if err != nil {
 		return nil
 	}
+	if body == nil {
+		inst.uiErrorMessage("add lora device body was empty")
+		return nil
+	}
+	applicationID := body.Device.ApplicationID
+	if applicationID == "" {
+		apps, err := assistClient.CSGetApplications(hostUUID, token)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return nil
+		}
+		if apps == nil {
+			inst.uiErrorMessage("no application has been added, please add one before trying to add a device")
+			return nil
+		}
+		for _, result := range apps.Result {
+			applicationID = result.Id
+		}
+		if applicationID == "" {
+			inst.uiErrorMessage("no application has been added, please add one before trying to add a device")
+			return nil
+		} else {
+			log.Infof("lorawan-api: use application id: %s", applicationID)
+		}
+		body.Device.ApplicationID = applicationID
+	}
 	devices, err := assistClient.CSAddDevice(hostUUID, token, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
