@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var ipAddr string = "192.168.15.17"
+var ipAddr string = "123.209.73.116"
 var uName string = "admin"
 var pass string = "Helensburgh2508"
 var deviceEUI string = "bd6324d827cc20b3"
@@ -98,13 +98,18 @@ func TestChirpClient_AddDevice(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	dev, err := c.GetDevice(deviceEUI)
-	if err != nil {
-		fmt.Println(err)
-		return
+
+	dev := &Device{
+		Device: &DeviceBody{
+			DevEUI:          "ccc693d239c20422",
+			Name:            "abc",
+			ApplicationID:   "4",
+			Description:     "my new dev",
+			DeviceProfileID: "31fcdf3c-efbc-439b-aaed-6acca398ecee",
+			IsDisabled:      false,
+		},
 	}
-	dev.Device.Name = "new name"
-	dev.Device.DevEUI = "ccc693d239c20422"
+
 	pprint.PrintJOSN(dev)
 
 	respEdit, err := c.AddDevice(dev)

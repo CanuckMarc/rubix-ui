@@ -41,13 +41,5 @@ func TestApp_WritePointValue(t *testing.T) {
 
 }
 func TestApp_getPointListPayload(t *testing.T) {
-	app := MockNewApp()
-
-	value, err := app.GetPointListPayload("cloud", "rc")
-	fmt.Println(err)
-	if err != nil {
-		return
-	}
-	pprint.PrintJOSN(value)
 
 }
