@@ -66,6 +66,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 declare global {
   interface Window {
     nodesCopied?: NodeInterface[];
+    egdesCopied?: Edge[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
