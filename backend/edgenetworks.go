@@ -35,8 +35,9 @@ func (inst *App) EdgeGetNetworks(connUUID, hostUUID string) []networking.Network
 type IpSettings struct {
 	Type     string   `json:"type" default:"string"`
 	Title    string   `json:"title" default:"ip setting"`
-	Options  []string `json:"enum" default:"[\"dhcp-dynamic\",\"static-fixed\"]"`
-	EnumName []string `json:"enumNames" default:"[\"dhcp-dynamic\",\"static-fixed\"]"`
+	Options  []string `json:"enum" default:"[\"Select option...\",\"dhcp-dynamic\",\"static-fixed\"]"`
+	EnumName []string `json:"enumNames" default:"[\"Select option...\",\"dhcp-dynamic\",\"static-fixed\"]"`
+	Default  string   `json:"default" default:"Select option..."`
 	ReadOnly bool     `json:"readOnly" default:"false"`
 }
 

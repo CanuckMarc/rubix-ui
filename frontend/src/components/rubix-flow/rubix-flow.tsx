@@ -49,6 +49,7 @@ import { LoadBacnetMap } from "./components/LoadBacnetMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
+import SelectMenu from "./components/SelectMenu";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -97,8 +98,10 @@ const Flow = (props: FlowProps) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
+  const [nodeSelect, setNodeSelect] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
   const [nodeMenuVisibility, setNodeMenuVisibility] = useState<XYPosition>();
+  const [nodeMenuSelectVisibility, setNodeMenuSelectVisibility] = useState<XYPosition>();
   const [isMenuOpenFromNodeTree, setMenuOpenFromNodeTree] = useState(false);
   const [lastConnectStart, setLastConnectStart] = useState<OnConnectStartParams>();
   const [isDoubleClick, setIsDoubleClick] = useState(false);
@@ -116,13 +119,15 @@ const Flow = (props: FlowProps) => {
     past: [],
     future: [],
   });
+  const [isChangedFlow, setIsChangedFlow] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
 
-  const [refreshCounter, incrementRefreshCounter] = useIsLoading(
-    (state) => [state.refreshCounter, state.incrementRefreshCounter]
-  )
+  const [refreshCounter, incrementRefreshCounter] = useIsLoading((state) => [
+    state.refreshCounter,
+    state.incrementRefreshCounter,
+  ]);
 
   const { DragSelection } = useSelectionContainer({
     onSelectionChange: (box: Box) => {
@@ -147,6 +152,7 @@ const Flow = (props: FlowProps) => {
       });
       selectableBoxes.current = elemEdges;
     },
+
     onSelectionEnd: () => {
       // when draw area to select nodes
       // we will unselected node that is not show in current view
@@ -179,6 +185,8 @@ const Flow = (props: FlowProps) => {
 
   const onMove = () => setShouldUpdateMiniMap((s) => !s);
 
+  const handleFlowChange = () => setIsChangedFlow(true);
+
   const handleAddNode = useCallback(
     async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
       closeNodePicker();
@@ -208,6 +216,7 @@ const Flow = (props: FlowProps) => {
           past: [...s.past],
         };
       });
+      handleFlowChange();
       setTimeout(() => {
         setNodes((newNodes) => {
           return newNodes.map((item) => ({ ...item, selected: false }));
@@ -228,8 +237,9 @@ const Flow = (props: FlowProps) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
+      
     },
-    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow]
+    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
@@ -319,6 +329,7 @@ const Flow = (props: FlowProps) => {
       nodes: [...window.allFlow.nodes, ...newNodesWithOldId],
       edges: [...window.allFlow.edges, ...finalEdges],
     };
+    handleFlowChange();
 
     // TODO better way to call fit vew after edges render
     setTimeout(() => {
@@ -333,6 +344,7 @@ const Flow = (props: FlowProps) => {
 
   const onClearAllNodes = () => {
     saveCurrentFlowForUndo();
+    handleFlowChange();
     if (selectedNodeForSubFlow) {
       const nodeIdsCleared = nodes
         .filter((node: NodeInterface) => node.parentId === selectedNodeForSubFlow.id)
@@ -413,6 +425,7 @@ const Flow = (props: FlowProps) => {
     setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
     window.allFlow = { nodes: nodesWithSetting, edges: window.allFlow.edges };
+    setIsChangedFlow(false);
     handleRefreshValues();
   };
 
@@ -476,6 +489,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
         }
         return;
       }
@@ -520,6 +534,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
         }
       } else {
         const element = evt.target as HTMLElement;
@@ -541,6 +556,7 @@ const Flow = (props: FlowProps) => {
             past: [...s.past, { edges, nodes }],
             future: s.future,
           }));
+          handleFlowChange();
           window.allFlow.edges = [...window.allFlow.edges, newEdge];
         }
       }
@@ -553,6 +569,7 @@ const Flow = (props: FlowProps) => {
     setLastConnectStart(undefined);
     setNodePickerVisibility(undefined);
     setNodeMenuVisibility(undefined);
+    setNodeMenuSelectVisibility(undefined);
     setIsDoubleClick(false);
   };
 
@@ -600,6 +617,12 @@ const Flow = (props: FlowProps) => {
     const { x, y } = setMousePosition(event);
     setNodeMenuVisibility({ x, y });
     setSelectedNode(node);
+  };
+  const handleSelectContextMenu = (event: ReactMouseEvent) => {
+    const { x, y } = setMousePosition(event);
+    setNodeMenuSelectVisibility({ x, y });
+    const nodeSelect = nodes.filter((item) => item.selected === true);
+    setNodeSelect(nodeSelect);
   };
 
   const setMousePosition = useCallback(
@@ -675,6 +698,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: [...s.future],
     }));
+    handleFlowChange();
   };
 
   const handleUndo = () => {
@@ -692,6 +716,7 @@ const Flow = (props: FlowProps) => {
       setNodes(lastPast.nodes);
       setEdges(lastPast.edges);
       setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+      handleFlowChange();
     }
   };
 
@@ -710,6 +735,7 @@ const Flow = (props: FlowProps) => {
       setNodes([...lastFuture.nodes]);
       setEdges([...lastFuture.edges]);
       setUndoState({ past: [...undoState.past], future: [...undoState.future] });
+      handleFlowChange();
     }
   };
 
@@ -762,6 +788,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+    handleFlowChange();
   };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
@@ -810,6 +837,23 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+    handleFlowChange();
+  };
+
+  const handleAlignLeft = (position: { x: number; y: number }) => {
+    nodes.forEach((item) => {
+      if (item.selected) {
+        item.position.x = position.x;
+      }
+    });
+  };
+
+  const handleAlignRight = (position: { x: number; y: number }, width: number) => {
+    nodes.forEach((item: NodeInterface) => {
+      if (item.selected) {
+        item.position.x = position.x + (width - item.width!!);
+      }
+    });
   };
 
   const handleRefreshValues = async () => {
@@ -1029,6 +1073,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes }],
       future: [...s.future],
     }));
+    handleFlowChange();
   };
 
   useEffect(() => {
@@ -1046,7 +1091,7 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
-          flowSettings = {flowSettings}
+          flowSettings={flowSettings}
         />
       )}
       {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
@@ -1059,7 +1104,10 @@ const Flow = (props: FlowProps) => {
         />
         <ReactFlowProvider>
           <ReactFlow
-            onContextMenu={() => setMenuOpenFromNodeTree(false)}
+            onContextMenu={(event: ReactMouseEvent) => {
+              handleSelectContextMenu(event);
+              setMenuOpenFromNodeTree(false);
+            }}
             nodeTypes={customNodeTypes}
             edgeTypes={customEdgeTypes}
             nodes={nodes}
@@ -1083,6 +1131,17 @@ const Flow = (props: FlowProps) => {
             onNodeDragStop={handleNodeDragStop}
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
+            {nodeMenuSelectVisibility && (
+              <SelectMenu
+                isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
+                position={nodeMenuSelectVisibility}
+                node={nodeSelect}
+                onClose={closeNodePicker}
+                selectedNodeForSubFlow={selectedNodeForSubFlow}
+              />
+            )}
             <LoadWiresMap />
             <LoadBacnetMap />
             <DragSelection />
@@ -1111,6 +1170,7 @@ const Flow = (props: FlowProps) => {
             <Controls />
             <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
             <BehaveControls
+              isChangedFlow={isChangedFlow}
               deleteNodesAndEdges={deleteNodesAndEdges}
               onCopyNodes={handleCopyNodes}
               onUndo={handleUndo}
@@ -1140,6 +1200,8 @@ const Flow = (props: FlowProps) => {
                 isOpenFromNodeTree={isMenuOpenFromNodeTree}
                 deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
                 deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                handleAlignLefts={handleAlignLeft}
+                handleAlignRights={handleAlignRight}
                 deleteNode={deleteNodesAndEdges}
                 duplicateNode={handleCopyNodes}
                 position={nodeMenuVisibility}
@@ -1217,7 +1279,7 @@ export const RubixFlow = () => {
           handleRemoveSelectedNodeForSubFlow={handleRemoveSelectedNodeForSubFlow}
         />
       ) : (
-        <Spin tip="Loading" size="large" style={{ height: '100%', position: 'absolute', top: "50%", left: "60%" }}/>
+        <Spin tip="Loading" size="large" style={{ height: "100%", position: "absolute", top: "50%", left: "60%" }} />
       )}
     </>
   );

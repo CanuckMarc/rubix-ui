@@ -22,6 +22,10 @@ const ERR_EVENT = "err";
 export interface PointTableType {
   key: string;
   name: string;
+  device_name: string;
+  network_name: string;
+  plugin_name: string;
+  point_name: string;
   uuid: string;
 }
 

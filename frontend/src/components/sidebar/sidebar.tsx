@@ -233,6 +233,7 @@ export const MenuSidebar = () => {
   const [menu, setMenu] = useState<MenuProps["items"]>([]);
   const [allKeyMenus, setAllKeyMenus] = useState<string[]>([]);
   const [openingKeys, setOpenningKeys] = useState<string[]>([]);
+  const [activeMenu, setActiveMenu] = useState<string>("");
 
   const sidebarItems = [
     {
@@ -402,8 +403,6 @@ export const MenuSidebar = () => {
     setIsBlockMenu(value);
   };
 
-  eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
-
   const onOpenChange = (openKeys: string[]) => {
     setOpenningKeys(openKeys);
   };
@@ -447,6 +446,8 @@ export const MenuSidebar = () => {
     setAllKeyMenus(menuKeys);
   };
 
+  eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
+
   useEffect(() => {
     fetchConnections();
   }, []);
@@ -454,6 +455,21 @@ export const MenuSidebar = () => {
   useEffect(() => {
     getSupervisorsMenu();
   }, [routeData]);
+
+  useEffect(() => {
+    const isBelongToDevicePath =
+      (location.pathname.includes("/plugins") && location.pathname.includes("/rf-networks")) ||
+      location.pathname.includes("/fl-networks");
+    if (isBelongToDevicePath) {
+      ////use for Drivers/Flow Networks/Flow Network Clones routes
+      const devicePath = location.pathname.includes("/rf-networks")
+        ? location.pathname.split("/plugins")[0]
+        : location.pathname.split("/fl-networks")[0];
+      setActiveMenu(devicePath);
+    } else {
+      setActiveMenu(location.pathname);
+    }
+  }, [location.pathname]);
 
   return (
     <Sider
@@ -483,8 +499,8 @@ export const MenuSidebar = () => {
             theme="dark"
             className="rubix-menu"
             items={menu}
-            selectedKeys={[location.pathname]}
-            activeKey={location.pathname}
+            selectedKeys={[activeMenu]}
+            activeKey={activeMenu}
             openKeys={openingKeys}
             onOpenChange={onOpenChange}
           />
