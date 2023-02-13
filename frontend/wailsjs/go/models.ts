@@ -483,6 +483,7 @@ export namespace backend {
 	    }
 	}
 	
+	
 	export class NetworksList {
 	    name: string;
 	    point_uuid: string;
@@ -562,6 +563,289 @@ export namespace backend {
 	        this.name = source["name"];
 	        this.uuid = source["uuid"];
 	    }
+	}
+
+}
+
+export namespace chirpstack {
+	
+	export class ApplicationsResult {
+	    id: string;
+	    name: string;
+	    description: string;
+	    organizationID: string;
+	    serviceProfileID: string;
+	    serviceProfileName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ApplicationsResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.description = source["description"];
+	        this.organizationID = source["organizationID"];
+	        this.serviceProfileID = source["serviceProfileID"];
+	        this.serviceProfileName = source["serviceProfileName"];
+	    }
+	}
+	export class Applications {
+	    totalCount: string;
+	    result: ApplicationsResult[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Applications(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.totalCount = source["totalCount"];
+	        this.result = this.convertValues(source["result"], ApplicationsResult);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class DeviceBody {
+	    devEUI: string;
+	    name: string;
+	    applicationID: string;
+	    description: string;
+	    deviceProfileID: string;
+	    isDisabled: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DeviceBody(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.devEUI = source["devEUI"];
+	        this.name = source["name"];
+	        this.applicationID = source["applicationID"];
+	        this.description = source["description"];
+	        this.deviceProfileID = source["deviceProfileID"];
+	        this.isDisabled = source["isDisabled"];
+	    }
+	}
+	export class Device {
+	    device?: DeviceBody;
+	    lastSeenAt: any;
+	    deviceStatusBattery: number;
+	    deviceStatusMargin: number;
+	    location: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Device(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.device = this.convertValues(source["device"], DeviceBody);
+	        this.lastSeenAt = source["lastSeenAt"];
+	        this.deviceStatusBattery = source["deviceStatusBattery"];
+	        this.deviceStatusMargin = source["deviceStatusMargin"];
+	        this.location = source["location"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class DeviceProfilesResult {
+	    id: string;
+	    name: string;
+	    organizationID: string;
+	    networkServerID: string;
+	    // Go type: time.Time
+	    createdAt: any;
+	    // Go type: time.Time
+	    updatedAt: any;
+	    networkServerName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DeviceProfilesResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.organizationID = source["organizationID"];
+	        this.networkServerID = source["networkServerID"];
+	        this.createdAt = this.convertValues(source["createdAt"], null);
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	        this.networkServerName = source["networkServerName"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class DeviceProfiles {
+	    totalCount: string;
+	    result: DeviceProfilesResult[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DeviceProfiles(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.totalCount = source["totalCount"];
+	        this.result = this.convertValues(source["result"], DeviceProfilesResult);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class DevicesResult {
+	    devEUI: string;
+	    name: string;
+	    applicationID: string;
+	    description: string;
+	    deviceProfileID: string;
+	    deviceProfileName: string;
+	    deviceStatusBattery: number;
+	    deviceStatusMargin: number;
+	    deviceStatusExternalPowerSource: boolean;
+	    deviceStatusBatteryLevelUnavailable: boolean;
+	    deviceStatusBatteryLevel: number;
+	    // Go type: time.Time
+	    lastSeenAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new DevicesResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.devEUI = source["devEUI"];
+	        this.name = source["name"];
+	        this.applicationID = source["applicationID"];
+	        this.description = source["description"];
+	        this.deviceProfileID = source["deviceProfileID"];
+	        this.deviceProfileName = source["deviceProfileName"];
+	        this.deviceStatusBattery = source["deviceStatusBattery"];
+	        this.deviceStatusMargin = source["deviceStatusMargin"];
+	        this.deviceStatusExternalPowerSource = source["deviceStatusExternalPowerSource"];
+	        this.deviceStatusBatteryLevelUnavailable = source["deviceStatusBatteryLevelUnavailable"];
+	        this.deviceStatusBatteryLevel = source["deviceStatusBatteryLevel"];
+	        this.lastSeenAt = this.convertValues(source["lastSeenAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Devices {
+	    totalCount: string;
+	    result: DevicesResult[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Devices(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.totalCount = source["totalCount"];
+	        this.result = this.convertValues(source["result"], DevicesResult);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }

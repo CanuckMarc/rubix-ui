@@ -82,6 +82,34 @@ export function BulkDeleteWiresConnection(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['BulkDeleteWiresConnection'](arg1, arg2, arg3, arg4);
 }
 
+export function CSAddDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSAddDevice'](arg1, arg2, arg3);
+}
+
+export function CSDeleteDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSDeleteDevice'](arg1, arg2, arg3);
+}
+
+export function CSEditDevice(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CSEditDevice'](arg1, arg2, arg3, arg4);
+}
+
+export function CSGetApplications(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetApplications'](arg1, arg2);
+}
+
+export function CSGetDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSGetDevice'](arg1, arg2, arg3);
+}
+
+export function CSGetDeviceProfiles(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetDeviceProfiles'](arg1, arg2);
+}
+
+export function CSGetDevices(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSGetDevices'](arg1, arg2, arg3);
+}
+
 export function ConfigureOpenVPN(arg1, arg2) {
   return window['go']['backend']['App']['ConfigureOpenVPN'](arg1, arg2);
 }
@@ -258,6 +286,10 @@ export function EdgeBiosLogin(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeBiosLogin'](arg1, arg2, arg3, arg4);
 }
 
+export function EdgeBiosRubixAssistVersions() {
+  return window['go']['backend']['App']['EdgeBiosRubixAssistVersions']();
+}
+
 export function EdgeBiosRubixEdgeInstall(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeBiosRubixEdgeInstall'](arg1, arg2, arg3);
 }
@@ -328,6 +360,10 @@ export function EdgeFirewallPortOpen(arg1, arg2, arg3) {
 
 export function EdgeFirewallStatus(arg1, arg2) {
   return window['go']['backend']['App']['EdgeFirewallStatus'](arg1, arg2);
+}
+
+export function EdgeFlowFrameworkVersions() {
+  return window['go']['backend']['App']['EdgeFlowFrameworkVersions']();
 }
 
 export function EdgeGetConfigPlugin(arg1, arg2, arg3) {
@@ -840,6 +876,10 @@ export function ImportNetworksBulk(arg1, arg2, arg3) {
 
 export function ImportPointBulk(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ImportPointBulk'](arg1, arg2, arg3, arg4);
+}
+
+export function LatestVersions() {
+  return window['go']['backend']['App']['LatestVersions']();
 }
 
 export function ListIO16BuildFiles(arg1, arg2) {
