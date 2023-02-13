@@ -45,6 +45,7 @@ import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 import { LoadWiresMap } from "./components/LoadWiresMap";
+import { LoadBacnetMap } from "./components/LoadBacnetMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
@@ -1083,6 +1084,7 @@ const Flow = (props: FlowProps) => {
             multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
           >
             <LoadWiresMap />
+            <LoadBacnetMap />
             <DragSelection />
             {flowSettings.showMiniMap && (
               <MiniMap

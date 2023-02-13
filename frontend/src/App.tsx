@@ -10,6 +10,7 @@ import AppRoutes from "./AppRoutes";
 import { MenuSidebar } from "./components/sidebar/sidebar";
 import { ThemeProvider } from "./themes/theme-provider";
 import { openNotificationWithIcon } from "./utils/utils";
+import { BacnetTableDataType } from "./components/wires-map/map"
 import "./App.css";
 
 const { Content } = Layout;
@@ -34,6 +35,11 @@ export interface PointTableTypeRecord {
 export const useStore = create((set: any) => ({
   wiresMapNodes: [] as PointTableTypeRecord[],
   setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray})),
+}));
+
+export const useBacnetStore = create((set: any) => ({
+  bacnetNodes: [] as BacnetTableDataType[],
+  setBacnetNodes: (nodesArray: BacnetTableDataType[]) => set(() => ({ bacnetNodes: nodesArray})),
 }));
 
 export const useIsLoading = create((set: any) => ({
