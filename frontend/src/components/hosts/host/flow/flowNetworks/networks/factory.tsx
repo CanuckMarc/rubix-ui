@@ -1,4 +1,4 @@
-import { backend, model } from "../../../../../../../wailsjs/go/models";
+import { backend, model, rumodel } from "../../../../../../../wailsjs/go/models";
 import {
   AddFlowNetwork,
   DeleteFlowNetwork,
@@ -47,7 +47,7 @@ export class FlowFrameworkNetworkFactory {
     return DeleteFlowNetworkBulk(this.connectionUUID, this.hostUUID, uuids);
   }
 
-  async FFSystemPing(hostUUID: string): Promise<any> {
+  async FFSystemPing(hostUUID: string): Promise<rumodel.Response> {
     hasUUID(this.connectionUUID);
     hasUUID(hostUUID);
     return FFSystemPing(this.connectionUUID, hostUUID);

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { model } from "../../../../../../../../wailsjs/go/models";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { useParams } from "react-router-dom";
-import { Checkbox, Form, Input, Modal, Select } from "antd";
-import { DebounceInputForm } from "../../../../../../../common/debounce-form-input";
+import { Checkbox, Form, Input, Modal } from "antd";
+import { DebounceInputForm, SelectOption } from "../../../../../../../common/debounce-form-input";
 import { TokenFormInput } from "../../../../../../../common/token-form-input";
+import { DefaultOptionType } from "rc-select/lib/Select";
+import { HostsFactory } from "../../../../../factory";
+import { hasError } from "../../../../../../../utils/response";
 
 
 export const CreateEditModal = (props: any) => {
@@ -13,17 +15,23 @@ export const CreateEditModal = (props: any) => {
   const { currentItem, isModalVisible, refreshList, onCloseModal } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [flowIPOptions, setFlowIPOptions] = useState([] as SelectOption[]);
 
   const factory = new FlowFrameworkNetworkFactory();
-  factory.connectionUUID = connUUID;
+  const factoryHost = new HostsFactory();
+  factory.connectionUUID = factoryHost.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
 
   useEffect(() => {
-    form.setFieldsValue(currentItem)
-    console.log("currentItem", currentItem)
-    console.log("form", form.getFieldValue("flow_token_local"))
-    console.log("is_remote", form.getFieldValue("is_remote"))
-    console.log("flow_token>>>", form.getFieldValue("flow_token"))
+    factoryHost.GetAll().then(hosts => {
+      setFlowIPOptions(hosts.map(host => {
+        return { label: `${host?.name} (${host.ip})`, value: host?.ip, uuid: host?.uuid };
+      }));
+    });
+  }, []);
+
+  useEffect(() => {
+    form.setFieldsValue(currentItem);
   }, [currentItem]);
 
   const _onCloseModal = () => {
@@ -33,8 +41,8 @@ export const CreateEditModal = (props: any) => {
 
   const handleSubmit = async () => {
     const network = form.validateFields;
-    console.log("network", form)
-    console.log("name", form.getFieldValue("name"))
+    console.log("network", form);
+    console.log("name", form.getFieldValue("name"));
     // network.flow_https = false;
     // network.flow_https_local = false;
     // network.is_token_auth = true;
@@ -102,9 +110,16 @@ export const CreateEditModal = (props: any) => {
                     message: 'Flow IP Remote is a required field',
                   }
                 ]}
-                onCall={async (input: string) => {
-                  await factory.FFSystemPing(input)
-                  return Promise.resolve({ error: "Invalid IP", success: false })
+                options={flowIPOptions}
+                onCall={async (ip: string) => {
+                  console.log("input", ip)
+                  const selectedRecord = flowIPOptions.find(flowIpRecord=> flowIpRecord.value === ip)
+                  console.log("selectedRecord?.label", selectedRecord?.uuid)
+                  const res = await factory.FFSystemPing(selectedRecord?.uuid as string);
+                  if (hasError(res)) {
+                    return Promise.resolve({ error: res.msg, success: false });
+                  }
+                  return Promise.resolve({ success: true });
                 }}
               />
               <TokenFormInput

@@ -10,13 +10,9 @@ func (inst *App) FFSystemPing(connUUID, hostUUID string) *rumodel.Response {
 	if err != nil {
 		return rumodel.FailResponse(err)
 	}
-	host, err := inst.getHost(connUUID, hostUUID)
-	if err != nil {
-		return rumodel.FailResponse(err)
-	}
 	_, err = client.FFSystemPing(hostUUID)
 	if err != nil {
-		msg := fmt.Sprintf("Check the IP: %s & rubix-edge, flow-framework installation on that device", host.IP)
+		msg := fmt.Sprintf("Check the IP, rubix-edge & flow-framework installation")
 		return rumodel.FailResponse(msg)
 	}
 	return rumodel.SuccessResponse("Valid Host")

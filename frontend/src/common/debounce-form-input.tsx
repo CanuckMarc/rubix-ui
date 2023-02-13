@@ -3,11 +3,18 @@ import { Rule } from "antd/lib/form";
 import debounce from "debounce-promise";
 import { useState } from "react";
 
+export interface SelectOption {
+  label: string;
+  value: string;
+  uuid: string;
+}
+
 export interface DebounceInputFormProps {
   name: string;
   placeholder?: string;
   label?: string;
   rules?: Rule[];
+  options?: SelectOption[];
   onCall: (input: string) => Promise<DebounceInputResponse>;
 }
 
@@ -67,7 +74,7 @@ export const DebounceInputForm = (props: DebounceInputFormProps) => {
     ]}
   >
     <Select
-      options={[{ value: 'lucy', label: 'Lucy' }]}
+      options={props.options}
     />
   </Form.Item>;
 };
