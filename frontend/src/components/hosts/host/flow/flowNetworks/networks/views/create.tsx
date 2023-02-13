@@ -2,7 +2,6 @@ import { useState } from "react";
 import { model } from "../../../../../../../../wailsjs/go/models";
 import { FlowFrameworkNetworkFactory } from "../factory";
 import { useParams } from "react-router-dom";
-import FlowNetwork = model.FlowNetwork;
 import { Checkbox, Form, Input, Modal } from "antd";
 import { DebounceInputForm } from "../../../../../../../common/debounce-form-input";
 import { TokenFormInput } from "../../../../../../../common/token-form-input";
@@ -20,13 +19,13 @@ export const CreateEditModal = (props: any) => {
   factory.hostUUID = hostUUID;
 
   const _onCloseModal = () => {
-    form.resetFields()
-    onCloseModal()
-  }
+    form.resetFields();
+    onCloseModal();
+  };
 
   const handleSubmit = async () => {
-    const network = form.validateFields
-    console.log("flow_token_local", form.getFieldValue("flow_token_local"))
+    const network = form.validateFields;
+    console.log("flow_token_local", form.getFieldValue("flow_token_local"));
     // network.flow_https = false;
     // network.flow_https_local = false;
     // network.is_token_auth = true;
@@ -106,7 +105,10 @@ export const CreateEditModal = (props: any) => {
                     message: 'Flow IP Remote is a required field.',
                   }
                 ]}
-                onCall={(username: string, password: string) => Promise.resolve({ token: "this is token", success: true })}
+                onCall={(username: string, password: string) => Promise.resolve({
+                  token: "this is token",
+                  success: true
+                })}
               />
 
               <TokenFormInput
@@ -119,7 +121,10 @@ export const CreateEditModal = (props: any) => {
                     message: 'Flow IP Remote is a required field.',
                   }
                 ]}
-                onCall={(username: string, password: string) => Promise.resolve({ token: "this is token", success: true })}
+                onCall={(username: string, password: string) => Promise.resolve({
+                  token: "this is token",
+                  success: true
+                })}
               />
             </>
           }
