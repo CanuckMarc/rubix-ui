@@ -236,7 +236,6 @@ const Flow = (props: FlowProps) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
-      
     },
     [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
   );
@@ -1173,7 +1172,6 @@ const Flow = (props: FlowProps) => {
               onCopyNodes={handleCopyNodes}
               onUndo={handleUndo}
               onRedo={handleRedo}
-              onRefreshValues={handleRefreshValues}
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}

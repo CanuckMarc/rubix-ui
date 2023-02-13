@@ -30,7 +30,6 @@ type ControlProps = {
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
-  onRefreshValues: () => void;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onBackToMain: () => void;
@@ -49,7 +48,6 @@ const Controls = ({
   onCopyNodes,
   onUndo,
   onRedo,
-  onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
   onLinkBuilder,
@@ -75,6 +73,7 @@ const Controls = ({
   useCtrlPressKey("KeyI", () => {
     setLoadModalOpen(true);
   });
+
   // Delete selected node
   const deleteSelectNode = () => {
     const _nodes = instance.getNodes();
@@ -85,10 +84,9 @@ const Controls = ({
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
   };
+
   /* Ctrl + Delete (key): Delete items selected  */
-  useCtrlPressKey("Backspace", () => {
-    deleteSelectNode();
-  });
+  useCtrlPressKey("Backspace", deleteSelectNode);
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
@@ -137,7 +135,6 @@ const Controls = ({
 
   /* Ctrl + X (key): Refresh node values */
   useCtrlPressKey("KeyX", () => {
-    onRefreshValues();
     copySelectNode();
     deleteSelectNode();
   });
@@ -149,9 +146,8 @@ const Controls = ({
       window.nodesCopied = nodesCopied;
     }
   };
-  useCtrlPressKey("KeyC", () => {
-    copySelectNode();
-  });
+
+  useCtrlPressKey("KeyC", copySelectNode);
 
   useCtrlPressKey("KeyV", () => {
     const activeElement = document.activeElement;
