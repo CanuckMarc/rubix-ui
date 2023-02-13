@@ -41,7 +41,6 @@ type ControlProps = {
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
-
 const Controls = ({
   settings,
   isChangedFlow,
@@ -76,9 +75,8 @@ const Controls = ({
   useCtrlPressKey("KeyI", () => {
     setLoadModalOpen(true);
   });
-
-  /* Ctrl + Delete (key): Delete items selected  */
-  useCtrlPressKey("Backspace", () => {
+  // Delete selected node
+  const deleteSelectNode = () => {
     const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
@@ -86,6 +84,10 @@ const Controls = ({
     const edgesDeleted = _edges.filter((item) => item.selected);
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
+  };
+  /* Ctrl + Delete (key): Delete items selected  */
+  useCtrlPressKey("Backspace", () => {
+    deleteSelectNode();
   });
 
   /* Ctrl + a (key): Select all items */
@@ -134,13 +136,21 @@ const Controls = ({
   useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", onRefreshValues);
+  useCtrlPressKey("KeyX", () => {
+    onRefreshValues();
+    copySelectNode();
+    deleteSelectNode();
+  });
 
-  useCtrlPressKey("KeyC", () => {
+  // Copy selected node
+  const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
     }
+  };
+  useCtrlPressKey("KeyC", () => {
+    copySelectNode();
   });
 
   useCtrlPressKey("KeyV", () => {
