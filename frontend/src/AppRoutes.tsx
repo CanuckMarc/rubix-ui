@@ -22,120 +22,43 @@ import WiresConnections from "./components/wires-connections/wires-connections";
 import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
 import { WiresMap } from "./components/wires-map/map";
-import { AppDetails } from "./components/hosts/views/appDetails"
+import { AppDetails } from "./components/hosts/views/appDetails";
+import { Lorawan } from "./components/chirpstack/lorawan";
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path={routes.ROOT}
-        element={<Navigate replace to={routes.CONNECTIONS} />}
-      />
+      <Route path={routes.ROOT} element={<Navigate replace to={routes.CONNECTIONS} />} />
       <Route path={routes.FLOW_DEVICES} element={<FlowDevices />} />
       <Route path={routes.FLOW_POINTS} element={<FlowPoints />} />
       <Route path={routes.LOGS} element={<Logs />} />
       <Route path={routes.BACKUPS} element={<Backups />} />
       <Route path={routes.NETWORKING} element={<PcNetworking />} />
       <Route path={routes.CONNECTIONS} element={<ConnectionPage />}>
-        <Route
-          key={routes.CONNECTIONS}
-          path={routes.CONNECTIONS}
-          element={<Connections />}
-        />
-        <Route
-          key={routes.LOCATIONS}
-          path={routes.LOCATIONS}
-          element={<Locations />}
-        />
-        <Route
-          key={routes.LOCATION_NETWORKS}
-          path={routes.LOCATION_NETWORKS}
-          element={<Networks />}
-        />
-        <Route
-          key={routes.LOCATION_NETWORK_HOSTS}
-          path={routes.LOCATION_NETWORK_HOSTS}
-          element={<Hosts />}
-        />
+        <Route key={routes.CONNECTIONS} path={routes.CONNECTIONS} element={<Connections />} />
+        <Route key={routes.LOCATIONS} path={routes.LOCATIONS} element={<Locations />} />
+        <Route key={routes.LOCATION_NETWORKS} path={routes.LOCATION_NETWORKS} element={<Networks />} />
+        <Route key={routes.LOCATION_NETWORK_HOSTS} path={routes.LOCATION_NETWORK_HOSTS} element={<Hosts />} />
         <Route key={routes.HOST} path={routes.HOST} element={<Host />} />
-        <Route
-          key={routes.DEVICES}
-          path={routes.DEVICES}
-          element={<FlowDevices />}
-        />
-        <Route
-          key={routes.APP_DETAILS}
-          path={routes.APP_DETAILS}
-          element={<AppDetails />}
-        />
-        <Route
-          key={routes.POINTS}
-          path={routes.POINTS}
-          element={<FlowPoints />}
-        />
-        <Route
-          key={routes.STREAMS}
-          path={routes.STREAMS}
-          element={<Streams />}
-        />
-        <Route
-          key={routes.PRODUCERS}
-          path={routes.PRODUCERS}
-          element={<Producers />}
-        />
-        <Route
-          key={routes.STREAMCLONES}
-          path={routes.STREAMCLONES}
-          element={<StreamClones />}
-        />
-        <Route
-          key={routes.CONSUMERS}
-          path={routes.CONSUMERS}
-          element={<Consumers />}
-        />
-        <Route
-          key={routes.WRITERS}
-          path={routes.WRITERS}
-          element={<Writers />}
-        />
-        <Route
-          key={routes.WRITERCLONES}
-          path={routes.WRITERCLONES}
-          element={<WriterClones />}
-        />
+        <Route key={routes.DEVICES} path={routes.DEVICES} element={<FlowDevices />} />
+        <Route key={routes.APP_DETAILS} path={routes.APP_DETAILS} element={<AppDetails />} />
+        <Route key={routes.POINTS} path={routes.POINTS} element={<FlowPoints />} />
+        <Route key={routes.STREAMS} path={routes.STREAMS} element={<Streams />} />
+        <Route key={routes.PRODUCERS} path={routes.PRODUCERS} element={<Producers />} />
+        <Route key={routes.STREAMCLONES} path={routes.STREAMCLONES} element={<StreamClones />} />
+        <Route key={routes.CONSUMERS} path={routes.CONSUMERS} element={<Consumers />} />
+        <Route key={routes.WRITERS} path={routes.WRITERS} element={<Writers />} />
+        <Route key={routes.WRITERCLONES} path={routes.WRITERCLONES} element={<WriterClones />} />
       </Route>
       <Route path={routes.RUBIX_FLOW} element={<RubixFlow />} />
       <Route path={routes.RUBIX_FLOW_REMOTE} element={<RubixFlow />} />
-      <Route
-        key={routes.WIRES_CONNECTIONS}
-        path={routes.WIRES_CONNECTIONS}
-        element={<WiresConnections />}
-      />
-      <Route
-        key={routes.WIRES_CONNECTIONS}
-        path={routes.WIRES_CONNECTIONS_REMOTE}
-        element={<WiresConnections />}
-      />
-      <Route
-        key={routes.SCHEDULES}
-        path={routes.SCHEDULES_REMOTE}
-        element={<Schedules />}
-      />
-      <Route
-        key={routes.USER_GUIDE}
-        path={routes.USER_GUIDE}
-        element={<UserGuide />}
-      />
-      <Route
-        key={routes.USER_GUIDE}
-        path={routes.USER_GUIDE_REMOTE}
-        element={<UserGuide />}
-      />
-      <Route
-        key={routes.WIRES_MAP_REMOTE}
-        path={routes.WIRES_MAP_REMOTE}
-        element={<WiresMap />}
-      />
+      <Route key={routes.WIRES_CONNECTIONS} path={routes.WIRES_CONNECTIONS} element={<WiresConnections />} />
+      <Route key={routes.WIRES_CONNECTIONS} path={routes.WIRES_CONNECTIONS_REMOTE} element={<WiresConnections />} />
+      <Route key={routes.SCHEDULES} path={routes.SCHEDULES_REMOTE} element={<Schedules />} />
+      <Route key={routes.USER_GUIDE} path={routes.USER_GUIDE} element={<UserGuide />} />
+      <Route key={routes.USER_GUIDE} path={routes.USER_GUIDE_REMOTE} element={<UserGuide />} />
+      <Route key={routes.WIRES_MAP_REMOTE} path={routes.WIRES_MAP_REMOTE} element={<WiresMap />} />
+      <Route key={routes.LORAWAN_REMOTE} path={routes.LORAWAN_REMOTE} element={<Lorawan />} />
     </Routes>
   );
 }
