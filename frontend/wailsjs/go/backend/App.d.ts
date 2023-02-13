@@ -6,6 +6,7 @@ import {model} from '../models';
 import {amodel} from '../models';
 import {db} from '../models';
 import {assistcli} from '../models';
+import {chirpstack} from '../models';
 import {backend} from '../models';
 import {flow} from '../models';
 import {ebmodel} from '../models';
@@ -60,6 +61,20 @@ export function BacnetMasterWhois(arg1:string,arg2:string,arg3:string,arg4:assis
 export function BacnetWhois(arg1:string,arg2:string,arg3:string,arg4:string):Promise<Array<model.Device>>;
 
 export function BulkDeleteWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:Array<string>):Promise<any>;
+
+export function CSAddDevice(arg1:string,arg2:string,arg3:chirpstack.Device):Promise<chirpstack.Device>;
+
+export function CSDeleteDevice(arg1:string,arg2:string,arg3:string):Promise<boolean>;
+
+export function CSEditDevice(arg1:string,arg2:string,arg3:string,arg4:chirpstack.Device):Promise<chirpstack.Device>;
+
+export function CSGetApplications(arg1:string,arg2:string):Promise<chirpstack.Applications>;
+
+export function CSGetDevice(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Device>;
+
+export function CSGetDeviceProfiles(arg1:string,arg2:string):Promise<chirpstack.DeviceProfiles>;
+
+export function CSGetDevices(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Devices>;
 
 export function ConfigureOpenVPN(arg1:string,arg2:string):Promise<boolean>;
 
@@ -149,6 +164,8 @@ export function EdgeBiosInstalledRubixEdgeVersion(arg1:string,arg2:string):Promi
 
 export function EdgeBiosLogin(arg1:string,arg2:string,arg3:string,arg4:string):Promise<model.TokenResponse>;
 
+export function EdgeBiosRubixAssistVersions():Promise<Array<string>>;
+
 export function EdgeBiosRubixEdgeInstall(arg1:string,arg2:string,arg3:string):Promise<any>;
 
 export function EdgeBiosRubixEdgeVersions():Promise<Array<string>>;
@@ -185,13 +202,15 @@ export function EdgeFirewallPortOpen(arg1:string,arg2:string,arg3:system.UFWBody
 
 export function EdgeFirewallStatus(arg1:string,arg2:string):Promise<ufw.Message>;
 
+export function EdgeFlowFrameworkVersions():Promise<Array<string>>;
+
 export function EdgeGetConfigPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function EdgeGetHardwareTZ(arg1:string,arg2:string):Promise<string>;
 
 export function EdgeGetNetworks(arg1:string,arg2:string):Promise<Array<networking.NetworkInterfaces>>;
 
-export function EdgeGetPlugins(arg1:string,arg2:string):Promise<rumodel.Response>;
+export function EdgeGetPlugins(arg1:string,arg2:string,arg3:boolean):Promise<rumodel.Response>;
 
 export function EdgeGetPluginsDistribution(arg1:string,arg2:string):Promise<rumodel.Response>;
 
@@ -438,6 +457,8 @@ export function ImportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ImportNetworksBulk(arg1:string,arg2:string,arg3:string):Promise<backend.BulkAddResponse>;
 
 export function ImportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string):Promise<backend.BulkAddResponse>;
+
+export function LatestVersions():Promise<backend.LatestVersions>;
 
 export function ListIO16BuildFiles(arg1:string,arg2:boolean):Promise<Array<string>>;
 
