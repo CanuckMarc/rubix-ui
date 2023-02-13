@@ -565,6 +565,7 @@ export const FLOW_POINT_HEADERS = [
     title: "Name",
     dataIndex: "name",
     key: "name",
+    fixed: "left",
     render(name: string) {
       if (name != undefined) {
         let colour = "#4d4dff";
@@ -643,6 +644,7 @@ export const FLOW_POINT_HEADERS = [
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
+    fixed: "left"
   },
 ];
 
