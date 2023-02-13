@@ -175,12 +175,22 @@ const Flow = (props: FlowProps) => {
         }),
         {}
       );
+      const newHiddenInput = spec.inputs?.reduce(
+        (result, item) => ({
+          ...result,
+          [item.name]: {
+            hiddenInput: false,
+          },
+        }),
+        {}
+      );
       const newNode = {
         id: generateUuid(),
         isParent,
         style,
         type: nodeType,
         position,
+        hiddenInput: newHiddenInput,
         orderInput: newOrder,
         data: {
           inputs: convertDataSpec(spec.inputs || []),
@@ -619,7 +629,11 @@ const Flow = (props: FlowProps) => {
     return prevNodes.map((node: NodeInterface) => {
       const data = outputNodes.find((item) => item.nodeId === node.id);
       if (data) {
-        const dataInputs = data?.inputs.map((item: any) => ({ ...item, ...node?.orderInput?.[item?.pin] }));
+        const dataInputs = data?.inputs?.map((item: any) => ({
+          ...item,
+          ...node?.orderInput?.[item?.pin],
+          ...node?.hiddenInput?.[item?.pin],
+        }));
 
         node.data.inputs = !node.data.inputs ? dataInputs : handleBeforeAddOutput(node.data.inputs, dataInputs);
         node.data.out = !node.data.out ? data?.outputs : handleBeforeAddOutput(node.data.out, data?.outputs);

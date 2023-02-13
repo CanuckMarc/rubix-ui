@@ -62,17 +62,16 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
     if (nodeInputs.length > 0 && nodeInputs.length < specInputs.length) {
       newInputs = specInputs.filter((item, idx) => idx < nodeInputs.length);
     } else {
-      const nodeInputsObj: any = {}
+      const nodeInputsObj: any = {};
       
-      nodeInputs.forEach((item: any) => nodeInputsObj[item.pin] = item)
+      nodeInputs.forEach((item: any) => (nodeInputsObj[item.pin!!] = item));
       newInputs = [...specInputs];
-      newInputs.sort(
-        (a:any,b:any) => (nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position)
-      )
+      newInputs.sort((a: InputSocketSpecJSON, b: InputSocketSpecJSON) => nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position);
+      newInputs = newInputs.filter((item) => nodeInputsObj[item.name].hiddenInput === false);
     }
   }
   const nodeInputsObj: any = {};
-  nodeInputs.forEach((item: any) => nodeInputsObj[item.pin] = item)
+  nodeInputs.forEach((item: any) => (nodeInputsObj[item.pin] = item));
   /* Add new inputs when set InputCount setting */
   nodeInputs.forEach((item: any) => {
     const isExist = specInputs.find((input) => input.name === item.pin);
@@ -86,9 +85,8 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
         defaultValue: item.value,
       } as InputSocketSpecJSON);
     }
-    newInputs.sort(
-      (a:any,b:any) => (nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position)
-    )
+    newInputs.sort((a: InputSocketSpecJSON, b: InputSocketSpecJSON) => nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position);
+    // newInputs = newInputs.filter((item) => nodeInputsObj[item.name].hiddenInput === false)
   });
 
   return newInputs;
