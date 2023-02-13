@@ -19,7 +19,7 @@ type LatestVersions struct {
 
 func (inst *App) LatestVersions() *LatestVersions {
 	return &LatestVersions{
-		LatestFlowFrameworkVersion: inst.LatestReleaseVersion,
+		LatestFlowFrameworkVersion: inst.LatestFlowFrameworkVersion,
 		LatestReleaseVersion:       inst.LatestReleaseVersion,
 		LatestRubixEdgeVersion:     inst.LatestRubixEdgeVersion,
 		LatestRubixAssistVersion:   inst.LatestRubixAssistVersion,
@@ -33,6 +33,11 @@ func (inst *App) EdgeBiosRubixAssistVersions() []string {
 
 func (inst *App) EdgeBiosRubixEdgeVersions() []string {
 	const repo = "rubix-edge"
+	return inst.getRepoVersions(constants.GitHubOwner, repo)
+}
+
+func (inst *App) EdgeFlowFrameworkVersions() []string {
+	const repo = "flow-framework"
 	return inst.getRepoVersions(constants.GitHubOwner, repo)
 }
 

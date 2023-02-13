@@ -23,12 +23,13 @@ func (inst *App) errMsg(err error) error {
 }
 
 type App struct {
-	ctx                      context.Context
-	DB                       storage.IStorage
-	appStore                 store.IAppStore
-	LatestReleaseVersion     string
-	LatestRubixEdgeVersion   string
-	LatestRubixAssistVersion string
+	ctx                        context.Context
+	DB                         storage.IStorage
+	appStore                   store.IAppStore
+	LatestReleaseVersion       string
+	LatestRubixEdgeVersion     string
+	LatestRubixAssistVersion   string
+	LatestFlowFrameworkVersion string
 }
 
 type AssistClient struct {
@@ -66,17 +67,30 @@ func (inst *App) getLatestVersions() {
 
 	listReleases := inst.GitListReleases(token)
 	if len(listReleases) > 0 {
-		inst.LatestReleaseVersion = listReleases[0].Name
+		inst.LatestReleaseVersion = listReleases[len(listReleases)-1].Name
 	}
 	assistVersions := inst.EdgeBiosRubixAssistVersions()
 	if len(assistVersions) > 0 {
 		inst.LatestRubixAssistVersion = assistVersions[0]
 	}
+	version, err := inst.getLatestReleaseVersion()
+	if err != nil {
+		return
+	}
+	flowVersions := inst.EdgeFlowFrameworkVersions()
+	if len(assistVersions) > 0 {
+		inst.LatestFlowFrameworkVersion = flowVersions[0]
+	}
+
+	if version != inst.LatestReleaseVersion {
+		log.Infof("a new release is available so re-sync: %s", inst.LatestRubixEdgeVersion)
+		inst.GitDownloadReleases()
+	}
 
 	log.Infof("lastest rubix-edge version: %s", inst.LatestRubixEdgeVersion)
 	log.Infof("lastest rubix-assist version: %s", inst.LatestRubixAssistVersion)
 	log.Infof("lastest release version: %s", inst.LatestReleaseVersion)
-	log.Infof("lastest flow-framework version: %s", inst.LatestReleaseVersion)
+	log.Infof("lastest flow-framework version: %s", inst.LatestFlowFrameworkVersion)
 
 }
 
