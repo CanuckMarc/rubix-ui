@@ -3,6 +3,7 @@ import { pluginLogo } from "../utils/utils";
 import imageRC5 from "../assets/images/RC5.png";
 import imageRCIO from "../assets/images/RC-IO.png";
 import imageEdge28 from "../assets/images/Edge-iO-28.png";
+import moment from "moment";
 
 export const FLOW_NETWORK_HEADERS = [
   {
@@ -1065,6 +1066,90 @@ export const SCHEDULES_HEADERS = [
     dataIndex: "period_stop_string",
     key: "period_stop_string",
     render: (text: string) => text,
+  },
+];
+
+export const LORAWAN_REMOTE_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    key: "description",
+    title: "Description",
+    dataIndex: "description",
+  },
+  {
+    key: "applicationID",
+    title: "Application ID",
+    dataIndex: "applicationID",
+  },
+  {
+    key: "deviceProfileName",
+    title: "Profile Name",
+    dataIndex: "deviceProfileName",
+  },
+  {
+    key: "deviceProfileID",
+    title: "Profile ID",
+    dataIndex: "deviceProfileID",
+  },
+  {
+    key: "deviceStatusBattery",
+    title: "Status Battery",
+    dataIndex: "deviceStatusBattery",
+    render(value: number) {
+      return <Tag color="#4d4dff">{value}</Tag>;
+    },
+  },
+  {
+    key: "deviceStatusBatteryLevel",
+    title: "Status Battery Level",
+    dataIndex: "deviceStatusBatteryLevel",
+    render(value: number) {
+      return <Tag color="#4d4dff">{value}</Tag>;
+    },
+  },
+  {
+    key: "deviceStatusBatteryLevelUnavailable",
+    title: "Status Battery Level Unavailable",
+    dataIndex: "deviceStatusBatteryLevelUnavailable",
+    render(value: boolean) {
+      const colour = value ? "orange" : "blue";
+      return <Tag color={colour}>{value.toString()}</Tag>;
+    },
+  },
+  {
+    key: "deviceStatusExternalPowerSource",
+    title: "Status External Power Source",
+    dataIndex: "deviceStatusExternalPowerSource",
+    render(value: boolean) {
+      const colour = value ? "orange" : "blue";
+      return <Tag color={colour}>{value.toString()}</Tag>;
+    },
+  },
+  {
+    key: "deviceStatusMargin",
+    title: "Status Margin",
+    dataIndex: "deviceStatusMargin",
+    render(value: number) {
+      return <Tag color="#4d4dff">{value}</Tag>;
+    },
+  },
+
+  {
+    key: "lastSeenAt",
+    title: "Last Seen At",
+    dataIndex: "lastSeenAt",
+    render(value: string) {
+      return moment.utc(value).format("YYYY-MM-DD");
+    },
+  },
+  {
+    key: "devEUI",
+    title: "EUI",
+    dataIndex: "devEUI",
   },
 ];
 

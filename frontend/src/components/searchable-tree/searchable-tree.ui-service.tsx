@@ -8,6 +8,7 @@ import {
   RadarChartOutlined,
   MenuOutlined,
   ToolOutlined,
+  WifiOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
@@ -44,6 +45,7 @@ let ObjectType = {
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
   WIRES_MAP_REMOTE: "wires-map",
+  LORAWAN_REMOTE: "lorawan",
 };
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
@@ -77,6 +79,8 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
     ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.WIRES_MAP_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.WIRES_MAP_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.LORAWAN_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.LORAWAN_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
 const className = "supervisors-menu";
@@ -293,6 +297,18 @@ export const getTreeDataIterative = (connections: any) => {
                     )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
+                  children: null,
+                },
+                {
+                  ...objectMap(
+                    getTreeObject(
+                      { name: "lorawan", uuid: "lorawan_" + host.uuid },
+                      ObjectTypesToRoutes[ObjectType.LORAWAN_REMOTE](connection.uuid, host.uuid),
+                      "",
+                      <WifiOutlined />
+                    )
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.LORAWAN_REMOTE](connection.uuid, host.uuid),
                   children: null,
                 },
               ],
