@@ -1,83 +1,83 @@
-import { Typography, Card, Select, Button, Table, Input, InputNumber } from "antd";
+import { Typography, Card, Select, Button, Table, Input, InputNumber, Spin } from "antd";
 import { useState, useEffect, ChangeEvent } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from "react-router-dom";
 import { MappingFactory } from "./factory";
 import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
-import { useIsLoading, useBacnetStore } from '../../App';
+import { useIsLoading, useBacnetStore, PointTableType } from '../../App';
 import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { generateUuid } from "../rubix-flow/lib/generateUuid";
 import { openNotificationWithIcon } from "../../utils/utils";
-import { SelectOptionType, BacnetTableDataType } from "./map";
+import { SelectOptionType, BacnetTableDataType, BacnetMapPropType } from "./map";
+import { BacnetPointTable } from "./views/bacnetPointTable";
 
 const { Title } = Typography;
 
-export const BacnetMap = () => {
-  let { connUUID = "", hostUUID = "" } = useParams();
+export const BacnetMap = (props: BacnetMapPropType) => {
+  const {connUUID, hostUUID, fetchFlownet, isFetchingFlownet, reset, pointList, flowNetList, flowNetOptionList} = props
+  
+
   const nav = useNavigate();
-  const [isFetching, setIsFetching] = useState(false);
+  // const [isFetching, setIsFetching] = useState(false);
+  const [clearSelection, setClearSelection] = useState(false);
   const [tableData, setTableData] = useState<BacnetTableDataType[]>([]);
-  const [bacnetList, setBacnetList] = useState<node.Schema[]>([]);
+  // const [bacnetList, setBacnetList] = useState<node.Schema[]>([]);
   const [selectValue, setSelectValue] = useState<string | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [bacnetOptionList, setBacnetOptionList] = useState<SelectOptionType[]>([]);
-  const [selectedBacnet, setSelectedBacnet] = useState<node.Schema | undefined>(undefined);
-
-  const mappingFactory = new MappingFactory();
-  const pointFactory = new FlowPointFactory();
-
-  const isRemote = !!connUUID && !!hostUUID;
+  const [selectedFlownet, setSelectedFlownet] = useState<node.Schema | undefined>(undefined);
+  const [pointSelection, setPointSelection] = useState<PointTableType | undefined>(undefined);
 
   const [bacnetNodes, setBacnetNodes] = useBacnetStore(
     (state) => [state.bacnetNodes, state.setBacnetNodes]
   )
 
-  const [refreshCounter, reset, incrementRefreshCounter] = useIsLoading(
-    (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
-  )
+  // useEffect(() => {
+  //   console.log('selected point is: ', pointSelection)
+  // }, [pointSelection])
 
-  const fetch = async() => {
-    try {
-        setIsFetching(true);
-        const bacnetRes = await mappingFactory.GetBacnetNodes(connUUID, hostUUID, isRemote)
-        if (bacnetRes) {
-          setBacnetList(bacnetRes)
-          setBacnetOptionList(bacnetRes.map((item: any) => ({
-            value: item.id,
-            label: item.hasOwnProperty('nodeName') ? item.nodeName : item.id
-          })))
-        }
-    } catch (error) {
-      setBacnetList([]);
-    } finally {
-      setIsFetching(false);
-    }
-  }
+  // const fetch = async() => {
+  //   try {
+  //       setIsFetching(true);
+  //       const bacnetRes = await mappingFactory.GetBacnetNodes(connUUID, hostUUID, isRemote)
+  //       if (bacnetRes) {
+  //         setBacnetList(bacnetRes)
+  //         setBacnetOptionList(bacnetRes.map((item: any) => ({
+  //           value: item.id,
+  //           label: item.hasOwnProperty('nodeName') ? item.nodeName : item.id
+  //         })))
+  //       }
+  //   } catch (error) {
+  //     setBacnetList([]);
+  //   } finally {
+  //     setIsFetching(false);
+  //   }
+  // }
 
   useEffect(() => {
-      pointFactory.connectionUUID = connUUID;
-      pointFactory.hostUUID = hostUUID;
       setBacnetNodes([]);
       reset();
-      fetch();
+      fetchFlownet();
   }, [connUUID, hostUUID]);
 
   const addPoints = () => {
-    if (!selectedBacnet) openNotificationWithIcon("warning", 'Please select a Bacnet variable node!');
-    if (selectedBacnet){
+    if (!selectedFlownet || !pointSelection) openNotificationWithIcon("warning", 'Please select a flow network and or a point!');
+    if (selectedFlownet && pointSelection){
+      console.log('pointSelection is: ', pointSelection)
       // test to see if selected bacnet node is already added to the table
-      const temp = tableData.find(item => item.existingBacnetName === selectedBacnet?.nodeName || item.existingBacnetName === selectedBacnet?.id)
+      const temp = tableData.find(item => item.selectedPointName === pointSelection.name)
       if (!temp) {
         let resObj = {} as BacnetTableDataType
         const newId = generateUuid()
         resObj = {
-          existingBacnetName: selectedBacnet?.nodeName ? selectedBacnet?.nodeName : selectedBacnet?.id,
-          outputTopic: undefined,
+          existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
+          selectedPoint: pointSelection,
+          selectedPointName: pointSelection.name,
+          outputTopic: pointSelection.point_name,
           instanceNumber: undefined,
           key: newId,
-          bacnetSchema: selectedBacnet
+          bacnetSchema: selectedFlownet
         }
         setTableData([...tableData, resObj])
       } else {
@@ -85,6 +85,8 @@ export const BacnetMap = () => {
       }
       // clear inputs after adding a pair of points
       setSelectValue(null);
+      setClearSelection(true);
+      setSelectedFlownet(undefined);
     }
   }
 
@@ -104,13 +106,14 @@ export const BacnetMap = () => {
   }
 
   const recordPoints = () => {
+    console.log(tableData)
     setBacnetNodes(tableData)
     nav(ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID))
   }
 
   const handleChange = (value: string) => {
     setSelectValue(value);
-    setSelectedBacnet(bacnetList.find((item: node.Schema) => item.id === value));
+    setSelectedFlownet(flowNetList.find((item: node.Schema) => item.id === value));
   };
 
   const onInstanceNumberChange = (value: number | null, record: BacnetTableDataType) => {
@@ -146,21 +149,27 @@ export const BacnetMap = () => {
   const columns: ColumnsType<BacnetTableDataType> = [
     {
       title: 'Flow network',
-      dataIndex: 'existingBacnetName',
-      key: 'existingBacnetName',
-      fixed: 'left',
+      dataIndex: 'existingFlowNetName',
+      key: 'existingFlowNetName',
       render: (text, record: BacnetTableDataType, index) => {
-        return record?.existingBacnetName || 'Bacnet name unspecified.'
+        return record?.existingFlowNetName || 'Flow network name unspecified.'
+      }
+    },
+    {
+      title: 'Point',
+      dataIndex: 'selectedPointName',
+      key: 'selectedPointName',
+      render: (text, record: BacnetTableDataType, index) => {
+        return record?.selectedPointName || 'Point name unspecified.'
       }
     },
     {
       title: 'Link output number topic',
       dataIndex: 'outputTopic',
       key: 'outputTopic',
-      fixed: 'left',
       render: (text, record: BacnetTableDataType, index) => {
         return (
-          <Input onChange={(event: ChangeEvent<HTMLInputElement>) => onOutputTopicChange(event, record)} />
+          <Input defaultValue={record.outputTopic} onChange={(event: ChangeEvent<HTMLInputElement>) => onOutputTopicChange(event, record)} />
         );
       }
     },
@@ -168,7 +177,6 @@ export const BacnetMap = () => {
       title: 'Analog variable instance number',
       dataIndex: 'instanceNumber',
       key: 'instanceNumber',
-      fixed: 'left',
       render: (text, record: BacnetTableDataType, index) => {
         return (
           <InputNumber style={{width: '100%'}} onChange={(value: number | null) => onInstanceNumberChange(value, record)} />
@@ -192,7 +200,7 @@ export const BacnetMap = () => {
       <Card bordered={true}>
         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
           <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
-            <Title level={5}>Select Bacnet: </Title>
+            <Title level={5}>Select flow network: </Title>
             <Select
               showSearch
               allowClear
@@ -200,10 +208,27 @@ export const BacnetMap = () => {
               style={{ width: '50%' }}
               placeholder="Please select"
               onChange={handleChange}
-              options={bacnetOptionList}
+              options={flowNetOptionList}
             />
           </div>
-          
+          <Spin spinning={isFetchingFlownet} style={{ width: '100%' }}>
+            <BacnetPointTable 
+              title={'Point'} 
+              pointList={pointList} 
+              // pairToAdd={pairToAdd} 
+              // pairToRemove={pairToRemove} 
+              clearSelection={clearSelection} 
+              setClearSelection={setClearSelection} 
+              pointSelection={pointSelection}
+              setPointSelection={setPointSelection}
+              // selectedPoints={selectedPointsTwo} 
+              // setSelectedPoints={setSelectedPointsOne}
+            />  
+            
+          </Spin>
+
+
+
           <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
 
             <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>

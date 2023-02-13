@@ -11,7 +11,7 @@ import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { generateUuid } from "../rubix-flow/lib/generateUuid";
 import { openNotificationWithIcon } from "../../utils/utils";
-import { SelectOptionType, AddedPointType } from "./map";
+import { SelectOptionType, AddedPointType, FlownetMapPropType } from "./map";
 
 const { Title } = Typography;
 
@@ -24,67 +24,25 @@ const filterForFullObj = (pointList: PointTableType[], selectedPoints: PointTabl
   return filteredPoint[0]
 }
 
-export const FlownetMap = () => {
-  let { connUUID = "", hostUUID = "" } = useParams();
+export const FlownetMap = (props: FlownetMapPropType) => {
+  const {connUUID, hostUUID, fetch, isFetching, reset, pointList, flowNetList, flowNetOptionList} = props
   const nav = useNavigate();
-  const [isFetching, setIsFetching] = useState(false);
   const [clearSelection, setClearSelection] = useState(false);
   const [tableData, setTableData] = useState<AddedPointType[]>([]);
-  const [pointList, setPointList] = useState<PointTableType[]>([]);
-  const [flowNetList, setFlowNetList] = useState<node.Schema[]>([]);
   const [selectValue, setSelectValue] = useState<string | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [flowNetOptionList, setFlowNetOptionList] = useState<SelectOptionType[]>([]);
   const [selectedFlowNet, setSelectedFlowNet] = useState<node.Schema | undefined>(undefined);
   const [selectedPointsOne, setSelectedPointsOne] = useState<PointTableType | undefined>(undefined);
   const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType | undefined>(undefined);
   const [pairToRemove, setPairToRemove] = useState<PointTableType[] | undefined>(undefined);
   const [pairToAdd, setPairToAdd] = useState<AddedPointType[] | undefined>(undefined);
 
-  const mappingFactory = new MappingFactory();
-  const pointFactory = new FlowPointFactory();
-
-  const isRemote = !!connUUID && !!hostUUID;
 
   const [wiresMapNodes, setWiresMapNodes] = useStore(
     (state) => [state.wiresMapNodes, state.setWiresMapNodes]
   )
 
-  const [refreshCounter, reset, incrementRefreshCounter] = useIsLoading(
-    (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
-  )
-
-  const fetch = async() => {
-    try {
-        setIsFetching(true);
-        const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
-        setPointList(res.map(item => ({
-            key: item.uuid,
-            name: item.name,
-            uuid: item.uuid,
-            device_name: item.device_name,
-            network_name: item.network_name,
-            plugin_name: item.plugin_name,
-            point_name: item.point_name
-        })));
-        const flowNetRes = await mappingFactory.GetNodesAllFlowNetworks(connUUID, hostUUID, isRemote)
-        if (flowNetRes) {
-            setFlowNetList(flowNetRes)
-            setFlowNetOptionList(flowNetRes.map((item: any) => ({
-                value: item.id,
-                label: item.hasOwnProperty('nodeName') ? item.nodeName : item.id
-            })))
-        }
-    } catch (error) {
-        setPointList([]);
-    } finally {
-        setIsFetching(false);
-    }
-  }
-
   useEffect(() => {
-      pointFactory.connectionUUID = connUUID;
-      pointFactory.hostUUID = hostUUID;
       setWiresMapNodes([]);
       reset();
       fetch();
