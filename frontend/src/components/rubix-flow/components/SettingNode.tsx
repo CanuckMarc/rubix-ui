@@ -38,8 +38,8 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
     }),
     {}
   );
-    
-  const orderInAll = node.isParent ? orderInPar :node.orderInput
+
+  const orderInAll = node.isParent ? orderInPar : node.orderInput;
   const [orderIn, setOrderIn] = useState(orderInAll);
   const [inPutsPar, setInPutsPar] = useState(inPutNode);
   const onChangeHiddenIn = (item: any) => {
@@ -165,8 +165,8 @@ export const SettingNode: FC<SetNameModalProps> = ({ node, open = false, onClose
                 </label>
               </div>
               <div>
-                <UpCircleOutlined className="mr-2" onClick={() => onClickUpInNode(item)} />
-                <DownCircleOutlined onClick={() => onClickDownInNode(item)} />
+                <UpCircleOutlined className="mr-2" onClick={() => onClickUpInNode(index)} />
+                <DownCircleOutlined onClick={() => onClickDownInNode(index)} />
               </div>
             </div>
           ))}
