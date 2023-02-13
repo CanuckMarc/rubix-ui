@@ -23,7 +23,7 @@ import UserGuide from "./components/user-guide/user-guide";
 import Schedules from "./components/schedules/schedules";
 import { WiresMap } from "./components/wires-map/map";
 import { AppDetails } from "./components/hosts/views/appDetails";
-import { Lorawan } from "./components/chirpstack/lorawan";
+import Lorawan from "./components/chirpstack/lorawan";
 
 function AppRoutes() {
   return (
