@@ -2,7 +2,6 @@
 @import './assets/styles/bootstrap.css';
 @import './react-flow.css';
 
-
 #app {
     height: 100vh;
     text-align: center;
@@ -63,8 +62,13 @@
     background-color: rgba(255, 255, 255, 1);
 }
 
-.ant-layout-sider-children>ul>li>ul {
-    max-height: 75vh;
+
+.ant-layout-sider-children>ul {
+    margin-left: -10px;
+}
+
+.ant-layout-sider-children>ul {
+    max-height: calc(100vh - 210px);
     overflow-y: auto;
 }
 
@@ -92,36 +96,6 @@
     width: 70%;
 }
 
-aside .active {
-    font-weight: bolder;
-    color: #fff;
-}
-
-.settings-dropdown {
-    box-shadow: 0 5px 5px -3px rgb(0 0 0 / 20%), 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%);
-    border-radius: 4px;
-    min-width: 220px !important;
-    left: 24px !important;
-}
-
-.settings-dropdown>ul>li:first-child {
-    min-height: 50px;
-    border-top: unset;
-}
-
-.settings-dropdown>ul>li {
-    min-height: 50px;
-    border-top: 1px solid var(--nube-light-grey);
-}
-
-.avar {
-    margin-left: 24px !important;
-    margin-top: 10px !important;
-    display: block !important;
-    background-color: var(--nube-green) !important;
-    cursor: pointer;
-}
-
 .react-flow .react-flow__edges {
     overflow: visible;
     pointer-events: none;
@@ -137,6 +111,8 @@ aside .active {
     padding: 24px;
     margin: 0;
     min-height: 280px;
+    overflow: auto;
+    max-height: calc(100vh - 40px);
 }
 
 .flow-layout {
@@ -177,17 +153,35 @@ svg {
     gap: 15px;
 }
 
-#flow-setting-modal-labels {
+.flow-setting-modal-labels {
     display: inline-block;
     width: 150px;
     text-align: right;
 }
 
 hr.solid {
-    border-top: 1px solid #DCDCDC;
+    border-top: 1px solid #dcdcdc;
 }
 
 .table-row-disconnected {
     color: #c92020;
     font-weight: 200;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px var(--nube-light-grey);
+    border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--nube-light-grey);
+    border-radius: 5px;
 }

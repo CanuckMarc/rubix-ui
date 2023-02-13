@@ -14,14 +14,6 @@ import (
 	"strings"
 )
 
-const bacnetServerPlg = "bacnetserver"
-const bacnetMasterPlg = "bacnetmaster"
-const loraPlg = "lora"
-const modbusPlg = "modbus"
-const systemPlg = "system"
-const rubixIOPlg = "rubixio"
-const edge28Plg = "edge28"
-
 func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.Response {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
@@ -80,13 +72,14 @@ func (inst *App) EdgeGetPluginsDistribution(connUUID, hostUUID string) *rumodel.
 			availablePlugins = append(availablePlugins, rumodel.AvailablePlugin{
 				Name:        pluginName,
 				IsInstalled: isInstalled,
+				Description: pluginDescriptions(pluginName),
 			})
 		}
 	}
 	return inst.successResponse(availablePlugins)
 }
 
-func (inst *App) EdgeGetPlugins(connUUID, hostUUID string) *rumodel.Response {
+func (inst *App) EdgeGetPlugins(connUUID, hostUUID string, thatAreEnable bool) *rumodel.Response {
 	assistClient, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return inst.fail(err)
@@ -94,6 +87,15 @@ func (inst *App) EdgeGetPlugins(connUUID, hostUUID string) *rumodel.Response {
 	plugins, err := assistClient.EdgeGetPlugins(hostUUID)
 	if err != nil {
 		return inst.fail(err)
+	}
+	var out []rumodel.Plugin
+	if thatAreEnable {
+		for _, plugin := range plugins {
+			if plugin.Enabled {
+				out = append(out, plugin)
+			}
+		}
+		return inst.successResponse(out)
 	}
 	return inst.successResponse(plugins)
 }
@@ -329,3 +331,16 @@ func (inst *App) edgeEnablePlugin(assistClient *assistcli.Client, hostUUID strin
 	}
 	return resp, nil
 }
+
+const bacnetServerPlg = "bacnetserver"
+const bacnetMasterPlg = "bacnetmaster"
+const loraPlg = "lora"
+const loraWANPlg = "lorawan"
+const modbusPlg = "modbus"
+const systemPlg = "system"
+const rubixIOPlg = "rubixio"
+const edge28Plg = "edge28"
+const influxDBPlg = "edgeinflux"
+const influx2Plg = "influx"
+const postgresPlg = "postgres"
+const historyPlg = "history"

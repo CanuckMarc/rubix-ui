@@ -347,6 +347,20 @@ export namespace assistcli {
 
 export namespace backend {
 	
+	export class BacnetPoints {
+	    av_existing: number[];
+	    bv_existing: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new BacnetPoints(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.av_existing = source["av_existing"];
+	        this.bv_existing = source["bv_existing"];
+	    }
+	}
 	export class BulkAddResponse {
 	    message: string;
 	    added_count: number;
@@ -454,6 +468,20 @@ export namespace backend {
 		}
 	}
 	
+	export class Help {
+	    name: string;
+	    help: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Help(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.help = source["help"];
+	    }
+	}
 	
 	export class NetworksList {
 	    name: string;
@@ -472,6 +500,10 @@ export namespace backend {
 	export class PointListPayload {
 	    uuid: string;
 	    name: string;
+	    plugin_name: string;
+	    network_name: string;
+	    device_name: string;
+	    point_name: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new PointListPayload(source);
@@ -481,6 +513,10 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.uuid = source["uuid"];
 	        this.name = source["name"];
+	        this.plugin_name = source["plugin_name"];
+	        this.network_name = source["network_name"];
+	        this.device_name = source["device_name"];
+	        this.point_name = source["point_name"];
 	    }
 	}
 	export class RcNetworkBody {
@@ -704,6 +740,7 @@ export namespace flowcli {
 	
 	export class NodesList {
 	    nodes: string[];
+	    get_childs: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new NodesList(source);
@@ -712,6 +749,7 @@ export namespace flowcli {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.nodes = source["nodes"];
+	        this.get_childs = source["get_childs"];
 	    }
 	}
 	export class SchemaBody {
@@ -2052,7 +2090,6 @@ export namespace model {
 	
 	
 	
-	
 	export class TokenResponse {
 	    access_token: string;
 	    token_type: string;
@@ -2338,6 +2375,135 @@ export namespace node {
 	        this.dynamicOutputs = source["dynamicOutputs"];
 	    }
 	}
+	export class Payload {
+	    any?: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Payload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.any = source["any"];
+	    }
+	}
+	export class SchemaOutputs {
+	    position: number;
+	    overridePosition: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaOutputs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
+	    }
+	}
+	export class SchemaLinks {
+	    nodeId: string;
+	    socket: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaLinks(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.nodeId = source["nodeId"];
+	        this.socket = source["socket"];
+	    }
+	}
+	export class SchemaInputs {
+	    value?: any;
+	    links?: SchemaLinks[];
+	    position: number;
+	    overridePosition: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new SchemaInputs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.value = source["value"];
+	        this.links = this.convertValues(source["links"], SchemaLinks);
+	        this.position = source["position"];
+	        this.overridePosition = source["overridePosition"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Schema {
+	    id: string;
+	    type: string;
+	    nodeName?: string;
+	    icon?: string;
+	    metadata?: Metadata;
+	    inputs: {[key: string]: SchemaInputs};
+	    outputs: {[key: string]: SchemaOutputs};
+	    settings?: {[key: string]: any};
+	    isParent: boolean;
+	    parentId?: string;
+	    payload?: Payload;
+	
+	    static createFrom(source: any = {}) {
+	        return new Schema(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.type = source["type"];
+	        this.nodeName = source["nodeName"];
+	        this.icon = source["icon"];
+	        this.metadata = this.convertValues(source["metadata"], Metadata);
+	        this.inputs = this.convertValues(source["inputs"], SchemaInputs, true);
+	        this.outputs = this.convertValues(source["outputs"], SchemaOutputs, true);
+	        this.settings = source["settings"];
+	        this.isParent = source["isParent"];
+	        this.parentId = source["parentId"];
+	        this.payload = this.convertValues(source["payload"], Payload);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	
+	
 	export class Status {
 	    subTitle?: string;
 	    activeMessage?: boolean;
@@ -2522,6 +2688,7 @@ export namespace rumodel {
 	    app_name?: string;
 	    min_version?: string;
 	    max_version?: string;
+	    description?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppsAvailableForInstall(source);
@@ -2532,6 +2699,7 @@ export namespace rumodel {
 	        this.app_name = source["app_name"];
 	        this.min_version = source["min_version"];
 	        this.max_version = source["max_version"];
+	        this.description = source["description"];
 	    }
 	}
 	export class RunningServices {
@@ -2968,6 +3136,26 @@ export namespace store {
 	        this.move_one_level_inside_file_to_outside = source["move_one_level_inside_file_to_outside"];
 	    }
 	}
+	export class Firmware {
+	    name: string;
+	    repo: string;
+	    description: string;
+	    min_version: string;
+	    max_version: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Firmware(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.repo = source["repo"];
+	        this.description = source["description"];
+	        this.min_version = source["min_version"];
+	        this.max_version = source["max_version"];
+	    }
+	}
 	export class Plugins {
 	    name: string;
 	    plugin: string;
@@ -3028,6 +3216,7 @@ export namespace store {
 	    apps: Apps[];
 	    plugins: Plugins[];
 	    services: Services[];
+	    firmware: Firmware[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Release(source);
@@ -3040,6 +3229,7 @@ export namespace store {
 	        this.apps = this.convertValues(source["apps"], Apps);
 	        this.plugins = this.convertValues(source["plugins"], Plugins);
 	        this.services = this.convertValues(source["services"], Services);
+	        this.firmware = this.convertValues(source["firmware"], Firmware);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

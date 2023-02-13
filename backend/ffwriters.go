@@ -55,7 +55,7 @@ func (inst *App) DeleteWriter(connUUID, hostUUID, uuid string) interface{} {
 	}
 	_, err = client.DeleteWriter(hostUUID, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return err
 	}
 	return "delete ok"
@@ -63,17 +63,16 @@ func (inst *App) DeleteWriter(connUUID, hostUUID, uuid string) interface{} {
 
 func (inst *App) DeleteWritersBulk(connUUID, hostUUID string, UUIDs []UUIDs) interface{} {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	err = inst.errMsg(err)
 	if err != nil {
-		return nil
+		inst.uiErrorMessage(err)
 	}
 	var addedCount int
 	var errorCount int
 	for _, item := range UUIDs {
-		_, err := client.DeleteStreamClone(hostUUID, item.UUID)
+		_, err := client.DeleteWriter(hostUUID, item.UUID)
 		if err != nil {
 			errorCount++
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			inst.uiErrorMessage(err)
 		} else {
 			addedCount++
 		}

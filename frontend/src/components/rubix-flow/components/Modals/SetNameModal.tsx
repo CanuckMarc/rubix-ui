@@ -11,11 +11,7 @@ export type SetNameModalProps = {
   onClose: () => void;
 };
 
-export const SetNameModal: FC<SetNameModalProps> = ({
-  node,
-  open = false,
-  onClose,
-}) => {
+export const SetNameModal: FC<SetNameModalProps> = ({ node, open = false, onClose }) => {
   const [name, setName] = useState<string>("");
   const instance = useReactFlow();
 
@@ -24,18 +20,27 @@ export const SetNameModal: FC<SetNameModalProps> = ({
   };
 
   const handleSubmit = () => {
-    const newNodes = instance.getNodes().map((item: NodeInterface) => {
-      if (item.id === node.id) {
-        return {
-          ...item,
-          info: { nodeName: name },
-        };
-      }
+    const nextValue = name.trim();
+    if (node.info?.nodeName !== nextValue) {
+      window.saveCurrentFlowForUndo();
+      const newNodes = instance.getNodes().map((item: NodeInterface) => {
+        if (item.id === node.id) {
+          return {
+            ...item,
+            info: { nodeName: nextValue },
+          };
+        }
 
-      return item;
-    });
-    instance.setNodes(newNodes);
-
+        return item;
+      });
+      window.allFlow.nodes = window.allFlow.nodes.map((item) => {
+        if (item.id === node.id) {
+          item.info = { nodeName: nextValue };
+        }
+        return item;
+      });
+      instance.setNodes(newNodes);
+    }
     setName("");
     onClose();
   };

@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeTreeItem } from "./NodeTreeItem";
 import { NodeSpecJSON } from '../lib';
+import { FlowSettings} from "./FlowSettingsModal";
 
 const { Sider } = Layout;
 
@@ -14,9 +15,10 @@ type NodeProps = {
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
+  flowSettings: FlowSettings;
 };
 
-export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu }: NodeProps) => {
+export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings}: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -52,9 +54,9 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
     const filtered =
       key.length > 0
         ? nodes.filter((node) => {
-            const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
-            return nodeType.toLowerCase().includes(key);
-          })
+          const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
+          return nodeType.toLowerCase().includes(key);
+        })
         : nodes;
 
     const allNodes = [...filtered];
@@ -96,7 +98,7 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
         <div className="p-2">
-          Nodes Tree {`(${nodes.length})`}
+          Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
           <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
             {isExpandedAll ? (
               <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
@@ -115,7 +117,7 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
             onChange={onChangeSearch}
           />
         </div>
-        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 70px)" }}>
+        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
           {nodesFiltered.nodesL1.map((node, index) => (
             <NodeTreeItem
               key={node.id}
@@ -128,6 +130,7 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
               allNodes={nodesFiltered.remainingNodes}
               selectedSubFlowId={selectedSubFlowId}
               handleNodeContextMenu={handleNodeContextMenu}
+              flowSettings={flowSettings}
             />
           ))}
         </div>

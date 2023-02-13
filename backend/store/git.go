@@ -24,6 +24,12 @@ func stringPtrToString(b *string) string {
 	}
 }
 
+func (inst *AppStore) ListReleases(repo *git.AssetOptions, token string, pageOpts *git.ListOptions) ([]*git.RepositoryRelease, error) {
+	ctx := context.Background()
+	gitClient := git.NewClient(token, repo, ctx)
+	return gitClient.ListReleases(pageOpts)
+}
+
 func (inst *AppStore) gitDownloadZipball(app App, token string, gitOptions git.DownloadOptions) (*string, error) {
 	opts := &git.AssetOptions{
 		Owner: inst.Store.Owner,

@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { FlowStreamCloneFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../../constants/routes";
-import { STREAM_HEADERS } from "../../../../../../../constants/headers";
+import { STREAM_CLONE_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
 import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
 import { ArrowRightOutlined } from "@ant-design/icons";
@@ -28,11 +28,12 @@ export const StreamClonesTable = () => {
   const factory = new FlowStreamCloneFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+  factory.flowNetworkCloneUUID = flNetworkCloneUUID;
 
   const columns = [
     {
-      title: "actions",
       key: "actions",
+      title: "Actions",
       fixed: "left",
       render: (_: any, item: StreamClone) => (
         <Space size="middle">
@@ -44,7 +45,7 @@ export const StreamClonesTable = () => {
         </Space>
       ),
     },
-    ...STREAM_HEADERS,
+    ...STREAM_CLONE_HEADERS,
   ];
 
   const rowSelection = {
@@ -71,8 +72,8 @@ export const StreamClonesTable = () => {
     try {
       setIsFetching(true);
       const res = await factory.GetAll();
-      setStreamClones(res);
-      setFilteredData(res);
+      setStreamClones(res?.stream_clones || []);
+      setFilteredData(res?.stream_clones || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -88,7 +89,7 @@ export const StreamClonesTable = () => {
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {streamClones.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {streamClones?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"

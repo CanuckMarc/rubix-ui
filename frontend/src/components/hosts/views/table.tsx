@@ -9,7 +9,6 @@ import {
   RbDeleteButton,
   RbMonitorButton,
   RbRefreshButton,
-  RbSyncButton
 } from "../../../common/rb-table-actions";
 import { HOST_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
@@ -22,13 +21,13 @@ import { EdgeBiosTokenFactory } from "../../edgebios/token-factory";
 import { InstallRubixEdgeModal } from "./install-rubix-edge/install-rubix-edge-modal";
 import { InstallFactory } from "./install-rubix-edge/factory";
 import { EdgeAppInfo } from "./install-app-info";
-import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import { RbSearchInput } from "../../../common/rb-search-input";
 import { Ping } from "./ping/ping";
 import { ConfigureOpenVpn } from "./configure-open-vpn/configure-open-vpn";
+import { AttachVirtualIP } from "./attach-virtual-ip/attach-virtual-ip";
+import { CreateHostWizard } from "./host-wizard";
 import Host = amodel.Host;
 import UUIDs = backend.UUIDs;
-import { AttachVirtualIP } from "./attach-virtual-ip/attach-virtual-ip";
 
 const ExpandedRow = (props: any) => {
   return (
@@ -48,7 +47,7 @@ export const HostsTable = (props: any) => {
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
-  const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
   const [loadingUpdateStatus, setLoadingUpdateStatus] = useState(false);
   const [tokenFactory, setTokenFactory] = useState(new EdgeBiosTokenFactory(connUUID));
   const [filteredData, setFilteredData] = useState(hosts);
@@ -143,6 +142,13 @@ export const HostsTable = (props: any) => {
     }
   };
 
+  const showWizard = () => {
+    if (isObjectEmpty(hostSchema)) {
+      getHostSchema();
+    }
+    setIsWizardModalVisible(true)
+  }
+
   const onCloseModal = () => {
     setIsModalVisible(false);
     setCurrentHost({} as Host);
@@ -175,21 +181,10 @@ export const HostsTable = (props: any) => {
     setTokenFactory(_tokenFactory);
   }, [currentHost]);
 
-  const onSyncReleases = async () => {
-    setLoadingSyncReleases(true);
-    try {
-      await GitDownloadReleases();
-    } catch (error) {
-      openNotificationWithIcon("error", error);
-    } finally {
-      setLoadingSyncReleases(false);
-    }
-  };
-
   const onUpdateStatus = async () => {
     setLoadingUpdateStatus(true);
     try {
-      await factory.UpdateStatus();
+      await factory.UpdateHostsStatus(netUUID);
       await refreshList();
     } catch (error) {
       openNotificationWithIcon("error", error);
@@ -201,22 +196,32 @@ export const HostsTable = (props: any) => {
   return (
     <div>
       <RbRefreshButton refreshList={refreshList} />
+      <RbAddButton handleClick={showWizard} />
       <RbMonitorButton onClick={onUpdateStatus} loading={loadingUpdateStatus} text="Update Status" />
-      <RbAddButton handleClick={(e: any) => showModal({} as Host, e)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      <RbSyncButton onClick={onSyncReleases} loading={loadingSyncReleases} text="Sync Releases" />
-      {hosts.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {hosts?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={hosts.length > 0 ? filteredData : []}
+        dataSource={hosts?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
         expandable={{
           expandedRowRender: (host: any) => <ExpandedRow host={host} />,
           rowExpandable: (record: any) => record.name !== "Not Expandable",
         }}
+      />
+
+      <CreateHostWizard 
+        currentHost={currentHost}
+        hostSchema={hostSchema}
+        isLoadingForm={isLoadingForm}
+        refreshList={refreshList}
+        hostsFactory={factory}
+        tokenFactory={tokenFactory}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
       />
 
       <CreateEditModal

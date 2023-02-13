@@ -24,6 +24,8 @@ import { ConnectionFactory } from "../connections/factory";
 import { DataNode } from "antd/es/tree";
 import { storage } from "../../../wailsjs/go/models";
 import { getTreeDataIterative } from "../searchable-tree/searchable-tree.ui-service";
+import eventEmit from "../rubix-flow/util/evenEmit";
+import "./sidebar.css";
 
 import RubixConnection = storage.RubixConnection;
 
@@ -36,6 +38,7 @@ const settingsFactory = new SettingsFactory();
 
 interface TDataNode extends DataNode {
   name?: string;
+  next?: string;
 }
 
 const DividerLock = (props: any) => {
@@ -228,6 +231,9 @@ export const MenuSidebar = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [routeData, updateRouteData] = useState([] as TDataNode[]);
   const [menu, setMenu] = useState<MenuProps["items"]>([]);
+  const [allKeyMenus, setAllKeyMenus] = useState<string[]>([]);
+  const [openingKeys, setOpenningKeys] = useState<string[]>([]);
+  const [activeMenu, setActiveMenu] = useState<string>("");
 
   const sidebarItems = [
     {
@@ -376,14 +382,15 @@ export const MenuSidebar = () => {
     }
   };
 
-  const getSupervisorsMenu = () => {
+  const getSupervisorsMenu = async () => {
     let menu = menuItems as any;
     if (routeData.length > 0) {
       let supervisorsMenu = sidebarItems.find((item) => item.name === "Supervisors");
       const Icon = supervisorsMenu?.icon as any;
       menu[0] = { ...routeData[0], icon: <Icon /> };
     }
-    setMenu(menu);
+    await setMenu(menu);
+    getKeyMenus();
   };
 
   const handleCollapse = (value: boolean) => {
@@ -397,8 +404,49 @@ export const MenuSidebar = () => {
   };
 
   const onOpenChange = (openKeys: string[]) => {
-    console.log("openKeys", openKeys);
+    setOpenningKeys(openKeys);
   };
+
+  const onUpdateOpenKeys = ({ key, isOpen }: any) => {
+    let _openingKeys = openingKeys;
+    if (isOpen) {
+      _openingKeys = _openingKeys.concat(allKeyMenus.filter((menuKey) => menuKey.startsWith(key)));
+    } else {
+      _openingKeys = openingKeys.filter((menuKey) => !menuKey.startsWith(key));
+    }
+    setOpenningKeys(_openingKeys);
+  };
+
+  const getKeyMenus = () => {
+    if (!routeData[0]) return [];
+    let menuKeys: any[] = [routeData[0].key];
+    routeData[0].children?.forEach((conenction: TDataNode) => {
+      menuKeys.push(conenction.key);
+      if (conenction.children && conenction.children.length > 0) {
+        conenction.children.forEach((location: TDataNode) => {
+          menuKeys.push(location.key);
+          if (location.children && location.children.length > 0) {
+            location.children.forEach((group: TDataNode) => {
+              menuKeys.push(group.key);
+              if (group.children && group.children.length > 0) {
+                group.children.forEach((controller: TDataNode) => {
+                  menuKeys.push(controller.key);
+                  if (controller.children && controller.children.length > 0) {
+                    controller.children.forEach((host: TDataNode) => {
+                      menuKeys.push(host.key);
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    setAllKeyMenus(menuKeys);
+  };
+
+  eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
 
   useEffect(() => {
     fetchConnections();
@@ -408,18 +456,35 @@ export const MenuSidebar = () => {
     getSupervisorsMenu();
   }, [routeData]);
 
+  useEffect(() => {
+    const isBelongToDevicePath =
+      (location.pathname.includes("/plugins") && location.pathname.includes("/rf-networks")) ||
+      location.pathname.includes("/fl-networks");
+    if (isBelongToDevicePath) {
+      ////use for Drivers/Flow Networks/Flow Network Clones routes
+      const devicePath = location.pathname.includes("/rf-networks")
+        ? location.pathname.split("/plugins")[0]
+        : location.pathname.split("/fl-networks")[0];
+      setActiveMenu(devicePath);
+    } else {
+      setActiveMenu(location.pathname);
+    }
+  }, [location.pathname]);
+
   return (
     <Sider
       id="sidebarMenu"
       width={280}
-      style={{ minHeight: "100vh" }}
+      style={{ height: "calc(100vh - 40px)" }}
       collapsed={collapsed}
       onClick={() => {
         if (collapsed && !collapseDisabled) handleCollapse(false);
       }}
     >
       {isFetching ? (
-        <Spin />
+        <div className="spin-wrapper">
+          <Spin />
+        </div>
       ) : (
         <>
           <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
@@ -432,9 +497,11 @@ export const MenuSidebar = () => {
           <Menu
             mode="inline"
             theme="dark"
+            className="rubix-menu"
             items={menu}
-            selectedKeys={[location.pathname]}
-            activeKey={location.pathname}
+            selectedKeys={[activeMenu]}
+            activeKey={activeMenu}
+            openKeys={openingKeys}
             onOpenChange={onOpenChange}
           />
           <AvatarDropdown setIsModalVisible={setIsModalVisible} />

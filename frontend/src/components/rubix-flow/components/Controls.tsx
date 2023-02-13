@@ -9,8 +9,13 @@ import {
   DownloadOutlined,
   RestOutlined,
   UploadOutlined,
-  PlayCircleOutlined,
+  VerticalAlignBottomOutlined,
   SettingOutlined,
+  LinkOutlined,
+  BuildOutlined,
+  RollbackOutlined,
+  CloseCircleOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
@@ -18,9 +23,9 @@ import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Edge } from "react-flow-renderer";
 
 type ControlProps = {
+  isChangedFlow: boolean;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
-  isConnectionBuilder: boolean;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
@@ -32,12 +37,14 @@ type ControlProps = {
   onCloseSubFlow: () => void;
   onSaveSettings: (settings: FlowSettings) => void;
   handleConnectionBuilderFlow: (node: NodeInterface) => void;
+  onLinkBuilder: () => void;
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
+
 const Controls = ({
   settings,
-  isConnectionBuilder,
+  isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
   onCopyNodes,
@@ -46,6 +53,7 @@ const Controls = ({
   onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
+  onLinkBuilder,
   onClearAllNodes,
   onCloseSubFlow,
   onBackToMain,
@@ -100,28 +108,8 @@ const Controls = ({
     instance.setEdges(newEdges);
   });
 
-  /* Ctrl + C (key): Copy nodes
-  useCtrlPressKey("KeyC", () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
-    const nodeIdCopied = nodesCopied.map((item) => item.id);
-    const edgesCopied = instance
-      .getEdges()
-      .filter(
-        (item) =>
-          item.selected &&
-          nodeIdCopied.includes(item.source) &&
-          nodeIdCopied.includes(item.target)
-      );
-
-    setCopied({
-      nodes: nodesCopied,
-      edges: edgesCopied,
-    });
-  }); */
-
-  /* Ctrl + D (key): Paste nodes */
-  useCtrlPressKey("KeyD", () => {
-    const nodesCopied = instance.getNodes().filter((item) => item.selected);
+  const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
+    const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
     const nodeIdCopied = nodesCopied.map((item) => item.id);
     const edgesCopied = instance
       .getEdges()
@@ -131,99 +119,72 @@ const Controls = ({
       nodes: nodesCopied,
       edges: edgesCopied,
     });
-  });
+  };
+
+  /* Ctrl + D (key): Paste nodes */
+  useCtrlPressKey("KeyD", () => handleDuplicatedNodes());
 
   /* Ctrl + Z (key): Undo */
-  useCtrlPressKey("KeyZ", () => {
-    onUndo();
-  });
+  useCtrlPressKey("KeyZ", onUndo);
 
   /* Ctrl + Y (key): Redo */
-  useCtrlPressKey("KeyY", () => {
-    onRedo();
-  });
+  useCtrlPressKey("KeyY", onRedo);
 
   /* Ctrl + S (key): Download/deploy flow */
-  useCtrlPressKey("KeyS", () => {
-    onHandelSaveFlow();
-  });
+  useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", () => {
-    onRefreshValues();
+  useCtrlPressKey("KeyX", onRefreshValues);
+
+  useCtrlPressKey("KeyC", () => {
+    const nodesCopied = instance.getNodes().filter((node) => node.selected);
+    if (nodesCopied) {
+      window.nodesCopied = nodesCopied;
+    }
+  });
+
+  useCtrlPressKey("KeyV", () => {
+    const activeElement = document.activeElement;
+    if (
+      !["input", "textarea"].includes(activeElement?.tagName?.toLowerCase() || "") &&
+      window.nodesCopied &&
+      window.nodesCopied.length > 0
+    ) {
+      handleDuplicatedNodes(window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id })));
+    }
+    window.nodesCopied = [];
   });
 
   const onConnectionBuilder = () => {
     handleConnectionBuilderFlow(selectedNodeForSubFlow!!);
   };
 
+  const renderIconBtn = (title: string, Icon: any, onClick: () => void, id = "") => {
+    return (
+      <div id={id} className="cursor-pointer border-r bg-white hover:bg-gray-100" title={title} onClick={onClick}>
+        <Icon className="p-2 text-gray-700 align-middle" />
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {isChangedFlow && renderIconBtn("Sync flow", SyncOutlined, onHandelSaveFlow)}
+        {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
           <>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Connection Builder"
-              onClick={onConnectionBuilder}
-            >
-              {isConnectionBuilder ? "Close Connection Builder" : "Connection Builder"}
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Back to Main"
-              onClick={onBackToMain}
-            >
-              Back to Main
-            </div>
-            <div
-              className="cursor-pointer border-r bg-white hover:bg-gray-100 px-8"
-              title="Close sub flow"
-              onClick={onCloseSubFlow}
-            >
-              Close Sub Flow
-            </div>
+            {renderIconBtn("Connection Builder", BuildOutlined, onConnectionBuilder)}
+            {renderIconBtn("Back to Main", RollbackOutlined, onBackToMain)}
+            {renderIconBtn("Close sub flow", CloseCircleOutlined, onCloseSubFlow)}
           </>
         )}
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Settings refresh value"
-          onClick={() => setSettingRefreshModalOpen(true)}
-        >
-          <SettingOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Help"
-          onClick={() => setHelpModalOpen(true)}
-        >
-          <QuestionCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Load"
-          onClick={() => setLoadModalOpen(true)}
-        >
-          <UploadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Save"
-          id="exportButton"
-          onClick={() => setSaveModalOpen(true)}
-        >
-          <DownloadOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div
-          className="cursor-pointer border-r bg-white hover:bg-gray-100"
-          title="Clear"
-          onClick={() => setClearModalOpen(true)}
-        >
-          <RestOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
-        <div className="cursor-pointer border-r bg-white hover:bg-gray-100" title="Run" onClick={onHandelSaveFlow}>
-          <PlayCircleOutlined className="p-2 text-gray-700 align-middle" />
-        </div>
+        {renderIconBtn("Settings", SettingOutlined, () => setSettingRefreshModalOpen(true))}
+        {renderIconBtn("Help", QuestionCircleOutlined, () => setHelpModalOpen(true))}
+        {renderIconBtn("Import", DownloadOutlined, () => setLoadModalOpen(true))}
+        {renderIconBtn("Export", UploadOutlined, () => setSaveModalOpen(true), "exportButton")}
+        {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
+        {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
       </div>
       <LoadModal
         open={loadModalOpen}

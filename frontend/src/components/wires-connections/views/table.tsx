@@ -52,8 +52,6 @@ export const WiresConnectionsTable = (props: any) => {
   };
 
   const bulkDelete = async () => {
-    console.log(isRemote);
-
     try {
       await factory.BulkDeleteWiresConnection(connUUID, hostUUID, isRemote, selectedUUIDs);
     } catch (error) {

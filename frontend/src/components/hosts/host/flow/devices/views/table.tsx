@@ -1,19 +1,19 @@
 import { Space, Spin, Tag, Tooltip } from "antd";
-import { FormOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { model, backend } from "../../../../../../../wailsjs/go/models";
+import { Link, useParams } from "react-router-dom";
+import { backend, model } from "../../../../../../../wailsjs/go/models";
 import RbTable from "../../../../../../common/rb-table";
 import {
+  RbAddButton,
+  RbDeleteButton,
   RbExportButton,
   RbImportButton,
-  RbDeleteButton,
-  RbAddButton,
   RbRestartButton,
 } from "../../../../../../common/rb-table-actions";
 import { FLOW_DEVICE_HEADERS } from "../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../constants/routes";
-import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import { openNotificationWithIcon, titleCase } from "../../../../../../utils/utils";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { FlowDeviceFactory } from "../factory";
 import { CreateModal } from "./create";
@@ -21,10 +21,9 @@ import { EditModal } from "./edit";
 import { ExportModal, ImportModal } from "./import-export";
 import MassEdit from "../../../../../../common/mass-edit";
 import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
-
+import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import Device = model.Device;
 import UUIDs = backend.UUIDs;
-import { RbSearchInput } from "../../../../../../common/rb-search-input";
 
 export const FlowDeviceTable = (props: any) => {
   const { connUUID = "", locUUID = "", netUUID = "", hostUUID = "", networkUUID = "", pluginName = "" } = useParams();
@@ -103,34 +102,26 @@ export const FlowDeviceTable = (props: any) => {
   const getTableHeaders = (schema: any) => {
     if (!schema) return;
 
-    const columns = [
-      {
-        title: "name",
-        dataIndex: "name",
-        key: "name",
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      },
-      ...FLOW_DEVICE_HEADERS,
-    ];
+    const stylingColumns = [...FLOW_DEVICE_HEADERS];
 
-    delete schema.plugin_name; //prevent mass edit on plugin_name
-    const columnKeys = columns.map((c: any) => c.key);
+    delete schema.plugin_name; // prevent mass edit on plugin_name
+    const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
     let headers = Object.keys(schema).map((key) => {
       return {
-        title: ["name", "uuid", "description"].includes(key) ? key : MassEditTitle(key, schema),
+        title: ["name", "uuid", "description"].includes(key)
+          ? titleCase(schema[key]?.title)
+          : MassEditTitle(key, schema),
         dataIndex: key,
         key: key,
-        sorter: (a: any, b: any) => ('' + a[key] ?? '').localeCompare('' + b[key] ?? ''),
-        render: (a: any) => '' + (a ?? ''), // boolean values doesn't display on the table
+        sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
+        render: (a: any) => "" + (a ?? ""), // boolean values doesn't display on the table
       };
     });
 
-    //styling columns
+    // styling columns
     headers = headers.map((header: any) => {
-      if (columnKeys.includes(header.key)) {
-        const headerFromColumns = columns.find((col: any) => col.key === header.key);
-        if (headerFromColumns) headerFromColumns.title = header.title;
-        return headerFromColumns;
+      if (stylingColumnKeys.includes(header.key)) {
+        return stylingColumns.find((col: any) => col.key === header.key);
       } else {
         return header;
       }
@@ -138,7 +129,7 @@ export const FlowDeviceTable = (props: any) => {
 
     const headerWithActions = [
       {
-        title: "actions",
+        title: "Actions",
         key: "actions",
         fixed: "left",
         render: (_: any, device: Device) => (
@@ -158,7 +149,7 @@ export const FlowDeviceTable = (props: any) => {
       },
       ...headers,
       {
-        title: "plugin name",
+        title: "Plugin Name",
         key: "plugin_name",
         dataIndex: "plugin_name",
         render() {
@@ -173,7 +164,9 @@ export const FlowDeviceTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} keyName={key} handleOk={handleMassEdit} />;
+    return (
+      <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key} handleOk={handleMassEdit} />
+    );
   };
 
   const handleMassEdit = async (updateData: any) => {
@@ -220,14 +213,10 @@ export const FlowDeviceTable = (props: any) => {
     getSchema();
   }, [pluginName]);
 
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
   return (
     <>
-      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={() => showCreateModal()} />
+      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />

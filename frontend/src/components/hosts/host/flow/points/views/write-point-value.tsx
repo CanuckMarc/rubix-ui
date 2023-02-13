@@ -7,7 +7,7 @@ import { model } from "../../../../../../../wailsjs/go/models";
 import Priority = model.Priority;
 
 export const WritePointValueModal = (props: any) => {
-  const { connUUID = "", hostUUID = "" } = useParams();
+  const { connUUID = "", hostUUID = "", pluginName = "" } = useParams();
   const { isModalVisible, onCloseModal, refreshList, point } = props;
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({} as any);
@@ -102,9 +102,12 @@ export const WritePointValueModal = (props: any) => {
               stringMode
               placeholder={priorityKey}
               defaultValue={formData[priorityKey]}
-              onChange={(v: number) => {
-                onChange(v, priorityKey);
+              onChange={(v: number | null) => {
+                if (v) onChange(v, priorityKey);
               }}
+              disabled={
+                pluginName === "bacnetmaster" && priorityKey !== "_14" && priorityKey !== "_15" && priorityKey !== "_16"
+              }
             />
           </Col>
         ))}

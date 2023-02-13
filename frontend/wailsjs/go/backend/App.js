@@ -242,6 +242,10 @@ export function DownloadFlow(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['DownloadFlow'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function DownloadIO16Firmware(arg1) {
+  return window['go']['backend']['App']['DownloadIO16Firmware'](arg1);
+}
+
 export function EdgeAppsInfo(arg1, arg2) {
   return window['go']['backend']['App']['EdgeAppsInfo'](arg1, arg2);
 }
@@ -482,6 +486,10 @@ export function FakeEdgeAppsInfoModelCreationOnUI() {
   return window['go']['backend']['App']['FakeEdgeAppsInfoModelCreationOnUI']();
 }
 
+export function FlashIO16(arg1) {
+  return window['go']['backend']['App']['FlashIO16'](arg1);
+}
+
 export function FlowNetworkNewLog(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['FlowNetworkNewLog'](arg1, arg2, arg3, arg4);
 }
@@ -506,6 +514,10 @@ export function GetBacnetDevicePoints(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['GetBacnetDevicePoints'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetBacnetFreeAddress(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetBacnetFreeAddress'](arg1, arg2, arg3);
+}
+
 export function GetConnection(arg1) {
   return window['go']['backend']['App']['GetConnection'](arg1);
 }
@@ -518,12 +530,8 @@ export function GetConnections() {
   return window['go']['backend']['App']['GetConnections']();
 }
 
-export function GetConsumer(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetConsumer'](arg1, arg2, arg3);
-}
-
-export function GetConsumerClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetConsumerClones'](arg1, arg2);
+export function GetConsumer(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetConsumer'](arg1, arg2, arg3, arg4);
 }
 
 export function GetConsumers(arg1, arg2) {
@@ -722,16 +730,16 @@ export function GetPointsForDevice(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetPointsForDevice'](arg1, arg2, arg3);
 }
 
-export function GetProducer(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3);
-}
-
-export function GetProducerClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetProducerClones'](arg1, arg2);
+export function GetProducer(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3, arg4);
 }
 
 export function GetProducers(arg1, arg2) {
   return window['go']['backend']['App']['GetProducers'](arg1, arg2);
+}
+
+export function GetProducersUnderStreamClone(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetProducersUnderStreamClone'](arg1, arg2, arg3);
 }
 
 export function GetRcNetworkSchema(arg1, arg2) {
@@ -770,20 +778,16 @@ export function GetSettings() {
   return window['go']['backend']['App']['GetSettings']();
 }
 
-export function GetStream(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetStream'](arg1, arg2, arg3);
+export function GetStream(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['GetStream'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStreamClones(arg1, arg2) {
-  return window['go']['backend']['App']['GetStreamClones'](arg1, arg2);
+export function GetStreamClone(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['GetStreamClone'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetStreams(arg1, arg2) {
   return window['go']['backend']['App']['GetStreams'](arg1, arg2);
-}
-
-export function GetStreamsByFlowNetwork(arg1, arg2, arg3) {
-  return window['go']['backend']['App']['GetStreamsByFlowNetwork'](arg1, arg2, arg3);
 }
 
 export function GetSubFlow(arg1, arg2, arg3, arg4) {
@@ -834,8 +838,24 @@ export function ImportPointBulk(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ImportPointBulk'](arg1, arg2, arg3, arg4);
 }
 
+export function ListIO16BuildFiles(arg1, arg2) {
+  return window['go']['backend']['App']['ListIO16BuildFiles'](arg1, arg2);
+}
+
+export function ListIO16Builds() {
+  return window['go']['backend']['App']['ListIO16Builds']();
+}
+
+export function ListIO16Releases() {
+  return window['go']['backend']['App']['ListIO16Releases']();
+}
+
 export function NewTab(arg1) {
   return window['go']['backend']['App']['NewTab'](arg1);
+}
+
+export function NextFreeBacnetAddress(arg1) {
+  return window['go']['backend']['App']['NextFreeBacnetAddress'](arg1);
 }
 
 export function NodeHelp(arg1, arg2, arg3) {
@@ -942,6 +962,10 @@ export function UpdateConnection(arg1, arg2) {
   return window['go']['backend']['App']['UpdateConnection'](arg1, arg2);
 }
 
+export function UpdateHostsStatus(arg1, arg2) {
+  return window['go']['backend']['App']['UpdateHostsStatus'](arg1, arg2);
+}
+
 export function UpdateLocalStorage(arg1, arg2, arg3) {
   return window['go']['backend']['App']['UpdateLocalStorage'](arg1, arg2, arg3);
 }
@@ -952,10 +976,6 @@ export function UpdateLocation(arg1, arg2, arg3) {
 
 export function UpdateSettings(arg1) {
   return window['go']['backend']['App']['UpdateSettings'](arg1);
-}
-
-export function UpdateStatus(arg1) {
-  return window['go']['backend']['App']['UpdateStatus'](arg1);
 }
 
 export function UpdateWiresConnection(arg1, arg2, arg3, arg4, arg5) {

@@ -17,8 +17,8 @@ import {networking} from '../models';
 import {datelib} from '../models';
 import {streamlog} from '../models';
 import {flowcli} from '../models';
-import {store} from '../models';
 import {node} from '../models';
+import {store} from '../models';
 import {nodes} from '../models';
 
 export function AddConnection(arg1:storage.RubixConnection):Promise<rumodel.Response>;
@@ -95,9 +95,9 @@ export function DeleteHost(arg1:string,arg2:string):Promise<assistcli.Response>;
 
 export function DeleteHostBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<any>;
 
-export function DeleteHostNetwork(arg1:string,arg2:string):Promise<assistcli.Response>;
+export function DeleteHostNetwork(arg1:string,arg2:string):Promise<boolean>;
 
-export function DeleteHostNetworkBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<any>;
+export function DeleteHostNetworkBulk(arg1:string,arg2:Array<backend.UUIDs>):Promise<boolean>;
 
 export function DeleteLocation(arg1:string,arg2:string):Promise<assistcli.Response>;
 
@@ -140,6 +140,8 @@ export function DeleteWritersBulk(arg1:string,arg2:string,arg3:Array<backend.UUI
 export function DoBackup(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string,arg6:any):Promise<storage.Backup>;
 
 export function DownloadFlow(arg1:string,arg2:string,arg3:boolean,arg4:any,arg5:boolean):Promise<flow.Message>;
+
+export function DownloadIO16Firmware(arg1:string):Promise<string>;
 
 export function EdgeAppsInfo(arg1:string,arg2:string):Promise<rumodel.Response>;
 
@@ -261,6 +263,8 @@ export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
 
+export function FlashIO16(arg1:string):Promise<string>;
+
 export function FlowNetworkNewLog(arg1:string,arg2:string,arg3:string,arg4:number):Promise<streamlog.Log>;
 
 export function GetBackup(arg1:string):Promise<storage.Backup>;
@@ -273,15 +277,15 @@ export function GetBackupsNoData():Promise<Array<storage.Backup>>;
 
 export function GetBacnetDevicePoints(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<Array<model.Point>>;
 
+export function GetBacnetFreeAddress(arg1:string,arg2:string,arg3:boolean):Promise<backend.BacnetPoints>;
+
 export function GetConnection(arg1:string):Promise<storage.RubixConnection>;
 
 export function GetConnectionSchema():Promise<backend.ConnectionSchema>;
 
 export function GetConnections():Promise<Array<storage.RubixConnection>>;
 
-export function GetConsumer(arg1:string,arg2:string,arg3:string):Promise<model.Consumer>;
-
-export function GetConsumerClones(arg1:string,arg2:string):Promise<Array<model.Consumer>>;
+export function GetConsumer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Consumer>;
 
 export function GetConsumers(arg1:string,arg2:string):Promise<Array<model.Consumer>>;
 
@@ -355,13 +359,13 @@ export function GetNetworksWithPoints(arg1:string,arg2:string):Promise<Array<mod
 
 export function GetNetworksWithPointsDisplay(arg1:string,arg2:string):Promise<Array<backend.NetworksList>>;
 
-export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+export function GetNodesAllFlowNetworks(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Schema>>;
 
 export function GetNodesAllFlowNetworksChildren(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetNodesByCategory(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
-export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
+export function GetNodesByType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<node.Schema>>;
 
 export function GetPcGetNetworks():Promise<any>;
 
@@ -381,11 +385,11 @@ export function GetPoints(arg1:string,arg2:string):Promise<Array<model.Point>>;
 
 export function GetPointsForDevice(arg1:string,arg2:string,arg3:string):Promise<Array<model.Point>>;
 
-export function GetProducer(arg1:string,arg2:string,arg3:string):Promise<model.Producer>;
-
-export function GetProducerClones(arg1:string,arg2:string):Promise<Array<model.Producer>>;
+export function GetProducer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Producer>;
 
 export function GetProducers(arg1:string,arg2:string):Promise<Array<model.Producer>>;
+
+export function GetProducersUnderStreamClone(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function GetRcNetworkSchema(arg1:string,arg2:string):Promise<any>;
 
@@ -405,13 +409,11 @@ export function GetServerTime(arg1:string):Promise<any>;
 
 export function GetSettings():Promise<rumodel.Response>;
 
-export function GetStream(arg1:string,arg2:string,arg3:string):Promise<model.Stream>;
+export function GetStream(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<model.Stream>;
 
-export function GetStreamClones(arg1:string,arg2:string):Promise<Array<model.StreamClone>>;
+export function GetStreamClone(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<rumodel.Response>;
 
 export function GetStreams(arg1:string,arg2:string):Promise<Array<model.Stream>>;
-
-export function GetStreamsByFlowNetwork(arg1:string,arg2:string,arg3:string):Promise<Array<model.Stream>>;
 
 export function GetSubFlow(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
@@ -437,11 +439,19 @@ export function ImportNetworksBulk(arg1:string,arg2:string,arg3:string):Promise<
 
 export function ImportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string):Promise<backend.BulkAddResponse>;
 
+export function ListIO16BuildFiles(arg1:string,arg2:boolean):Promise<Array<string>>;
+
+export function ListIO16Builds():Promise<Array<string>>;
+
+export function ListIO16Releases():Promise<Array<string>>;
+
 export function NewTab(arg1:string):Promise<void>;
+
+export function NextFreeBacnetAddress(arg1:Array<number>):Promise<number>;
 
 export function NodeHelp(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Help>>;
 
-export function NodeHelpByName(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<node.Help>;
+export function NodeHelpByName(arg1:string,arg2:string,arg3:boolean,arg4:string):Promise<backend.Help>;
 
 export function NodePallet(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<Array<nodes.PalletNode>>;
 
@@ -491,13 +501,13 @@ export function SetGitToken(arg1:string):Promise<rumodel.Response>;
 
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<rumodel.Response>;
 
+export function UpdateHostsStatus(arg1:string,arg2:string):Promise<amodel.Network>;
+
 export function UpdateLocalStorage(arg1:string,arg2:string,arg3:model.LocalStorageFlowNetwork):Promise<model.LocalStorageFlowNetwork>;
 
 export function UpdateLocation(arg1:string,arg2:string,arg3:amodel.Location):Promise<rumodel.Response>;
 
 export function UpdateSettings(arg1:storage.Settings):Promise<rumodel.Response>;
-
-export function UpdateStatus(arg1:string):Promise<Array<amodel.Host>>;
 
 export function UpdateWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:string,arg5:db.Connection):Promise<db.Connection>;
 

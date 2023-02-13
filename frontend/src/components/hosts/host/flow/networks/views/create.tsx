@@ -95,12 +95,12 @@ export const CreateModal = (props: any) => {
 
   useEffect(() => {
     setSchema({});
-    setSelectedPlugin("please select plugin...");
+    setSelectedPlugin("please enable and select plugin....");
   }, [isModalVisible]);
 
   const fetchPlugins = async () => {
     try {
-      const res = (await pluginFactory.GetAll()) || [];
+      const res = (await pluginFactory.GetAll(true)) || [];
       setPlugins(res);
     } catch (error) {
       console.log(error);

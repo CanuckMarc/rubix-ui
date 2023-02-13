@@ -138,12 +138,12 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node:
 
 export const isInputFlow = (type: string) => {
   const newType = type.split("/")?.[1];
-  return ["input-float", "input-string", "input-bool"].includes(newType);
+  return ["input-float", "input-string", "input-boolean"].includes(newType);
 };
 
 export const isOutputFlow = (type: string) => {
   const newType = type.split("/")?.[1];
-  return ["output-float", "output-string", "output-bool"].includes(newType);
+  return ["output-float", "output-string", "output-boolean"].includes(newType);
 };
 
 export const Node = memo((props: NodeProps) => {
@@ -250,7 +250,7 @@ export const Node = memo((props: NodeProps) => {
       isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
-      nodeName={node?.info?.nodeName || ""}
+      nodeName={node?.info?.nodeName?.replace('{parent.name}', '') || ""}
       category={spec.category}
       selected={selected}
       height={node?.height ?? 30}
@@ -261,12 +261,12 @@ export const Node = memo((props: NodeProps) => {
       {pairs.map(([input, output], ix) => {
         if (
           input &&
-          !data[input.name] &&
-          data[input.name] !== null &&
-          ((input.valueType === "number" && data[input.name] !== 0) ||
-            (input.valueType === "boolean" && data[input.name] === undefined))
+          !newData[input.name] &&
+          newData[input.name] !== null &&
+          ((input.valueType === "number" && newData[input.name] !== 0) ||
+            (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          data[input.name] = input.defaultValue;
+          newData[input.name] = input.defaultValue;
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";

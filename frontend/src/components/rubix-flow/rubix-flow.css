@@ -10,7 +10,7 @@
 
 .rubix-flow__wrapper {
   flex-grow: 1;
-  height: 100vh;
+  height: calc(100vh - 40px);
 }
 
 .title-icon {
@@ -20,6 +20,15 @@
   cursor: pointer;
 }
 
-.node-help-modal > .ant-modal-content > .ant-modal-body > div > table {
+.node-help-modal>.ant-modal-content>.ant-modal-body>div>table {
   width: 100%;
+}
+
+.rubix-flow__wrapper.has-tabs .react-flow {
+  height: calc(100vh - 77px) !important;
+  top: 36px;
+}
+
+.subflow-tabs .ant-tabs-nav {
+  margin: 0 !important;
 }

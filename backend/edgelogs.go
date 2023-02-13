@@ -22,6 +22,8 @@ func pluginLogs(pluginName string) []string {
 		stringFilters = []string{"rubixio"}
 	case systemPlg:
 		stringFilters = []string{"system"}
+	case loraWANPlg:
+		stringFilters = []string{"lorawan"}
 	}
 	return stringFilters
 }
@@ -34,6 +36,9 @@ func (inst *App) edgeCreateLog(connUUID, hostUUID, serviceName string, duration 
 	}
 	if duration == 0 {
 		duration = 10
+	}
+	if duration > 60 {
+		duration = 60
 	}
 	body := &streamlog.Log{
 		Service:        serviceName,

@@ -2,10 +2,11 @@ package backend
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/NubeIO/nubeio-rubix-lib-helpers-go/pkg/nils"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
-	"testing"
 )
 
 func TestApp_WritePointValue(t *testing.T) {
@@ -42,7 +43,7 @@ func TestApp_WritePointValue(t *testing.T) {
 func TestApp_getPointListPayload(t *testing.T) {
 	app := MockNewApp()
 
-	value, err := app.getPointListPayload("cloud", "rc")
+	value, err := app.GetPointListPayload("cloud", "rc")
 	fmt.Println(err)
 	if err != nil {
 		return

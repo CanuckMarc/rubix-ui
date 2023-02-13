@@ -26,7 +26,7 @@ export const handleCopyNodesAndEdges = (
     childNodes.forEach((item: NodeInterface) => {
       const childNodeId = generateUuid();
       subNodes.push({ ...item, oldId: item.id, id: childNodeId, parentId: newId });
-      
+
       if (item.isParent) {
         copyAllNode(item.id, childNodeId);
       }
@@ -57,11 +57,7 @@ export const handleCopyNodesAndEdges = (
       id: newNodeId,
       position: { x: item.position.x + 10, y: item.position.y - 10 },
       selected: isAutoSelected,
-      data: {
-        ...item.data,
-        input: undefined,
-        output: undefined,
-      },
+      data: { ...item.data },
     };
   });
 

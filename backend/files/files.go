@@ -33,7 +33,8 @@ func writeDataToFileAsJSON(data interface{}, filedir string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	file, err := os.OpenFile(filedir, os.O_RDWR|os.O_CREATE, 0666)
+	file, err := os.OpenFile(filedir, os.O_RDWR|os.O_CREATE|os.O_WRONLY, 0666)
+
 	if err != nil {
 		return 0, err
 	}

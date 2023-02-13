@@ -5,24 +5,46 @@ import {
   HeatMapOutlined,
   LaptopOutlined,
   ClusterOutlined,
+  RadarChartOutlined,
+  MenuOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
+import eventEmit from "../rubix-flow/util/evenEmit";
+
+interface ObjectTypeRoute {
+  [objectType: string]: (connUUID?: string, locUUID?: string, netUUID?: string, hostUUID?: string) => string;
+}
+
+interface RubixObjectI {
+  name: string;
+  uuid: string;
+  connections?: any;
+  locations?: any;
+  networks?: any;
+  hosts?: any;
+}
+
+type TreeObj = {
+  name: any;
+  label: JSX.Element;
+  key: any;
+  icon: any;
+};
 
 let ObjectType = {
   CONNECTIONS: "Connections",
   LOCATIONS: "locations",
   NETWORKS: "networks",
   HOSTS: "hosts",
+  APP_DETAILS: "app-details",
   RUBIX_FLOW_REMOTE: "rubix-flow",
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
+  WIRES_MAP_REMOTE: "wires-map",
 };
-
-interface ObjectTypeRoute {
-  [objectType: string]: (connUUID?: string, locUUID?: string, netUUID?: string, hostUUID?: string) => string;
-}
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
   [ObjectType.CONNECTIONS]: (connUUID: string = "") => ROUTES.LOCATIONS.replace(":connUUID", connUUID),
@@ -37,47 +59,46 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
       .replace(":locUUID", locUUID)
       .replace(":netUUID", netUUID)
       .replace(":hostUUID", hostUUID),
+  [ObjectType.APP_DETAILS]: (
+    connUUID: string = "",
+    locUUID: string = "",
+    netUUID: string = "",
+    hostUUID: string = ""
+  ) =>
+    ROUTES.APP_DETAILS.replace(":connUUID", connUUID)
+      .replace(":locUUID", locUUID)
+      .replace(":netUUID", netUUID)
+      .replace(":hostUUID", hostUUID),
   [ObjectType.RUBIX_FLOW_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.WIRES_CONNECTIONS_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.WIRES_CONNECTIONS_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.SCHEDULES_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.WIRES_MAP_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.WIRES_MAP_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
-function getItemValue(item: any, type: string) {
-  let itemC = { ...item };
-  let deleteProp = "";
-  switch (type) {
-    case ObjectType.CONNECTIONS:
-      deleteProp = ObjectType.LOCATIONS;
-      break;
-    case ObjectType.LOCATIONS:
-      deleteProp = ObjectType.NETWORKS;
-      break;
-    case ObjectType.HOSTS:
-    case ObjectType.RUBIX_FLOW_REMOTE:
-    case ObjectType.WIRES_CONNECTIONS_REMOTE:
-    case ObjectType.SCHEDULES_REMOTE:
-    default:
-      deleteProp = "";
-      break;
+const className = "supervisors-menu";
+const isActionLoading = {} as any;
+
+const handleOpenAllMenus = (e: React.MouseEvent, next: string, isOpen: any) => {
+  e.preventDefault(); //prevent navigate
+  if (next === "/connections") {
+    for (const key in isActionLoading) {
+      isActionLoading[key] = isActionLoading["Supervisors"];
+    }
   }
-  if (deleteProp) delete itemC[deleteProp];
+  eventEmit.dispatch("openAllMenus", { key: next, isOpen });
+};
 
-  return itemC;
-}
-
-interface RubixObjectI {
-  name: string;
-  uuid: string;
-  connections?: any;
-  locations?: any;
-  networks?: any;
-  hosts?: any;
-}
+const preventDropdown = (e: React.MouseEvent) => {
+  e.stopPropagation();
+};
 
 const getTreeObject = (item: any, next: string | undefined, prependName?: string, icon?: any) => {
+  isActionLoading[item.name] = false;
+
   if (!next) {
     return {
       name: item.name,
@@ -93,34 +114,56 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
   } else {
     return {
       name: item.name,
-      label: (
-        <NavLink to={next} style={{ color: "unset" }}>
-          <span style={{ padding: "10px 0" }}>
-            <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>
-            {item.name}
-          </span>
-        </NavLink>
-      ),
+      label: displayLabel(item.name, prependName, next),
       key: next,
       icon,
     };
   }
 };
 
-type TreeObj = {
-  name: any;
-  label: JSX.Element;
-  key: any;
-  icon: any;
-};
-
 const objectMap = (treeObj: TreeObj) => {
-  treeObj.label = (
+  const isDisabledTooltip =
+    treeObj.key && treeObj.key.split("/").length < 5 && treeObj.key.split("/")[1] === "connections";
+  treeObj.label = isDisabledTooltip ? (
+    <>{treeObj.label}</>
+  ) : (
     <Tooltip placement="right" title={treeObj.name}>
       {treeObj.label}
     </Tooltip>
   );
   return treeObj;
+};
+
+const displayLabel = (name: string, prependName: string | undefined, link: string) => {
+  const allowOpenAll = link.split("/").length < 5 && link.split("/")[1] === "connections";
+  const splittedName = name.split("(device");
+  if (splittedName.length < 2) {
+    return (
+      <NavLink to={link} style={{ color: "unset" }} onClick={preventDropdown}>
+        {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
+        <span style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {name}
+          {allowOpenAll && (
+            <MenuOutlined
+              style={{ float: "right", marginRight: "12px" }}
+              onClick={(e) => handleOpenAllMenus(e, link, (isActionLoading[name] = !isActionLoading[name]))}
+            />
+          )}
+        </span>
+      </NavLink>
+    );
+  } else {
+    const label = splittedName[0];
+    return (
+      <div onClick={preventDropdown}>
+        <span style={{ cursor: "context-menu", marginRight: "5px" }}>
+          {prependName && <span style={{ fontWeight: 200, fontSize: 12, paddingRight: 5 }}>{prependName}</span>}
+          {label}
+        </span>
+        <NavLink to={link}>{"(device" + splittedName[1]}</NavLink>
+      </div>
+    );
+  }
 };
 
 export const getTreeDataIterative = (connections: any) => {
@@ -133,7 +176,6 @@ export const getTreeDataIterative = (connections: any) => {
           getTreeObject(connection, ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid), "", <HomeOutlined />)
         ),
         next: ObjectTypesToRoutes[ObjectType.CONNECTIONS](connection.uuid),
-        value: getItemValue(connection, ObjectType.CONNECTIONS),
         children: (connection.locations || []).map((location: RubixObjectI) => ({
           ...objectMap(
             getTreeObject(
@@ -144,36 +186,63 @@ export const getTreeDataIterative = (connections: any) => {
             )
           ),
           next: ObjectTypesToRoutes[ObjectType.LOCATIONS](connection.uuid, location.uuid),
-          value: getItemValue(location, ObjectType.LOCATIONS),
           children: (location.networks || []).map((network: RubixObjectI) => ({
             ...objectMap(
               getTreeObject(
-                network,
+                { ...network, name: network.name + " (devices)" },
                 ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
                 "",
                 <LaptopOutlined />
               )
             ),
             next: ObjectTypesToRoutes[ObjectType.NETWORKS](connection.uuid, location.uuid, network.uuid),
-            value: getItemValue(network, ObjectType.NETWORKS),
             children: (network.hosts || []).map((host: RubixObjectI) => ({
               ...objectMap(
                 getTreeObject(
                   { ...host, name: host.name + " (device)" },
-                  ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                  ObjectTypesToRoutes[ObjectType.APP_DETAILS](connection.uuid, location.uuid, network.uuid, host.uuid),
                   "",
                   <ClusterOutlined />
                 )
               ),
-              next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
-              value: getItemValue(host, ObjectType.HOSTS),
+              next: ObjectTypesToRoutes[ObjectType.APP_DETAILS](
+                connection.uuid,
+                location.uuid,
+                network.uuid,
+                host.uuid
+              ),
               children: [
                 {
                   ...objectMap(
-                    getTreeObject({ name: "wires", uuid: "wires_" + host.uuid }, undefined, "", <NodeIndexOutlined />)
+                    getTreeObject(
+                      { name: "drivers", uuid: "drivers_" + host.uuid },
+                      ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                      "",
+                      <ToolOutlined />
+                    )
                   ),
-                  next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
+                  next: ObjectTypesToRoutes[ObjectType.HOSTS](connection.uuid, location.uuid, network.uuid, host.uuid),
+                  children: null,
+                },
+                {
+                  ...objectMap(
+                    getTreeObject(
+                      {
+                        name: "wires",
+                        uuid:
+                          ObjectTypesToRoutes[ObjectType.HOSTS](
+                            connection.uuid,
+                            location.uuid,
+                            network.uuid,
+                            host.uuid
+                          ) + "_wires",
+                      },
+                      undefined,
+                      "",
+                      <NodeIndexOutlined />
+                    )
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
                   children: [
                     {
                       ...objectMap(
@@ -185,7 +254,6 @@ export const getTreeDataIterative = (connections: any) => {
                         )
                       ),
                       next: ObjectTypesToRoutes[ObjectType.RUBIX_FLOW_REMOTE](connection.uuid, host.uuid),
-                      value: getItemValue(host, ObjectType.RUBIX_FLOW_REMOTE),
                       children: null,
                     },
                     {
@@ -198,10 +266,22 @@ export const getTreeDataIterative = (connections: any) => {
                         )
                       ),
                       next: ObjectTypesToRoutes[ObjectType.WIRES_CONNECTIONS_REMOTE](connection.uuid, host.uuid),
-                      value: getItemValue(host, ObjectType.WIRES_CONNECTIONS_REMOTE),
+                      children: null,
+                    },
+                    {
+                      ...objectMap(
+                        getTreeObject(
+                          { name: "map", uuid: "wires_map_" + host.uuid },
+                          ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
+                          "",
+                          <RadarChartOutlined />
+                        )
+                      ),
+                      next: ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
                       children: null,
                     },
                   ],
+                  className,
                 },
                 {
                   ...objectMap(
@@ -213,13 +293,16 @@ export const getTreeDataIterative = (connections: any) => {
                     )
                   ),
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
-                  value: getItemValue(host, ObjectType.SCHEDULES_REMOTE),
                   children: null,
                 },
               ],
+              className,
             })),
+            className,
           })),
         })),
+        className:
+          !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,
       })),
     },
   ];

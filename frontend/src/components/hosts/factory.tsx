@@ -9,7 +9,7 @@ import {
   GetHostSchema,
   ConfigureOpenVPN,
   PingHost,
-  UpdateStatus,
+  UpdateHostsStatus,
 } from "../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
 import Response = assistcli.Response;
@@ -61,8 +61,8 @@ export class HostsFactory {
     return await DeleteHostBulk(this.connectionUUID, uuids);
   }
 
-  async UpdateStatus(): Promise<Array<Host>> {
-    return await UpdateStatus(this.connectionUUID);
+  async UpdateHostsStatus(hostNetworkUUID: string): Promise<amodel.Network> {
+    return await UpdateHostsStatus(this.connectionUUID, hostNetworkUUID);
   }
 
   async ConfigureOpenVPN(): Promise<boolean> {

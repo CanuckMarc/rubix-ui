@@ -9,25 +9,30 @@ import RbTable from "../../../common/rb-table";
 import { RbRefreshButton, RbAddButton, RbDeleteButton, RbExportButton } from "../../../common/rb-table-actions";
 import { CONNECTION_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
-import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
+import { isObjectEmpty, openNotificationWithIcon, titleCase } from "../../../utils/utils";
 import { TokenModal } from "../../../common/token/token-modal";
 import { ConnectionFactory } from "../factory";
 import { CreateEditModal } from "./create";
 import { RubixAssistTokenFactory } from "./token-factory";
 import { ImportJsonModal } from "../../../common/import-json-modal";
 import { ImportExcelModal } from "../../hosts/host/flow/points/views/import-export";
+import { CreateConnectionWizard } from "./connection-wizard";
+import { hasError } from "../../../utils/response";
+import { SELECTED_ITEMS } from "../../rubix-flow/use-nodes-spec";
+import MassEdit from "../../../common/mass-edit";
 
 import RubixConnection = storage.RubixConnection;
 import UUIDs = backend.UUIDs;
-import { hasError } from "../../../utils/response";
 
 export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [filteredData, setFilteredData] = useState<RubixConnection[]>([]);
+  const [tableHeaders, setTableHeaders] = useState<any[]>([]);
   const [currentConnection, setCurrentConnection] = useState({} as RubixConnection);
   const [connectionSchema, setConnectionSchema] = useState<any>({});
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
 
@@ -39,43 +44,11 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     setFilteredData: setFilteredData,
   };
 
-  const columns = [
-    {
-      title: "Actions",
-      key: "actions",
-      fixed: "left",
-      render: (_: any, conn: RubixConnection) => (
-        <Space size="middle">
-          <Tooltip title="Ping">
-            <a onClick={() => pingConnection(conn.uuid)}>
-              <PhoneOutlined />
-            </a>
-          </Tooltip>
-          <Tooltip title="Edit">
-            <a onClick={() => showModal(conn)}>
-              <FormOutlined />
-            </a>
-          </Tooltip>
-          <Tooltip title="Tokens">
-            <a onClick={(e) => showTokenModal(conn, e)}>
-              <ScanOutlined />
-            </a>
-          </Tooltip>
-          <Link to={ROUTES.LOCATIONS.replace(":connUUID", conn.uuid)}>
-            <Tooltip title="View">
-              <ArrowRightOutlined />
-            </Tooltip>
-          </Link>
-        </Space>
-      ),
-    },
-    ...CONNECTION_HEADERS,
-  ];
-
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       setSelectedKeys(selectedRowKeys);
       setSelectedUUIDs(selectedRows);
+      localStorage.setItem(SELECTED_ITEMS, JSON.stringify(selectedRows));
     },
   };
 
@@ -89,6 +62,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     setIsLoadingForm(true);
     const jsonSchema = await factory.Schema();
     setConnectionSchema(jsonSchema);
+    getTableHeaders(jsonSchema.properties);
     setIsLoadingForm(false);
   };
 
@@ -148,12 +122,115 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     factory.ExportConnection(selectedKeys);
   };
 
+  const getTableHeaders = (schema: any) => {
+    if (!schema) return;
+    const massEditColumnKeys = ["description", "port", "https", "enable"];
+    delete schema.external_token;
+    let headers = Object.keys(schema).map((key) => {
+      if (key === "ip") {
+        schema[key].title = "address";
+      } else if (key === "https") {
+        schema[key].title = "https";
+      }
+
+      return {
+        title: massEditColumnKeys.includes(key) ? MassEditTitle(key, schema) : titleCase(schema[key]?.title),
+        dataIndex: key,
+        key: key,
+        sorter: (a: any, b: any) => ("" + a[key] ?? "").localeCompare("" + b[key] ?? ""),
+        render: (a: any) => "" + (a ?? ""), // boolean values doesn't display on the table
+      };
+    });
+
+    // styling columns
+    const stylingColumns = [...CONNECTION_HEADERS];
+    const stylingColumnKeys = stylingColumns.map((c: any) => c.key);
+    headers = headers.map((header: any) => {
+      if (stylingColumnKeys.includes(header.key)) {
+        const column = stylingColumns.find((col: any) => col.key === header.key);
+        return { ...header, render: column?.render };
+      } else {
+        return header;
+      }
+    });
+
+    const headerWithActions = [
+      {
+        title: "Actions",
+        key: "actions",
+        fixed: "left",
+        render: (_: any, conn: RubixConnection) => (
+          <Space size="middle">
+            <Tooltip title="Ping">
+              <a onClick={() => pingConnection(conn.uuid)}>
+                <PhoneOutlined />
+              </a>
+            </Tooltip>
+            <Tooltip title="Edit">
+              <a onClick={() => showModal(conn)}>
+                <FormOutlined />
+              </a>
+            </Tooltip>
+            <Tooltip title="Tokens">
+              <a onClick={(e) => showTokenModal(conn, e)}>
+                <ScanOutlined />
+              </a>
+            </Tooltip>
+            <Link to={ROUTES.LOCATIONS.replace(":connUUID", conn.uuid)}>
+              <Tooltip title="View">
+                <ArrowRightOutlined />
+              </Tooltip>
+            </Link>
+          </Space>
+        ),
+      },
+      ...headers,
+      {
+        key: "uuid",
+        title: "UUID",
+        dataIndex: "uuid",
+      },
+    ];
+
+    setTableHeaders(headerWithActions);
+  };
+
+  const MassEditTitle = (key: string, schema: any) => {
+    return (
+      <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key} handleOk={handleMassEdit} />
+    );
+  };
+
+  const handleMassEdit = async (updateData: any) => {
+    const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
+    const promises = [];
+    console.log("updateData", updateData);
+    for (let item of selectedItems) {
+      item = { ...item, ...updateData };
+      promises.push(editConnection(item));
+    }
+    await Promise.all(promises);
+    fetch();
+  };
+
+  const editConnection = async (connection: RubixConnection) => {
+    factory.uuid = connection.uuid;
+    factory.this = connection;
+    return await factory.Update();
+  };
+
+  useEffect(() => {
+    localStorage.setItem(SELECTED_ITEMS, JSON.stringify(selectedUUIDs));
+    return () => {
+      localStorage.removeItem(SELECTED_ITEMS);
+    };
+  }, []);
+
   useEffect(() => {
     tokenFactory.connectionUUID = currentConnection.uuid;
   }, [currentConnection]);
 
   useEffect(() => {
-    setFilteredData(data);
     if (isObjectEmpty(connectionSchema)) {
       getSchema();
     }
@@ -162,7 +239,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   return (
     <div>
       <RbRefreshButton refreshList={fetch} />
-      <RbAddButton handleClick={() => showModal({} as RubixConnection)} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbExportButton handleExport={handleExport} />
       <ImportDropdownButton refreshList={fetch} schema={connectionSchema} handleSubmit={handleAddConnectionsBulk} />
@@ -173,8 +250,17 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
         rowKey="uuid"
         dataSource={filteredData}
         rowSelection={rowSelection}
-        columns={columns}
+        columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
+      />
+      <CreateConnectionWizard
+        currentConnection={currentConnection}
+        connectionSchema={connectionSchema}
+        isLoadingForm={isLoadingForm}
+        refreshList={fetch}
+        tokenFactory={tokenFactory}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
       />
       <CreateEditModal
         currentConnection={currentConnection}
@@ -203,12 +289,6 @@ const ImportDropdownButton = (props: any) => {
   const style: React.CSSProperties = { lineHeight: "3rem" };
 
   const items: MenuProps["items"] = [
-    // {
-    //   label: "json",
-    //   key: "json",
-    //   onClick: () => setIsJsonModalVisible(true),
-    //   style,
-    // },
     {
       label: "excel",
       key: "excel",

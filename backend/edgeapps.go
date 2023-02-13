@@ -255,6 +255,7 @@ func (inst *App) edgeAppsInfo(connUUID, hostUUID string) (*rumodel.EdgeAppsInfo,
 				appAvailable.AppName = versionApp.Name
 				appAvailable.MinVersion = versionApp.MinVersion
 				appAvailable.MaxVersion = versionApp.MaxVersion
+				appAvailable.Description = appsDescriptions(appAvailable.AppName)
 				appsAvailable = append(appsAvailable, appAvailable)
 			}
 		}

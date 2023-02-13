@@ -215,22 +215,34 @@ func (inst *App) nodeHelpByName(connUUID, hostUUID, nodeName string) (*node.Help
 	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
 }
 
-func (inst *App) NodeHelpByName(connUUID, hostUUID string, isRemote bool, nodeName string) *node.Help {
+type Help struct {
+	NodeName string `json:"name"`
+	Help     string `json:"help"`
+}
+
+func (inst *App) NodeHelpByName(connUUID, hostUUID string, isRemote bool, nodeName string) *Help {
+	out := &Help{}
 	if isRemote {
 		resp, err := inst.nodeHelpByName(connUUID, hostUUID, nodeName)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-			return resp
+			return out
 		}
-		return resp
+		return &Help{
+			NodeName: resp.NodeName,
+			Help:     resp.Help,
+		}
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.NodeHelpByName(nodeName)
 	if err != nil {
 		inst.uiErrorMessage("download the node first to edit the settings")
-		return resp
+		return out
 	}
-	return resp
+	return &Help{
+		NodeName: resp.NodeName,
+		Help:     resp.Help,
+	}
 }
 
 func (inst *App) getFlow(connUUID, hostUUID string) (interface{}, error) {
@@ -273,44 +285,10 @@ func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 	return resp
 }
 
-func (inst *App) getSubFlow(connUUID, hostUUID, subFlowID string) (interface{}, error) {
-	c, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		return nil, err
-	}
-	path := fmt.Sprintf("/wires/api/flows/export/parent/%s", subFlowID)
-	resp, err := c.ProxyGET(hostUUID, path)
-	if err != nil {
-		return nil, err
-	}
-	if resp.IsSuccess() {
-		var out interface{}
-		err := json.Unmarshal(resp.Body(), &out)
-		return out, err
-	}
-	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
-}
-
 func (inst *App) GetSubFlow(connUUID, hostUUID, subFlowID string, isRemote bool) interface{} {
-	if isRemote {
-		resp, err := inst.getSubFlow(connUUID, hostUUID, subFlowID)
-		nodeList := &nodes.NodesList{}
-		mapstructure.Decode(resp, &nodeList)
-		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-			return resp
-		}
-		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
-		return resp
-	}
-	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
-	resp, err := client.GetSubFlow(subFlowID)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return resp
-	}
-	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
-	return resp
+	nodeIds := &flowcli.NodesList{}
+	nodeIds.Nodes = append(nodeIds.Nodes, subFlowID)
+	return inst.GetFlowList(connUUID, hostUUID, nodeIds, isRemote)
 }
 
 func (inst *App) getFlowList(connUUID, hostUUID string, nodeIds *flowcli.NodesList) (interface{}, error) {
@@ -489,7 +467,6 @@ func (inst *App) DownloadFlow(connUUID, hostUUID string, isRemote bool, encodedN
 			}
 			inst.uiSuccessMessage("restarted rubix-edge-wires ok")
 		}
-
 		return resp
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
@@ -535,7 +512,6 @@ func (inst *App) NodePayload(connUUID, hostUUID string, isRemote bool, payload i
 		return resp
 	} else {
 		var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
-
 		resp, err := client.NodePayload(nodeId, p)
 		if err != nil {
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))

@@ -62,15 +62,16 @@ func (inst *App) getBacnetDevicePoints(connUUID, hostUUID, deviceUUID string, ad
 
 func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts *assistcli.WhoIsOpts) ([]model.Device, error) {
 	var err error
-
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
-	if err != nil {
-		err = inst.errMsg(err)
-	}
-
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
-	if err != nil {
-		err = inst.errMsg(err)
+	var bacnetWasRunning bool
+	status, _ := inst.edgeSystemCtlStatus(connUUID, hostUUID, constants.BacnetServerServiceName)
+	if status != nil {
+		if status.SubState == "running" {
+			bacnetWasRunning = true
+			_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Stop)
+			if err != nil {
+				err = inst.errMsg(err)
+			}
+		}
 	}
 	err = inst.bacnetChecks(connUUID, hostUUID, bacnetMasterPlg)
 	err = inst.errMsg(err)
@@ -90,8 +91,10 @@ func (inst *App) bacnetMasterWhois(connUUID, hostUUID, networkUUID string, opts 
 		device.NetworkUUID = networkUUID
 		devicesUpdated = append(devicesUpdated, device)
 	}
-	_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Start)
-	err = inst.errMsg(err)
+	if bacnetWasRunning {
+		_, err = inst.edgeSystemCtlAction(connUUID, hostUUID, constants.BacnetServerServiceName, amodel.Start)
+		err = inst.errMsg(err)
+	}
 	return devicesUpdated, nil
 }
 
