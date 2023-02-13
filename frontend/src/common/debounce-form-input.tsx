@@ -1,7 +1,7 @@
 import { Form, Input, Select } from "antd";
 import { Rule } from "antd/lib/form";
 import debounce from "debounce-promise";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface SelectOption {
   label: string;
@@ -16,6 +16,7 @@ export interface DebounceInputFormProps {
   rules?: Rule[];
   options?: SelectOption[];
   onCall: (input: string) => Promise<DebounceInputResponse>;
+  validationStatus: ValidateStatus;
 }
 
 export interface DebounceInputResponse {
@@ -27,13 +28,18 @@ const onValidateInput = debounce((input: string, onCall: (input: string) => Prom
   return onCall(input);
 }, 500);
 
-enum ValidateStatus {
+export enum ValidateStatus {
   error = "error", validating = "validating", success = "success", initial = "initial"
 }
 
 export const DebounceInputForm = (props: DebounceInputFormProps) => {
 
   const [validateStatus, setValidateStatus] = useState(ValidateStatus.initial);
+
+  useEffect(()=> {
+    setValidateStatus(props.validationStatus)
+  }, [props.validationStatus])
+
   const required = props.rules?.find((rule) => {
     // @ts-ignore
     return rule.required;

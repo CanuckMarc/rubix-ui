@@ -4,6 +4,7 @@ import {
   DeleteFlowNetwork,
   DeleteFlowNetworkBulk,
   EditFlowNetwork,
+  FFToken,
   FFSystemPing,
   GetFlowNetworks,
 } from "../../../../../../../wailsjs/go/backend/App";
@@ -23,13 +24,13 @@ export class FlowFrameworkNetworkFactory {
     return GetFlowNetworks(this.connectionUUID, this.hostUUID, withStream);
   }
 
-  async Add(body: model.FlowNetwork): Promise<model.FlowNetwork> {
+  async Add(body: model.FlowNetwork): Promise<rumodel.Response> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
     return AddFlowNetwork(this.connectionUUID, this.hostUUID, body);
   }
 
-  async Update(uuid: string, body: model.FlowNetwork): Promise<model.FlowNetwork> {
+  async Update(uuid: string, body: model.FlowNetwork): Promise<rumodel.Response> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
     return EditFlowNetwork(this.connectionUUID, this.hostUUID, uuid, body);
@@ -51,5 +52,11 @@ export class FlowFrameworkNetworkFactory {
     hasUUID(this.connectionUUID);
     hasUUID(hostUUID);
     return FFSystemPing(this.connectionUUID, hostUUID);
+  }
+
+  async FFToken(hostUUID: string, remoteHostUUID: string, username: string, password: string): Promise<rumodel.Response> {
+    hasUUID(this.connectionUUID);
+    hasUUID(hostUUID);
+    return FFToken(this.connectionUUID, hostUUID, remoteHostUUID, username, password);
   }
 }
