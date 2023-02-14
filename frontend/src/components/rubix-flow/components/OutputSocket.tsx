@@ -31,7 +31,7 @@ export const OutputSocket = memo(
           const out = dataOut.find((item: { pin: string }) => item.pin === outputName);
 
           if (valueType === "number" && out) {
-            if (out.value === null) out.value = "null";
+            if (out.value === null) out.value = `${out.value}`;
             return out.value !== undefined ? `${out.value}` : "";
           }
           return out?.value;
@@ -48,8 +48,6 @@ export const OutputSocket = memo(
         case true:
         case false:
           return `${newVal}`;
-        case null:
-          return "null";
         default:
           return "false";
       }
