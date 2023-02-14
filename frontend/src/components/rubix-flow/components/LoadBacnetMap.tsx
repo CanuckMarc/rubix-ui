@@ -94,7 +94,7 @@ export const LoadBacnetMap = () => {
       const nodeSpecs: NodeGenInputType[] = [
         {
           type: 'flow/flow-point',
-          name: setOfNodesToAdd.outputTopic || undefined,
+          name: setOfNodesToAdd.selectedPointName || undefined,
           isParent: false,
           parentId: setOfNodesToAdd.flownetSchema.id,
           x: x,
