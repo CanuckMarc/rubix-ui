@@ -263,6 +263,36 @@ func (inst *App) getFlow(connUUID, hostUUID string) (interface{}, error) {
 	return nil, errors.New(fmt.Sprintf("failed to edit %s:", path))
 }
 
+func (inst *App) GetFlowByNodeType(connUUID, hostUUID, nodeType string, isRemote bool) interface{} {
+	if isRemote {
+		resp, err := inst.getFlow(connUUID, hostUUID)
+		nodeList := &nodes.NodesList{}
+		mapstructure.Decode(resp, &nodeList)
+		if err != nil {
+			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+			return resp
+		}
+		var out *nodes.NodesList
+		if nodeList != nil {
+			for _, schema := range nodeList.Nodes {
+				if schema.Type == nodeType {
+					out.Nodes = append(out.Nodes, schema)
+				}
+			}
+		}
+		log.Infof("nodes uploaded from backend count: %d", len(nodeList.Nodes))
+		return out
+	}
+	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
+	resp, err := client.GetFlowByNodeType(nodeType)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return resp
+	}
+	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
+	return resp
+}
+
 func (inst *App) GetFlow(connUUID, hostUUID string, isRemote bool) interface{} {
 	if isRemote {
 		resp, err := inst.getFlow(connUUID, hostUUID)
