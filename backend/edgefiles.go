@@ -34,6 +34,7 @@ func (inst *App) EdgeDeleteAppDB(connUUID, hostUUID, appName string) *assistcli.
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	inst.uiSuccessMessage(fmt.Sprintf("delete db ok path: %s app: %s", resp.Message, appName))
 	return resp
 }
 
