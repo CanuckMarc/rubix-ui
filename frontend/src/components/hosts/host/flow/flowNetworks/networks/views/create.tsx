@@ -33,24 +33,26 @@ export const CreateEditModal = (props: any) => {
   }, []);
 
   useEffect(() => {
-    form.setFieldsValue(currentItem);
-
+    form.setFieldsValue({ ...currentItem });
   }, [currentItem]);
 
   useEffect(() => {
-    setIpValidationStatus(ValidateStatus.validating);
-    const remoteHostUUID = getHostUUIDFromIp(currentItem.flow_ip);
-    setRemoteHostUUID(remoteHostUUID);
-    if (remoteHostUUID) {
-      factory.FFSystemPing(remoteHostUUID).then(res => {
-        if (hasError(res)) {
-          setIpValidationStatus(ValidateStatus.error);
-        } else {
-          setIpValidationStatus(ValidateStatus.success);
-        }
-      });
-    } else {
-      setIpValidationStatus(ValidateStatus.error);
+    setIpValidationStatus(ValidateStatus.initial);
+    if (currentItem.flow_ip) {
+      setIpValidationStatus(ValidateStatus.validating);
+      const remoteHostUUID = getHostUUIDFromIp(currentItem.flow_ip);
+      setRemoteHostUUID(remoteHostUUID);
+      if (remoteHostUUID) {
+        factory.FFSystemPing(remoteHostUUID).then(res => {
+          if (hasError(res)) {
+            setIpValidationStatus(ValidateStatus.error);
+          } else {
+            setIpValidationStatus(ValidateStatus.success);
+          }
+        });
+      } else {
+        setIpValidationStatus(ValidateStatus.error);
+      }
     }
   }, [currentItem.flow_ip]);
 
@@ -94,7 +96,7 @@ export const CreateEditModal = (props: any) => {
         res = await factory.Add(network);
       }
       if (hasError(res)) {
-        openNotificationWithIcon("error", res.msg)
+        openNotificationWithIcon("error", res.msg);
       } else {
         refreshList();
         onCloseModal();
@@ -154,6 +156,15 @@ export const CreateEditModal = (props: any) => {
                 ]}
                 options={flowIPOptions}
                 onCall={async (ip: string) => {
+                  if (ip !== currentItem.flow_ip) {
+                    form.setFieldsValue({
+                      "flow_token": ""
+                    });
+                  } else {
+                    form.setFieldsValue({
+                      "flow_token": currentItem.flow_token
+                    });
+                  }
                   const _remoteHostUUID = getHostUUIDFromIp(ip);
                   setRemoteHostUUID(_remoteHostUUID);
                   const res = await factory.FFSystemPing(_remoteHostUUID);

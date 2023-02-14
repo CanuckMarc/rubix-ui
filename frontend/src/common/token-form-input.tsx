@@ -48,7 +48,7 @@ export const TokenFormInput = (props: TokenFormInputProps) => {
           [props.name]: response.token ?? ""
         });
         setUseAuth(false);
-        form.resetFields()
+        form.resetFields();
       } else {
         setError(response?.msg ?? "");
         setValidateStatus("error");
