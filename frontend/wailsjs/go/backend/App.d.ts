@@ -17,8 +17,8 @@ import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
 import {streamlog} from '../models';
-import {flowcli} from '../models';
 import {node} from '../models';
+import {flowcli} from '../models';
 import {store} from '../models';
 import {nodes} from '../models';
 
@@ -313,6 +313,8 @@ export function GetBackupsNoData():Promise<Array<storage.Backup>>;
 export function GetBacnetDevicePoints(arg1:string,arg2:string,arg3:string,arg4:boolean,arg5:boolean):Promise<Array<model.Point>>;
 
 export function GetBacnetFreeAddress(arg1:string,arg2:string,arg3:boolean):Promise<backend.BacnetPoints>;
+
+export function GetBacnetNodes(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Schema>>;
 
 export function GetConnection(arg1:string):Promise<storage.RubixConnection>;
 

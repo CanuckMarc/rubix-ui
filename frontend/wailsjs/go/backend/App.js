@@ -586,6 +586,10 @@ export function GetBacnetFreeAddress(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetBacnetFreeAddress'](arg1, arg2, arg3);
 }
 
+export function GetBacnetNodes(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetBacnetNodes'](arg1, arg2, arg3);
+}
+
 export function GetConnection(arg1) {
   return window['go']['backend']['App']['GetConnection'](arg1);
 }

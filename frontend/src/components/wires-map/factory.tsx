@@ -1,10 +1,14 @@
-import { GetBacnetFreeAddress, GetNodesAllFlowNetworks, NextFreeBacnetAddress } from "../../../wailsjs/go/backend/App";
-import { backend } from "../../../wailsjs/go/models";
+import { GetBacnetFreeAddress, GetNodesAllFlowNetworks, NextFreeBacnetAddress, GetBacnetNodes } from "../../../wailsjs/go/backend/App";
+import { node, backend } from "../../../wailsjs/go/models";
 
 export class MappingFactory {
 
   async GetNodesAllFlowNetworks(connUUID: string, hostUUID: string, isRemote: boolean): Promise<any> {
     return await GetNodesAllFlowNetworks(connUUID, hostUUID, isRemote);
+  }
+
+  async GetBacnetNodes(connUUID: string, hostUUID: string, isRemote: boolean): Promise<Array<node.Schema>> {
+    return await GetBacnetNodes(connUUID, hostUUID, isRemote);
   }
 
   async GetBacnetFreeAddress(connUUID: string, hostUUID: string, isRemote: boolean): Promise<backend.BacnetPoints> {
