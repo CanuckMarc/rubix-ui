@@ -165,8 +165,8 @@ func (inst *Client) CSDeleteDevice(hostIDName, token, devEui string) (bool, erro
 	return true, nil
 }
 
-// CSDeviceKeys active a device
-func (inst *Client) CSDeviceKeys(hostIDName, token, devEui string, body *chirpstack.DeviceKey) (*chirpstack.DeviceKey, error) {
+// CSDeviceOTAKeys active a device
+func (inst *Client) CSDeviceOTAKeys(hostIDName, token, devEui string, body *chirpstack.DeviceKey) (*chirpstack.DeviceKey, error) {
 	q := fmt.Sprintf("proxy/chirp/api/devices/%s/keys", devEui)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetResult(chirpstack.DeviceKey{}).
@@ -178,7 +178,8 @@ func (inst *Client) CSDeviceKeys(hostIDName, token, devEui string, body *chirpst
 	if err != nil {
 		return nil, err
 	}
-	return resp.Result().(*chirpstack.DeviceKey), nil
+	r := resp.Result().(*chirpstack.DeviceKey)
+	return r, nil
 }
 
 // CSActivateDevice active a device

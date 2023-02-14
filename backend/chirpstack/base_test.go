@@ -6,10 +6,27 @@ import (
 	"testing"
 )
 
-var ipAddr string = "123.209.73.116"
+var ipAddr string = "192.168.15.17"
 var uName string = "admin"
 var pass string = "Helensburgh2508"
 var deviceEUI string = "bd6324d827cc20b3"
+
+func TestChirpClient_GetGateways(t *testing.T) {
+
+	c := New(&Connection{Ip: ipAddr})
+	err := c.Login(uName, pass)
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.GetGateways()
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(resp)
+}
 
 func TestChirpClient_Login(t *testing.T) {
 

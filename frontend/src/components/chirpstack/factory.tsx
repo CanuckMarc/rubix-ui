@@ -1,11 +1,11 @@
 import {
   CSAddDevice,
-  CSDeleteDevice,
+  CSDeleteDevice, CSDeviceOTAKeys,
   CSEditDevice,
   CSGetApplications,
   CSGetDevice,
   CSGetDeviceProfiles,
-  CSGetDevices,
+  CSGetDevices, CSGetGateway,
 } from "../../../wailsjs/go/backend/App";
 import { chirpstack } from "../../../wailsjs/go/models";
 
@@ -41,5 +41,12 @@ export class ChirpFactory {
     return await CSDeleteDevice(connUUID, hostUUID, devEui);
   }
 
+  async CSDeviceOTAKeys(connUUID: string, hostUUID: string, devEui: string, key: string): Promise<chirpstack.DeviceKey> {
+    return await CSDeviceOTAKeys(connUUID, hostUUID, devEui, key);
+  }
+
+  async CSGetGateway(connUUID: string, hostUUID: string): Promise<chirpstack.GatewaysResult> {
+    return await CSGetGateway(connUUID, hostUUID);
+  }
 
 }

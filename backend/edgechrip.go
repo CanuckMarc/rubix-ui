@@ -5,6 +5,7 @@ import (
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
 	"github.com/NubeIO/rubix-ui/backend/chirpstack"
 	"github.com/NubeIO/rubix-ui/backend/constants"
+	"github.com/NubeIO/rubix-ui/backend/ttime"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,6 +29,42 @@ func (inst *App) CSGetApplications(connUUID, hostUUID string) *chirpstack.Applic
 		return nil
 	}
 	resp, err := assistClient.CSGetApplications(hostUUID, token)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return resp
+}
+
+func (inst *App) CSGetGateway(connUUID, hostUUID string) *chirpstack.GatewaysResult {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	resp, err := assistClient.CSGetGateways(hostUUID, token)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	if len(resp.Result) > 0 {
+		r := resp.Result[0]
+		r.LastSeenAtString = ttime.TimeSince(r.LastSeenAt)
+		r.LastSeenAtString = ttime.TimeSince(r.LastSeenAt)
+		r.CreatedAt = r.CreatedAt.Local()
+		r.UpdatedAt = r.UpdatedAt.Local()
+		r.FirstSeenAt = r.FirstSeenAt.Local()
+		r.LastSeenAt = r.LastSeenAt.Local()
+		return r
+	}
+	return nil
+}
+
+func (inst *App) CSGetGateways(connUUID, hostUUID string) *chirpstack.Gateways {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	resp, err := assistClient.CSGetGateways(hostUUID, token)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
@@ -139,6 +176,30 @@ func (inst *App) CSEditDevice(connUUID, hostUUID, devEui string, body *chirpstac
 		return nil
 	}
 	devices, err := assistClient.CSEditDevice(hostUUID, token, devEui, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return devices
+}
+
+func (inst *App) CSDeviceOTAKeys(connUUID, hostUUID, devEui, key string) *chirpstack.DeviceKey {
+	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
+	if err != nil {
+		return nil
+	}
+	body := &chirpstack.DeviceKey{
+		DeviceKeys: struct {
+			DevEUI    string `json:"devEUI"`
+			NwkKey    string `json:"nwkKey"`
+			AppKey    string `json:"appKey"`
+			GenAppKey string `json:"genAppKey"`
+		}{
+			DevEUI: devEui,
+			NwkKey: key,
+		},
+	}
+	devices, err := assistClient.CSDeviceOTAKeys(hostUUID, token, devEui, body)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
