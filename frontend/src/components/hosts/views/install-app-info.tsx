@@ -193,12 +193,12 @@ export const EdgeAppInfo = (props: any) => {
                           overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
                   <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
                 </Dropdown>
-                
+
                 <Popconfirm
                   title={(
                     <div style={{display: 'flex', flexDirection: 'column', rowGap: '10px'}}>
                       <span style={{color: 'yellow'}}>Warning</span>
-                      <span>This action will delete <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span> from database!  </span>
+                      <span>This action will delete the database for app: <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span>!  </span>
                     </div>
                   )}
                   onConfirm={handleConfirm}
@@ -245,7 +245,7 @@ export const EdgeAppInfo = (props: any) => {
             </List.Item>
           )}
         />
-        
+
         <List
           itemLayout="horizontal"
           loading={isLoading}
@@ -295,7 +295,7 @@ export const EdgeAppInfo = (props: any) => {
           installedVersion={installedVersion}
           fetchAppInfo={fetchAppInfo}
         />
-        
+
       </div>
     </div>
   );
