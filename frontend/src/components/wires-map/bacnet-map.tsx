@@ -2,30 +2,24 @@ import { Typography, Card, Select, Button, Table, Input, InputNumber, Spin } fro
 import { useState, useEffect, ChangeEvent } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from "react-router-dom";
-import { MappingFactory } from "./factory";
-import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
 import { useIsLoading, useBacnetStore, PointTableType } from '../../App';
 import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { generateUuid } from "../rubix-flow/lib/generateUuid";
 import { openNotificationWithIcon } from "../../utils/utils";
-import { SelectOptionType, BacnetTableDataType, BacnetMapPropType } from "./map";
+import { BacnetTableDataType, BacnetMapPropType } from "./map";
 import { BacnetPointTable } from "./views/bacnetPointTable";
-
+import { FlowFactory } from "../rubix-flow/factory"
 import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
 
 const { Title } = Typography;
 
 export const BacnetMap = (props: BacnetMapPropType) => {
   const {connUUID, hostUUID, fetchFlownet, isFetchingFlownet, reset, pointList, flowNetList, flowNetOptionList} = props
-  
-
   const nav = useNavigate();
-  // const [isFetching, setIsFetching] = useState(false);
   const [clearSelection, setClearSelection] = useState(false);
   const [tableData, setTableData] = useState<BacnetTableDataType[]>([]);
-  // const [bacnetList, setBacnetList] = useState<node.Schema[]>([]);
   const [selectValue, setSelectValue] = useState<string | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedFlownet, setSelectedFlownet] = useState<node.Schema | undefined>(undefined);
@@ -37,27 +31,8 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     (state) => [state.bacnetNodes, state.setBacnetNodes]
   )
 
-  // useEffect(() => {
-  //   console.log('selected point is: ', pointSelection)
-  // }, [pointSelection])
-
-  // const fetch = async() => {
-  //   try {
-  //       setIsFetching(true);
-  //       const bacnetRes = await mappingFactory.GetBacnetNodes(connUUID, hostUUID, isRemote)
-  //       if (bacnetRes) {
-  //         setBacnetList(bacnetRes)
-  //         setBacnetOptionList(bacnetRes.map((item: any) => ({
-  //           value: item.id,
-  //           label: item.hasOwnProperty('nodeName') ? item.nodeName : item.id
-  //         })))
-  //       }
-  //   } catch (error) {
-  //     setBacnetList([]);
-  //   } finally {
-  //     setIsFetching(false);
-  //   }
-  // }
+  const flowFactory = new FlowFactory();
+  const isRemote = !!connUUID && !!hostUUID;
 
   useEffect(() => {
       setBacnetNodes([]);
@@ -66,20 +41,15 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       searchExistingBacnet();
   }, [connUUID, hostUUID]);
 
-  const searchExistingBacnet = () => {
-    if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
-      const bacnetNode = window.allFlow.nodes.find((item: NodeInterface) => {
-        if (item.type === 'bacnet/bacnet-server') return true
-      })
-      if (bacnetNode) {
-        setDisableAllButton(false)
-        setBacnetServerNode(bacnetNode)
-      } else {
-        setDisableAllButton(true)
-        openNotificationWithIcon("warning", 'No existing Bacnet server in Wires sheet!');
-      }
+  const searchExistingBacnet = async () => {
+    const bacnetNodes = await flowFactory.GetFlowByNodeType(connUUID, hostUUID, 'bacnet/bacnet-server', isRemote)
+    console.log('bacnetnodes are: ', bacnetNodes)
+    if (bacnetNodes && bacnetNodes.nodes.length > 0) {
+      setDisableAllButton(false)
+      setBacnetServerNode(bacnetNodes.nodes[0])
     } else {
-      console.log('what')
+      setDisableAllButton(true)
+      openNotificationWithIcon("warning", 'No existing Bacnet server in Wires sheet!');
     }
   }
 

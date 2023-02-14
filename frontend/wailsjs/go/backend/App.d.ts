@@ -66,6 +66,8 @@ export function CSAddDevice(arg1:string,arg2:string,arg3:chirpstack.Device):Prom
 
 export function CSDeleteDevice(arg1:string,arg2:string,arg3:string):Promise<boolean>;
 
+export function CSDeviceOTAKeys(arg1:string,arg2:string,arg3:string,arg4:string):Promise<any>;
+
 export function CSEditDevice(arg1:string,arg2:string,arg3:string,arg4:chirpstack.Device):Promise<chirpstack.Device>;
 
 export function CSGetApplications(arg1:string,arg2:string):Promise<chirpstack.Applications>;
@@ -75,6 +77,10 @@ export function CSGetDevice(arg1:string,arg2:string,arg3:string):Promise<chirpst
 export function CSGetDeviceProfiles(arg1:string,arg2:string):Promise<chirpstack.DeviceProfiles>;
 
 export function CSGetDevices(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Devices>;
+
+export function CSGetGateway(arg1:string,arg2:string):Promise<chirpstack.GatewaysResult>;
+
+export function CSGetGateways(arg1:string,arg2:string):Promise<chirpstack.Gateways>;
 
 export function ConfigureOpenVPN(arg1:string,arg2:string):Promise<boolean>;
 
@@ -315,6 +321,8 @@ export function GetDevice(arg1:string,arg2:string,arg3:string,arg4:boolean):Prom
 export function GetDevices(arg1:string,arg2:string,arg3:boolean):Promise<Array<model.Device>>;
 
 export function GetFlow(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+
+export function GetFlowByNodeType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 

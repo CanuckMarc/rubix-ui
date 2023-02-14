@@ -90,6 +90,10 @@ export function CSDeleteDevice(arg1, arg2, arg3) {
   return window['go']['backend']['App']['CSDeleteDevice'](arg1, arg2, arg3);
 }
 
+export function CSDeviceOTAKeys(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CSDeviceOTAKeys'](arg1, arg2, arg3, arg4);
+}
+
 export function CSEditDevice(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['CSEditDevice'](arg1, arg2, arg3, arg4);
 }
@@ -108,6 +112,14 @@ export function CSGetDeviceProfiles(arg1, arg2) {
 
 export function CSGetDevices(arg1, arg2, arg3) {
   return window['go']['backend']['App']['CSGetDevices'](arg1, arg2, arg3);
+}
+
+export function CSGetGateway(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateway'](arg1, arg2);
+}
+
+export function CSGetGateways(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateways'](arg1, arg2);
 }
 
 export function ConfigureOpenVPN(arg1, arg2) {
@@ -588,6 +600,10 @@ export function GetDevices(arg1, arg2, arg3) {
 
 export function GetFlow(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetFlow'](arg1, arg2, arg3);
+}
+
+export function GetFlowByNodeType(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetFlowByNodeType'](arg1, arg2, arg3, arg4);
 }
 
 export function GetFlowDeviceSchema(arg1, arg2, arg3) {
