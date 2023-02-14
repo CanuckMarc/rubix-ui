@@ -43,7 +43,6 @@ export const BacnetMap = (props: BacnetMapPropType) => {
 
   const searchExistingBacnet = async () => {
     const bacnetNodes = await flowFactory.GetFlowByNodeType(connUUID, hostUUID, 'bacnet/bacnet-server', isRemote)
-    console.log('bacnetnodes are: ', bacnetNodes)
     if (bacnetNodes && bacnetNodes.nodes.length > 0) {
       setDisableAllButton(false)
       setBacnetServerNode(bacnetNodes.nodes[0])
@@ -56,7 +55,6 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const addPoints = () => {
     if (!selectedFlownet || !pointSelection) openNotificationWithIcon("warning", 'Please select a flow network and or a point!');
     if (selectedFlownet && pointSelection){
-      console.log('pointSelection is: ', pointSelection)
       // test to see if selected bacnet node is already added to the table
       const temp = tableData.find(item => item.selectedPointName === pointSelection.name)
       if (!temp) {
@@ -99,7 +97,6 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   }
 
   const recordPoints = () => {
-    console.log(tableData)
     setBacnetNodes(tableData)
     nav(ROUTES.RUBIX_FLOW_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID))
   }
