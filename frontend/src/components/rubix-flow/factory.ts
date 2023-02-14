@@ -2,7 +2,7 @@ import {
   AddWiresConnection,
   BulkDeleteWiresConnection,
   DownloadFlow,
-  GetFlow, GetFlowList, GetSubFlow,
+  GetFlow, GetFlowByNodeType, GetFlowList, GetSubFlow,
   GetWiresConnection,
   GetWiresConnections,
   NodeHelp,
@@ -145,6 +145,18 @@ export class FlowFactory {
   ): Promise<any> {
     return await GetFlow(connUUID, hostUUID, isRemote);
   }
+
+  async GetFlowByNodeType(
+    connUUID: string,
+    hostUUID: string,
+    nodeType: string,
+    isRemote: boolean
+  ): Promise<any> {
+    return await GetFlowByNodeType(connUUID, hostUUID, nodeType, isRemote);
+  }
+
+
+
 
   async GetSubFlow(
     connUUID: string,

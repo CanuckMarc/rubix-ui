@@ -183,7 +183,7 @@ func (inst *App) CSEditDevice(connUUID, hostUUID, devEui string, body *chirpstac
 	return devices
 }
 
-func (inst *App) CSDeviceOTAKeys(connUUID, hostUUID, devEui, key string) *chirpstack.DeviceKey {
+func (inst *App) CSDeviceOTAKeys(connUUID, hostUUID, devEui, key string) interface{} {
 	assistClient, token, err := inst.csLogin(connUUID, hostUUID)
 	if err != nil {
 		return nil
