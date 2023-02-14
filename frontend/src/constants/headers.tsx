@@ -645,7 +645,7 @@ export const FLOW_POINT_HEADERS = [
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
-    fixed: "left"
+    fixed: "left",
   },
 ];
 
@@ -1081,6 +1081,11 @@ export const LORAWAN_REMOTE_HEADERS = [
     dataIndex: "description",
   },
   {
+    key: "devEUI",
+    title: "EUI",
+    dataIndex: "devEUI",
+  },
+  {
     key: "applicationID",
     title: "Application ID",
     dataIndex: "applicationID",
@@ -1096,60 +1101,12 @@ export const LORAWAN_REMOTE_HEADERS = [
     dataIndex: "deviceProfileID",
   },
   {
-    key: "deviceStatusBattery",
-    title: "Status Battery",
-    dataIndex: "deviceStatusBattery",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusBatteryLevel",
-    title: "Status Battery Level",
-    dataIndex: "deviceStatusBatteryLevel",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusBatteryLevelUnavailable",
-    title: "Status Battery Level Unavailable",
-    dataIndex: "deviceStatusBatteryLevelUnavailable",
-    render(value: boolean) {
-      const colour = value ? "orange" : "blue";
-      return <Tag color={colour}>{value.toString()}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusExternalPowerSource",
-    title: "Status External Power Source",
-    dataIndex: "deviceStatusExternalPowerSource",
-    render(value: boolean) {
-      const colour = value ? "orange" : "blue";
-      return <Tag color={colour}>{value.toString()}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusMargin",
-    title: "Status Margin",
-    dataIndex: "deviceStatusMargin",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-
-  {
     key: "lastSeenAt",
     title: "Last Seen At",
     dataIndex: "lastSeenAt",
     render(value: string) {
       return moment.utc(value).format("YYYY-MM-DD");
     },
-  },
-  {
-    key: "devEUI",
-    title: "EUI",
-    dataIndex: "devEUI",
   },
 ];
 
