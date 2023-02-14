@@ -475,7 +475,7 @@ export const MenuSidebar = () => {
     <Sider
       id="sidebarMenu"
       width={280}
-      style={{ height: "calc(100vh - 40px)" }}
+      style={{ height: "calc(100vh - 40px)", overflowX: "hidden" }}
       collapsed={collapsed}
       onClick={() => {
         if (collapsed && !collapseDisabled) handleCollapse(false);

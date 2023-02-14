@@ -1,27 +1,23 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import SplitPane from "react-split-pane";
 
 import TabSplitContent from "./TabSplitContent";
 
+const SplitPanelKey = "SplitPanel";
 
 const SplitScreenApp: React.FC = () => {
-  const [showSplit, setShowSplit] = useState(false);
+  const [showSplit, setShowSplit] = useState(Boolean(JSON.parse(localStorage.getItem(SplitPanelKey) || "")));
 
   const toggleSplit = () => {
+    localStorage.setItem(SplitPanelKey, JSON.stringify(!showSplit));
     setShowSplit(!showSplit);
-  }
+  };
 
   return (
     // @ts-ignore
-    <SplitPane
-      split="vertical"
-      size={showSplit ? "50%" : "100%"}
-      allowResize
-      style={{ overflowY: 'auto' }}
-    >
+    <SplitPane split="vertical" size={showSplit ? "50%" : "100%"} allowResize style={{ overflowY: "auto" }}>
       <TabSplitContent showSplit={!showSplit} toggleSplit={toggleSplit} />
-      {showSplit ? <TabSplitContent showSplit isRightPane toggleSplit={toggleSplit} /> : <div></div>}
+      {showSplit ? <TabSplitContent showSplit isRightPane toggleSplit={toggleSplit} /> : <div />}
     </SplitPane>
   );
 };

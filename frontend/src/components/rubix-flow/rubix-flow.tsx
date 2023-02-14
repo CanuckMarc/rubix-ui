@@ -46,10 +46,11 @@ import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
 import { LoadWiresMap } from "./components/LoadFlownetMap";
 import { LoadBacnetMap } from "./components/LoadBacnetMap";
-import { useIsLoading } from "../../App";
+import { AppTabContent, useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
+import { MAIN_TABS } from "../../TabSplitContent";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -85,7 +86,7 @@ type FlowProps = {
   setSelectedNodeForSubFlow: (node: NodeInterface[]) => void;
   handlePushSelectedNodeForSubFlow: (node: NodeInterface) => void;
   handleRemoveSelectedNodeForSubFlow: () => void;
-};
+} & AppTabContent;
 
 const Flow = (props: FlowProps) => {
   const { connUUID = "", hostUUID = "" } = useParams();
@@ -96,6 +97,8 @@ const Flow = (props: FlowProps) => {
     setSelectedNodeForSubFlow,
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
+    parentTab,
+    childTab,
   } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -205,6 +208,8 @@ const Flow = (props: FlowProps) => {
           inputs: convertDataSpec(spec.inputs || []),
           out: convertDataSpec(spec.outputs || []),
         },
+        parentTab,
+        childTab,
         parentId: selectedNodeForSubFlow?.id || undefined,
         settings: nodeSettings,
         selected: false,
@@ -377,9 +382,13 @@ const Flow = (props: FlowProps) => {
     } else {
       setNodes([]);
       setEdges([]);
+      const nodesRemaining = window.allFlow.nodes.filter(
+        (node) => node.parentTab !== parentTab && node.childTab !== childTab
+      );
+      const ids = nodesRemaining.map((node) => node.id);
       window.allFlow = {
-        nodes: [],
-        edges: [],
+        nodes: nodesRemaining,
+        edges: window.allFlow.edges.filter((e) => !ids.includes(e.source) && !ids.includes(e.target)),
       };
     }
   };
@@ -1112,6 +1121,8 @@ const Flow = (props: FlowProps) => {
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
         <NodesTree
+          parentTab={parentTab}
+          childTab={childTab}
           nodes={window.allFlow?.nodes || []}
           selectedSubFlowId={selectedNodeForSubFlow?.id}
           openNodeMenu={openNodeMenu}
@@ -1261,7 +1272,7 @@ const Flow = (props: FlowProps) => {
   );
 };
 
-export const RubixFlow = () => {
+export const RubixFlow = (props: AppTabContent) => {
   const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
@@ -1298,6 +1309,7 @@ export const RubixFlow = () => {
     <>
       {!isFetchingNodeSpec ? (
         <Flow
+          {...props}
           customEdgeTypes={customEdgeTypes}
           customNodeTypes={customNodeTypes}
           selectedNodeForSubFlow={nodeForSubFlowEnd}

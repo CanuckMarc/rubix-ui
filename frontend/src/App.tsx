@@ -2,7 +2,7 @@ import { Layout } from "antd";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import cx from "classnames";
-import create from 'zustand';
+import create from "zustand";
 import { node } from "../wailsjs/go/models";
 
 import { EventsOff, EventsOn } from "../wailsjs/runtime";
@@ -38,7 +38,7 @@ export interface PointTableTypeRecord {
 
 export const useStore = create((set: any) => ({
   wiresMapNodes: [] as PointTableTypeRecord[],
-  setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray})),
+  setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray })),
 }));
 
 export const useBacnetStore = create((set: any) => ({
@@ -48,8 +48,8 @@ export const useBacnetStore = create((set: any) => ({
 
 export const useIsLoading = create((set: any) => ({
   refreshCounter: 0 as Number,
-  reset: () => set(() => ({ refreshCounter: 0})),
-  incrementRefreshCounter: () => set((state: any) => ({ refreshCounter: state.refreshCounter + 1}))
+  reset: () => set(() => ({ refreshCounter: 0 })),
+  incrementRefreshCounter: () => set((state: any) => ({ refreshCounter: state.refreshCounter + 1 })),
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {
@@ -89,7 +89,9 @@ const AppContainer = ({ isFlowRoute, children }: AppContainerProps) => {
   );
 };
 
-const App: React.FC = () => {
+export type AppTabContent = { parentTab: string; childTab: string };
+
+const App: React.FC<AppTabContent> = ({ parentTab, childTab }) => {
   const { pathname } = useLocation();
   const [isRegistered, updateIsRegistered] = useState(false);
   const [isFlowRoute, setIsFlowRoute] = useState(false);
@@ -129,7 +131,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <AppContainer isFlowRoute={isFlowRoute}>
-        <AppRoutes></AppRoutes>
+        <AppRoutes parentTab={parentTab} childTab={childTab} />
       </AppContainer>
     </ThemeProvider>
   );

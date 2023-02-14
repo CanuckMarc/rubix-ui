@@ -20,6 +20,8 @@ export type NodeJSON = {
   data?: { [key: string]: any };
   style?: CSSProperties;
   isParent?: boolean;
+  parentTab?: string;
+  childTab?: string;
   parentId?: string;
   nodeName?: string;
 };

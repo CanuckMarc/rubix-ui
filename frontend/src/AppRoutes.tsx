@@ -25,7 +25,9 @@ import { WiresMap } from "./components/wires-map/map";
 import { AppDetails } from "./components/hosts/views/appDetails";
 import Lorawan from "./components/chirpstack/lorawan";
 
-function AppRoutes() {
+import { AppTabContent } from "./App";
+
+function AppRoutes(props: AppTabContent) {
   return (
     <Routes>
       <Route path={routes.ROOT} element={<Navigate replace to={routes.CONNECTIONS} />} />
@@ -50,8 +52,8 @@ function AppRoutes() {
         <Route key={routes.WRITERS} path={routes.WRITERS} element={<Writers />} />
         <Route key={routes.WRITERCLONES} path={routes.WRITERCLONES} element={<WriterClones />} />
       </Route>
-      <Route path={routes.RUBIX_FLOW} element={<RubixFlow />} />
-      <Route path={routes.RUBIX_FLOW_REMOTE} element={<RubixFlow />} />
+      <Route path={routes.RUBIX_FLOW} element={<RubixFlow {...props} />} />
+      <Route path={routes.RUBIX_FLOW_REMOTE} element={<RubixFlow {...props} />} />
       <Route key={routes.WIRES_CONNECTIONS} path={routes.WIRES_CONNECTIONS} element={<WiresConnections />} />
       <Route key={routes.WIRES_CONNECTIONS} path={routes.WIRES_CONNECTIONS_REMOTE} element={<WiresConnections />} />
       <Route key={routes.SCHEDULES} path={routes.SCHEDULES_REMOTE} element={<Schedules />} />

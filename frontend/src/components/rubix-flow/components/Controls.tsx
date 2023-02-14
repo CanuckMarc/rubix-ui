@@ -197,7 +197,7 @@ const Controls = ({
         {renderIconBtn("Import", DownloadOutlined, () => setLoadModalOpen(true))}
         {renderIconBtn("Export", UploadOutlined, () => setSaveModalOpen(true), "exportButton")}
         {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
-        {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
+        {/* {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)} */}
       </div>
       {loadModalOpen && (
         <LoadModal open onClose={() => setLoadModalOpen(false)} handleLoadNodesAndEdges={handleLoadNodesAndEdges} />
