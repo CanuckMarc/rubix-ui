@@ -43,7 +43,8 @@ export const BacnetMap = (props: BacnetMapPropType) => {
 
   const searchExistingBacnet = async () => {
     const bacnetNodes = await flowFactory.GetFlowByNodeType(connUUID, hostUUID, 'bacnet/bacnet-server', isRemote)
-    if (bacnetNodes && bacnetNodes.nodes.length > 0) {
+    console.log(bacnetNodes)
+    if (bacnetNodes.nodes && bacnetNodes.nodes.length > 0) {
       setDisableAllButton(false)
       setBacnetServerNode(bacnetNodes.nodes[0])
     } else {
