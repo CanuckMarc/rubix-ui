@@ -12,6 +12,12 @@ func TestApp_CSGetApplications(t *testing.T) {
 	fmt.Println(resp)
 }
 
+func TestApp_CSGetGateway(t *testing.T) {
+	app := MockNewApp()
+	resp := app.CSGetGateway("cloud", "rc")
+	pprint.PrintJOSN(resp)
+}
+
 func TestApp_CSGetDevices(t *testing.T) {
 	app := MockNewApp()
 	resp := app.CSGetDevices("cloud", "rc", "")
@@ -27,5 +33,11 @@ func TestApp_CSDeleteDevice(t *testing.T) {
 func TestApp_CSGetDeviceProfiles(t *testing.T) {
 	app := MockNewApp()
 	resp := app.CSGetDeviceProfiles("cloud", "rc")
+	fmt.Println(resp)
+}
+
+func TestApp_CSDeviceOTAKeys(t *testing.T) {
+	app := MockNewApp()
+	resp := app.CSDeviceOTAKeys("cloud", "rc", "a81758fffe0590b7", "dd9b7b5e23f351ee4fb3ed610afa45dc")
 	fmt.Println(resp)
 }
