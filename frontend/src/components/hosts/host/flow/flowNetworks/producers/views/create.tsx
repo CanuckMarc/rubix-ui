@@ -51,6 +51,17 @@ export const CreateEditModal = (props: any) => {
             type: "boolean",
             default: false,
           },
+          history_interval: {
+            title: "history interval",
+            type: "number",
+            default: 15,
+          },
+          history_type: {
+            title: "history type",
+            type: "string",
+            enum: ["INTERVAL", "COV", "COV_AND_INTERVAL"],
+            default: "INTERVAL",
+          },
           producer_thing_class: {
             type: "string",
             enum: ["point"],

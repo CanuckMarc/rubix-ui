@@ -272,7 +272,7 @@ func (inst *App) GetFlowByNodeType(connUUID, hostUUID, nodeType string, isRemote
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
-		var out *nodes.NodesList
+		out := &nodes.NodesList{}
 		if nodeList != nil {
 			for _, schema := range nodeList.Nodes {
 				if schema.Type == nodeType {
@@ -343,6 +343,16 @@ func (inst *App) GetFlowList(connUUID, hostUUID string, nodeIds *flowcli.NodesLi
 	if nodeIds != nil {
 		nodeIds.GetChilds = true
 	}
+	if nodeIds == nil {
+		inst.uiErrorMessage(" node id's can not be empty")
+		return nil
+	}
+	if nodeIds.Nodes == nil {
+		inst.uiErrorMessage(" node id's can not be empty")
+		return nil
+	}
+	log.Infof("nodes export list count: %d", len(nodeIds.Nodes))
+	log.Infof("nodes id's: %s", nodeIds.Nodes)
 	if isRemote {
 		resp, err := inst.getFlowList(connUUID, hostUUID, nodeIds)
 		nodeList := &nodes.NodesList{}
@@ -356,10 +366,13 @@ func (inst *App) GetFlowList(connUUID, hostUUID string, nodeIds *flowcli.NodesLi
 	}
 	var client = flowcli.New(&flowcli.Connection{Ip: flowEngIP})
 	resp, err := client.GetFlowList(nodeIds)
-	log.Infof("nodes uploaded from backend count: %d", len(resp.Nodes))
+
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return resp
+	}
+	if resp != nil {
+		log.Infof("nodes sent from backend count: %d", len(resp.Nodes))
 	}
 	return resp
 }

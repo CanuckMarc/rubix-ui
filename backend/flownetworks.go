@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *App) addFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwork) (*model.FlowNetwork, error) {
@@ -22,13 +23,12 @@ func (inst *App) addFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwo
 	return networks, nil
 }
 
-func (inst *App) AddFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwork) *model.FlowNetwork {
+func (inst *App) AddFlowNetwork(connUUID, hostUUID string, body *model.FlowNetwork) *rumodel.Response {
 	networks, err := inst.addFlowNetwork(connUUID, hostUUID, body)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	return networks
+	return rumodel.SuccessResponse(networks)
 }
 
 func (inst *App) GetFlowNetworks(connUUID, hostUUID string, withStream bool) []model.FlowNetwork {
@@ -59,18 +59,16 @@ func (inst *App) GetFlowNetwork(connUUID, hostUUID, uuid string, withStreams boo
 	return resp
 }
 
-func (inst *App) EditFlowNetwork(connUUID, hostUUID, networkUUID string, body *model.FlowNetwork) *model.FlowNetwork {
+func (inst *App) EditFlowNetwork(connUUID, hostUUID, networkUUID string, body *model.FlowNetwork) *rumodel.Response {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
-		inst.uiErrorMessage(err)
-		return nil
+		return rumodel.FailResponse(err)
 	}
 	networks, err := client.EditFlowNetwork(hostUUID, networkUUID, body)
 	if err != nil {
-		inst.uiErrorMessage(err)
-		return nil
+		return rumodel.FailResponse(err)
 	}
-	return networks
+	return rumodel.SuccessResponse(networks)
 }
 
 func (inst *App) DeleteFlowNetwork(connUUID, hostUUID, networkUUID string) interface{} {
