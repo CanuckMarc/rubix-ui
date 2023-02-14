@@ -90,6 +90,10 @@ export function CSDeleteDevice(arg1, arg2, arg3) {
   return window['go']['backend']['App']['CSDeleteDevice'](arg1, arg2, arg3);
 }
 
+export function CSDeviceOTAKeys(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CSDeviceOTAKeys'](arg1, arg2, arg3, arg4);
+}
+
 export function CSEditDevice(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['CSEditDevice'](arg1, arg2, arg3, arg4);
 }
@@ -108,6 +112,14 @@ export function CSGetDeviceProfiles(arg1, arg2) {
 
 export function CSGetDevices(arg1, arg2, arg3) {
   return window['go']['backend']['App']['CSGetDevices'](arg1, arg2, arg3);
+}
+
+export function CSGetGateway(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateway'](arg1, arg2);
+}
+
+export function CSGetGateways(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateways'](arg1, arg2);
 }
 
 export function ConfigureOpenVPN(arg1, arg2) {
@@ -334,8 +346,20 @@ export function EdgeDHCPSetStaticIP(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPSetStaticIP'](arg1, arg2, arg3);
 }
 
+export function EdgeDeleteAppDB(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteAppDB'](arg1, arg2, arg3);
+}
+
+export function EdgeDeleteDataFile(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteDataFile'](arg1, arg2, arg3);
+}
+
 export function EdgeEnablePlugins(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeEnablePlugins'](arg1, arg2, arg3, arg4);
+}
+
+export function EdgeFileExists(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeFileExists'](arg1, arg2, arg3);
 }
 
 export function EdgeFirewallDisable(arg1, arg2) {
@@ -518,6 +542,14 @@ export function ExportPointBulk(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['ExportPointBulk'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function FFSystemPing(arg1, arg2) {
+  return window['go']['backend']['App']['FFSystemPing'](arg1, arg2);
+}
+
+export function FFToken(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['FFToken'](arg1, arg2, arg3, arg4, arg5);
+}
+
 export function FakeEdgeAppsInfoModelCreationOnUI() {
   return window['go']['backend']['App']['FakeEdgeAppsInfoModelCreationOnUI']();
 }
@@ -584,6 +616,10 @@ export function GetDevices(arg1, arg2, arg3) {
 
 export function GetFlow(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetFlow'](arg1, arg2, arg3);
+}
+
+export function GetFlowByNodeType(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetFlowByNodeType'](arg1, arg2, arg3, arg4);
 }
 
 export function GetFlowDeviceSchema(arg1, arg2, arg3) {
