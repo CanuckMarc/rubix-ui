@@ -2,6 +2,7 @@ package backend
 
 import (
 	"fmt"
+	"github.com/NubeIO/rubix-ui/backend/flowcli"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
 	"testing"
 )
@@ -14,8 +15,16 @@ func TestApp_NodePallet(t *testing.T) {
 
 func TestApp_GetFlow(t *testing.T) {
 	app := MockNewApp()
-	c := app.GetFlow("cloud", "rc", false)
-	fmt.Println(c)
+	c := app.GetFlow("cloud", "rc", true)
+	pprint.PrintJOSN(c)
+}
+
+func TestApp_GetFlowList(t *testing.T) {
+	app := MockNewApp()
+	nodeIds := &flowcli.NodesList{}
+	nodeIds.Nodes = []string{"6C63373BA0CB4CF498EF6F03861685B4"}
+	c := app.GetFlowList("cloud", "rc", nodeIds, false)
+	pprint.PrintJOSN(c)
 }
 
 func TestApp_GetFlowByNodeType(t *testing.T) {
