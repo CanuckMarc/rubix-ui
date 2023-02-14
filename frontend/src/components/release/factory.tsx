@@ -1,6 +1,6 @@
 import { amodel, store, } from "../../../wailsjs/go/models";
 import {
-  EdgeAppsInfo,
+  EdgeAppsInfo, EdgeDeleteAppDB,
   EdgeServiceRestart,
   EdgeServiceStart,
   EdgeServiceStop,
@@ -75,6 +75,11 @@ export class ReleasesFactory {
   // gets all the latest version of nube software, assist, edge and FF
   async LatestVersions() {
     return await LatestVersions();
+  }
+
+  // delete a app DB file
+  async EdgeDeleteAppDB(connUUID: string, hostUUID: string, appName: string) {
+    return await EdgeDeleteAppDB(connUUID, hostUUID, appName);
   }
 
 }

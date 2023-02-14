@@ -645,7 +645,7 @@ export const FLOW_POINT_HEADERS = [
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
-    fixed: "left"
+    fixed: "left",
   },
 ];
 
@@ -1081,6 +1081,11 @@ export const LORAWAN_REMOTE_HEADERS = [
     dataIndex: "description",
   },
   {
+    key: "devEUI",
+    title: "EUI",
+    dataIndex: "devEUI",
+  },
+  {
     key: "applicationID",
     title: "Application ID",
     dataIndex: "applicationID",
@@ -1096,49 +1101,6 @@ export const LORAWAN_REMOTE_HEADERS = [
     dataIndex: "deviceProfileID",
   },
   {
-    key: "deviceStatusBattery",
-    title: "Status Battery",
-    dataIndex: "deviceStatusBattery",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusBatteryLevel",
-    title: "Status Battery Level",
-    dataIndex: "deviceStatusBatteryLevel",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusBatteryLevelUnavailable",
-    title: "Status Battery Level Unavailable",
-    dataIndex: "deviceStatusBatteryLevelUnavailable",
-    render(value: boolean) {
-      const colour = value ? "orange" : "blue";
-      return <Tag color={colour}>{value.toString()}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusExternalPowerSource",
-    title: "Status External Power Source",
-    dataIndex: "deviceStatusExternalPowerSource",
-    render(value: boolean) {
-      const colour = value ? "orange" : "blue";
-      return <Tag color={colour}>{value.toString()}</Tag>;
-    },
-  },
-  {
-    key: "deviceStatusMargin",
-    title: "Status Margin",
-    dataIndex: "deviceStatusMargin",
-    render(value: number) {
-      return <Tag color="#4d4dff">{value}</Tag>;
-    },
-  },
-
-  {
     key: "lastSeenAt",
     title: "Last Seen At",
     dataIndex: "lastSeenAt",
@@ -1146,85 +1108,9 @@ export const LORAWAN_REMOTE_HEADERS = [
       return moment.utc(value).format("YYYY-MM-DD");
     },
   },
-  {
-    key: "devEUI",
-    title: "EUI",
-    dataIndex: "devEUI",
-  },
 ];
 
 //--------------schema-------------//
-export const LOCAL_FLOW_NETWORKS_SCHEMA = {
-  required: ["name"],
-  properties: {
-    name: {
-      title: "name",
-      type: "string",
-      maxLength: 50,
-      minLength: 2,
-    },
-    is_remote: {
-      type: "boolean",
-      title: "is remote network",
-    },
-  },
-};
-
-export const REMOTE_FLOW_NETWORKS_SCHEMA = {
-  required: ["name", "flow_ip_local", "flow_ip", "flow_port_local", "flow_port", "flow_token_local", "flow_token"],
-  properties: {
-    name: {
-      title: "name",
-      type: "string",
-      maxLength: 50,
-      minLength: 2,
-    },
-    is_remote: {
-      type: "boolean",
-      title: "is remote network",
-    },
-    flow_ip_local: {
-      type: "string",
-      title: "flow ip local",
-      default: "10.8.1.1",
-      minLength: 6,
-      maxLength: 100,
-    },
-    flow_ip: {
-      type: "string",
-      title: "flow ip remote",
-      default: "10.8.1.1",
-      minLength: 6,
-      maxLength: 100,
-    },
-    flow_port_local: {
-      type: "number",
-      title: "flow port local",
-      minimum: 1,
-      maximum: 65535,
-      default: 1660,
-    },
-    flow_port: {
-      type: "number",
-      title: "flow port remote",
-      minimum: 1,
-      maximum: 65535,
-      default: 1660,
-    },
-    flow_token_local: {
-      title: "token local",
-      type: "string",
-      minLength: 60,
-      maxLength: 60,
-    },
-    flow_token: {
-      title: "token remote",
-      type: "string",
-      minLength: 60,
-      maxLength: 60,
-    },
-  },
-};
 
 export const WIRES_CONNECTION_SCHEMA = {
   name: {
