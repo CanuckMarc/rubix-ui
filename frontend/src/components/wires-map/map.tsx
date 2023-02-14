@@ -8,6 +8,8 @@ import { FlowPointFactory } from '../../components/hosts/host/flow/points/factor
 
 import { useStore, useIsLoading, PointTableTypeRecord, PointTableType } from '../../App';
 import { node } from "../../../wailsjs/go/models";
+import { NodeInstance } from "rc-tree/lib/interface";
+import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -34,7 +36,8 @@ export interface BacnetTableDataType {
   instanceNumber: number | undefined;
   outputTopic: string | undefined;
   key: string;
-  bacnetSchema: node.Schema
+  flownetSchema: node.Schema,
+  bacnetServerInterface: NodeInterface
 }
 
 export interface FlownetMapPropType {

@@ -6,7 +6,7 @@ import { Edge, useReactFlow } from "react-flow-renderer/nocss";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { handleGetSettingType } from "../util/handleSettings";
 import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../use-nodes-spec";
-import { NodeSpecJSON } from "../lib";
+import { NodeSpecJSON, InputSocketSpecJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
 import { node } from "../../../../wailsjs/go/models";
 import { openNotificationWithIcon } from "../../../utils/utils";
@@ -19,7 +19,8 @@ type NodeGenInputType = {
   x: number;
   y: number;
   topic: string | undefined;
-  // instanceNumber: number | undefined;
+  name: string | undefined;
+  instanceNumber: number | undefined;
 }
 
 function getRandomArbitrary(min: number, max: number) {
@@ -51,12 +52,20 @@ export const LoadBacnetMap = () => {
         let xTemp: number = xRand
         let yTemp: number = yRand
 
+        if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
+          let largeX = 0
+          window.allFlow.nodes.forEach((item: NodeInterface) => {
+            if (item.position.x > largeX) {
+              largeX = item.position.x
+            }
+          })
+          xTemp = largeX + 400
+        }
+
         bacnetNodes.forEach((item: BacnetTableDataType) => {
-          if (item.bacnetSchema.metadata?.positionX && item.bacnetSchema.metadata?.positionY) {
-            xTemp = parseFloat(item.bacnetSchema.metadata?.positionX) - 500
-            yTemp = parseFloat(item.bacnetSchema.metadata?.positionY)
-          }
-          const resObj = addNewNodesEdges(item, item.bacnetSchema, xTemp, yTemp);
+          xTemp = xTemp + 400
+          yTemp = yTemp + 400
+          const resObj = addNewNodesEdges(item, xTemp, yTemp);
           localNodes = [...localNodes, ...resObj.nodes]
           localEdges = [...localEdges, ...resObj.edges]
         })
@@ -72,41 +81,57 @@ export const LoadBacnetMap = () => {
       if (refreshCounter === 2) {     
         openNotificationWithIcon("success", 'Rubix flow loading complete!');
         if (bacnetNodes.length !== 0) {
-          // replace existing 'analog-variable' nodes with copies that are amended with new settings
-          let modifiedExistingNode = [] as NodeInterface[]
-          bacnetNodes.forEach((item: BacnetTableDataType) => {
-            const filteredOldNodes = window.allFlow.nodes.filter((aNode: NodeInterface) => {
-              if (aNode.id === item.bacnetSchema.id) {
-                const copyObj = aNode
-                copyObj["settings"]["instance-number"] = item.instanceNumber;
-                modifiedExistingNode.push(copyObj);
-                return false
-              } else {
-                return true
-              }
-            })
-            flowInstance.setNodes(filteredOldNodes)
-            window.allFlow.nodes = filteredOldNodes
-          })
-          renderPointsToFlowEditor([...newNodes, ...modifiedExistingNode], newEdges);
+          renderPointsToFlowEditor(newNodes, newEdges);
           setBacnetNodes([]);
         }
       }
     }, [refreshCounter])
 
-    const addNewNodesEdges = (bacnetPoint: BacnetTableDataType, nodeToConnect: node.Schema, x: number, y: number) => {
+    const addNewNodesEdges = (setOfNodesToAdd: BacnetTableDataType, x: number, y: number) => {
       const nodes: NodeInterface[] = [];
-      const edges: Edge[] = [];
+      let edges: Edge[] = [];
 
       // generate new nodes
       const nodeSpecs: NodeGenInputType[] = [
         {
-          type: 'link/link-output-number',
+          type: 'flow/flow-point',
+          name: setOfNodesToAdd.outputTopic || undefined,
           isParent: false,
-          parentId: nodeToConnect.parentId,
+          parentId: setOfNodesToAdd.flownetSchema.id,
           x: x,
           y: y,
-          topic: bacnetPoint.outputTopic
+          topic: undefined,
+          instanceNumber: undefined
+        }, 
+        {
+          type: 'link/link-input-number',
+          name: undefined,
+          isParent: false,
+          parentId: setOfNodesToAdd.flownetSchema.id,
+          x: x + 800,
+          y: y,
+          topic: setOfNodesToAdd.outputTopic,
+          instanceNumber: undefined
+        },
+        {
+          type: 'link/link-output-number',
+          name: undefined,
+          isParent: false,
+          parentId: setOfNodesToAdd.bacnetServerInterface.id,
+          x: x,
+          y: y,
+          topic: setOfNodesToAdd.outputTopic,
+          instanceNumber: undefined
+        },
+        {
+          type: 'bacnet/analog-variable',
+          name: undefined,
+          isParent: false,
+          parentId: setOfNodesToAdd.bacnetServerInterface.id,
+          x: x + 800,
+          y: y,
+          topic: undefined,
+          instanceNumber: setOfNodesToAdd.instanceNumber
         }
       ]
 
@@ -118,14 +143,21 @@ export const LoadBacnetMap = () => {
       })
 
       // generate new edge
-      const Edge: Edge = {
+      const flownetEdge: Edge = {
         id: generateUuid(),
         source: nodeIds[0],
         sourceHandle: "output",
-        target: nodeToConnect.id,
+        target: nodeIds[1],
+        targetHandle: "input"
+      }
+      const bacnetEdge: Edge = {
+        id: generateUuid(),
+        source: nodeIds[2],
+        sourceHandle: "output",
+        target: nodeIds[3],
         targetHandle: "in15"
       }
-      edges.push(Edge);
+      edges = [flownetEdge, bacnetEdge];
 
       return {nodes: nodes, edges: edges}
     }
@@ -147,11 +179,21 @@ export const LoadBacnetMap = () => {
       const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
 
+      let updatedSettings: any = {}
+      if (item.topic && !item.instanceNumber) {
+        updatedSettings = {...nodeSettings, topic: item.topic}
+      } else if (!item.topic && item.instanceNumber) {
+        updatedSettings = {...nodeSettings}
+        updatedSettings["instance-number"] = item.instanceNumber;
+      } else {
+        updatedSettings = {...nodeSettings}
+      }
+
       return {
         id: generateUuid(),
         isParent: item.isParent,
         type: item.type,
-        info: {},
+        info: { nodeName: item.name ? item.name : ''},
         position: {
           x: item.x,
           y: item.y,
@@ -167,7 +209,7 @@ export const LoadBacnetMap = () => {
         style: {},
         status: undefined,
         parentId: item.parentId,
-        settings: item.topic ? {...nodeSettings, topic: item.topic} : nodeSettings,
+        settings: updatedSettings,
         selected: false,
       };
     }

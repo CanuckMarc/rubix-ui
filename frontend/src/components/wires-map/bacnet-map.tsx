@@ -13,6 +13,8 @@ import { openNotificationWithIcon } from "../../utils/utils";
 import { SelectOptionType, BacnetTableDataType, BacnetMapPropType } from "./map";
 import { BacnetPointTable } from "./views/bacnetPointTable";
 
+import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
+
 const { Title } = Typography;
 
 export const BacnetMap = (props: BacnetMapPropType) => {
@@ -28,6 +30,8 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedFlownet, setSelectedFlownet] = useState<node.Schema | undefined>(undefined);
   const [pointSelection, setPointSelection] = useState<PointTableType | undefined>(undefined);
+  const [bacnetServerNode, setBacnetServerNode] = useState({} as NodeInterface);
+  const [disableAllButton, setDisableAllButton] = useState(false);
 
   const [bacnetNodes, setBacnetNodes] = useBacnetStore(
     (state) => [state.bacnetNodes, state.setBacnetNodes]
@@ -59,7 +63,25 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       setBacnetNodes([]);
       reset();
       fetchFlownet();
+      searchExistingBacnet();
   }, [connUUID, hostUUID]);
+
+  const searchExistingBacnet = () => {
+    if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
+      const bacnetNode = window.allFlow.nodes.find((item: NodeInterface) => {
+        if (item.type === 'bacnet/bacnet-server') return true
+      })
+      if (bacnetNode) {
+        setDisableAllButton(false)
+        setBacnetServerNode(bacnetNode)
+      } else {
+        setDisableAllButton(true)
+        openNotificationWithIcon("warning", 'No existing Bacnet server in Wires sheet!');
+      }
+    } else {
+      console.log('what')
+    }
+  }
 
   const addPoints = () => {
     if (!selectedFlownet || !pointSelection) openNotificationWithIcon("warning", 'Please select a flow network and or a point!');
@@ -74,10 +96,11 @@ export const BacnetMap = (props: BacnetMapPropType) => {
           existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
           selectedPoint: pointSelection,
           selectedPointName: pointSelection.name,
-          outputTopic: pointSelection.point_name,
+          outputTopic: pointSelection.name,
           instanceNumber: undefined,
           key: newId,
-          bacnetSchema: selectedFlownet
+          flownetSchema: selectedFlownet,
+          bacnetServerInterface: bacnetServerNode
         }
         setTableData([...tableData, resObj])
       } else {
@@ -236,8 +259,8 @@ export const BacnetMap = (props: BacnetMapPropType) => {
                 <Title level={5}>
                   Selected points: 
                 </Title>
-                <Button type="primary" icon={<PlusOutlined />} onClick={addPoints} size={'middle'} style={{width: '6vw'}}>Add</Button>
-                <Button type="primary" icon={<MinusOutlined />} danger={true} onClick={deletePoints} disabled={tableData.length === 0 || selectedRowKeys.length === 0} size={'middle'} style={{width: '6vw'}}>Delete</Button>
+                <Button type="primary" icon={<PlusOutlined />} onClick={addPoints} disabled={disableAllButton} size={'middle'} style={{width: '6vw'}}>Add</Button>
+                <Button type="primary" icon={<MinusOutlined />} danger={true} onClick={deletePoints} disabled={disableAllButton || tableData.length === 0 || selectedRowKeys.length === 0} size={'middle'} style={{width: '6vw'}}>Delete</Button>
               </div>
               <Table 
                 bordered={true}
@@ -251,7 +274,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
                   locale: { items_per_page: "" },
                 }}
               />
-              <Button type="primary" icon={<UploadOutlined />} onClick={recordPoints} size={'large'} disabled={tableData.length === 0} style={{width: '15vw'}}>Generate point connections</Button>
+              <Button type="primary" icon={<UploadOutlined />} onClick={recordPoints} size={'large'} disabled={disableAllButton || tableData.length === 0} style={{width: '15vw'}}>Generate point connections</Button>
             </div>
           </div> 
         </div>
