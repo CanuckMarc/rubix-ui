@@ -1,5 +1,5 @@
 import { Space, Tooltip, Spin, Popconfirm } from "antd";
-import { DeleteOutlined, FormOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FormOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { chirpstack } from "../../../../wailsjs/go/models";
@@ -8,6 +8,7 @@ import { RbRefreshButton, RbAddButton } from "../../../common/rb-table-actions";
 import { LORAWAN_REMOTE_HEADERS } from "../../../constants/headers";
 import { ChirpFactory } from "../factory";
 import { CreateEditModal } from "./create";
+import { ActiveModal } from "./active-modal";
 
 import DevicesResult = chirpstack.DevicesResult;
 
@@ -16,6 +17,7 @@ export const LorawanTable = () => {
   const [data, setData] = useState<DevicesResult[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isActiveModalVisible, setIsActiveModalVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState<DevicesResult | undefined>(undefined);
 
   const columns = [
@@ -30,11 +32,15 @@ export const LorawanTable = () => {
               <FormOutlined />
             </a>
           </Tooltip>
-
           <Tooltip title="Delete">
             <Popconfirm title="Delete" onConfirm={() => deleteDevice(item.devEUI)}>
               <DeleteOutlined className="danger--text" />
             </Popconfirm>
+          </Tooltip>
+          <Tooltip title="Active">
+            <a onClick={() => showActiveModal(item)}>
+              <PlayCircleOutlined />
+            </a>
           </Tooltip>
         </Space>
       ),
@@ -65,9 +71,16 @@ export const LorawanTable = () => {
     setCurrentItem(dev);
     setIsModalVisible(true);
   };
+
   const handleClose = () => {
     setIsModalVisible(false);
+    setIsActiveModalVisible(false);
     setCurrentItem(undefined);
+  };
+
+  const showActiveModal = (dev: DevicesResult | undefined) => {
+    setCurrentItem(dev);
+    setIsActiveModalVisible(true);
   };
 
   useEffect(() => {
@@ -89,6 +102,13 @@ export const LorawanTable = () => {
       <CreateEditModal
         currentItem={currentItem}
         isModalVisible={isModalVisible}
+        refreshList={fetch}
+        onCloseModal={handleClose}
+      />
+
+      <ActiveModal
+        currentItem={currentItem}
+        isModalVisible={isActiveModalVisible}
         refreshList={fetch}
         onCloseModal={handleClose}
       />

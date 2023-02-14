@@ -80,7 +80,7 @@ export const CreateEditModal = (props: any) => {
       });
     } else {
       setInitData({
-        deviceProfileID: "31fcdf3c-efbc-439b-aaed-6acca398ecee",
+        deviceProfileID: "",
         devEUI: "",
         name: "",
         applicationID: "",
