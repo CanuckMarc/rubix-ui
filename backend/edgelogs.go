@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/rubix-edge/pkg/streamlog"
+	"github.com/NubeIO/rubix-ui/backend/constants"
 )
 
 func pluginLogs(pluginName string) []string {
@@ -26,6 +27,17 @@ func pluginLogs(pluginName string) []string {
 		stringFilters = []string{"lorawan"}
 	}
 	return stringFilters
+}
+
+func appLogs(pluginName string) string {
+	var serviceName string
+	switch pluginName {
+	case constants.BacnetServerDriver:
+		serviceName = constants.BacnetServerServiceName
+	case constants.FlowFramework:
+		serviceName = constants.FlowFrameworkServiceName
+	}
+	return serviceName
 }
 
 func (inst *App) edgeCreateLog(connUUID, hostUUID, serviceName string, duration int, filters []string) (*streamlog.Log, error) {
@@ -71,6 +83,26 @@ func (inst *App) FlowNetworkNewLog(connUUID, hostUUID, pluginName string, durati
 	logs, err := inst.edgeCreateLog(connUUID, hostUUID, "nubeio-flow-framework.service", duration, filters)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("get plugin logs error: %s", err.Error()))
+		return nil
+	}
+	return logs
+
+}
+
+// EdgeAppNewLog let user get network driver logs from flow framework
+func (inst *App) EdgeAppNewLog(connUUID, hostUUID, appName string, duration int) *streamlog.Log {
+	if appName == "" {
+		inst.uiErrorMessage("get app logs: no app found be name was provided")
+		return nil
+	}
+	serviceName := appLogs(appName)
+	if serviceName == "" {
+		inst.uiErrorMessage(fmt.Sprintf("get app logs: no app found be name: %s", appName))
+		return nil
+	}
+	logs, err := inst.edgeCreateLog(connUUID, hostUUID, fmt.Sprintf("%s.service", serviceName), duration, nil)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("get app logs error: %s", err.Error()))
 		return nil
 	}
 	return logs
