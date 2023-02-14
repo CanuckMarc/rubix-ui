@@ -20,6 +20,7 @@ type NodeGenInputType = {
   topic: string | undefined;
   name: string | undefined;
   instanceNumber: number | undefined;
+  pointName: string | undefined;
 }
 
 function getRandomArbitrary(min: number, max: number) {
@@ -100,7 +101,8 @@ export const LoadBacnetMap = () => {
           x: x,
           y: y,
           topic: undefined,
-          instanceNumber: undefined
+          instanceNumber: undefined,
+          pointName: setOfNodesToAdd.selectedPointName
         }, 
         {
           type: 'link/link-input-number',
@@ -110,7 +112,8 @@ export const LoadBacnetMap = () => {
           x: x + 800,
           y: y,
           topic: setOfNodesToAdd.outputTopic,
-          instanceNumber: undefined
+          instanceNumber: undefined,
+          pointName: undefined
         },
         {
           type: 'link/link-output-number',
@@ -120,7 +123,8 @@ export const LoadBacnetMap = () => {
           x: x,
           y: y,
           topic: setOfNodesToAdd.outputTopic,
-          instanceNumber: undefined
+          instanceNumber: undefined,
+          pointName: undefined
         },
         {
           type: 'bacnet/analog-variable',
@@ -130,7 +134,8 @@ export const LoadBacnetMap = () => {
           x: x + 800,
           y: y,
           topic: undefined,
-          instanceNumber: setOfNodesToAdd.instanceNumber
+          instanceNumber: setOfNodesToAdd.instanceNumber,
+          pointName: undefined
         }
       ]
 
@@ -179,11 +184,13 @@ export const LoadBacnetMap = () => {
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
 
       let updatedSettings: any = {}
-      if (item.topic && !item.instanceNumber) {
-        updatedSettings = {...nodeSettings, topic: item.topic}
-      } else if (!item.topic && item.instanceNumber) {
+      if (!item.pointName && item.topic && !item.instanceNumber) {
+        updatedSettings = {...nodeSettings, topic: item.type === 'link/link-output-number' ? `num-${item.topic}` : item.topic}
+      } else if (!item.pointName && !item.topic && item.instanceNumber) {
         updatedSettings = {...nodeSettings}
         updatedSettings["instance-number"] = item.instanceNumber;
+      } else if (item.pointName && !item.topic && !item.instanceNumber) {
+        updatedSettings = {...nodeSettings, point: item.pointName}
       } else {
         updatedSettings = {...nodeSettings}
       }

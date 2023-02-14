@@ -44,7 +44,7 @@ import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
 import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
-import { LoadWiresMap } from "./components/LoadWiresMap";
+import { LoadWiresMap } from "./components/LoadFlownetMap";
 import { LoadBacnetMap } from "./components/LoadBacnetMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";

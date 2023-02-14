@@ -30,7 +30,7 @@ export function AddDevice(arg1:string,arg2:string,arg3:model.Device):Promise<mod
 
 export function AddDevicesBulk(arg1:string,arg2:string,arg3:Array<model.Device>):Promise<void>;
 
-export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function AddHost(arg1:string,arg2:amodel.Host):Promise<rumodel.Response>;
 
@@ -194,7 +194,13 @@ export function EdgeDHCPSetAsAuto(arg1:string,arg2:string,arg3:system.Networking
 
 export function EdgeDHCPSetStaticIP(arg1:string,arg2:string,arg3:dhcpd.SetStaticIP):Promise<string>;
 
+export function EdgeDeleteAppDB(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
+export function EdgeDeleteDataFile(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
 export function EdgeEnablePlugins(arg1:string,arg2:string,arg3:Array<string>,arg4:boolean):Promise<rumodel.Response>;
+
+export function EdgeFileExists(arg1:string,arg2:string,arg3:string):Promise<assistcli.FilesExists>;
 
 export function EdgeFirewallDisable(arg1:string,arg2:string):Promise<ufw.Message>;
 
@@ -258,7 +264,7 @@ export function EditConsumer(arg1:string,arg2:string,arg3:string,arg4:model.Cons
 
 export function EditDevice(arg1:string,arg2:string,arg3:string,arg4:model.Device):Promise<model.Device>;
 
-export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function EditHost(arg1:string,arg2:string,arg3:amodel.Host):Promise<rumodel.Response>;
 
@@ -285,6 +291,10 @@ export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Array<string>):Promise<storage.Backup>;
 
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
+
+export function FFSystemPing(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function FFToken(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<rumodel.Response>;
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
 

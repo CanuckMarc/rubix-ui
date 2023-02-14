@@ -233,6 +233,32 @@ export namespace assistcli {
 		    return a;
 		}
 	}
+	export class FilesExists {
+	    file: string;
+	    exists: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new FilesExists(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.file = source["file"];
+	        this.exists = source["exists"];
+	    }
+	}
+	export class Message {
+	    message: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Message(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.message = source["message"];
+	    }
+	}
 	
 	export class Response {
 	    code: number;

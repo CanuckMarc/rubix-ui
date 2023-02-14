@@ -346,8 +346,20 @@ export function EdgeDHCPSetStaticIP(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPSetStaticIP'](arg1, arg2, arg3);
 }
 
+export function EdgeDeleteAppDB(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteAppDB'](arg1, arg2, arg3);
+}
+
+export function EdgeDeleteDataFile(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteDataFile'](arg1, arg2, arg3);
+}
+
 export function EdgeEnablePlugins(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeEnablePlugins'](arg1, arg2, arg3, arg4);
+}
+
+export function EdgeFileExists(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeFileExists'](arg1, arg2, arg3);
 }
 
 export function EdgeFirewallDisable(arg1, arg2) {
@@ -528,6 +540,14 @@ export function ExportNetworksBulk(arg1, arg2, arg3, arg4) {
 
 export function ExportPointBulk(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['ExportPointBulk'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function FFSystemPing(arg1, arg2) {
+  return window['go']['backend']['App']['FFSystemPing'](arg1, arg2);
+}
+
+export function FFToken(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['FFToken'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function FakeEdgeAppsInfoModelCreationOnUI() {
