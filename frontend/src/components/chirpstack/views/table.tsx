@@ -19,6 +19,7 @@ export const LorawanTable = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isActiveModalVisible, setIsActiveModalVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState<DevicesResult | undefined>(undefined);
+  const [lastSeenAtString, setLastSeenAtString] = useState<string>("");
 
   const columns = [
     {
@@ -67,6 +68,11 @@ export const LorawanTable = () => {
     fetch();
   };
 
+  const fetchGateway = async () => {
+    const { lastSeenAtString } = await factory.CSGetGateway(connUUID, hostUUID);
+    setLastSeenAtString(lastSeenAtString);
+  };
+
   const showModal = (dev: DevicesResult | undefined) => {
     setCurrentItem(dev);
     setIsModalVisible(true);
@@ -85,12 +91,18 @@ export const LorawanTable = () => {
 
   useEffect(() => {
     fetch();
+    fetchGateway();
   }, [connUUID, hostUUID]);
 
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal(undefined)} />
+      {lastSeenAtString && (
+        <div className="text-end ">
+          Gateway last seen: <b>{lastSeenAtString}</b>
+        </div>
+      )}
 
       <RbTable
         rowKey="devEUI"
@@ -98,14 +110,12 @@ export const LorawanTable = () => {
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
-
       <CreateEditModal
         currentItem={currentItem}
         isModalVisible={isModalVisible}
         refreshList={fetch}
         onCloseModal={handleClose}
       />
-
       <ActiveModal
         currentItem={currentItem}
         isModalVisible={isActiveModalVisible}
