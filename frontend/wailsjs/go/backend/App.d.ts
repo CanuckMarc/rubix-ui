@@ -30,7 +30,7 @@ export function AddDevice(arg1:string,arg2:string,arg3:model.Device):Promise<mod
 
 export function AddDevicesBulk(arg1:string,arg2:string,arg3:Array<model.Device>):Promise<void>;
 
-export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function AddHost(arg1:string,arg2:amodel.Host):Promise<rumodel.Response>;
 
@@ -66,6 +66,8 @@ export function CSAddDevice(arg1:string,arg2:string,arg3:chirpstack.Device):Prom
 
 export function CSDeleteDevice(arg1:string,arg2:string,arg3:string):Promise<boolean>;
 
+export function CSDeviceOTAKeys(arg1:string,arg2:string,arg3:string,arg4:string):Promise<any>;
+
 export function CSEditDevice(arg1:string,arg2:string,arg3:string,arg4:chirpstack.Device):Promise<chirpstack.Device>;
 
 export function CSGetApplications(arg1:string,arg2:string):Promise<chirpstack.Applications>;
@@ -75,6 +77,10 @@ export function CSGetDevice(arg1:string,arg2:string,arg3:string):Promise<chirpst
 export function CSGetDeviceProfiles(arg1:string,arg2:string):Promise<chirpstack.DeviceProfiles>;
 
 export function CSGetDevices(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Devices>;
+
+export function CSGetGateway(arg1:string,arg2:string):Promise<chirpstack.GatewaysResult>;
+
+export function CSGetGateways(arg1:string,arg2:string):Promise<chirpstack.Gateways>;
 
 export function ConfigureOpenVPN(arg1:string,arg2:string):Promise<boolean>;
 
@@ -188,7 +194,13 @@ export function EdgeDHCPSetAsAuto(arg1:string,arg2:string,arg3:system.Networking
 
 export function EdgeDHCPSetStaticIP(arg1:string,arg2:string,arg3:dhcpd.SetStaticIP):Promise<string>;
 
+export function EdgeDeleteAppDB(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
+export function EdgeDeleteDataFile(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
 export function EdgeEnablePlugins(arg1:string,arg2:string,arg3:Array<string>,arg4:boolean):Promise<rumodel.Response>;
+
+export function EdgeFileExists(arg1:string,arg2:string,arg3:string):Promise<assistcli.FilesExists>;
 
 export function EdgeFirewallDisable(arg1:string,arg2:string):Promise<ufw.Message>;
 
@@ -252,7 +264,7 @@ export function EditConsumer(arg1:string,arg2:string,arg3:string,arg4:model.Cons
 
 export function EditDevice(arg1:string,arg2:string,arg3:string,arg4:model.Device):Promise<model.Device>;
 
-export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function EditHost(arg1:string,arg2:string,arg3:amodel.Host):Promise<rumodel.Response>;
 
@@ -279,6 +291,10 @@ export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Array<string>):Promise<storage.Backup>;
 
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
+
+export function FFSystemPing(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function FFToken(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<rumodel.Response>;
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
 
@@ -313,6 +329,8 @@ export function GetDevice(arg1:string,arg2:string,arg3:string,arg4:boolean):Prom
 export function GetDevices(arg1:string,arg2:string,arg3:boolean):Promise<Array<model.Device>>;
 
 export function GetFlow(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+
+export function GetFlowByNodeType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 

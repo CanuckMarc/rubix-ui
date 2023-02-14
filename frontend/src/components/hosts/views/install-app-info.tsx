@@ -1,5 +1,5 @@
-import { Button, Dropdown, List, Menu, Modal, Typography } from "antd";
-import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { Button, Dropdown, List, Menu, Modal, Typography, Popconfirm } from "antd";
+import { DownloadOutlined, EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
@@ -23,7 +23,7 @@ const installAppFactory = new InstallAppFactory();
 
 export const EdgeAppInfo = (props: any) => {
   const { host } = props;
-  const { connUUID = "" } = useParams();
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [isLoading, updateIsLoading] = useState(false);
   const [isActionLoading, updateActionLoading] = useState({} as any);
   const [installedApps, updateInstalledApps] = useState([] as InstalledApps[]);
@@ -34,6 +34,7 @@ export const EdgeAppInfo = (props: any) => {
   const [installedVersion, updateInstalledVersion] = useState("");
   const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
+  const [appToDelete, setAppToDelete] = useState<InstalledApps | undefined>(undefined);
 
   let timeout;
 
@@ -123,6 +124,23 @@ export const EdgeAppInfo = (props: any) => {
     updateIsInstallRubixAppModalVisible(false);
   };
 
+  const handleConfirm = async () => {
+    if (appToDelete) {
+      console.log(appToDelete)
+      try {
+        const res = await releaseFactory.EdgeDeleteAppDB(connUUID, hostUUID, appToDelete.app_name!);
+        if (res) {
+          console.log(res)
+        }
+      } catch (err) {
+        console.log(err)
+      } finally {
+        fetchAppInfo();
+        setAppToDelete(undefined)
+      }
+    }
+  }
+
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
       <div style={{display: 'flex', flexDirection: 'row'}}>
@@ -137,9 +155,9 @@ export const EdgeAppInfo = (props: any) => {
           dataSource={availableApps}
           header={<div style={{textAlign: 'start'}}><strong>Available Apps</strong></div>}
           renderItem={(item) => (
-            <List.Item style={{ padding: "8px 16px", textAlign: 'start'}}>
+            <List.Item style={{ padding: "8px 16px", textAlign: 'start'}} >
               <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
-              <span style={{ width: "350px" }}>
+              <span style={{ width: "390px" }}>
                 <div style={{display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
                   <span>{item.app_name}</span>
                   <span style={{color: 'grey'}}>{`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}</span>
@@ -170,11 +188,25 @@ export const EdgeAppInfo = (props: any) => {
           header={<div style={{textAlign: 'start'}}><strong>Installed Apps</strong></div>}
           renderItem={(item) => (
             <List.Item style={{ padding: "8px 16px", textAlign: 'start' }}>
-              <span className="mr-6">
+              <span className="mr-6" style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
                 <Dropdown trigger={["click"]}
                           overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
                   <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
                 </Dropdown>
+                
+                <Popconfirm
+                  title={(
+                    <div style={{display: 'flex', flexDirection: 'column', rowGap: '10px'}}>
+                      <span style={{color: 'yellow'}}>Warning</span>
+                      <span>This action will delete <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span> from database!  </span>
+                    </div>
+                  )}
+                  onConfirm={handleConfirm}
+                  okText="Confirm"
+                  cancelText="Cancel"
+                >
+                  <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setAppToDelete(item)}/>
+                </Popconfirm>
               </span>
 
               <span style={{ width: "250px" }}>{item.app_name}</span>
@@ -229,7 +261,7 @@ export const EdgeAppInfo = (props: any) => {
                 </Dropdown>
               </span>
 
-              <span style={{ width: "350px" }}>{item.name}</span>
+              <span style={{ width: "392px" }}>{item.name}</span>
               <span
                 className="flex-1"
                 style={{
