@@ -272,7 +272,7 @@ func (inst *App) GetFlowByNodeType(connUUID, hostUUID, nodeType string, isRemote
 			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 			return resp
 		}
-		var out *nodes.NodesList
+		out := &nodes.NodesList{}
 		if nodeList != nil {
 			for _, schema := range nodeList.Nodes {
 				if schema.Type == nodeType {
