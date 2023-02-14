@@ -139,22 +139,22 @@ export function TabSplitContent({
     }
   };
 
-  useEffect(() => {
-    const savePanel = localStorage.getItem(parentTab);
-    const items = savePanel === null ? [] : JSON.parse(savePanel!!);
+  // useEffect(() => {
+  //   const savePanel = localStorage.getItem(parentTab);
+  //   const items = savePanel === null ? [] : JSON.parse(savePanel!!);
 
-    if (isRightPane) {
-      if (items.length > 0) {
-        setItems(getItemsWithChildren(items));
-      }
-    } else {
-      setItems(getItemsWithChildren(items));
-    }
+  //   if (isRightPane) {
+  //     if (items.length > 0) {
+  //       setItems(getItemsWithChildren(items));
+  //     }
+  //   } else {
+  //     setItems(getItemsWithChildren(items));
+  //   }
 
-    return () => {
-      localStorage.removeItem(parentTab);
-    };
-  }, []);
+  //   return () => {
+  //     localStorage.removeItem(parentTab);
+  //   };
+  // }, []);
 
   const togglePaneBtn = (
     <Tooltip placement="topLeft" title={"Split Editor Right"}>

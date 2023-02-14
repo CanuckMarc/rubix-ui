@@ -6,12 +6,16 @@ import TabSplitContent from "./TabSplitContent";
 const SplitPanelKey = "SplitPanel";
 
 const SplitScreenApp: React.FC = () => {
-  const [showSplit, setShowSplit] = useState(Boolean(JSON.parse(localStorage.getItem(SplitPanelKey) || "")));
+  const [showSplit, setShowSplit] = useState(false);
 
   const toggleSplit = () => {
     localStorage.setItem(SplitPanelKey, JSON.stringify(!showSplit));
     setShowSplit(!showSplit);
   };
+
+  // useEffect(() => {
+  //   setShowSplit(Boolean(JSON.parse(localStorage.getItem(SplitPanelKey) || "")));
+  // }, []);
 
   return (
     // @ts-ignore
