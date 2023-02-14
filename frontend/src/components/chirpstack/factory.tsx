@@ -41,7 +41,7 @@ export class ChirpFactory {
     return await CSDeleteDevice(connUUID, hostUUID, devEui);
   }
 
-  async CSDeviceOTAKeys(connUUID: string, hostUUID: string, devEui: string, key: string): Promise<chirpstack.DeviceKey> {
+  async CSDeviceOTAKeys(connUUID: string, hostUUID: string, devEui: string, key: string): Promise<any> {
     return await CSDeviceOTAKeys(connUUID, hostUUID, devEui, key);
   }
 
