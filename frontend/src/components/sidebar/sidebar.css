@@ -64,5 +64,5 @@ aside .active {
 .ant-menu.ant-menu-inline-collapsed>.ant-menu-submenu>.ant-menu-submenu-title .anticon {
     height: 24px !important;
     line-height: 24px !important;
-    margin-left: 5px !important;
+    margin: 3px 0 0 5px !important;
 }

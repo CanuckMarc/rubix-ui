@@ -212,8 +212,8 @@ export const FlowPointsTable = (props: any) => {
 
   return (
     <>
-      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={showCreateModal} />
+      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={showCreateBulkModal} text="Create bulk" />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <ImportDropdownButton refreshList={refreshList} schema={schema} />

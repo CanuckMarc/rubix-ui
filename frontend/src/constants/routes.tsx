@@ -46,4 +46,5 @@ export const ROUTES: ROUTE = {
   SCHEDULES_REMOTE: "/schedules/connections/:connUUID/hosts/:hostUUID",
   WIRES_MAP: "/wires-map",
   WIRES_MAP_REMOTE: "/wires-map/connections/:connUUID/hosts/:hostUUID",
+  LORAWAN_REMOTE: "/lorawan/connections/:connUUID/hosts/:hostUUID",
 };

@@ -67,6 +67,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 declare global {
   interface Window {
     nodesCopied?: NodeInterface[];
+    egdesCopied?: Edge[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
@@ -237,7 +238,6 @@ const Flow = (props: FlowProps) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
-      
     },
     [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
   );
@@ -1175,7 +1175,6 @@ const Flow = (props: FlowProps) => {
               onCopyNodes={handleCopyNodes}
               onUndo={handleUndo}
               onRedo={handleRedo}
-              onRefreshValues={handleRefreshValues}
               settings={flowSettings}
               onSaveSettings={onSaveFlowSettings}
               selectedNodeForSubFlow={selectedNodeForSubFlow}

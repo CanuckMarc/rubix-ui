@@ -204,7 +204,6 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const handleMassEdit = async (updateData: any) => {
     const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
     const promises = [];
-    console.log("updateData", updateData);
     for (let item of selectedItems) {
       item = { ...item, ...updateData };
       promises.push(editConnection(item));

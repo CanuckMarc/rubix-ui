@@ -30,7 +30,6 @@ type ControlProps = {
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
-  onRefreshValues: () => void;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onBackToMain: () => void;
@@ -41,7 +40,6 @@ type ControlProps = {
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
-
 const Controls = ({
   settings,
   isChangedFlow,
@@ -50,7 +48,6 @@ const Controls = ({
   onCopyNodes,
   onUndo,
   onRedo,
-  onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
   onLinkBuilder,
@@ -77,8 +74,8 @@ const Controls = ({
     setLoadModalOpen(true);
   });
 
-  /* Ctrl + Delete (key): Delete items selected  */
-  useCtrlPressKey("Backspace", () => {
+  // Delete selected node
+  const deleteSelectNode = () => {
     const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
@@ -86,7 +83,10 @@ const Controls = ({
     const edgesDeleted = _edges.filter((item) => item.selected);
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
-  });
+  };
+
+  /* Ctrl + Delete (key): Delete items selected  */
+  useCtrlPressKey("Backspace", deleteSelectNode);
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
@@ -108,12 +108,15 @@ const Controls = ({
     instance.setEdges(newEdges);
   });
 
-  const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
+  const handleDuplicatedNodes = (nodes?: NodeInterface[], edges?: Edge[]) => {
     const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
+
     const nodeIdCopied = nodesCopied.map((item) => item.id);
-    const edgesCopied = instance
-      .getEdges()
-      .filter((item) => item.selected && nodeIdCopied.includes(item.source) && nodeIdCopied.includes(item.target));
+    const edgesCopied =
+      edges ||
+      instance
+        .getEdges()
+        .filter((item) => item.selected && nodeIdCopied.includes(item.source) && nodeIdCopied.includes(item.target));
 
     onCopyNodes({
       nodes: nodesCopied,
@@ -134,14 +137,22 @@ const Controls = ({
   useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", onRefreshValues);
+  useCtrlPressKey("KeyX", () => {
+    copySelectNode();
+    deleteSelectNode();
+  });
 
-  useCtrlPressKey("KeyC", () => {
+  // Copy selected node
+  const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
+    const egdesCopied = instance.getEdges().filter((edge) => edge.selected);
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
+      window.egdesCopied = egdesCopied;
     }
-  });
+  };
+
+  useCtrlPressKey("KeyC", copySelectNode);
 
   useCtrlPressKey("KeyV", () => {
     const activeElement = document.activeElement;
@@ -150,7 +161,9 @@ const Controls = ({
       window.nodesCopied &&
       window.nodesCopied.length > 0
     ) {
-      handleDuplicatedNodes(window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id })));
+      const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
+      const egdes = window.egdesCopied;
+      handleDuplicatedNodes(nodes, egdes);
     }
     window.nodesCopied = [];
   });
