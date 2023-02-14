@@ -20,6 +20,25 @@ func (inst *FlowClient) NodePayload(nodeId string, payload *node.Payload) (*flow
 	return resp.Result().(*flow.Message), nil
 }
 
+func (inst *FlowClient) GetFlowByNodeType(nodeType string) (*nodes.NodesList, error) {
+	resp, err := nresty.FormatRestyResponse(inst.client.R().
+		SetResult(&nodes.NodesList{}).
+		Get("/api/flows"))
+	if err != nil {
+		return nil, err
+	}
+	var out *nodes.NodesList
+	n := resp.Result().(*nodes.NodesList)
+	if n != nil {
+		for _, schema := range n.Nodes {
+			if schema.Type == nodeType {
+				out.Nodes = append(out.Nodes, schema)
+			}
+		}
+	}
+	return out, nil
+}
+
 func (inst *FlowClient) GetFlow() (*nodes.NodesList, error) {
 	resp, err := nresty.FormatRestyResponse(inst.client.R().
 		SetResult(&nodes.NodesList{}).

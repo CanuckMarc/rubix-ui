@@ -36,6 +36,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/na4ma4/config v1.0.0
 	github.com/nqd/flat v0.2.0
+	github.com/rvflash/elapsed v0.3.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.13.0
@@ -100,7 +101,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
-	github.com/rvflash/elapsed v0.3.0 // indirect
 	github.com/samber/lo v1.27.1 // indirect
 	github.com/sergeymakinen/go-systemdconf/v2 v2.0.2 // indirect
 	github.com/spf13/afero v1.8.2 // indirect

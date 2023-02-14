@@ -27,8 +27,8 @@ type OrganizationsResult struct {
 }
 
 type Organizations struct {
-	TotalCount string                `json:"totalCount"`
-	Result     []OrganizationsResult `json:"result"`
+	TotalCount string                 `json:"totalCount"`
+	Result     []*OrganizationsResult `json:"result"`
 }
 
 type DevicesResult struct {
@@ -48,8 +48,8 @@ type DevicesResult struct {
 
 // Devices GET
 type Devices struct {
-	TotalCount string          `json:"totalCount"`
-	Result     []DevicesResult `json:"result"`
+	TotalCount string           `json:"totalCount"`
+	Result     []*DevicesResult `json:"result"`
 }
 
 type T struct {
@@ -132,8 +132,8 @@ type DeviceProfilesResult struct {
 }
 
 type DeviceProfiles struct {
-	TotalCount string                 `json:"totalCount"`
-	Result     []DeviceProfilesResult `json:"result"`
+	TotalCount string                  `json:"totalCount"`
+	Result     []*DeviceProfilesResult `json:"result"`
 }
 
 type ApplicationsResult struct {
@@ -146,8 +146,8 @@ type ApplicationsResult struct {
 }
 
 type Applications struct {
-	TotalCount string               `json:"totalCount"`
-	Result     []ApplicationsResult `json:"result"`
+	TotalCount string                `json:"totalCount"`
+	Result     []*ApplicationsResult `json:"result"`
 }
 
 type ServiceProfilesResult struct {
@@ -161,8 +161,8 @@ type ServiceProfilesResult struct {
 }
 
 type ServiceProfiles struct {
-	TotalCount string                  `json:"totalCount"`
-	Result     []ServiceProfilesResult `json:"result"`
+	TotalCount string                   `json:"totalCount"`
+	Result     []*ServiceProfilesResult `json:"result"`
 }
 
 type GatewayProfilesResult struct {
@@ -175,8 +175,8 @@ type GatewayProfilesResult struct {
 }
 
 type GatewayProfiles struct {
-	TotalCount string                  `json:"totalCount"`
-	Result     []GatewayProfilesResult `json:"result"`
+	TotalCount string                   `json:"totalCount"`
+	Result     []*GatewayProfilesResult `json:"result"`
 }
 
 type UsersResult struct {
@@ -190,23 +190,25 @@ type UsersResult struct {
 }
 
 type Users struct {
-	TotalCount string        `json:"totalCount"`
-	Result     []UsersResult `json:"result"`
+	TotalCount string         `json:"totalCount"`
+	Result     []*UsersResult `json:"result"`
 }
 
 type GatewaysResult struct {
-	Id              string    `json:"id"`
-	Name            string    `json:"name"`
-	Description     string    `json:"description"`
-	CreatedAt       time.Time `json:"createdAt"`
-	UpdatedAt       time.Time `json:"updatedAt"`
-	FirstSeenAt     time.Time `json:"firstSeenAt"`
-	LastSeenAt      time.Time `json:"lastSeenAt"`
-	OrganizationID  string    `json:"organizationID"`
-	NetworkServerID string    `json:"networkServerID"`
+	Id                string    `json:"id"`
+	Name              string    `json:"name"`
+	Description       string    `json:"description"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
+	FirstSeenAt       time.Time `json:"firstSeenAt"`
+	LastSeenAt        time.Time `json:"lastSeenAt"`
+	FirstSeenAtString string    `json:"firstSeenAtString"`
+	LastSeenAtString  string    `json:"lastSeenAtString"`
+	OrganizationID    string    `json:"organizationID"`
+	NetworkServerID   string    `json:"networkServerID"`
 }
 
 type Gateways struct {
-	TotalCount string           `json:"totalCount"`
-	Result     []GatewaysResult `json:"result"`
+	TotalCount string            `json:"totalCount"`
+	Result     []*GatewaysResult `json:"result"`
 }
