@@ -42,6 +42,7 @@ export const LogTable = (props: LogTablePropType) => {
 
   useEffect(() => {
     cleanUp();
+    setDuration(5);
   }, []);
 
   useEffect(() => {
@@ -168,8 +169,8 @@ export const LogTable = (props: LogTablePropType) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-start", gap: "2vh" }}>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.5vw" }}>
-        <strong>Duration: </strong>
-        <Input value={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
+        <strong>Duration (seconds): </strong>
+        <Input value={duration} defaultValue={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
         <Button
           type="primary"
           style={{ width: "6vw" }}
