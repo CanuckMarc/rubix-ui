@@ -243,11 +243,11 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
       <RbExportButton handleExport={handleExport} />
       <ImportDropdownButton refreshList={fetch} schema={connectionSchema} handleSubmit={handleAddConnectionsBulk} />
 
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         rowSelection={rowSelection}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}

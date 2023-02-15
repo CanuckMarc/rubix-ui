@@ -95,12 +95,12 @@ export const WritersTable = () => {
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as Writer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {writers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {writers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={writers?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

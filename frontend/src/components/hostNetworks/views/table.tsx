@@ -128,12 +128,12 @@ export const NetworksTable = () => {
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => showModal({} as amodel.Network)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {networks?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={networks?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

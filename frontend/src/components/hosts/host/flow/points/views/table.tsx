@@ -150,8 +150,9 @@ export const FlowPointsTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key}
-                     handleOk={handleMassEdit} />;
+    return (
+      <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key} handleOk={handleMassEdit} />
+    );
   };
 
   const handleMassEdit = async (updateData: any) => {
@@ -218,12 +219,12 @@ export const FlowPointsTable = (props: any) => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <ImportDropdownButton refreshList={refreshList} schema={schema} />
       <RbExportButton handleExport={handleExport} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
