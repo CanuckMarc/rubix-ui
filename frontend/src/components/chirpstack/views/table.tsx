@@ -69,8 +69,8 @@ export const LorawanTable = () => {
   };
 
   const fetchGateway = async () => {
-    const { lastSeenAtString } = await factory.CSGetGateway(connUUID, hostUUID);
-    setLastSeenAtString(lastSeenAtString);
+    const res = await factory.CSGetGateway(connUUID, hostUUID);
+    setLastSeenAtString(res?.lastSeenAtString || "");
   };
 
   const showModal = (dev: DevicesResult | undefined) => {
