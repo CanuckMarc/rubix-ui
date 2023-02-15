@@ -64,7 +64,7 @@ export const WriterClonesTable = () => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={writerClones?.length > 0 ? filteredData : []}
         columns={WRITER_CLONE_HEADERS}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

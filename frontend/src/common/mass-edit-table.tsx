@@ -170,13 +170,13 @@ export const MassEditTable = (props: any) => {
 
   return (
     <>
-      {items.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {items?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowClassName="editable-row"
         bordered
-        dataSource={filteredData}
+        dataSource={items?.length > 0 ? filteredData : []}
         columns={mergedColumns}
         components={{
           body: {

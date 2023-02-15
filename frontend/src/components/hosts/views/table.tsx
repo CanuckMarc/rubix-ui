@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { amodel, backend } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import {
-  RbAddButton,
-  RbDeleteButton,
-  RbMonitorButton,
-  RbRefreshButton,
-} from "../../../common/rb-table-actions";
+import { RbAddButton, RbDeleteButton, RbMonitorButton, RbRefreshButton } from "../../../common/rb-table-actions";
 import { HOST_HEADERS } from "../../../constants/headers";
 import { ROUTES } from "../../../constants/routes";
 import { isObjectEmpty, openNotificationWithIcon } from "../../../utils/utils";
@@ -69,10 +64,7 @@ export const HostsTable = (props: any) => {
       fixed: "left",
       render: (_: any, host: Host) => (
         <Space size="middle">
-          <Ping
-            host={host}
-            factory={factory}
-          />
+          <Ping host={host} factory={factory} />
           <Tooltip title="Edit">
             <a onClick={(e) => showModal(host, e)}>
               <FormOutlined />
@@ -88,14 +80,8 @@ export const HostsTable = (props: any) => {
               <ScanOutlined />
             </a>
           </Tooltip>
-          <ConfigureOpenVpn
-            host={host}
-            factory={factory}
-          />
-          <AttachVirtualIP
-            host={host}
-            factory={factory}
-          />
+          <ConfigureOpenVpn host={host} factory={factory} />
+          <AttachVirtualIP host={host} factory={factory} />
           <Link
             to={ROUTES.HOST.replace(":connUUID", connUUID)
               .replace(":locUUID", locUUID)
@@ -109,7 +95,7 @@ export const HostsTable = (props: any) => {
         </Space>
       ),
     },
-    ...HOST_HEADERS
+    ...HOST_HEADERS,
   ];
 
   const rowSelection = {
@@ -146,8 +132,8 @@ export const HostsTable = (props: any) => {
     if (isObjectEmpty(hostSchema)) {
       getHostSchema();
     }
-    setIsWizardModalVisible(true)
-  }
+    setIsWizardModalVisible(true);
+  };
 
   const onCloseModal = () => {
     setIsModalVisible(false);
@@ -213,7 +199,7 @@ export const HostsTable = (props: any) => {
         }}
       />
 
-      <CreateHostWizard 
+      <CreateHostWizard
         currentHost={currentHost}
         hostSchema={hostSchema}
         isLoadingForm={isLoadingForm}

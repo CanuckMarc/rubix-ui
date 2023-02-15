@@ -98,7 +98,7 @@ export const FlowNetworkTable = () => {
   const onOpenLog = (network: model.Network) => {
     setLogNetwork(network);
     setIsLogTableOpen(true);
-  }
+  };
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -196,12 +196,12 @@ export const FlowNetworkTable = () => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
-      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {networks?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={networks?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
@@ -229,7 +229,13 @@ export const FlowNetworkTable = () => {
         refreshList={fetchNetworks}
       />
       <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
-        <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData}/>
+        <LogTable
+          connUUID={connUUID}
+          hostUUID={hostUUID}
+          pluginName={logNetwork?.plugin_name}
+          resetLogTableData={resetLogTableData}
+          setResetLogTableData={setResetLogTableData}
+        />
       </Modal>
     </>
   );

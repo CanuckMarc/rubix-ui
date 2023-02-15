@@ -1,7 +1,5 @@
 import { Input } from "antd";
-import { log } from "loglevel";
 import { ChangeEvent, useEffect, useState } from "react";
-import Log from "../components/rubix-flow/lib/Nodes/Generic/Actions/Log";
 
 export const RbSearchInput = (props: any) => {
   const { originData = [], setFilteredData } = props.config;
