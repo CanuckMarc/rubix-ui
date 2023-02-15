@@ -59,6 +59,8 @@ type SelectableBoxType = {
 type UndoStateType = {
   nodes: NodeInterface[];
   edges: Edge[];
+  childNode?: NodeInterface[];
+  childEdge?: Edge[];
 };
 
 type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
@@ -705,13 +707,29 @@ const Flow = (props: FlowProps) => {
     const lastPast = undoState.past.pop();
     if (lastPast) {
       undoState.future.push({ nodes, edges });
+      const nodeAdded = lastPast.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
       const nodeIdsDeleted = nodes.filter((n1) => !lastPast.nodes.some((n2) => n1.id === n2.id)).map(({ id }) => id);
-      const nodesAdded = lastPast.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
-      window.allFlow.nodes = [...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)), ...nodesAdded];
+      const nodeChild = lastPast?.childNode || [];
+      const nodeIdChild = nodeAdded.map((item) => item.id);
+      const nodeChillAdd = nodeChild.filter((item) => !nodeIdChild.includes(item.id));
 
+      window.allFlow.nodes = [
+        ...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)),
+        ...nodeAdded,
+        ...nodeChillAdd
+      ];
+
+      const edgeAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
       const edgeIdsDeleted = edges.filter((n1) => !lastPast.edges.some((n2) => n1.id === n2.id)).map(({ id }) => id);
-      const edgesAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
-      window.allFlow.edges = [...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)), ...edgesAdded];
+      const edgeChild = lastPast?.childEdge || [];
+      const edgeIdChild = edgeAdded.map((item) => item.id);
+      const edgeChillAdd = edgeChild.filter((item) => !edgeIdChild.includes(item.id));
+
+      window.allFlow.edges = [
+        ...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)),
+        ...edgeAdded,
+        ...edgeChillAdd
+      ];
 
       setNodes(lastPast.nodes);
       setEdges(lastPast.edges);
@@ -744,9 +762,10 @@ const Flow = (props: FlowProps) => {
       (node: NodeInterface) => node.parentId === parentId
     );
     const nodeIds: string[] = [];
-
+    const nodeChild: NodeInterface[] = [];
     for (const node of childNodes) {
       nodeIds.push(node.id);
+      nodeChild.push(node);
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
@@ -756,13 +775,14 @@ const Flow = (props: FlowProps) => {
 
   const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
     const nodeIds: string[] = [];
-
     for (const node of _nodesDeleted) {
       nodeIds.push(node.id);
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
     }
+    const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
 
     const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
     const remainingEdges = edges.filter(
@@ -785,7 +805,7 @@ const Flow = (props: FlowProps) => {
     setNodes(remainingNodes);
     setEdges(remainingEdges);
     setUndoState((s) => ({
-      past: [...s.past, { edges, nodes }],
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
       future: s.future,
     }));
     handleFlowChange();
