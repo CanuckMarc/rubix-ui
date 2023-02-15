@@ -3,7 +3,7 @@ import {
   AddProducer,
   DeleteProducer,
   DeleteProducerBulk,
-  EditProducer,
+  EditProducer, EditProducerHistory,
   GetStream,
 } from "../../../../../../../wailsjs/go/backend/App";
 
@@ -32,4 +32,17 @@ export class FlowProducerFactory {
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
     return await DeleteProducerBulk(this.connectionUUID, this.hostUUID, uuids);
   }
+
+
+  //EditProducerHistory
+  // valid type historyType
+  // historyTypeCov            string = "COV"
+  // historyTypeInterval       string = "INTERVAL"
+  // historyTypeCovAndInterval string = "COV_AND_INTERVAL"
+
+
+  async EditProducerHistory(connUUID: string, hostUUID: string, pointUUID: string, historyType: string, historyEnable: boolean, interval: number): Promise<model.Producer> {
+    return await EditProducerHistory(connUUID, hostUUID, pointUUID, historyType, historyEnable, interval);
+  }
+
 }

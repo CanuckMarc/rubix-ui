@@ -19,7 +19,6 @@ func (inst *Client) EdgeFileExists(hostIDName, path string) (*FilesExists, error
 		SetHeader("host-name", hostIDName).
 		SetResult(&FilesExists{}).
 		Get(url))
-	fmt.Println(resp.String())
 	if err != nil {
 		return nil, err
 	}

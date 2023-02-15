@@ -51,6 +51,32 @@ func (inst *Client) GetProducer(hostIDName, uuid string, withWriterClones bool) 
 	return resp.Result().(*model.Producer), nil
 }
 
+func (inst *Client) GetProducerByThingUUID(hostIDName, thingUUID string) (*model.Producer, error) {
+	url := fmt.Sprintf("proxy/ff/api/producers/one/args?thing_uuid=%s", thingUUID)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&model.Producer{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*model.Producer), nil
+}
+
+func (inst *Client) GetProducerOneArg(hostIDName, arg string) (*model.Producer, error) {
+	url := fmt.Sprintf("proxy/ff/api/producers/one/args?%s", arg)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&model.Producer{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*model.Producer), nil
+}
+
 func (inst *Client) EditProducer(hostIDName, uuid string, body *model.Producer) (*model.Producer, error) {
 	url := fmt.Sprintf("proxy/ff/api/producers/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
