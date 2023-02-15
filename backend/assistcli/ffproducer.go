@@ -52,7 +52,7 @@ func (inst *Client) GetProducer(hostIDName, uuid string, withWriterClones bool) 
 }
 
 func (inst *Client) GetProducerByThingUUID(hostIDName, thingUUID string) (*model.Producer, error) {
-	url := fmt.Sprintf("proxy/ff/api/producers/one/args?thing_uuid=%s", thingUUID)
+	url := fmt.Sprintf("proxy/ff/api/producers/one/args?producer_thing_uuid=%s", thingUUID)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
