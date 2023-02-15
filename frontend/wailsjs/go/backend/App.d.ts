@@ -9,6 +9,7 @@ import {assistcli} from '../models';
 import {chirpstack} from '../models';
 import {backend} from '../models';
 import {flow} from '../models';
+import {streamlog} from '../models';
 import {ebmodel} from '../models';
 import {externaltoken} from '../models';
 import {system} from '../models';
@@ -16,7 +17,6 @@ import {dhcpd} from '../models';
 import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
-import {streamlog} from '../models';
 import {node} from '../models';
 import {flowcli} from '../models';
 import {store} from '../models';
@@ -163,6 +163,8 @@ export function DoBackup(arg1:string,arg2:string,arg3:string,arg4:string,arg5:st
 export function DownloadFlow(arg1:string,arg2:string,arg3:boolean,arg4:any,arg5:boolean):Promise<flow.Message>;
 
 export function DownloadIO16Firmware(arg1:string):Promise<string>;
+
+export function EdgeAppNewLog(arg1:string,arg2:string,arg3:string,arg4:number):Promise<streamlog.Log>;
 
 export function EdgeAppsInfo(arg1:string,arg2:string):Promise<rumodel.Response>;
 

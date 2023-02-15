@@ -286,6 +286,10 @@ export function DownloadIO16Firmware(arg1) {
   return window['go']['backend']['App']['DownloadIO16Firmware'](arg1);
 }
 
+export function EdgeAppNewLog(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['EdgeAppNewLog'](arg1, arg2, arg3, arg4);
+}
+
 export function EdgeAppsInfo(arg1, arg2) {
   return window['go']['backend']['App']['EdgeAppsInfo'](arg1, arg2);
 }

@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { Spin, Table, Button, Input, Typography, Tag, DatePicker } from "antd";
+import { Spin, Table, Button, Input, Typography, Tag, Modal } from "antd";
 import { HostsFactory } from "../../hosts/factory";
-import { LogTablePropType } from "./install-app-info";
+import { AppLogModalPropType } from "./install-app-info";
 import { openNotificationWithIcon } from "../../../utils/utils";
 import type { ColumnsType } from 'antd/es/table';
 
@@ -20,14 +20,15 @@ interface FilterItemType {
   value: string;
 }
 
-export const LogTable = (props: LogTablePropType) => {
-  let { connUUID, hostUUID, pluginName, resetLogTableData, setResetLogTableData } = props;
+export const AppLogModal = (props: AppLogModalPropType) => {
+  let { appName, connUUID, hostUUID, isShowingLog, setIsShowingLog } = props;
   const [isFetching, setIsFetching] = useState(false);
   const [allLogs, setAllLogs] = useState<LogTableType[]>([]);
   const [tableData, setTableData] = useState<LogTableType[]>([]);
   const [duration, setDuration] = useState<number | undefined>(undefined);
   const [filterItem, setFilterItem] = useState<FilterItemType[]>([]);
   const [search, setSearch] = useState("");
+  const [resetLogTableData, setResetLogTableData] = useState(false);
 
   const hostsFactory = new HostsFactory();
   hostsFactory.connectionUUID = connUUID;
@@ -55,46 +56,47 @@ export const LogTable = (props: LogTablePropType) => {
   }, [resetLogTableData])
 
   const fetch = async (duration: number) => {
-    // try {
-    //   setIsFetching(true);
-    // //   const logs = await hostsFactory.EdgeAppNewLog(connUUID, hostUUID, appName, duration);
-    //   const logs = await hostsFactory.GetOne();
-    //   if (logs) {
-    //     let i = 0;
-    //     let tempFilterItems: FilterItemType[] = []
-    //     const temp = logs.message.map((item: any) => {
-    //       i++;
-    //       let tableItem: any = {};
-    //       const remainderMsg = item.split(" ").splice(3, item.split(" ").length).join(" ");
-    //       item
-    //         .split(" ")
-    //         .splice(0, 3)
-    //         .forEach((el: string, index: number) => {
-    //           const [name, value] = el.split("=");
-    //           tableItem["key"] = i;
-    //           switch (index) {
-    //             case 1:
-    //               tableItem[name] = value
-    //               if (!tempFilterItems.some(item => item.text === value)) tempFilterItems.push({text: value, value: value});
-    //               break;
-    //             case 2: 
-    //               tableItem[name] = value + " " + remainderMsg
-    //               break;
-    //             default:
-    //               tableItem[name] = value
-    //           }
-    //         });
-    //       return tableItem;
-    //     });
-    //     setAllLogs(temp);
-    //     setTableData(temp);
-    //     setFilterItem(tempFilterItems)
-    //   }
-    // } catch (error) {
-    //   console.log("error fetching logs: ", error);
-    // } finally {
-    //   setIsFetching(false);
-    // }
+    if (appName) {
+      try {
+        setIsFetching(true);
+        const logs = await hostsFactory.EdgeAppNewLog(connUUID, hostUUID, appName, duration);
+        if (logs) {
+          let i = 0;
+          let tempFilterItems: FilterItemType[] = []
+          const temp = logs.message.map((item: any) => {
+            i++;
+            let tableItem: any = {};
+            const remainderMsg = item.split(" ").splice(3, item.split(" ").length).join(" ");
+            item
+              .split(" ")
+              .splice(0, 3)
+              .forEach((el: string, index: number) => {
+                const [name, value] = el.split("=");
+                tableItem["key"] = i;
+                switch (index) {
+                  case 1:
+                    tableItem[name] = value
+                    if (!tempFilterItems.some(item => item.text === value)) tempFilterItems.push({text: value, value: value});
+                    break;
+                  case 2: 
+                    tableItem[name] = value + " " + remainderMsg
+                    break;
+                  default:
+                    tableItem[name] = value
+                }
+              });
+            return tableItem;
+          });
+          setAllLogs(temp);
+          setTableData(temp);
+          setFilterItem(tempFilterItems)
+        }
+      } catch (error) {
+        console.log("error fetching logs: ", error);
+      } finally {
+        setIsFetching(false);
+      }
+    }
   };
 
   const columns: ColumnsType<LogTableType> = [
@@ -166,42 +168,54 @@ export const LogTable = (props: LogTablePropType) => {
     }
   };
 
+  const handleOk = () => {
+    setIsShowingLog(false);
+    setResetLogTableData(true);
+  };
+
+  const handleCancel = () => {
+    setIsShowingLog(false);
+    setResetLogTableData(true);
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-start", gap: "2vh" }}>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.5vw" }}>
-        <strong>Duration: </strong>
-        <Input value={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
-        <Button
-          type="primary"
-          style={{ width: "6vw" }}
-          disabled={duration === undefined}
-          onClick={handleLoadButtonClicked}
-        >
-          Load Logs
-        </Button>
+    <Modal title="Log table" visible={isShowingLog} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
+      <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-start", gap: "2vh" }}>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.5vw" }}>
+          <strong>Duration: </strong>
+          <Input value={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
+          <Button
+            type="primary"
+            style={{ width: "6vw" }}
+            disabled={duration === undefined}
+            onClick={handleLoadButtonClicked}
+          >
+            Load Logs
+          </Button>
+        </div>
+        <Search
+          placeholder="Search log by message"
+          enterButton="Search"
+          disabled={tableData.length === 0}
+          allowClear={true}
+          value={search}
+          onChange={onSearchBarChange}
+          onSearch={handleOnSearch}
+          style={{width: '100%'}}
+        />
+        <Table
+          rowKey="uuid"
+          dataSource={tableData}
+          columns={columns}
+          pagination={{
+            position: ["bottomLeft"],
+            showSizeChanger: true,
+            pageSizeOptions: [10, 50, 100, 1000],
+            locale: { items_per_page: "" },
+          }}
+          loading={{ indicator: <Spin />, spinning: isFetching }}
+        />
       </div>
-      <Search
-        placeholder="Search log by message"
-        enterButton="Search"
-        disabled={tableData.length === 0}
-        allowClear={true}
-        value={search}
-        onChange={onSearchBarChange}
-        onSearch={handleOnSearch}
-        style={{width: '100%'}}
-      />
-      <Table
-        rowKey="uuid"
-        dataSource={tableData}
-        columns={columns}
-        pagination={{
-          position: ["bottomLeft"],
-          showSizeChanger: true,
-          pageSizeOptions: [10, 50, 100, 1000],
-          locale: { items_per_page: "" },
-        }}
-        loading={{ indicator: <Spin />, spinning: isFetching }}
-      />
-    </div>
+    </Modal>
   );
 };
