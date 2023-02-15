@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 	"github.com/NubeIO/rubix-ui/backend/helpers/kb"
+	"github.com/NubeIO/rubix-ui/backend/ttime"
 	"time"
 )
 
 type Snapshots struct {
-	Name         string    `json:"name"`
-	Size         int64     `json:"size"`
-	SizeReadable string    `json:"size_readable"`
-	CreatedAt    time.Time `json:"created_at"`
+	Name              string    `json:"name"`
+	Size              int64     `json:"size"`
+	SizeReadable      string    `json:"size_readable"`
+	CreatedAt         time.Time `json:"created_at"`
+	CreatedAtReadable string    `json:"created_at_readable"`
 }
 
 type CreateStatus string
@@ -56,10 +58,13 @@ func (inst *Client) EdgeGetSnapshots(hostIDName string) ([]Snapshots, error) {
 	if err != nil {
 		return nil, err
 	}
+	var res []Snapshots
 	var out []Snapshots
-	out = *resp.Result().(*[]Snapshots)
-	for _, snapshots := range out {
+	res = *resp.Result().(*[]Snapshots)
+	for _, snapshots := range res {
 		snapshots.SizeReadable = kb.PrettyByteSize(int(snapshots.Size))
+		snapshots.CreatedAtReadable = ttime.TimeSince(snapshots.CreatedAt)
+		out = append(out, snapshots)
 	}
 	return out, nil
 }
