@@ -23,7 +23,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const [selectValue, setSelectValue] = useState<string | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedFlownet, setSelectedFlownet] = useState<node.Schema | undefined>(undefined);
-  const [pointSelection, setPointSelection] = useState<PointTableType | undefined>(undefined);
+  const [pointSelection, setPointSelection] = useState<PointTableType[] | undefined>(undefined);
   const [bacnetServerNode, setBacnetServerNode] = useState({} as NodeInterface);
   const [disableAllButton, setDisableAllButton] = useState(false);
 
@@ -55,25 +55,30 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const addPoints = () => {
     if (!selectedFlownet || !pointSelection) openNotificationWithIcon("warning", 'Please select a flow network and or a point!');
     if (selectedFlownet && pointSelection){
-      // test to see if selected bacnet node is already added to the table
-      const temp = tableData.find(item => item.selectedPointName === pointSelection.name)
-      if (!temp) {
-        let resObj = {} as BacnetTableDataType
-        const newId = generateUuid()
-        resObj = {
-          existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
-          selectedPoint: pointSelection,
-          selectedPointName: pointSelection.name,
-          outputTopic: pointSelection.name,
-          instanceNumber: undefined,
-          key: newId,
-          flownetSchema: selectedFlownet,
-          bacnetServerInterface: bacnetServerNode
+      let tempTableDataArray: BacnetTableDataType[] = []
+      pointSelection.forEach((point: PointTableType) => {
+        // test to see if selected bacnet node is already added to the table
+        const temp = tableData.find(item => item.selectedPointName === point.name)
+        if (!temp) {
+          let resObj = {} as BacnetTableDataType
+          const newId = generateUuid()
+          resObj = {
+            existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
+            selectedPoint: point,
+            selectedPointName: point.name,
+            outputTopic: point.name,
+            instanceNumber: undefined,
+            key: newId,
+            flownetSchema: selectedFlownet,
+            bacnetServerInterface: bacnetServerNode,
+            avName: undefined
+          }
+          tempTableDataArray.push(resObj)
+        } else {
+          openNotificationWithIcon("warning", 'Already added!');
         }
-        setTableData([...tableData, resObj])
-      } else {
-        openNotificationWithIcon("warning", 'Already added!');
-      }
+      })
+      setTableData([...tableData, ...tempTableDataArray])
       // clear inputs after adding a pair of points
       setSelectValue(null);
       setClearSelection(true);
@@ -110,7 +115,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     if (record) {
       let objCopy = record;
       let tableDataCopy = tableData;
-      value ? objCopy.instanceNumber = value : objCopy.instanceNumber = undefined;
+      objCopy.instanceNumber = value ? value : undefined;
       tableData.forEach((obj, index) => {
         if (obj.key === record.key) {
           tableDataCopy[index] = objCopy
@@ -126,7 +131,23 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     if (record) {
       let objCopy = record;
       let tableDataCopy = tableData;
-      value ? objCopy.outputTopic = value : objCopy.outputTopic = undefined;
+      objCopy.outputTopic = value ? value : undefined;
+      tableData.forEach((obj, index) => {
+        if (obj.key === record.key) {
+          tableDataCopy[index] = objCopy
+        }
+      })
+      setTableData(tableDataCopy)
+    } 
+  }
+
+  const onAvNameChange = (event: ChangeEvent<HTMLInputElement>, record: BacnetTableDataType) => {
+    event.stopPropagation();
+    const value = event?.target.value;
+    if (record) {
+      let objCopy = record;
+      let tableDataCopy = tableData;
+      objCopy.avName = value ? value : undefined;
       tableData.forEach((obj, index) => {
         if (obj.key === record.key) {
           tableDataCopy[index] = objCopy
@@ -170,6 +191,16 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       render: (text, record: BacnetTableDataType, index) => {
         return (
           <InputNumber style={{width: '100%'}} onChange={(value: number | null) => onInstanceNumberChange(value, record)} />
+        );
+      }
+    },
+    {
+      title: 'Analog variable node name',
+      dataIndex: 'avName',
+      key: 'avName',
+      render: (text, record: BacnetTableDataType, index) => {
+        return (
+          <Input onChange={(event: ChangeEvent<HTMLInputElement>) => onAvNameChange(event, record)} />
         );
       }
     }
