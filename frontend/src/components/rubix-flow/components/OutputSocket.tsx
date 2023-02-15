@@ -31,7 +31,7 @@ export const OutputSocket = memo(
           const out = dataOut.find((item: { pin: string }) => item.pin === outputName);
 
           if (valueType === "number" && out) {
-            if (out.value === null) out.value = `${out.value}`;
+            if (out.value === null) out.value = "null";
             return out.value !== undefined ? `${out.value}` : "";
           }
           return out?.value;
@@ -48,6 +48,8 @@ export const OutputSocket = memo(
         case true:
         case false:
           return `${newVal}`;
+        case null:
+          return "null";
         default:
           return "false";
       }
@@ -55,7 +57,7 @@ export const OutputSocket = memo(
 
     useEffect(() => {
       const val = valueType === "boolean" ? getValueOptions(getValueOutput(name)) : getValueOutput(name);
-      
+
       if (val !== outValue) {
         setOutValue(val);
       }

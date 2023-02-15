@@ -48,7 +48,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
         const item = {
           pin: `in${i}`,
           dataType: nodeInputs[0]?.dataType,
-          value: nodeInputs[0]?.defaultValue,
+          value: nodeInputs[0]?.value,
         };
         if (newData) {
           newData.push(item);
@@ -258,7 +258,7 @@ export const Node = memo((props: NodeProps) => {
           ((input.valueType === "number" && newData[input.name] !== 0) ||
             (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          newData[input.name] = input.defaultValue;
+          newData[input.name] = nodeInputs?.[0].value;
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";
@@ -268,7 +268,7 @@ export const Node = memo((props: NodeProps) => {
             {input && (
               <InputSocket
                 {...input}
-                value={input.valueOfChild || newData[input.name]}
+                value={nodeInputs?.[0].value || newData[input.name]}
                 onChange={handleChange}
                 connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
