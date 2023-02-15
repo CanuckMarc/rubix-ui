@@ -100,6 +100,7 @@ export const CreateEditModal = (props: any) => {
   return (
     <>
       <Modal
+        forceRender
         style={{ textAlign: "start" }}
         title={currentItem && currentItem.devEUI ? "Edit " + currentItem.name : "Add New"}
         visible={isModalVisible}
