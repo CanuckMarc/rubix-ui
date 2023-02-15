@@ -97,11 +97,12 @@ func (inst *App) EditProducerHistory(connUUID, hostUUID, pointUUID, historyType 
 		return nil
 	}
 	producer, err := client.GetProducerByThingUUID(hostUUID, pointUUID)
-	if err != nil || producer == nil {
-		if err != nil {
-			inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-			return nil
-		}
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	if producer == nil {
+		inst.uiErrorMessage("this point has not been setup for mapping")
 		return nil
 	}
 	var correctType bool
