@@ -70,7 +70,7 @@ func (inst *App) CSGetGateways(connUUID, hostUUID string) *chirpstack.Gateways {
 		return nil
 	}
 	for _, result := range resp.Result {
-		log.Infof("lorawan: found gateway: %s", result.LastSeenAtString)
+		inst.uiSuccessMessage(fmt.Sprintf("lorawan: found gateway: %s", result.LastSeenAtString))
 	}
 	return resp
 }
@@ -171,7 +171,7 @@ func (inst *App) CSAddDevice(connUUID, hostUUID string, body *chirpstack.Device)
 		return nil
 	}
 	if device != nil {
-		log.Infof("added LoRaWAN device EUI: %s please now activate the device", body.Device.DevEUI)
+		inst.uiSuccessMessage(fmt.Sprintf("added LoRaWAN device EUI: %s please now activate the device", body.Device.DevEUI))
 	}
 
 	return device
@@ -187,7 +187,7 @@ func (inst *App) CSEditDevice(connUUID, hostUUID, devEui string, body *chirpstac
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
-	log.Infof("updated LoRaWAN device EUI: %s ok!", devEui)
+	inst.uiSuccessMessage(fmt.Sprintf("updated LoRaWAN device EUI: %s ok!", devEui))
 	return devices
 }
 
@@ -214,11 +214,11 @@ func (inst *App) CSDeviceOTAKeys(connUUID, hostUUID, devEui, key string) interfa
 			inst.uiErrorMessage(fmt.Sprintf("failed to activate on update device %s", errUpdate.Error()))
 			return nil
 		} else {
-			log.Infof("updated activated LoRaWAN device EUI: %s network-key: %s", devEui, key)
+			inst.uiSuccessMessage(fmt.Sprintf("updated activated LoRaWAN device EUI: %s network-key: %s", devEui, key))
 			return devices
 		}
 	}
-	log.Infof("activated LoRaWAN device EUI: %s network-key: %s", devEui, key)
+	inst.uiSuccessMessage(fmt.Sprintf("activated LoRaWAN device EUI: %s network-key: %s", devEui, key))
 	return devices
 }
 
@@ -232,6 +232,6 @@ func (inst *App) CSDeleteDevice(connUUID, hostUUID, devEui string) bool {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return deleted
 	}
-	log.Infof("deleted LoRaWAN device EUI: %s ok", devEui)
+	inst.uiSuccessMessage(fmt.Sprintf("deleted LoRaWAN device EUI: %s ok", devEui))
 	return deleted
 }
