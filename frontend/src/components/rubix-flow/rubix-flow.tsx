@@ -29,7 +29,7 @@ import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
 import ControlUndoable from "./components/ControlUndoable";
 import { NodeInterface } from "./lib/Nodes/NodeInterface";
-import { handleGetSettingType, handleNodesEmptySettings } from "./util/handleSettings";
+import { handleGetSettingType } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
 import { NodesTree } from "./components/NodesTree";
@@ -325,8 +325,20 @@ const Flow = (props: FlowProps) => {
       };
     });
 
-    setNodes([...currentNodes, ...newNodesWithOldId]);
-    setEdges([...currentEdges, ...finalEdges]);
+    // just show nodes and edges at level 1
+    const newNodesL1 = newNodesWithOldId.filter((node) => !node.parentId);
+    newNodesWithOldId.forEach((node1) => {
+      const hasParent = nodesL1.some((node2) => !!node1.parentId && node2.id === node1.parentId);
+      if (hasParent) {
+        newNodesL1.push(node1);
+      }
+    });
+    const newEdgesL1 = finalEdges.filter((e) =>
+      newNodesL1.some((node) => node.id === e.target || node.id === e.source)
+    );
+
+    setNodes([...currentNodes, ...newNodesL1]);
+    setEdges([...currentEdges, ...newEdgesL1]);
     window.allFlow = {
       nodes: [...window.allFlow.nodes, ...newNodesWithOldId],
       edges: [...window.allFlow.edges, ...finalEdges],
@@ -385,7 +397,7 @@ const Flow = (props: FlowProps) => {
   };
 
   const onHandelSaveFlow = async () => {
-    const allNodes = [...nodes];
+    const allNodes: NodeInterface[] = [...nodes];
     window.allFlow.nodes.forEach((node) => {
       const isExist = allNodes.some((n) => n.id === node.id);
       if (!isExist) {
@@ -404,15 +416,12 @@ const Flow = (props: FlowProps) => {
     // save nodes and edges
     await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
-    // format nodes with settings
-    const nodesWithSetting = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newNodesFiltered);
-
     // filter nodes at level 1 or in sub flow
-    const newNodesL1 = nodesWithSetting.filter((node) => {
+    const newNodesL1 = newNodesFiltered.filter((node) => {
       return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
     });
 
-    nodesWithSetting.forEach((node1) => {
+    newNodesFiltered.forEach((node1) => {
       const hasParent = newNodesL1.some((node2) => {
         return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
       });
@@ -426,7 +435,7 @@ const Flow = (props: FlowProps) => {
 
     setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
-    window.allFlow = { nodes: nodesWithSetting, edges: window.allFlow.edges };
+    window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
     setIsChangedFlow(false);
     handleRefreshValues();
   };
@@ -716,7 +725,7 @@ const Flow = (props: FlowProps) => {
       window.allFlow.nodes = [
         ...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)),
         ...nodeAdded,
-        ...nodeChillAdd
+        ...nodeChillAdd,
       ];
 
       const edgeAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
@@ -728,7 +737,7 @@ const Flow = (props: FlowProps) => {
       window.allFlow.edges = [
         ...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)),
         ...edgeAdded,
-        ...edgeChillAdd
+        ...edgeChillAdd,
       ];
 
       setNodes(lastPast.nodes);
@@ -821,8 +830,6 @@ const Flow = (props: FlowProps) => {
      * Add new id source and target of edges copied
      */
     const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges);
-
-    newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
 
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
@@ -1052,10 +1059,9 @@ const Flow = (props: FlowProps) => {
     factory
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
-        let [_nodes, _edges] = behaveToFlow(res);
-        _nodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
+        const [_nodes, _edges] = behaveToFlow(res) as [NodeInterface[], Edge[]];
+        const newNodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
 
-        const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, _nodes);
         // just show nodes and edges at level 1
         const nodesL1 = newNodes.filter((node) => !node.parentId);
 
@@ -1232,20 +1238,22 @@ const Flow = (props: FlowProps) => {
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
               />
             )}
-            {!!selectedNodeForSubFlow && (
+            {!!selectedNodeForSubFlow && isConnectionBuilder && (
               <ConnectionBuilderModal
                 parentNode={selectedNodeForSubFlow}
-                open={isConnectionBuilder}
+                open
                 onClose={onCloseBuilderModal}
                 nodesSpec={nodesSpec}
               />
             )}
-            <LinkBuilderModal
-              parentNode={selectedNodeForSubFlow}
-              open={isLinkBuilder}
-              onClose={onCloseBuilderModal}
-              nodesSpec={nodesSpec}
-            />
+            {isLinkBuilder && (
+              <LinkBuilderModal
+                parentNode={selectedNodeForSubFlow}
+                open
+                onClose={onCloseBuilderModal}
+                nodesSpec={nodesSpec}
+              />
+            )}
           </ReactFlow>
         </ReactFlowProvider>
       </div>
