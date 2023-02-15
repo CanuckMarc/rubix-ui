@@ -59,7 +59,6 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
 
   useEffect(() => {
     if (pointsToRemove) {
-      console.log('need to remove: ', pointsToRemove)
       const filteredTableData = tableData.filter((item: PointTableType) => {
         let flag = true
         pointsToRemove.forEach((removeItem: PointTableType) => {
@@ -74,8 +73,6 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
 
   useEffect(() => {
     if (rowKeysToAddBack) {
-      console.log('need to add: ', rowKeysToAddBack)
-      console.log('removed data is: ', removedData)
       let rowsToAddBack: PointTableType[] = []
       rowKeysToAddBack.forEach((key: BacnetTableDataType) => {
         removedData.forEach((item: PointTableType) => {
