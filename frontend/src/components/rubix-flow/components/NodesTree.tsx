@@ -16,20 +16,9 @@ type NodeProps = {
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
   flowSettings: FlowSettings;
-  parentTab: string;
-  childTab: string;
 };
 
-export const NodesTree = ({
-  nodes: allNodes,
-  nodesSpec,
-  selectedSubFlowId,
-  parentTab,
-  childTab,
-  gotoNode,
-  openNodeMenu,
-  flowSettings,
-}: NodeProps) => {
+export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings }: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -37,7 +26,6 @@ export const NodesTree = ({
     nodesL1: [],
     remainingNodes: [],
   });
-  const [nodes, setNodes] = useState<NodeInterface[]>([]);
 
   const changeKeys = (key: string) => {
     const isExist = panelKeys.includes(key);
@@ -105,10 +93,6 @@ export const NodesTree = ({
   useEffect(() => {
     setPanelKeys([...(window.subFlowIds || [])]);
   }, [selectedSubFlowId]);
-
-  useEffect(() => {
-    setNodes(allNodes.filter((n) => n.parentTab === parentTab && n.childTab === childTab));
-  }, [allNodes]);
 
   return (
     <div>

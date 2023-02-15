@@ -89,9 +89,9 @@ const AppContainer = ({ isFlowRoute, children }: AppContainerProps) => {
   );
 };
 
-export type AppTabContent = { parentTab: string; childTab: string };
+export type AppTabContent = { windowTab: string; tabId: string };
 
-const App: React.FC<AppTabContent> = ({ parentTab, childTab }) => {
+const App: React.FC<AppTabContent> = ({ windowTab, tabId }) => {
   const { pathname } = useLocation();
   const [isRegistered, updateIsRegistered] = useState(false);
   const [isFlowRoute, setIsFlowRoute] = useState(false);
@@ -131,7 +131,7 @@ const App: React.FC<AppTabContent> = ({ parentTab, childTab }) => {
   return (
     <ThemeProvider>
       <AppContainer isFlowRoute={isFlowRoute}>
-        <AppRoutes parentTab={parentTab} childTab={childTab} />
+        <AppRoutes windowTab={windowTab} tabId={tabId} />
       </AppContainer>
     </ThemeProvider>
   );

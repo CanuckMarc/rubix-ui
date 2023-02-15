@@ -50,7 +50,7 @@ import { AppTabContent, useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
-import { MAIN_TABS } from "../../TabSplitContent";
+import { MAIN_TABS, NODES_IN_TAB } from "../../TabSplitContent";
 
 type SelectableBoxType = {
   edgeId: string;
@@ -97,8 +97,8 @@ const Flow = (props: FlowProps) => {
     setSelectedNodeForSubFlow,
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
-    parentTab,
-    childTab,
+    windowTab,
+    tabId,
   } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -193,6 +193,23 @@ const Flow = (props: FlowProps) => {
 
   const handleFlowChange = () => setIsChangedFlow(true);
 
+  const addNodeIntoTab = (nodeId: string) => {
+    const tabState = localStorage.getItem(NODES_IN_TAB);
+    const newTabState = tabState === null ? {} : JSON.parse(tabState);
+    if (newTabState[tabId]) {
+      newTabState[tabId].push(nodeId);
+    } else {
+      newTabState[tabId] = [nodeId];
+    }
+    localStorage.setItem(NODES_IN_TAB, JSON.stringify(newTabState));
+  };
+
+  const getNodeIdsOfTab = () => {
+    const tabState = localStorage.getItem(NODES_IN_TAB);
+    const newTabState = tabState === null ? {} : JSON.parse(tabState);
+    return newTabState[tabId] || [];
+  };
+
   const handleAddNode = useCallback(
     async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
       closeNodePicker();
@@ -208,8 +225,6 @@ const Flow = (props: FlowProps) => {
           inputs: convertDataSpec(spec.inputs || []),
           out: convertDataSpec(spec.outputs || []),
         },
-        parentTab,
-        childTab,
         parentId: selectedNodeForSubFlow?.id || undefined,
         settings: nodeSettings,
         selected: false,
@@ -217,6 +232,7 @@ const Flow = (props: FlowProps) => {
 
       onNodesChange([{ type: "add", item: newNode }]);
       window.allFlow.nodes = [...window.allFlow.nodes, newNode];
+      addNodeIntoTab(newNode.id);
       setUndoState((s) => {
         s.past.push({ nodes, edges });
         return {
@@ -246,7 +262,7 @@ const Flow = (props: FlowProps) => {
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
     },
-    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
+    [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange, getNodeIdsOfTab]
   );
 
   const handleAddSubFlow = (node: NodeInterface) => {
@@ -382,13 +398,10 @@ const Flow = (props: FlowProps) => {
     } else {
       setNodes([]);
       setEdges([]);
-      const nodesRemaining = window.allFlow.nodes.filter(
-        (node) => node.parentTab !== parentTab && node.childTab !== childTab
-      );
-      const ids = nodesRemaining.map((node) => node.id);
+      // TODO: need to check
       window.allFlow = {
-        nodes: nodesRemaining,
-        edges: window.allFlow.edges.filter((e) => !ids.includes(e.source) && !ids.includes(e.target)),
+        nodes: [],
+        edges: [],
       };
     }
   };
@@ -442,7 +455,9 @@ const Flow = (props: FlowProps) => {
       newNodesL1.some((node) => node.id === e.target || node.id === e.source)
     );
 
-    setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
+    const nodeIds = getNodeIdsOfTab();
+
+    setNodes(newNodesL1.filter((n) => nodeIds.includes(n.id)).map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
     window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
     setIsChangedFlow(false);
@@ -1065,14 +1080,18 @@ const Flow = (props: FlowProps) => {
 
   useEffect(() => {
     closeNodePicker();
+
+    // just get nodes at primary tab - child tab 0
+    const nodeIds = getNodeIdsOfTab();
+
     factory
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
-        const [_nodes, _edges] = behaveToFlow(res) as [NodeInterface[], Edge[]];
+        const [_nodes, _edges] = behaveToFlow(res);
         const newNodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
 
         // just show nodes and edges at level 1
-        const nodesL1 = newNodes.filter((node) => !node.parentId);
+        const nodesL1 = newNodes.filter((node) => !node.parentId && nodeIds.includes(node.id));
 
         newNodes.forEach((node1) => {
           const hasParent = nodesL1.some((node2) => !!node1.parentId && node2.id === node1.parentId);
@@ -1083,8 +1102,11 @@ const Flow = (props: FlowProps) => {
         const edgesL1 = _edges.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
         // tracking all nodes and edges to save
-        window.allFlow = { nodes: newNodes, edges: _edges };
-        setNodes(nodesL1);
+        if (windowTab === MAIN_TABS.PrimaryTab && tabId === "0") {
+          window.allFlow = { nodes: newNodes, edges: _edges };
+        }
+
+        setNodes(nodesL1.filter((node) => nodeIds.includes(node.id)));
         setEdges(edgesL1);
         /* Get output Nodes */
         handleRefreshValues();
@@ -1115,15 +1137,14 @@ const Flow = (props: FlowProps) => {
     window.saveCurrentFlowForUndo = saveCurrentFlowForUndo;
   }, [saveCurrentFlowForUndo]);
 
-  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
+  const nodeIds = getNodeIdsOfTab();
+  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent && nodeIds.includes(n.id));
 
   return (
     <div className="rubix-flow">
       {flowSettings.showNodesTree && (
         <NodesTree
-          parentTab={parentTab}
-          childTab={childTab}
-          nodes={window.allFlow?.nodes || []}
+          nodes={(window.allFlow?.nodes || []).filter((n) => nodeIds.includes(n.id))}
           selectedSubFlowId={selectedNodeForSubFlow?.id}
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
@@ -1185,6 +1206,9 @@ const Flow = (props: FlowProps) => {
             {flowSettings.showMiniMap && (
               <MiniMap
                 nodes={nodes.filter((node: NodeInterface) => {
+                  if (!nodeIds.includes(node.id)) {
+                    return false;
+                  }
                   if (selectedNodeForSubFlow) {
                     return node.parentId === selectedNodeForSubFlow.id;
                   }

@@ -22,8 +22,6 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
         positionX: String(node.position.x),
         positionY: String(node.position.y),
       },
-      parentTab: node.parentTab,
-      childTab: node.childTab,
       settings: node.settings,
       nodeName: node.info?.nodeName,
     };

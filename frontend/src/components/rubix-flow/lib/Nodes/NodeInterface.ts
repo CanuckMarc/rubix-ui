@@ -34,8 +34,6 @@ export interface NodeInterface<T = any> {
   parentNode?: string;
   zIndex?: number;
   extent?: "parent" | CoordinateExtent;
-  parentTab?: string
-  childTab?: string
   expandParent?: boolean;
   positionAbsolute?: XYPosition;
   [internalsSymbol]?: {

@@ -23,22 +23,25 @@ export interface TabSplitContentProps {
   toggleSplit?: VoidFunction;
 }
 
-const defaultKey = "0";
+const MainTabKeyDefault = "PrimaryTab-0";
+const SecondTabKeyDefault = "SecondaryTab-0";
 
 export enum MAIN_TABS {
   PrimaryTab = "PrimaryTab",
   SecondaryTab = "SecondaryTab",
 }
 
+export const NODES_IN_TAB = "nodes_by_tab";
+
 const RightPaneDefault = [
   {
-    key: defaultKey,
-    tabId: "tab0",
+    key: SecondTabKeyDefault,
+    tabId: SecondTabKeyDefault,
     label: "Tab 0",
     closable: true,
     children: (
       <HashRouter>
-        <App parentTab={MAIN_TABS.SecondaryTab} childTab="tab0" />
+        <App windowTab={MAIN_TABS.SecondaryTab} tabId={SecondTabKeyDefault} />
       </HashRouter>
     ),
   },
@@ -49,8 +52,8 @@ export function TabSplitContent({
   isRightPane = false,
   toggleSplit = () => {},
 }: TabSplitContentProps): React.ReactElement {
-  const parentTab = isRightPane ? MAIN_TABS.SecondaryTab : MAIN_TABS.PrimaryTab;
-  const [activeKey, setActiveKey] = useState(defaultKey);
+  const windowTab = isRightPane ? MAIN_TABS.SecondaryTab : MAIN_TABS.PrimaryTab;
+  const [activeKey, setActiveKey] = useState(isRightPane ? SecondTabKeyDefault : MainTabKeyDefault);
   const [items, setItems] = useState<TabsBuilder[]>(isRightPane ? RightPaneDefault : []);
   const newTabIndex = useRef(1);
 
@@ -58,9 +61,20 @@ export function TabSplitContent({
     setActiveKey(newActiveKey);
   };
 
+  const saveNewTabIntoLocalStorage = (tabId: string, isDelete = false) => {
+    const tabState = localStorage.getItem(NODES_IN_TAB);
+    const newTabState = tabState === null ? {} : JSON.parse(tabState);
+    if (isDelete) {
+      delete newTabState[tabId];
+    } else {
+      newTabState[tabId] = [];
+    }
+    localStorage.setItem(NODES_IN_TAB, JSON.stringify({ ...newTabState }));
+  };
+
   const add = () => {
     const nextTab = newTabIndex.current++;
-    const tabId = `${parentTab}-${nextTab}`;
+    const tabId = `${windowTab}-${nextTab}`;
     const newPanes = [...items];
     const label = `Tab ${nextTab}`;
     newPanes.push({
@@ -70,18 +84,19 @@ export function TabSplitContent({
       closable: true,
       children: (
         <HashRouter>
-          <App parentTab={parentTab} childTab={tabId} />
+          <App windowTab={windowTab} tabId={tabId} />
         </HashRouter>
       ),
     });
     saveToLocalStorage(newPanes);
+    saveNewTabIntoLocalStorage(tabId);
     setItems(newPanes);
     setActiveKey(tabId);
   };
 
   const saveToLocalStorage = (panItems: TabsBuilder[]) => {
     const items = panItems.map(({ children, ...item }) => item);
-    localStorage.setItem(parentTab, JSON.stringify(items));
+    localStorage.setItem(windowTab, JSON.stringify(items));
   };
 
   const getItemsWithChildren = (items: TabsBuilder[]) =>
@@ -89,10 +104,24 @@ export function TabSplitContent({
       ...item,
       children: (
         <HashRouter>
-          <App parentTab={parentTab} childTab={item.tabId} />
+          <App windowTab={windowTab} tabId={item.tabId} />
         </HashRouter>
       ),
     }));
+
+  const removeNodesInTab = (tabId: string) => {
+    if (!window.allFlow) {
+      window.allFlow = { nodes: [], edges: [] };
+    }
+    const tabState = localStorage.getItem(NODES_IN_TAB);
+    const newTabState = tabState === null ? {} : JSON.parse(tabState);
+    const nodeIds = newTabState[tabId] || [];
+
+    window.allFlow.nodes = window.allFlow.nodes.filter((node) => !nodeIds.includes(node.id));
+    window.allFlow.edges = window.allFlow.edges.filter(
+      (edge) => !nodeIds.includes(edge.target) && !nodeIds.includes(edge.source)
+    );
+  };
 
   const remove = (targetKey: TargetKey) => {
     let newActiveKey = activeKey;
@@ -104,12 +133,6 @@ export function TabSplitContent({
       }
     });
 
-    const nodeIdsDeleted = window.allFlow.nodes.filter((node) => node.childTab === targetKey).map((node) => node.id);
-    window.allFlow.nodes = window.allFlow.nodes.filter((node) => !nodeIdsDeleted.includes(node.id));
-    window.allFlow.edges = window.allFlow.edges.filter(
-      (edge) => !nodeIdsDeleted.includes(edge.target) && !nodeIdsDeleted.includes(edge.source)
-    );
-
     const newPanes = items.filter((item) => item.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
@@ -120,11 +143,13 @@ export function TabSplitContent({
     }
     setItems(newPanes);
     saveToLocalStorage(newPanes);
+    saveNewTabIntoLocalStorage(targetKey as string, true);
+    removeNodesInTab(targetKey as string);
     if (newPanes.length == 0) {
       if (isRightPane) {
         toggleSplit();
       } else {
-        setActiveKey(defaultKey);
+        setActiveKey(MainTabKeyDefault);
       }
     } else {
       setActiveKey(newActiveKey);
@@ -139,22 +164,22 @@ export function TabSplitContent({
     }
   };
 
-  // useEffect(() => {
-  //   const savePanel = localStorage.getItem(parentTab);
-  //   const items = savePanel === null ? [] : JSON.parse(savePanel!!);
+  useEffect(() => {
+    const savePanel = localStorage.getItem(windowTab);
+    const items = savePanel === null ? [] : JSON.parse(savePanel!!);
 
-  //   if (isRightPane) {
-  //     if (items.length > 0) {
-  //       setItems(getItemsWithChildren(items));
-  //     }
-  //   } else {
-  //     setItems(getItemsWithChildren(items));
-  //   }
+    if (isRightPane) {
+      if (items.length > 0) {
+        setItems(getItemsWithChildren(items));
+      }
+    } else {
+      setItems(getItemsWithChildren(items));
+    }
 
-  //   return () => {
-  //     localStorage.removeItem(parentTab);
-  //   };
-  // }, []);
+    return () => {
+      localStorage.removeItem(windowTab);
+    };
+  }, []);
 
   const togglePaneBtn = (
     <Tooltip placement="topLeft" title={"Split Editor Right"}>
@@ -179,9 +204,9 @@ export function TabSplitContent({
       tabBarExtraContent={showSplit && togglePaneBtn}
     >
       {!isRightPane && (
-        <TabPane tab={homeIcon} key={defaultKey} closable={false}>
+        <TabPane tab={homeIcon} key={MainTabKeyDefault} closable={false}>
           <HashRouter>
-            <App parentTab={parentTab} childTab={defaultKey} />
+            <App windowTab={windowTab} tabId={MainTabKeyDefault} />
           </HashRouter>
         </TabPane>
       )}
