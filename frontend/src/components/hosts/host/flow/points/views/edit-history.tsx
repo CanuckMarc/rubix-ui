@@ -53,7 +53,7 @@ export const EditHistoryModal = (props: any) => {
     <>
       <Modal
         forceRender
-        title={"Edit history" + currentItem.name}
+        title={"Edit history " + currentItem.name}
         visible={isModalVisible}
         onOk={form.submit}
         onCancel={onCloseModal}
