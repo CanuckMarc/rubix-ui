@@ -3,13 +3,15 @@ package assistcli
 import (
 	"fmt"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/helpers/kb"
 	"time"
 )
 
 type Snapshots struct {
-	Name      string    `json:"name"`
-	Size      int64     `json:"size"`
-	CreatedAt time.Time `json:"created_at"`
+	Name         string    `json:"name"`
+	Size         int64     `json:"size"`
+	SizeReadable string    `json:"size_readable"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type CreateStatus string
@@ -56,6 +58,9 @@ func (inst *Client) EdgeGetSnapshots(hostIDName string) ([]Snapshots, error) {
 	}
 	var out []Snapshots
 	out = *resp.Result().(*[]Snapshots)
+	for _, snapshots := range out {
+		snapshots.SizeReadable = kb.PrettyByteSize(int(snapshots.Size))
+	}
 	return out, nil
 }
 
