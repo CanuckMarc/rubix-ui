@@ -1,5 +1,5 @@
 import { Button, Dropdown, List, Menu, Modal, Typography, Popconfirm } from "antd";
-import { DownloadOutlined, EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EllipsisOutlined, DeleteOutlined, BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
@@ -16,6 +16,14 @@ import { GitDownloadReleases } from "../../../../wailsjs/go/backend/App";
 import InstalledApps = rumodel.InstalledApps;
 import AppsAvailableForInstall = rumodel.AppsAvailableForInstall;
 import RunningServices = rumodel.RunningServices;
+
+export interface LogTablePropType {
+  pluginName: string | undefined;
+  connUUID: string;
+  hostUUID: string;
+  resetLogTableData: boolean;
+  setResetLogTableData: Function;
+}
 
 const { Text, Title } = Typography;
 const releaseFactory = new ReleasesFactory();
@@ -34,7 +42,8 @@ export const EdgeAppInfo = (props: any) => {
   const [installedVersion, updateInstalledVersion] = useState("");
   const [loadingSyncReleases, setLoadingSyncReleases] = useState(false);
   const [isInstallRubixAppModalVisible, updateIsInstallRubixAppModalVisible] = useState(false);
-  const [appToDelete, setAppToDelete] = useState<InstalledApps | undefined>(undefined);
+  const [app, setApp] = useState<InstalledApps | undefined>(undefined);
+  const [isShowingLog, setIsShowingLog] = useState(false);
 
   let timeout;
 
@@ -125,10 +134,10 @@ export const EdgeAppInfo = (props: any) => {
   };
 
   const handleConfirm = async () => {
-    if (appToDelete) {
-      console.log(appToDelete)
+    if (app) {
+      console.log(app)
       try {
-        const res = await releaseFactory.EdgeDeleteAppDB(connUUID, hostUUID, appToDelete.app_name!);
+        const res = await releaseFactory.EdgeDeleteAppDB(connUUID, hostUUID, app.app_name!);
         if (res) {
           console.log(res)
         }
@@ -136,9 +145,15 @@ export const EdgeAppInfo = (props: any) => {
         console.log(err)
       } finally {
         fetchAppInfo();
-        setAppToDelete(undefined)
+        setApp(undefined)
       }
     }
+  }
+
+  const handleShowLog = (item: InstalledApps) => {
+    console.log('show log for item: ', item)
+    setIsShowingLog(true)
+    setApp(item)
   }
 
   return (
@@ -157,7 +172,7 @@ export const EdgeAppInfo = (props: any) => {
           renderItem={(item) => (
             <List.Item style={{ padding: "8px 16px", textAlign: 'start'}} >
               <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
-              <span style={{ width: "390px" }}>
+              <span style={{ width: "430px" }}>
                 <div style={{display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
                   <span>{item.app_name}</span>
                   <span style={{color: 'grey'}}>{`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}</span>
@@ -205,8 +220,10 @@ export const EdgeAppInfo = (props: any) => {
                   okText="Confirm"
                   cancelText="Cancel"
                 >
-                  <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setAppToDelete(item)}/>
+                  <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
                 </Popconfirm>
+
+                <Button icon={<BookOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => handleShowLog(item)}/>
               </span>
 
               <span style={{ width: "250px" }}>{item.app_name}</span>
@@ -261,7 +278,7 @@ export const EdgeAppInfo = (props: any) => {
                 </Dropdown>
               </span>
 
-              <span style={{ width: "392px" }}>{item.name}</span>
+              <span style={{ width: "432px" }}>{item.name}</span>
               <span
                 className="flex-1"
                 style={{
