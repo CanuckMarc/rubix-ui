@@ -136,11 +136,10 @@ export const EdgeAppInfo = (props: any) => {
 
   const handleConfirm = async () => {
     if (app) {
-      console.log(app)
       try {
         const res = await releaseFactory.EdgeDeleteAppDB(connUUID, hostUUID, app.app_name!);
         if (res) {
-          console.log(res)
+          openNotificationWithIcon("success", `${res.message}`);
         }
       } catch (err) {
         console.log(err)
@@ -152,7 +151,6 @@ export const EdgeAppInfo = (props: any) => {
   }
 
   const handleShowLog = (item: InstalledApps) => {
-    console.log('show log for item: ', item)
     setIsShowingLog(true)
     setApp(item)
   }

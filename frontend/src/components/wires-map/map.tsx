@@ -36,7 +36,8 @@ export interface BacnetTableDataType {
   outputTopic: string | undefined;
   key: string;
   flownetSchema: node.Schema,
-  bacnetServerInterface: NodeInterface
+  bacnetServerInterface: NodeInterface,
+  avName: string | undefined
 }
 
 export interface FlownetMapPropType {
@@ -108,8 +109,6 @@ export const WiresMap = () => {
         setIsFetching(false);
     }
   }
-
-  
 
   return (
     <>

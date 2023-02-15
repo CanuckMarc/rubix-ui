@@ -15,6 +15,16 @@ import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
 
 const { Title } = Typography;
 
+export interface BacnetPointTablePropType {
+  title: string;
+  pointList: PointTableType[]; 
+  rowKeysToAddBack: BacnetTableDataType[] | undefined;
+  pointsToRemove: PointTableType[] | undefined; 
+  clearSelection: boolean; 
+  setClearSelection: Function;
+  setPointSelection: Function;
+}
+
 export const BacnetMap = (props: BacnetMapPropType) => {
   const {connUUID, hostUUID, fetchFlownet, isFetchingFlownet, reset, pointList, flowNetList, flowNetOptionList} = props
   const nav = useNavigate();
@@ -22,10 +32,13 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const [tableData, setTableData] = useState<BacnetTableDataType[]>([]);
   const [selectValue, setSelectValue] = useState<string | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [rowKeysToAddBack, setRowKeysToAddBack] = useState<BacnetTableDataType[] | undefined>(undefined);
   const [selectedFlownet, setSelectedFlownet] = useState<node.Schema | undefined>(undefined);
-  const [pointSelection, setPointSelection] = useState<PointTableType | undefined>(undefined);
+  const [pointSelection, setPointSelection] = useState<PointTableType[] | undefined>(undefined);
+  const [pointsToRemove, setPointsToRemove] = useState<PointTableType[] | undefined>(undefined);
   const [bacnetServerNode, setBacnetServerNode] = useState({} as NodeInterface);
   const [disableAllButton, setDisableAllButton] = useState(false);
+  const [instancePrefill, setInstancePrefill] = useState(1);
 
   const [bacnetNodes, setBacnetNodes] = useBacnetStore(
     (state) => [state.bacnetNodes, state.setBacnetNodes]
@@ -39,6 +52,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       reset();
       fetchFlownet();
       searchExistingBacnet();
+      setInstancePrefill(1);
   }, [connUUID, hostUUID]);
 
   const searchExistingBacnet = async () => {
@@ -55,25 +69,34 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const addPoints = () => {
     if (!selectedFlownet || !pointSelection) openNotificationWithIcon("warning", 'Please select a flow network and or a point!');
     if (selectedFlownet && pointSelection){
-      // test to see if selected bacnet node is already added to the table
-      const temp = tableData.find(item => item.selectedPointName === pointSelection.name)
-      if (!temp) {
-        let resObj = {} as BacnetTableDataType
-        const newId = generateUuid()
-        resObj = {
-          existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
-          selectedPoint: pointSelection,
-          selectedPointName: pointSelection.name,
-          outputTopic: pointSelection.name,
-          instanceNumber: undefined,
-          key: newId,
-          flownetSchema: selectedFlownet,
-          bacnetServerInterface: bacnetServerNode
+      setPointsToRemove(pointSelection)
+      let tempTableDataArray: BacnetTableDataType[] = []
+      let counter = instancePrefill
+      pointSelection.forEach((point: PointTableType) => {
+        // test to see if selected bacnet node is already added to the table
+        const temp = tableData.find(item => item.selectedPointName === point.name)
+        if (!temp) {
+          let resObj = {} as BacnetTableDataType
+          const newId = generateUuid()
+          resObj = {
+            existingFlowNetName: selectedFlownet?.nodeName ? selectedFlownet?.nodeName : selectedFlownet?.id,
+            selectedPoint: point,
+            selectedPointName: point.name,
+            outputTopic: point.name,
+            instanceNumber: counter,
+            key: newId,
+            flownetSchema: selectedFlownet,
+            bacnetServerInterface: bacnetServerNode,
+            avName: point.point_name
+          }
+          counter += 1;
+          tempTableDataArray.push(resObj)
+        } else {
+          openNotificationWithIcon("warning", 'Already added!');
         }
-        setTableData([...tableData, resObj])
-      } else {
-        openNotificationWithIcon("warning", 'Already added!');
-      }
+      })
+      setInstancePrefill(counter)
+      setTableData([...tableData, ...tempTableDataArray])
       // clear inputs after adding a pair of points
       setSelectValue(null);
       setClearSelection(true);
@@ -82,18 +105,20 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   }
 
   const deletePoints = () => {
+    const removedItems: BacnetTableDataType[] = []
     const updatedData: BacnetTableDataType[] = tableData.filter(item => {
       let flag = true;
       selectedRowKeys.forEach(rowKey => {
           if (item.key === rowKey) {
               flag = false;
+              removedItems.push(item)
           }
       })
       return flag
     })
-
-    setTableData(updatedData)
-    setSelectedRowKeys([])
+    setRowKeysToAddBack(removedItems);
+    setTableData(updatedData);
+    setSelectedRowKeys([]);
   }
 
   const recordPoints = () => {
@@ -110,7 +135,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     if (record) {
       let objCopy = record;
       let tableDataCopy = tableData;
-      value ? objCopy.instanceNumber = value : objCopy.instanceNumber = undefined;
+      objCopy.instanceNumber = value ? value : undefined;
       tableData.forEach((obj, index) => {
         if (obj.key === record.key) {
           tableDataCopy[index] = objCopy
@@ -126,7 +151,23 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     if (record) {
       let objCopy = record;
       let tableDataCopy = tableData;
-      value ? objCopy.outputTopic = value : objCopy.outputTopic = undefined;
+      objCopy.outputTopic = value ? value : undefined;
+      tableData.forEach((obj, index) => {
+        if (obj.key === record.key) {
+          tableDataCopy[index] = objCopy
+        }
+      })
+      setTableData(tableDataCopy)
+    } 
+  }
+
+  const onAvNameChange = (event: ChangeEvent<HTMLInputElement>, record: BacnetTableDataType) => {
+    event.stopPropagation();
+    const value = event?.target.value;
+    if (record) {
+      let objCopy = record;
+      let tableDataCopy = tableData;
+      objCopy.avName = value ? value : undefined;
       tableData.forEach((obj, index) => {
         if (obj.key === record.key) {
           tableDataCopy[index] = objCopy
@@ -169,7 +210,17 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       key: 'instanceNumber',
       render: (text, record: BacnetTableDataType, index) => {
         return (
-          <InputNumber style={{width: '100%'}} onChange={(value: number | null) => onInstanceNumberChange(value, record)} />
+          <InputNumber defaultValue={record.instanceNumber} style={{width: '100%'}} onChange={(value: number | null) => onInstanceNumberChange(value, record)} />
+        );
+      }
+    },
+    {
+      title: 'Analog variable node name',
+      dataIndex: 'avName',
+      key: 'avName',
+      render: (text, record: BacnetTableDataType, index) => {
+        return (
+          <Input defaultValue={record.avName} onChange={(event: ChangeEvent<HTMLInputElement>) => onAvNameChange(event, record)} />
         );
       }
     }
@@ -205,22 +256,15 @@ export const BacnetMap = (props: BacnetMapPropType) => {
             <BacnetPointTable 
               title={'Point'} 
               pointList={pointList} 
-              // pairToAdd={pairToAdd} 
-              // pairToRemove={pairToRemove} 
+              rowKeysToAddBack={rowKeysToAddBack}
+              pointsToRemove={pointsToRemove} 
               clearSelection={clearSelection} 
-              setClearSelection={setClearSelection} 
-              pointSelection={pointSelection}
+              setClearSelection={setClearSelection}
               setPointSelection={setPointSelection}
-              // selectedPoints={selectedPointsTwo} 
-              // setSelectedPoints={setSelectedPointsOne}
-            />  
-            
+            />
           </Spin>
 
-
-
           <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
-
             <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
               <div style={{display: 'flex', flexDirection: 'row', gap: '1vw', alignItems: 'center'}}>
                 <Title level={5}>

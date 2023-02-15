@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { backend } from "../../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { PointTableType } from '../../../App';
-import { AddedPointType } from "../map";
+import { BacnetPointTablePropType } from '../bacnet-map';
+import { BacnetTableDataType } from '../map';
 
 interface MenuItemsType {
   text: string;
@@ -22,12 +23,11 @@ const addNameToArray = (name: string, array: MenuItemsType[], type: string) => {
   }
 }
 
-export const BacnetPointTable = (props: any) => {
-  const {title, pointList, clearSelection, setClearSelection, pointSelection, setPointSelection} = props
+export const BacnetPointTable = (props: BacnetPointTablePropType) => {
+  const {title, pointList, rowKeysToAddBack, pointsToRemove, clearSelection, setClearSelection, setPointSelection} = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  // const [ownSelection, setOwnSelection] = useState<PointTableType | undefined>(undefined);
-  // const [removedItem, setRemovedItem] = useState<PointTableType[]>([]);
   const [tableData, setTableData] = useState<PointTableType[]>([]);
+  const [removedData, setRemovedData] = useState<PointTableType[]>([]);
   const [allNames, setAllNames] = useState<Array<Array<MenuItemsType>>>([]);
 
   const types = ['plugin', 'network', 'device', 'point']
@@ -58,54 +58,47 @@ export const BacnetPointTable = (props: any) => {
   }, [pointList])
 
   useEffect(() => {
+    if (pointsToRemove) {
+      const filteredTableData = tableData.filter((item: PointTableType) => {
+        let flag = true
+        pointsToRemove.forEach((removeItem: PointTableType) => {
+          if (item.uuid === removeItem.uuid) flag = false 
+        })
+        return flag
+      })
+      setTableData(filteredTableData);
+      setRemovedData([...removedData, ...pointsToRemove]);
+    }
+  }, [pointsToRemove])
+
+  useEffect(() => {
+    if (rowKeysToAddBack) {
+      let rowsToAddBack: PointTableType[] = []
+      rowKeysToAddBack.forEach((key: BacnetTableDataType) => {
+        removedData.forEach((item: PointTableType) => {
+          if(key.selectedPoint.key === item.key) rowsToAddBack.push(item)
+        })
+      })
+      setTableData([...tableData, ...rowsToAddBack]);
+
+      const filteredRemovedData = removedData.filter((i: PointTableType) => {
+        let flag = true
+        rowsToAddBack.forEach((j: PointTableType) => {
+          if (i.uuid === j.uuid) flag = false
+        })
+        return flag
+      })
+      setRemovedData(filteredRemovedData);
+    }
+  }, [rowKeysToAddBack])
+
+  useEffect(() => {
     if (clearSelection) {
       setSelectedRowKeys([]);
       setPointSelection(undefined);
       setClearSelection(false);
     }
   }, [clearSelection])
-
-//   useEffect(() => {
-//     let temp: PointTableType[] = []
-//     if (pairToRemove !== undefined) {
-//       const updatedTableData = tableData.filter(item => {
-//         if (item.uuid !== pairToRemove[0].uuid && item.uuid !== pairToRemove[1].uuid) {
-//           return true
-//         } else {
-//           temp.push(item)
-//           return false
-//         }
-//       })
-
-//       setTableData(updatedTableData);
-//       setRemovedItem([...removedItem, ...temp]);
-//     }
-//   }, [pairToRemove])
-
-//   useEffect(() => {
-//     const rowsToAddBack: PointTableType[] = []
-//     if (pairToAdd !== undefined) {
-//         pairToAdd.forEach((item: AddedPointType) => {
-//             removedItem.forEach(el => {
-//                 if (el.name === item.pointOneName || el.name === item.pointTwoName) {
-//                     rowsToAddBack.push(el);
-//                 }
-//             })
-//         });
-//         setTableData([...tableData, ...rowsToAddBack])
-
-//         const temp = removedItem.filter(item => {
-//             let flag = true;
-//             rowsToAddBack.forEach(el => {
-//                 if (item.uuid === el.uuid) {
-//                     flag = false;
-//                 }
-//             })
-//             return flag
-//         })
-//         setRemovedItem(temp)
-//     }
-//   }, [pairToAdd])
 
   const columns: ColumnsType<PointTableType> = [
     {
@@ -181,11 +174,11 @@ export const BacnetPointTable = (props: any) => {
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
-    let selectedItems: PointTableType = {} as PointTableType
+    let selectedItems: PointTableType[] = []
     newSelectedRowKeys.forEach(i => {
       tableData.forEach(j => {
         if (j.uuid === i) {
-          selectedItems = j
+          selectedItems.push(j)
         }
       })
     })
@@ -195,14 +188,7 @@ export const BacnetPointTable = (props: any) => {
   const rowSelection = {
     hideSelectAll: true,
     selectedRowKeys,
-    onChange: onSelectChange,
-    getCheckboxProps: (record: PointTableType) => {
-      if (pointSelection) {
-        return {disabled: record.uuid !== pointSelection?.uuid}
-      } else {
-        return {disabled: false}
-      }
-    }
+    onChange: onSelectChange
   }
 
   return (

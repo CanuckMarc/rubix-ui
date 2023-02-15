@@ -128,7 +128,7 @@ export const LoadBacnetMap = () => {
         },
         {
           type: 'bacnet/analog-variable',
-          name: undefined,
+          name: setOfNodesToAdd.avName,
           isParent: false,
           parentId: setOfNodesToAdd.bacnetServerInterface.id,
           x: x + 800,
