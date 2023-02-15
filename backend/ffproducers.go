@@ -122,7 +122,6 @@ func (inst *App) EditProducerHistory(connUUID, hostUUID, pointUUID, historyType 
 	producer.HistoryType = model.HistoryType(historyType)
 	producer.EnableHistory = boolean.New(historyEnable)
 	producer.HistoryInterval = integer.New(interval)
-
 	producers, err := client.EditProducer(hostUUID, producer.UUID, producer)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
