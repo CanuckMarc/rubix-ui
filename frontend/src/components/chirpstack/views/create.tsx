@@ -130,9 +130,9 @@ export const CreateEditModal = (props: any) => {
             <Form.Item label="Name:" name="name" rules={[{ required: true, message: "Please input a device name!" }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="Application ID:" name="applicationID">
-              <Input />
-            </Form.Item>
+            {/*<Form.Item label="Application ID:" name="applicationID">*/}
+            {/*  <Input />*/}
+            {/*</Form.Item>*/}
             <Form.Item
               label="Description:"
               name="description"
