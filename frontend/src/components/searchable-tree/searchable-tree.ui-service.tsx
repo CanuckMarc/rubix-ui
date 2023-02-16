@@ -275,7 +275,7 @@ export const getTreeDataIterative = (connections: any) => {
                     {
                       ...objectMap(
                         getTreeObject(
-                          { name: "map", uuid: "wires_map_" + host.uuid },
+                          { name: "point mapping", uuid: "wires_map_" + host.uuid },
                           ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
                           "",
                           <RadarChartOutlined />
