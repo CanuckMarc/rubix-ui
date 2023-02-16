@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { assistcli } from "../../../../../wailsjs/go/models";
 import RbTable from "../../../../common/rb-table";
-import { RbAddButton } from "../../../../common/rb-table-actions";
+import { RbAddButton, RbRefreshButton } from "../../../../common/rb-table-actions";
 import { CREATE_LOGS_HEADERS } from "../../../../constants/headers";
 import { openNotificationWithIcon } from "../../../../utils/utils";
 import { SnapShotFactory } from "../../../edge/system/snapshot/factory";
@@ -42,6 +42,7 @@ export const TakeSnapshot = () => {
   return (
     <>
       <div className="d-flex mb-4">
+        <RbRefreshButton refreshList={fetch} />
         <RbAddButton handleClick={create} />
       </div>
       <Title level={4} style={{ textAlign: "left" }}>

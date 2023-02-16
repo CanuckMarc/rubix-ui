@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { SnapShotFactory } from "../../../edge/system/snapshot/factory";
 import { Spin, Typography } from "antd";
 import RbTable from "../../../../common/rb-table";
-import { RbRestartButton } from "../../../../common/rb-table-actions";
+import { RbRefreshButton, RbRestartButton } from "../../../../common/rb-table-actions";
 import { SNAPSHOTS_HEADERS } from "../../../../constants/headers";
 import { openNotificationWithIcon } from "../../../../utils/utils";
 import { assistcli } from "../../../../../wailsjs/go/models";
@@ -54,6 +54,7 @@ export const RestoreSnapshot = () => {
   return (
     <>
       <div className="d-flex mb-4">
+        <RbRefreshButton refreshList={fetch} />
         <RbRestartButton handleClick={restore} text="Restore" />
       </div>
       <Title level={4} style={{ textAlign: "left" }}>
