@@ -1,5 +1,5 @@
 import { Button, Dropdown, List, Menu, Modal, Typography, Popconfirm } from "antd";
-import { DownloadOutlined, EllipsisOutlined, DeleteOutlined, BookOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EllipsisOutlined, DeleteOutlined, DatabaseOutlined, BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { rumodel } from "../../../../wailsjs/go/models";
@@ -106,6 +106,7 @@ export const EdgeAppInfo = (props: any) => {
   }
 
   const onMenuClick = (actionType: string, serviceName: string, appName: string) => {
+    console.log('action type is: ', actionType)
     updateActionLoading((prevState: any) => ({
       ...prevState,
       [serviceName]: true,
@@ -143,9 +144,10 @@ export const EdgeAppInfo = (props: any) => {
         }
       } catch (err) {
         console.log(err)
+        openNotificationWithIcon('error', `${err}`);
       } finally {
         fetchAppInfo();
-        setApp(undefined)
+        setApp(undefined);
       }
     }
   }
@@ -153,6 +155,23 @@ export const EdgeAppInfo = (props: any) => {
   const handleShowLog = (item: InstalledApps) => {
     setIsShowingLog(true)
     setApp(item)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (app) {
+      try {
+        const res = await releaseFactory.EdgeServiceAction('uninstall', connUUID, host.uuid, app.service_name!, app.app_name!)
+        if (res) {
+          openNotificationWithIcon('success', `${res.message}`);
+        }
+      } catch (err) {
+        console.log(err)
+        openNotificationWithIcon('error', `${err}`);
+      } finally {
+        fetchAppInfo();
+        setApp(undefined);
+      }
+    }
   }
 
   return (
@@ -173,7 +192,7 @@ export const EdgeAppInfo = (props: any) => {
             renderItem={(item) => (
               <List.Item style={{ padding: "8px 16px", textAlign: 'start'}} >
                 <DownloadOutlined onClick={() => setIsInstallRubixAppModalVisible(item)} className="ml-4 mr-10" />
-                <span style={{ width: "430px" }}>
+                <span style={{ width: "476px" }}>
                   <div style={{display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
                     <span>{item.app_name}</span>
                     <span style={{color: 'grey'}}>{`(${item.min_version || "Infinite"} - ${item.max_version || "Infinite"})`}</span>
@@ -221,10 +240,24 @@ export const EdgeAppInfo = (props: any) => {
                     okText="Confirm"
                     cancelText="Cancel"
                   >
-                    <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                    <Button icon={<DatabaseOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
                   </Popconfirm>
 
                   <Button icon={<BookOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => handleShowLog(item)}/>
+
+                  <Popconfirm
+                    title={(
+                      <div style={{display: 'flex', flexDirection: 'column', rowGap: '10px'}}>
+                        <span style={{color: 'yellow'}}>Warning</span>
+                        <span>This action will delete the app: <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span>!  </span>
+                      </div>
+                    )}
+                    onConfirm={handleDeleteConfirm}
+                    okText="Confirm"
+                    cancelText="Cancel"
+                  >
+                    <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                  </Popconfirm>
                 </span>
 
                 <span style={{ width: "250px" }}>{item.app_name}</span>
@@ -279,7 +312,7 @@ export const EdgeAppInfo = (props: any) => {
                   </Dropdown>
                 </span>
 
-                <span style={{ width: "432px" }}>{item.name}</span>
+                <span style={{ width: "476px" }}>{item.name}</span>
                 <span
                   className="flex-1"
                   style={{
