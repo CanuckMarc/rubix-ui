@@ -1145,11 +1145,6 @@ const Flow = (props: FlowProps) => {
             onBackToMain={onBackToMain}
           />
         )}
-        {isSaving && (
-          <div className="absolute l-0 z-[100] w-full h-full flex bg-gray-800 bg-opacity-50">
-            <Spin className="m-auto" />
-          </div>
-        )}
         {isFetching ? (
           <div className="h-full flex">
             <Spin className="m-auto" />
@@ -1223,6 +1218,7 @@ const Flow = (props: FlowProps) => {
               <Controls />
               <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
               <BehaveControls
+                isSaving={isSaving}
                 isChangedFlow={isChangedFlow}
                 deleteNodesAndEdges={deleteNodesAndEdges}
                 onCopyNodes={handleCopyNodes}

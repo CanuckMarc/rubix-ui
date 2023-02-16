@@ -21,9 +21,11 @@ import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { Edge } from "react-flow-renderer";
+import { Spin } from "antd";
 
 type ControlProps = {
   isChangedFlow: boolean;
+  isSaving: boolean;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
@@ -42,6 +44,7 @@ type ControlProps = {
 
 const Controls = ({
   settings,
+  isSaving,
   isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
@@ -174,7 +177,13 @@ const Controls = ({
 
   const renderIconBtn = (title: string, Icon: any, onClick: () => void, id = "") => {
     return (
-      <div id={id} className="cursor-pointer border-r bg-white hover:bg-gray-100" title={title} onClick={onClick}>
+      <div
+        id={id}
+        className="cursor-pointer border-r bg-white hover:bg-gray-100"
+        title={title}
+        onClick={onClick}
+        style={{ height: 24 }}
+      >
         <Icon className="p-2 text-gray-700 align-middle" />
       </div>
     );
@@ -183,6 +192,11 @@ const Controls = ({
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {isSaving && (
+          <div className=" border-r bg-white " title="Saving..." style={{ height: 24 }}>
+            <Spin size="small" className="pt-1 px-2" />
+          </div>
+        )}
         {isChangedFlow && renderIconBtn("Sync flow", SyncOutlined, onHandelSaveFlow)}
         {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
@@ -197,7 +211,6 @@ const Controls = ({
         {renderIconBtn("Import", DownloadOutlined, () => setLoadModalOpen(true))}
         {renderIconBtn("Export", UploadOutlined, () => setSaveModalOpen(true), "exportButton")}
         {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
-        {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
       </div>
       {loadModalOpen && (
         <LoadModal open onClose={() => setLoadModalOpen(false)} handleLoadNodesAndEdges={handleLoadNodesAndEdges} />
