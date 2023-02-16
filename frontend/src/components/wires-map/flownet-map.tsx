@@ -1,4 +1,4 @@
-import { Typography, Card, Select, Spin, Button, Table, Tabs } from "antd";
+import { Card, Select, Spin, Button, Table, Input } from "antd";
 import { useState, useEffect } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ import { generateUuid } from "../rubix-flow/lib/generateUuid";
 import { openNotificationWithIcon } from "../../utils/utils";
 import { SelectOptionType, AddedPointType, FlownetMapPropType } from "./map";
 
-const { Title } = Typography;
+const { Search } = Input;
 
 const filterForFullObj = (pointList: PointTableType[], selectedPoints: PointTableType) => {
   const filteredPoint = pointList.filter(item => {
@@ -36,6 +36,8 @@ export const FlownetMap = (props: FlownetMapPropType) => {
   const [selectedPointsTwo, setSelectedPointsTwo] = useState<PointTableType | undefined>(undefined);
   const [pairToRemove, setPairToRemove] = useState<PointTableType[] | undefined>(undefined);
   const [pairToAdd, setPairToAdd] = useState<AddedPointType[] | undefined>(undefined);
+  const [search, setSearch] = useState<string | undefined>(undefined);
+  const [pointsPaneSearch, setPointsPaneSearch] = useState<string | undefined>(undefined);
 
 
   const [wiresMapNodes, setWiresMapNodes] = useStore(
@@ -75,7 +77,6 @@ export const FlownetMap = (props: FlownetMapPropType) => {
             pointTwoName: resObj.pointTwo.name,
             key: newId
         }])
-
         setPairToRemove([resObj['pointOne'], resObj['pointTwo']])
 
         // clear inputs after adding a pair of points
@@ -154,27 +155,52 @@ export const FlownetMap = (props: FlownetMapPropType) => {
     onChange: onSelectChange
   };
 
+  const onSearchBarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+    if (event.target.value === "") {
+      setSearch(undefined)
+      setPointsPaneSearch(undefined)
+    }
+  };
+
+  const handleSearchPointName = () => {
+    console.log('search value is: ', search)
+    setPointsPaneSearch(search)
+  }
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', gap: '2vw'}}>
       <Card bordered={true}>
         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-          <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
-            <Title level={5}>Select flow network: </Title>
+          <div style={{display: 'flex', flexDirection: 'row', gap: '30px', alignItems: 'center'}}>
+            <strong>Select flow network: </strong>
             <Select
               showSearch
               allowClear
               value={selectValue}
-              style={{ width: '50%' }}
+              style={{ width: '500px' }}
               placeholder="Please select"
               onChange={handleChange}
               options={flowNetOptionList}
             />
           </div>
+          <div style={{display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center'}}>
+            <strong>Search by point name: </strong>
+            <Search 
+              placeholder="search by point name"
+              enterButton="Search"
+              disabled={pointList.length === 0}
+              allowClear={true} 
+              value={search} 
+              onChange={onSearchBarChange} 
+              onSearch={handleSearchPointName} 
+              style={{ width: '500px' }} 
+            />
+          </div>
           <Spin spinning={isFetching} style={{ width: '100%' }}>
             <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center', justifyContent: 'space-around'}}>
-              <PointsPane title={'Point one'} pointList={pointList} pairToAdd={pairToAdd} pairToRemove={pairToRemove} clearSelection={clearSelection} setClearSelection={setClearSelection} selectedPoints={selectedPointsTwo} setSelectedPoints={setSelectedPointsOne}/>
-              <PointsPane title={'Point two'} pointList={pointList} pairToAdd={pairToAdd} pairToRemove={pairToRemove} clearSelection={clearSelection} setClearSelection={setClearSelection} selectedPoints={selectedPointsOne} setSelectedPoints={setSelectedPointsTwo}/>
+              <PointsPane title={'Point one'} pointsPaneSearch={pointsPaneSearch} pointList={pointList} pairToAdd={pairToAdd} pairToRemove={pairToRemove} clearSelection={clearSelection} setClearSelection={setClearSelection} selectedPoints={selectedPointsTwo} setSelectedPoints={setSelectedPointsOne}/>
+              <PointsPane title={'Point two'} pointsPaneSearch={pointsPaneSearch} pointList={pointList} pairToAdd={pairToAdd} pairToRemove={pairToRemove} clearSelection={clearSelection} setClearSelection={setClearSelection} selectedPoints={selectedPointsOne} setSelectedPoints={setSelectedPointsTwo}/>
             </div>
           </Spin>
         </div>
@@ -184,9 +210,9 @@ export const FlownetMap = (props: FlownetMapPropType) => {
         <Card bordered={true}>
           <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
             <div style={{display: 'flex', flexDirection: 'row', gap: '1vw', alignItems: 'center'}}>
-              <Title level={5}>
+              <strong>
                 Selected points: 
-              </Title>
+              </strong>
               <Button type="primary" icon={<PlusOutlined />} onClick={addPoints} size={'middle'} style={{width: '6vw'}}>Add</Button>
               <Button type="primary" icon={<MinusOutlined />} danger={true} onClick={deletePoints} disabled={tableData.length === 0 || selectedRowKeys.length === 0} size={'middle'} style={{width: '6vw'}}>Delete</Button>
             </div>

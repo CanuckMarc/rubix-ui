@@ -5,6 +5,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { PointTableType } from '../../../App';
 import { BacnetPointTablePropType } from '../bacnet-map';
 import { BacnetTableDataType } from '../map';
+import { openNotificationWithIcon } from "../../../utils/utils";
 
 interface MenuItemsType {
   text: string;
@@ -24,13 +25,37 @@ const addNameToArray = (name: string, array: MenuItemsType[], type: string) => {
 }
 
 export const BacnetPointTable = (props: BacnetPointTablePropType) => {
-  const {title, pointList, rowKeysToAddBack, pointsToRemove, clearSelection, setClearSelection, setPointSelection} = props
+  const {title, pointsPaneSearch, pointList, rowKeysToAddBack, pointsToRemove, clearSelection, setClearSelection, setPointSelection} = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState<PointTableType[]>([]);
   const [removedData, setRemovedData] = useState<PointTableType[]>([]);
+  const [beforesearch, setBeforesearch] = useState<PointTableType[]>([]);
   const [allNames, setAllNames] = useState<Array<Array<MenuItemsType>>>([]);
 
   const types = ['plugin', 'network', 'device', 'point']
+
+  useEffect(() => {
+    if (pointsPaneSearch && pointsPaneSearch !== "") {
+      setBeforesearch(tableData);
+      let temp: PointTableType[] = [];
+      tableData.forEach((item: PointTableType) => {
+        if (item.name.toLowerCase().includes(pointsPaneSearch)) {
+          temp.push(item);
+        }
+      });
+
+      if (temp.length === 0) {
+        setTableData(beforesearch)
+        openNotificationWithIcon("warning", 'No result matches your search.');
+      } else {
+        setTableData(temp);
+      }
+    } else {
+      setTableData(beforesearch)
+    }
+    // console.log('to show: ', tableData)
+    // console.log('to track: ', beforesearch)
+  }, [pointsPaneSearch])
 
   useEffect(() => {
     let mappedList: PointTableType[] = []
@@ -54,6 +79,7 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
       })
     }
     setTableData(mappedList);
+    setBeforesearch(mappedList);
     setAllNames(localAllNames);
   }, [pointList])
 
@@ -66,7 +92,17 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
         })
         return flag
       })
+
+      const filteredBeforeSearchTableData = beforesearch.filter((item: PointTableType) => {
+        let flag = true
+        pointsToRemove.forEach((removeItem: PointTableType) => {
+          if (item.uuid === removeItem.uuid) flag = false 
+        })
+        return flag
+      })
+
       setTableData(filteredTableData);
+      setBeforesearch(filteredBeforeSearchTableData);
       setRemovedData([...removedData, ...pointsToRemove]);
     }
   }, [pointsToRemove])
@@ -80,6 +116,7 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
         })
       })
       setTableData([...tableData, ...rowsToAddBack]);
+      setBeforesearch([...beforesearch, ...rowsToAddBack]);
 
       const filteredRemovedData = removedData.filter((i: PointTableType) => {
         let flag = true
@@ -129,7 +166,6 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
         },
         ],
         filterMode: 'tree',
-        filterSearch: true,
         onFilter: (value: any, record: PointTableType) => {
           let flag = false
           const [type, name] = value.split(':');
@@ -186,7 +222,6 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
   };
 
   const rowSelection = {
-    hideSelectAll: true,
     selectedRowKeys,
     onChange: onSelectChange
   }

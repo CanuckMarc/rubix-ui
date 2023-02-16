@@ -4,6 +4,7 @@ import { backend } from "../../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { PointTableType } from '../../../App';
 import { AddedPointType } from "../map";
+import { openNotificationWithIcon } from "../../../utils/utils";
 
 interface MenuItemsType {
   text: string;
@@ -23,14 +24,38 @@ const addNameToArray = (name: string, array: MenuItemsType[], type: string) => {
 }
 
 export const PointsPane = (props: any) => {
-  const {title, pointList, pairToAdd, pairToRemove, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
+  const {title, pointsPaneSearch, pointList, pairToAdd, pairToRemove, clearSelection, setClearSelection, selectedPoints, setSelectedPoints} = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [ownSelection, setOwnSelection] = useState<PointTableType | undefined>(undefined);
   const [removedItem, setRemovedItem] = useState<PointTableType[]>([]);
   const [tableData, setTableData] = useState<PointTableType[]>([]);
+  const [beforesearch, setBeforesearch] = useState<PointTableType[]>([]);
   const [allNames, setAllNames] = useState<Array<Array<MenuItemsType>>>([]);
 
   const types = ['plugin', 'network', 'device', 'point']
+
+  useEffect(() => {
+    if (pointsPaneSearch && pointsPaneSearch !== "") {
+      setBeforesearch(tableData);
+      let temp: PointTableType[] = [];
+      tableData.forEach((item: PointTableType) => {
+        if (item.name.toLowerCase().includes(pointsPaneSearch)) {
+          temp.push(item);
+        }
+      });
+
+      if (temp.length === 0) {
+        setTableData(beforesearch)
+        openNotificationWithIcon("warning", 'No result matches your search.');
+      } else {
+        setTableData(temp);
+      }
+    } else {
+      setTableData(beforesearch)
+    }
+    // console.log('to show: ', tableData)
+    // console.log('to track: ', beforesearch)
+  }, [pointsPaneSearch])
 
   useEffect(() => {
     let mappedList: PointTableType[] = []
@@ -54,6 +79,7 @@ export const PointsPane = (props: any) => {
       })
     }
     setTableData(mappedList);
+    setBeforesearch(mappedList);
     setAllNames(localAllNames);
   }, [pointList])
 
@@ -68,6 +94,7 @@ export const PointsPane = (props: any) => {
 
   useEffect(() => {
     let temp: PointTableType[] = []
+    let beforeTemp: PointTableType[] = []
     if (pairToRemove !== undefined) {
       const updatedTableData = tableData.filter(item => {
         if (item.uuid !== pairToRemove[0].uuid && item.uuid !== pairToRemove[1].uuid) {
@@ -78,7 +105,17 @@ export const PointsPane = (props: any) => {
         }
       })
 
+      const updatedBeforeSearchTableData = beforesearch.filter(item => {
+        if (item.uuid !== pairToRemove[0].uuid && item.uuid !== pairToRemove[1].uuid) {
+          return true
+        } else {
+          beforeTemp.push(item)
+          return false
+        }
+      })
+
       setTableData(updatedTableData);
+      setBeforesearch(updatedBeforeSearchTableData);
       setRemovedItem([...removedItem, ...temp]);
     }
   }, [pairToRemove])
@@ -94,6 +131,7 @@ export const PointsPane = (props: any) => {
             })
         });
         setTableData([...tableData, ...rowsToAddBack])
+        setBeforesearch([...beforesearch, ...rowsToAddBack])
 
         const temp = removedItem.filter(item => {
             let flag = true;
@@ -137,7 +175,6 @@ export const PointsPane = (props: any) => {
         },
         ],
         filterMode: 'tree',
-        filterSearch: true,
         onFilter: (value: any, record: PointTableType) => {
           let flag = false
           const [type, name] = value.split(':');
@@ -171,13 +208,7 @@ export const PointsPane = (props: any) => {
       dataIndex: 'point_name',
       key: 'point_name',
       fixed: 'left'
-    },
-    // {
-    //   title: 'uuid',
-    //   dataIndex: 'uuid',
-    //   key: 'uuid',
-    //   fixed: 'left'
-    // }
+    }
   ]
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -212,7 +243,7 @@ export const PointsPane = (props: any) => {
       bordered={true}
       columns={columns} 
       dataSource={tableData} 
-      style={{ width: '45%' }}
+      style={{ maxWidth: '45%' }}
       rowSelection={rowSelection}
       pagination={{
           position: ["bottomCenter"],

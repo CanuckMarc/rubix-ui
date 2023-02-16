@@ -338,6 +338,10 @@ export function EdgeBiosTokens(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeBiosTokens'](arg1, arg2, arg3);
 }
 
+export function EdgeCreateSnapshot(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeCreateSnapshot'](arg1, arg2);
+}
+
 export function EdgeDHCPPortExists(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPPortExists'](arg1, arg2, arg3);
 }
@@ -356,6 +360,10 @@ export function EdgeDeleteAppDB(arg1, arg2, arg3) {
 
 export function EdgeDeleteDataFile(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDeleteDataFile'](arg1, arg2, arg3);
+}
+
+export function EdgeDeleteSnapshot(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteSnapshot'](arg1, arg2, arg3);
 }
 
 export function EdgeEnablePlugins(arg1, arg2, arg3, arg4) {
@@ -414,6 +422,18 @@ export function EdgeGetPluginsDistribution(arg1, arg2) {
   return window['go']['backend']['App']['EdgeGetPluginsDistribution'](arg1, arg2);
 }
 
+export function EdgeGetSnapshots(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshots'](arg1, arg2);
+}
+
+export function EdgeGetSnapshotsCreateLogs(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshotsCreateLogs'](arg1, arg2);
+}
+
+export function EdgeGetSnapshotsRestoreLogs(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshotsRestoreLogs'](arg1, arg2);
+}
+
 export function EdgeGetTimeZoneList(arg1, arg2) {
   return window['go']['backend']['App']['EdgeGetTimeZoneList'](arg1, arg2);
 }
@@ -440,6 +460,10 @@ export function EdgeNTPEnable(arg1, arg2) {
 
 export function EdgeRestartPlugins(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeRestartPlugins'](arg1, arg2, arg3);
+}
+
+export function EdgeRestoreSnapshot(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeRestoreSnapshot'](arg1, arg2, arg3);
 }
 
 export function EdgeRubixAppVersions(arg1, arg2, arg3, arg4, arg5) {
@@ -512,6 +536,10 @@ export function EditPoint(arg1, arg2, arg3, arg4) {
 
 export function EditProducer(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EditProducer'](arg1, arg2, arg3, arg4);
+}
+
+export function EditProducerHistory(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['backend']['App']['EditProducerHistory'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 export function EditSchedule(arg1, arg2, arg3, arg4) {
@@ -812,6 +840,10 @@ export function GetPointsForDevice(arg1, arg2, arg3) {
 
 export function GetProducer(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3, arg4);
+}
+
+export function GetProducerByThingUUID(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetProducerByThingUUID'](arg1, arg2, arg3);
 }
 
 export function GetProducers(arg1, arg2) {

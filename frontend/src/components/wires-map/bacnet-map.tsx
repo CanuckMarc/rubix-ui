@@ -1,4 +1,4 @@
-import { Typography, Card, Select, Button, Table, Input, InputNumber, Spin } from "antd";
+import { Card, Select, Button, Table, Input, InputNumber, Spin } from "antd";
 import { useState, useEffect, ChangeEvent } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from "react-router-dom";
@@ -13,10 +13,11 @@ import { BacnetPointTable } from "./views/bacnetPointTable";
 import { FlowFactory } from "../rubix-flow/factory"
 import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
 
-const { Title } = Typography;
+const { Search } = Input;
 
 export interface BacnetPointTablePropType {
   title: string;
+  pointsPaneSearch: string | undefined;
   pointList: PointTableType[]; 
   rowKeysToAddBack: BacnetTableDataType[] | undefined;
   pointsToRemove: PointTableType[] | undefined; 
@@ -39,6 +40,8 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const [bacnetServerNode, setBacnetServerNode] = useState({} as NodeInterface);
   const [disableAllButton, setDisableAllButton] = useState(false);
   const [instancePrefill, setInstancePrefill] = useState(1);
+  const [search, setSearch] = useState<string | undefined>(undefined);
+  const [pointsPaneSearch, setPointsPaneSearch] = useState<string | undefined>(undefined);
 
   const [bacnetNodes, setBacnetNodes] = useBacnetStore(
     (state) => [state.bacnetNodes, state.setBacnetNodes]
@@ -47,12 +50,19 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   const flowFactory = new FlowFactory();
   const isRemote = !!connUUID && !!hostUUID;
 
+  const cleanUp = () => {
+    setBacnetNodes([]);
+    reset();
+    fetchFlownet();
+    searchExistingBacnet();
+    setInstancePrefill(1);
+  }
+
   useEffect(() => {
-      setBacnetNodes([]);
-      reset();
-      fetchFlownet();
-      searchExistingBacnet();
-      setInstancePrefill(1);
+    cleanUp();
+    return () => {
+      cleanUp();
+    }
   }, [connUUID, hostUUID]);
 
   const searchExistingBacnet = async () => {
@@ -62,7 +72,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       setBacnetServerNode(bacnetNodes.nodes[0])
     } else {
       setDisableAllButton(true)
-      openNotificationWithIcon("warning", 'No existing Bacnet server in Wires sheet!');
+      openNotificationWithIcon("warning", 'No existing BACnet server in wires sheet!');
     }
   }
 
@@ -87,7 +97,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
             key: newId,
             flownetSchema: selectedFlownet,
             bacnetServerInterface: bacnetServerNode,
-            avName: point.point_name
+            avName: point.name.split(':').splice(1, 4).join(' ')
           }
           counter += 1;
           tempTableDataArray.push(resObj)
@@ -179,15 +189,16 @@ export const BacnetMap = (props: BacnetMapPropType) => {
 
   const columns: ColumnsType<BacnetTableDataType> = [
     {
-      title: 'Flow network',
+      title: 'Flow network name',
       dataIndex: 'existingFlowNetName',
       key: 'existingFlowNetName',
+      width: '300px',
       render: (text, record: BacnetTableDataType, index) => {
         return record?.existingFlowNetName || 'Flow network name unspecified.'
       }
     },
     {
-      title: 'Point',
+      title: 'Point name',
       dataIndex: 'selectedPointName',
       key: 'selectedPointName',
       render: (text, record: BacnetTableDataType, index) => {
@@ -208,6 +219,7 @@ export const BacnetMap = (props: BacnetMapPropType) => {
       title: 'Analog variable instance number',
       dataIndex: 'instanceNumber',
       key: 'instanceNumber',
+      width: '200px',
       render: (text, record: BacnetTableDataType, index) => {
         return (
           <InputNumber defaultValue={record.instanceNumber} style={{width: '100%'}} onChange={(value: number | null) => onInstanceNumberChange(value, record)} />
@@ -235,26 +247,57 @@ export const BacnetMap = (props: BacnetMapPropType) => {
     onChange: onSelectChange
   };
 
+  const onSearchBarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+    if (event.target.value === "") {
+      setSearch(undefined)
+      setPointsPaneSearch(undefined)
+    }
+  };
+
+  const handleSearchPointName = () => {
+    console.log('search value is: ', search)
+    setPointsPaneSearch(search)
+  }
+
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', gap: '2vw'}}>
       <Card bordered={true}>
         <div style={{display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-          <div style={{display: 'flex', flexDirection: 'row', gap: '2vw', alignItems: 'center'}}>
-            <Title level={5}>Select flow network: </Title>
+          <div style={{display: 'flex', flexDirection: 'row', gap: '30px', alignItems: 'center'}}>
+            <strong>Select flow network: </strong>
             <Select
               showSearch
               allowClear
               value={selectValue}
-              style={{ width: '50%' }}
+              style={{ width: '500px' }}
               placeholder="Please select"
               onChange={handleChange}
               options={flowNetOptionList}
             />
           </div>
+
+          <div style={{display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center'}}>
+            <strong>Search by point name: </strong>
+            <Search 
+              placeholder="search by point name"
+              enterButton="Search"
+              disabled={pointList.length === 0}
+              allowClear={true} 
+              value={search} 
+              onChange={onSearchBarChange} 
+              onSearch={handleSearchPointName} 
+              style={{ width: '500px' }} 
+            />
+          </div>
+
+          {disableAllButton && (<span style={{color: "orange", fontSize: '18px'}}>Warning: No existing BACnet server in wires sheet!</span>)}
+
           <Spin spinning={isFetchingFlownet} style={{ width: '100%' }}>
             <BacnetPointTable 
               title={'Point'} 
+              pointsPaneSearch={pointsPaneSearch}
               pointList={pointList} 
               rowKeysToAddBack={rowKeysToAddBack}
               pointsToRemove={pointsToRemove} 
@@ -267,9 +310,9 @@ export const BacnetMap = (props: BacnetMapPropType) => {
           <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
             <div style={{display: 'flex', flexDirection: 'column', gap: '2vh', alignItems: 'stretch'}}>
               <div style={{display: 'flex', flexDirection: 'row', gap: '1vw', alignItems: 'center'}}>
-                <Title level={5}>
+                <strong>
                   Selected points: 
-                </Title>
+                </strong>
                 <Button type="primary" icon={<PlusOutlined />} onClick={addPoints} disabled={disableAllButton} size={'middle'} style={{width: '6vw'}}>Add</Button>
                 <Button type="primary" icon={<MinusOutlined />} danger={true} onClick={deletePoints} disabled={disableAllButton || tableData.length === 0 || selectedRowKeys.length === 0} size={'middle'} style={{width: '6vw'}}>Delete</Button>
               </div>
