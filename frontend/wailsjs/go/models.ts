@@ -917,6 +917,8 @@ export namespace chirpstack {
 	    deviceStatusBatteryLevel: number;
 	    // Go type: time.Time
 	    lastSeenAt: any;
+	    lastSeenAtTime: string;
+	    lastSeenAtReadable: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DevicesResult(source);
@@ -936,6 +938,8 @@ export namespace chirpstack {
 	        this.deviceStatusBatteryLevelUnavailable = source["deviceStatusBatteryLevelUnavailable"];
 	        this.deviceStatusBatteryLevel = source["deviceStatusBatteryLevel"];
 	        this.lastSeenAt = this.convertValues(source["lastSeenAt"], null);
+	        this.lastSeenAtTime = source["lastSeenAtTime"];
+	        this.lastSeenAtReadable = source["lastSeenAtReadable"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
