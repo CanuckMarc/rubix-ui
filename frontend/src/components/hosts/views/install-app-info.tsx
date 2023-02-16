@@ -1,4 +1,4 @@
-import { Button, Dropdown, List, Menu, Modal, Typography, Popconfirm } from "antd";
+import { Button, Dropdown, List, Menu, Modal, Typography, Popconfirm, Tooltip } from "antd";
 import { DownloadOutlined, EllipsisOutlined, DeleteOutlined, DatabaseOutlined, BookOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -226,7 +226,9 @@ export const EdgeAppInfo = (props: any) => {
                 <span className="mr-6" style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
                   <Dropdown trigger={["click"]}
                             overlay={<ConfirmActionMenu item={item} onMenuClick={onMenuClick} hasUninstall={true} />}>
-                    <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
+                    <Tooltip title="More options">
+                      <Button icon={<EllipsisOutlined />} loading={isActionLoading[item.service_name || ""] || false} />
+                    </Tooltip>
                   </Dropdown>
 
                   <Popconfirm
@@ -240,23 +242,29 @@ export const EdgeAppInfo = (props: any) => {
                     okText="Confirm"
                     cancelText="Cancel"
                   >
-                    <Button icon={<DatabaseOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                    <Tooltip title="Delete database">
+                      <Button icon={<DatabaseOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                    </Tooltip>
                   </Popconfirm>
 
-                  <Button icon={<BookOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => handleShowLog(item)}/>
+                  <Tooltip title="Open log">
+                    <Button icon={<BookOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => handleShowLog(item)}/>
+                  </Tooltip>
 
                   <Popconfirm
                     title={(
                       <div style={{display: 'flex', flexDirection: 'column', rowGap: '10px'}}>
                         <span style={{color: 'yellow'}}>Warning</span>
-                        <span>This action will delete the app: <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span>!  </span>
+                        <span>This action will uninstall the app: <span style={{background: 'rgba(255,165,0,0.5)'}}>{`${item.app_name}`}</span>!  </span>
                       </div>
                     )}
                     onConfirm={handleDeleteConfirm}
                     okText="Confirm"
                     cancelText="Cancel"
                   >
-                    <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                    <Tooltip title="Uninstall app">
+                      <Button icon={<DeleteOutlined />} loading={isActionLoading[item.service_name || ""] || false} onClick={() => setApp(item)}/>
+                    </Tooltip>
                   </Popconfirm>
                 </span>
 
