@@ -1,4 +1,4 @@
-import { Button, Dropdown, List, Menu, Modal, Typography, Card, Tabs } from "antd";
+import { Typography, Card, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { amodel } from "../../../../wailsjs/go/models";
@@ -7,12 +7,14 @@ import { EdgeAppInfo } from "./install-app-info";
 import { HostTable } from "../host/views/table";
 import { ROUTES } from "../../../constants/routes";
 import RbxBreadcrumb from "../../breadcrumbs/breadcrumbs";
+import { Snapshots } from "./snapshots/snapshots";
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 const { TabPane } = Tabs;
 
 const detailsTag = "App details";
 const settingsTag = "Settings";
+const snapshotsTag = "Snapshots";
 
 export const AppDetails = () => {
   let { connUUID = "", netUUID = "", locUUID = "", hostUUID = "" } = useParams();
@@ -48,18 +50,18 @@ export const AppDetails = () => {
   ];
 
   const fetchList = async () => {
-      try {
-        setIsFetching(true);
-        const res = await GetHostNetwork(connUUID, netUUID)
-        const filteredHost = res.hosts.filter((item: amodel.Host) => {
-          if (item.uuid === hostUUID) return true
-        })
-        setHosts(filteredHost);  
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsFetching(false);
-      }
+    try {
+      setIsFetching(true);
+      const res = await GetHostNetwork(connUUID, netUUID);
+      const filteredHost = res.hosts.filter((item: amodel.Host) => {
+        if (item.uuid === hostUUID) return true;
+      });
+      setHosts(filteredHost);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   useEffect(() => {
@@ -80,6 +82,10 @@ export const AppDetails = () => {
 
           <TabPane tab={settingsTag} key={settingsTag}>
             <HostTable />
+          </TabPane>
+
+          <TabPane tab={snapshotsTag} key={snapshotsTag}>
+            <Snapshots />
           </TabPane>
         </Tabs>
       </Card>

@@ -316,6 +316,7 @@ export const getTreeDataIterative = (connections: any) => {
             })),
             className,
           })),
+          className,
         })),
         className:
           !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,

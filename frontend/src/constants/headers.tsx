@@ -1120,6 +1120,62 @@ export const LORAWAN_REMOTE_HEADERS = [
   },
 ];
 
+export const CREATE_LOGS_HEADERS = [
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+  {
+    key: "status",
+    title: "Status",
+    dataIndex: "status",
+  },
+  {
+    key: "msg",
+    title: "MSG",
+    dataIndex: "msg",
+  },
+  {
+    key: "host_uuid",
+    title: "Host UUID",
+    dataIndex: "host_uuid",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
+export const SNAPSHOTS_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    key: "size",
+    title: "Size",
+    dataIndex: "size",
+  },
+  {
+    key: "size_readable",
+    title: "Size Readable",
+    dataIndex: "size_readable",
+  },
+  {
+    key: "created_at_readable",
+    title: "Created At Readable",
+    dataIndex: "created_at_readable",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
 //--------------schema-------------//
 
 export const WIRES_CONNECTION_SCHEMA = {
