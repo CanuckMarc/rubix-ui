@@ -60,9 +60,6 @@ export const BacnetMap = (props: BacnetMapPropType) => {
 
   useEffect(() => {
     cleanUp();
-    return () => {
-      cleanUp();
-    }
   }, [connUUID, hostUUID]);
 
   const searchExistingBacnet = async () => {
