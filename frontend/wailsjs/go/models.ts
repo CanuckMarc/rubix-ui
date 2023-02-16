@@ -423,14 +423,22 @@ export namespace assistcli {
 	export class Snapshots {
 	    name: string;
 	    size: number;
-
 	    size_readable: string;
 	    // Go type: time.Time
 	    created_at: any;
 	    created_at_readable: string;
-
-	    // Go type: time.Time
-	    created_at: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Snapshots(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.size = source["size"];
+	        this.size_readable = source["size_readable"];
+	        this.created_at = this.convertValues(source["created_at"], null);
+	        this.created_at_readable = source["created_at_readable"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
