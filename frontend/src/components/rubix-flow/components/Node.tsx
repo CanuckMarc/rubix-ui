@@ -242,7 +242,7 @@ export const Node = memo((props: NodeProps) => {
       isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
-      nodeName={node?.info?.nodeName?.replace('{parent.name}', '') || ""}
+      nodeName={node?.info?.nodeName?.replace("{parent.name}", "") || ""}
       category={spec.category}
       selected={selected}
       height={node?.height ?? 30}
@@ -258,7 +258,9 @@ export const Node = memo((props: NodeProps) => {
           ((input.valueType === "number" && newData[input.name] !== 0) ||
             (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          newData[input.name] = nodeInputs?.[0].value;
+          nodeInputs?.forEach((item: any) => {
+            return newData[input.name] = item.value;
+          })
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";
@@ -268,7 +270,7 @@ export const Node = memo((props: NodeProps) => {
             {input && (
               <InputSocket
                 {...input}
-                value={nodeInputs?.[0].value || newData[input.name]}
+                value={input.defaultValue || newData[input.name]}
                 onChange={handleChange}
                 connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
