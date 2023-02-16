@@ -437,7 +437,15 @@ export const HOST_HEADERS = [
     title: "Is Online",
     dataIndex: "is_online",
     key: "is_online",
-    render: (a: any) => "" + (a ?? ""),
+    render: (a: boolean) => {
+      let colour = "red";
+      let text = "Offline";
+      if (a) {
+        colour = "green";
+        text = "Online";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
     sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
