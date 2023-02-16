@@ -16,7 +16,7 @@ export const ActiveForm = (props: any) => {
   const handleSubmit = async () => {
     try {
       setConfirmLoading(true);
-      await factory.CSDeviceOTAKeys(connUUID, hostUUID, devEUI.devEUI, key);
+      await factory.CSDeviceOTAKeys(connUUID, hostUUID, devEUI, key);
       refreshList();
       handleWizardClose();
     } catch (err) {
