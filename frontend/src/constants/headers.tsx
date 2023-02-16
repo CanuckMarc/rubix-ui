@@ -1133,13 +1133,8 @@ export const CREATE_LOGS_HEADERS = [
   },
   {
     key: "msg",
-    title: "MSG",
+    title: "Message",
     dataIndex: "msg",
-  },
-  {
-    key: "host_uuid",
-    title: "Host UUID",
-    dataIndex: "host_uuid",
   },
   {
     key: "created_at",
