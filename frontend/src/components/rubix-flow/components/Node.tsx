@@ -270,7 +270,7 @@ export const Node = memo((props: NodeProps) => {
             {input && (
               <InputSocket
                 {...input}
-                value={input.defaultValue || newData[input.name]}
+                value={input.valueOfChild || newData[input.name]}
                 onChange={handleChange}
                 connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
