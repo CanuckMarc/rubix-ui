@@ -44,6 +44,8 @@ type DevicesResult struct {
 	DeviceStatusBatteryLevelUnavailable bool      `json:"deviceStatusBatteryLevelUnavailable"`
 	DeviceStatusBatteryLevel            int       `json:"deviceStatusBatteryLevel"`
 	LastSeenAt                          time.Time `json:"lastSeenAt"`
+	LastSeenAtTime                      string    `json:"lastSeenAtTime"`
+	LastSeenAtReadable                  string    `json:"lastSeenAtReadable"`
 }
 
 // Devices GET

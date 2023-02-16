@@ -1101,12 +1101,14 @@ export const LORAWAN_REMOTE_HEADERS = [
     dataIndex: "deviceProfileID",
   },
   {
-    key: "lastSeenAt",
+    key: "lastSeenAtReadable",
     title: "Last Seen At",
-    dataIndex: "lastSeenAt",
-    render(value: string) {
-      return moment.utc(value).format("YYYY-MM-DD");
-    },
+    dataIndex: "lastSeenAtReadable",
+  },
+  {
+    key: "lastSeenAtTime",
+    title: "Time Last Seen At",
+    dataIndex: "lastSeenAtTime",
   },
 ];
 

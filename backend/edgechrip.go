@@ -118,6 +118,12 @@ func (inst *App) CSGetDevices(connUUID, hostUUID, applicationID string) *chirpst
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+
+	format := "2006-01-02 15:04:05"
+	for _, result := range devices.Result {
+		result.LastSeenAtReadable = ttime.TimeSince(result.LastSeenAt)
+		result.LastSeenAtTime = result.LastSeenAt.Local().Format(format)
+	}
 	return devices
 }
 
