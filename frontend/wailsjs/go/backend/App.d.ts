@@ -190,6 +190,8 @@ export function EdgeBiosTokenRegenerate(arg1:string,arg2:string,arg3:string,arg4
 
 export function EdgeBiosTokens(arg1:string,arg2:string,arg3:string):Promise<externaltoken.ExternalToken>;
 
+export function EdgeCreateSnapshot(arg1:string,arg2:string):Promise<assistcli.Message>;
+
 export function EdgeDHCPPortExists(arg1:string,arg2:string,arg3:system.NetworkingBody):Promise<system.DHCPPortExists>;
 
 export function EdgeDHCPSetAsAuto(arg1:string,arg2:string,arg3:system.NetworkingBody):Promise<system.Message>;
@@ -199,6 +201,8 @@ export function EdgeDHCPSetStaticIP(arg1:string,arg2:string,arg3:dhcpd.SetStatic
 export function EdgeDeleteAppDB(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
 
 export function EdgeDeleteDataFile(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
+export function EdgeDeleteSnapshot(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
 
 export function EdgeEnablePlugins(arg1:string,arg2:string,arg3:Array<string>,arg4:boolean):Promise<rumodel.Response>;
 
@@ -228,6 +232,12 @@ export function EdgeGetPlugins(arg1:string,arg2:string,arg3:boolean):Promise<rum
 
 export function EdgeGetPluginsDistribution(arg1:string,arg2:string):Promise<rumodel.Response>;
 
+export function EdgeGetSnapshots(arg1:string,arg2:string):Promise<Array<assistcli.Snapshots>>;
+
+export function EdgeGetSnapshotsCreateLogs(arg1:string,arg2:string):Promise<Array<assistcli.SnapshotCreateLog>>;
+
+export function EdgeGetSnapshotsRestoreLogs(arg1:string,arg2:string):Promise<Array<assistcli.SnapshotRestoreLog>>;
+
 export function EdgeGetTimeZoneList(arg1:string,arg2:string):Promise<Array<string>>;
 
 export function EdgeHostReboot(arg1:string,arg2:string):Promise<system.Message>;
@@ -241,6 +251,8 @@ export function EdgeNTPDisable(arg1:string,arg2:string):Promise<system.Message>;
 export function EdgeNTPEnable(arg1:string,arg2:string):Promise<system.Message>;
 
 export function EdgeRestartPlugins(arg1:string,arg2:string,arg3:Array<string>):Promise<rumodel.Response>;
+
+export function EdgeRestoreSnapshot(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
 
 export function EdgeRubixAppVersions(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<Array<string>>;
 
@@ -277,6 +289,8 @@ export function EditNetwork(arg1:string,arg2:string,arg3:string,arg4:model.Netwo
 export function EditPoint(arg1:string,arg2:string,arg3:string,arg4:model.Point):Promise<model.Point>;
 
 export function EditProducer(arg1:string,arg2:string,arg3:string,arg4:model.Producer):Promise<model.Producer>;
+
+export function EditProducerHistory(arg1:string,arg2:string,arg3:string,arg4:string,arg5:boolean,arg6:number):Promise<model.Producer>;
 
 export function EditSchedule(arg1:string,arg2:string,arg3:string,arg4:assistcli.Schedule):Promise<any>;
 
@@ -427,6 +441,8 @@ export function GetPoints(arg1:string,arg2:string):Promise<Array<model.Point>>;
 export function GetPointsForDevice(arg1:string,arg2:string,arg3:string):Promise<Array<model.Point>>;
 
 export function GetProducer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Producer>;
+
+export function GetProducerByThingUUID(arg1:string,arg2:string,arg3:string):Promise<model.Producer>;
 
 export function GetProducers(arg1:string,arg2:string):Promise<Array<model.Producer>>;
 
