@@ -161,12 +161,6 @@ export const HostsTable = (props: any) => {
     setCurrentHost({} as Host);
   };
 
-  useEffect(() => {
-    const _tokenFactory: EdgeBiosTokenFactory = new EdgeBiosTokenFactory(connUUID);
-    _tokenFactory.hostUUID = currentHost.uuid;
-    setTokenFactory(_tokenFactory);
-  }, [currentHost]);
-
   const onUpdateStatus = async () => {
     setLoadingUpdateStatus(true);
     try {
@@ -178,6 +172,17 @@ export const HostsTable = (props: any) => {
       setLoadingUpdateStatus(false);
     }
   };
+
+  useEffect(() => {
+    onUpdateStatus();
+  }, [])
+
+  useEffect(() => {
+    const _tokenFactory: EdgeBiosTokenFactory = new EdgeBiosTokenFactory(connUUID);
+    _tokenFactory.hostUUID = currentHost.uuid;
+    setTokenFactory(_tokenFactory);
+  }, [currentHost]);
+
 
   return (
     <div>

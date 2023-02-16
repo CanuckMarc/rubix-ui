@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/rubix-ui/backend/assistcli"
+	log "github.com/sirupsen/logrus"
 )
 
 func (inst *App) EdgeGetSnapshots(connUUID, hostUUID string) []assistcli.Snapshots {
@@ -58,16 +59,18 @@ func (inst *App) EdgeCreateSnapshot(connUUID, hostUUID string) *assistcli.Messag
 }
 
 func (inst *App) EdgeRestoreSnapshot(connUUID, hostUUID, fileName string) *assistcli.Message {
-	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
-	if err != nil {
-		return nil
-	}
-	resp, err := client.EdgeRestoreSnapshot(hostUUID, fileName)
-	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
-		return nil
-	}
-	return resp
+	// client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	// if err != nil {
+	// 	return nil
+	// }
+	// resp, err := client.EdgeRestoreSnapshot(hostUUID, fileName)
+	// if err != nil {
+	// 	inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+	// 	return nil
+	// }
+	// return resp
+	log.Error("RESTORE SNAPSHOT ADD ME IN", connUUID, hostUUID, fileName)
+	return nil
 }
 
 func (inst *App) EdgeDeleteSnapshot(connUUID, hostUUID, fileName string) *assistcli.Message {

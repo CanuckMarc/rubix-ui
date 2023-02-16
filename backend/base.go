@@ -73,13 +73,15 @@ func (inst *App) getLatestVersions() {
 	if len(assistVersions) > 0 {
 		inst.LatestRubixAssistVersion = assistVersions[0]
 	}
-	version, err := inst.getLatestReleaseVersion()
-	if err != nil {
-		return
-	}
+
 	flowVersions := inst.EdgeFlowFrameworkVersions()
 	if len(assistVersions) > 0 {
 		inst.LatestFlowFrameworkVersion = flowVersions[0]
+	}
+
+	version, err := inst.getLatestReleaseVersion()
+	if err != nil {
+		return
 	}
 
 	if version != inst.LatestReleaseVersion {

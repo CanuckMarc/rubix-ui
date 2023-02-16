@@ -437,7 +437,15 @@ export const HOST_HEADERS = [
     title: "Is Online",
     dataIndex: "is_online",
     key: "is_online",
-    render: (a: any) => "" + (a ?? ""),
+    render: (a: boolean) => {
+      let colour = "red";
+      let text = "Offline";
+      if (a) {
+        colour = "green";
+        text = "Online";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
     sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
@@ -1109,6 +1117,57 @@ export const LORAWAN_REMOTE_HEADERS = [
     key: "lastSeenAtTime",
     title: "Time Last Seen At",
     dataIndex: "lastSeenAtTime",
+  },
+];
+
+export const CREATE_LOGS_HEADERS = [
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
+  },
+  {
+    key: "status",
+    title: "Status",
+    dataIndex: "status",
+  },
+  {
+    key: "msg",
+    title: "Message",
+    dataIndex: "msg",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
+export const SNAPSHOTS_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    key: "size",
+    title: "Size",
+    dataIndex: "size",
+  },
+  {
+    key: "size_readable",
+    title: "Size Readable",
+    dataIndex: "size_readable",
+  },
+  {
+    key: "created_at_readable",
+    title: "Created At Readable",
+    dataIndex: "created_at_readable",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
   },
 ];
 

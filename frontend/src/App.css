@@ -185,3 +185,7 @@ hr.solid {
     background: var(--nube-light-grey);
     border-radius: 5px;
 }
+
+.d-flex {
+    display: flex;
+}

@@ -27,17 +27,17 @@ func (inst *App) LatestVersions() *LatestVersions {
 }
 
 func (inst *App) EdgeBiosRubixAssistVersions() []string {
-	const repo = "rubix-assist"
+	const repo = constants.RubixAssist
 	return inst.getRepoVersions(constants.GitHubOwner, repo)
 }
 
 func (inst *App) EdgeBiosRubixEdgeVersions() []string {
-	const repo = "rubix-edge"
+	const repo = constants.RubixEdge
 	return inst.getRepoVersions(constants.GitHubOwner, repo)
 }
 
 func (inst *App) EdgeFlowFrameworkVersions() []string {
-	const repo = "flow-framework"
+	const repo = constants.FlowFramework
 	return inst.getRepoVersions(constants.GitHubOwner, repo)
 }
 
