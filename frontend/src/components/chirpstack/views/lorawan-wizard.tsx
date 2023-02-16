@@ -1,36 +1,37 @@
 import { useEffect, useState } from "react";
-import { Modal, Spin, Steps, Button, StepsProps } from "antd";
+import { Modal, Steps, StepsProps } from "antd";
 import { CreateEditForm } from "./create-form";
 import { ActiveForm } from "./active-form";
-import { openNotificationWithIcon } from "../../../utils/utils";
 const { Step } = Steps;
 
 export const AddDeviceWizard = (props: any) => {
   const { refreshList, isWizardModalVisible, setIsWizardModalVisible } = props;
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
-  // const [errorAtPing, setErrorAtPing] = useState(false);
   const [devEUI, setDevEUI] = useState<string | undefined>(undefined);
   
   useEffect(() => {
     setStepStatus('process');
+    setDevEUI(undefined);
   }, [])
 
   const handleWizardClose = () => {
     setCurrentStep(0);
     setIsWizardModalVisible(false);
+    setStepStatus('process');
+    setDevEUI(undefined);
     refreshList();
   }
   
   const data = [
     { id: "1", name: "Step 1", text: 'Create new device', content: (
       <div style={{width: '35vw'}}>
-        <CreateEditForm 
-          currentItem={undefined}
+        <CreateEditForm
           refreshList={refreshList}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           setDevEUI={setDevEUI}
+          setStepStatus={setStepStatus}
         />
       </div>
     ) },
@@ -40,6 +41,7 @@ export const AddDeviceWizard = (props: any) => {
           devEUI={devEUI}
           refreshList={refreshList}
           handleWizardClose={handleWizardClose}
+          setStepStatus={setStepStatus}
         />
       </div>
     ) }
@@ -48,7 +50,6 @@ export const AddDeviceWizard = (props: any) => {
   const onStepsChange = (value: number) => {
     if (stepStatus === 'error') {
       setStepStatus('process');
-      // setErrorAtPing(false);
     }
     setCurrentStep(value);
   };
