@@ -25,7 +25,7 @@ export const badgeDetails: BadgeDetailI = {
   },
   [APPLICATION_STATES.DISABLED]: {
     title: "Disabled",
-    color: "red",
+    color: "light gray",
   },
   [APPLICATION_STATES.ACTIVE]: {
     title: "Active",
