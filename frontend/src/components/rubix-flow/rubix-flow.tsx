@@ -97,6 +97,8 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
@@ -397,6 +399,7 @@ const Flow = (props: FlowProps) => {
   };
 
   const onHandelSaveFlow = async () => {
+    setIsSaving(true);
     const allNodes: NodeInterface[] = [...nodes];
     window.allFlow.nodes.forEach((node) => {
       const isExist = allNodes.some((n) => n.id === node.id);
@@ -413,31 +416,36 @@ const Flow = (props: FlowProps) => {
     });
     const graphJson = flowToBehave(newNodesFiltered, window.allFlow.edges);
 
-    // save nodes and edges
-    await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
+    try {
+      // save nodes and edges
+      await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
 
-    // filter nodes at level 1 or in sub flow
-    const newNodesL1 = newNodesFiltered.filter((node) => {
-      return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
-    });
-
-    newNodesFiltered.forEach((node1) => {
-      const hasParent = newNodesL1.some((node2) => {
-        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
+      // filter nodes at level 1 or in sub flow
+      const newNodesL1 = newNodesFiltered.filter((node) => {
+        return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
       });
-      if (hasParent) {
-        newNodesL1.push(node1);
-      }
-    });
-    const edgesL1 = window.allFlow.edges.filter((e) =>
-      newNodesL1.some((node) => node.id === e.target || node.id === e.source)
-    );
 
-    setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
-    setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
-    window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
-    setIsChangedFlow(false);
-    handleRefreshValues();
+      newNodesFiltered.forEach((node1) => {
+        const hasParent = newNodesL1.some((node2) => {
+          return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
+        });
+        if (hasParent) {
+          newNodesL1.push(node1);
+        }
+      });
+      const edgesL1 = window.allFlow.edges.filter((e) =>
+        newNodesL1.some((node) => node.id === e.target || node.id === e.source)
+      );
+
+      setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
+      setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
+      window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
+      setIsChangedFlow(false);
+      handleRefreshValues();
+    } catch (error) {
+      console.log("__ERROR__", error);
+    }
+    setIsSaving(false);
   };
 
   const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
@@ -1056,6 +1064,7 @@ const Flow = (props: FlowProps) => {
 
   useEffect(() => {
     closeNodePicker();
+    setIsFetching(true);
     factory
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
@@ -1080,8 +1089,11 @@ const Flow = (props: FlowProps) => {
         /* Get output Nodes */
         handleRefreshValues();
         incrementRefreshCounter();
+        setIsFetching(false);
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsFetching(false);
+      });
   }, [connUUID, hostUUID]);
 
   useEffect(() => {
@@ -1110,7 +1122,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      {flowSettings.showNodesTree && (
+      {!isFetching && flowSettings.showNodesTree && (
         <NodesTree
           nodes={window.allFlow?.nodes || []}
           selectedSubFlowId={selectedNodeForSubFlow?.id}
@@ -1120,142 +1132,158 @@ const Flow = (props: FlowProps) => {
           flowSettings={flowSettings}
         />
       )}
-      {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className={`rubix-flow__wrapper ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
-        <SubFlowTabs
-          nodes={nodesParent}
-          selectedSubflow={selectedNodeForSubFlow}
-          goSubFlow={handleAddSubFlow}
-          onBackToMain={onBackToMain}
-        />
-        <ReactFlowProvider>
-          <ReactFlow
-            onContextMenu={(event: ReactMouseEvent) => {
-              handleSelectContextMenu(event);
-              setMenuOpenFromNodeTree(false);
-            }}
-            nodeTypes={customNodeTypes}
-            edgeTypes={customEdgeTypes}
-            nodes={nodes}
-            edges={edges}
-            onMove={onMove}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onSelectionChange={onChangeSelection}
-            onEdgeClick={onEdgeClick}
-            onConnectStart={handleStartConnect}
-            onEdgeContextMenu={onEdgeContextMenu}
-            onConnectEnd={onConnectEnd}
-            onPaneClick={handlePaneClick}
-            onPaneContextMenu={handlePaneContextMenu}
-            onNodeContextMenu={handleNodeContextMenu}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onInit={setRubixFlowInstance}
-            fitView
-            deleteKeyCode={["Delete"]}
-            onNodeDragStop={handleNodeDragStop}
-            multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
-          >
-            {nodeMenuSelectVisibility && (
-              <SelectMenu
-                isOpenFromNodeTree={isMenuOpenFromNodeTree}
-                handleAlignLefts={handleAlignLeft}
-                handleAlignRights={handleAlignRight}
-                position={nodeMenuSelectVisibility}
-                node={nodeSelect}
-                onClose={closeNodePicker}
+      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
+      <div
+        className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
+        ref={rubixFlowWrapper}
+      >
+        {!isFetching && (
+          <SubFlowTabs
+            nodes={nodesParent}
+            selectedSubflow={selectedNodeForSubFlow}
+            goSubFlow={handleAddSubFlow}
+            onBackToMain={onBackToMain}
+          />
+        )}
+        {isSaving && (
+          <div className="absolute l-0 z-[100] w-full h-full flex bg-gray-800 bg-opacity-50">
+            <Spin className="m-auto" />
+          </div>
+        )}
+        {isFetching ? (
+          <div className="h-full flex">
+            <Spin className="m-auto" />
+          </div>
+        ) : (
+          <ReactFlowProvider>
+            <ReactFlow
+              onContextMenu={(event: ReactMouseEvent) => {
+                handleSelectContextMenu(event);
+                setMenuOpenFromNodeTree(false);
+              }}
+              nodeTypes={customNodeTypes}
+              edgeTypes={customEdgeTypes}
+              nodes={nodes}
+              edges={edges}
+              onMove={onMove}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onSelectionChange={onChangeSelection}
+              onEdgeClick={onEdgeClick}
+              onConnectStart={handleStartConnect}
+              onEdgeContextMenu={onEdgeContextMenu}
+              onConnectEnd={onConnectEnd}
+              onPaneClick={handlePaneClick}
+              onPaneContextMenu={handlePaneContextMenu}
+              onNodeContextMenu={handleNodeContextMenu}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onInit={setRubixFlowInstance}
+              fitView
+              deleteKeyCode={["Delete"]}
+              onNodeDragStop={handleNodeDragStop}
+              multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
+            >
+              {nodeMenuSelectVisibility && (
+                <SelectMenu
+                  isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                  handleAlignLefts={handleAlignLeft}
+                  handleAlignRights={handleAlignRight}
+                  position={nodeMenuSelectVisibility}
+                  node={nodeSelect}
+                  onClose={closeNodePicker}
+                  selectedNodeForSubFlow={selectedNodeForSubFlow}
+                />
+              )}
+              <LoadWiresMap />
+              <LoadBacnetMap />
+              <DragSelection />
+              {flowSettings.showMiniMap && (
+                <MiniMap
+                  nodes={nodes.filter((node: NodeInterface) => {
+                    if (selectedNodeForSubFlow) {
+                      return node.parentId === selectedNodeForSubFlow.id;
+                    }
+                    return !node.parentId;
+                  })}
+                  shouldUpdate={shouldUpdateMiniMap}
+                  className={cx("absolute", {
+                    "top-20 right-4": flowSettings.positionMiniMap === "top",
+                  })}
+                  nodeColor={handleMinimapNodeColor}
+                  nodeStrokeColor={handleMinimapBorderColor}
+                />
+              )}
+              <ControlUndoable
+                canUndo={undoState.past.length > 0}
+                onUndo={handleUndo}
+                canRedo={undoState.future.length > 0}
+                onRedo={handleRedo}
+              />
+              <Controls />
+              <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
+              <BehaveControls
+                isChangedFlow={isChangedFlow}
+                deleteNodesAndEdges={deleteNodesAndEdges}
+                onCopyNodes={handleCopyNodes}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                settings={flowSettings}
+                onSaveSettings={onSaveFlowSettings}
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
+                onClearAllNodes={onClearAllNodes}
+                onCloseSubFlow={onCloseSubFlow}
+                onBackToMain={onBackToMain}
+                onHandelSaveFlow={onHandelSaveFlow}
+                onLinkBuilder={handleLinkBuilder}
+                handleConnectionBuilderFlow={handleConnectionBuilderFlow}
+                handleLoadNodesAndEdges={handleLoadNodesAndEdges}
               />
-            )}
-            <LoadWiresMap />
-            <LoadBacnetMap />
-            <DragSelection />
-            {flowSettings.showMiniMap && (
-              <MiniMap
-                nodes={nodes.filter((node: NodeInterface) => {
-                  if (selectedNodeForSubFlow) {
-                    return node.parentId === selectedNodeForSubFlow.id;
-                  }
-                  return !node.parentId;
-                })}
-                shouldUpdate={shouldUpdateMiniMap}
-                className={cx("absolute", {
-                  "top-20 right-4": flowSettings.positionMiniMap === "top",
-                })}
-                nodeColor={handleMinimapNodeColor}
-                nodeStrokeColor={handleMinimapBorderColor}
-              />
-            )}
-            <ControlUndoable
-              canUndo={undoState.past.length > 0}
-              onUndo={handleUndo}
-              canRedo={undoState.future.length > 0}
-              onRedo={handleRedo}
-            />
-            <Controls />
-            <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
-            <BehaveControls
-              isChangedFlow={isChangedFlow}
-              deleteNodesAndEdges={deleteNodesAndEdges}
-              onCopyNodes={handleCopyNodes}
-              onUndo={handleUndo}
-              onRedo={handleRedo}
-              settings={flowSettings}
-              onSaveSettings={onSaveFlowSettings}
-              selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onClearAllNodes={onClearAllNodes}
-              onCloseSubFlow={onCloseSubFlow}
-              onBackToMain={onBackToMain}
-              onHandelSaveFlow={onHandelSaveFlow}
-              onLinkBuilder={handleLinkBuilder}
-              handleConnectionBuilderFlow={handleConnectionBuilderFlow}
-              handleLoadNodesAndEdges={handleLoadNodesAndEdges}
-            />
-            {nodePickerVisibility && (
-              <NodePicker
-                position={nodePickerVisibility}
-                filters={getNodePickerFilters(nodes, lastConnectStart)}
-                onPickNode={handleAddNode}
-                onClose={closeNodePicker}
-              />
-            )}
-            {nodeMenuVisibility && (
-              <NodeMenu
-                isOpenFromNodeTree={isMenuOpenFromNodeTree}
-                deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
-                deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
-                handleAlignLefts={handleAlignLeft}
-                handleAlignRights={handleAlignRight}
-                deleteNode={deleteNodesAndEdges}
-                duplicateNode={handleCopyNodes}
-                position={nodeMenuVisibility}
-                node={selectedNode}
-                nodesSpec={nodesSpec}
-                onClose={closeNodePicker}
-                isDoubleClick={isDoubleClick}
-                handleAddSubFlow={handleAddSubFlow}
-                selectedNodeForSubFlow={selectedNodeForSubFlow}
-              />
-            )}
-            {!!selectedNodeForSubFlow && isConnectionBuilder && (
-              <ConnectionBuilderModal
-                parentNode={selectedNodeForSubFlow}
-                open
-                onClose={onCloseBuilderModal}
-                nodesSpec={nodesSpec}
-              />
-            )}
-            {isLinkBuilder && (
-              <LinkBuilderModal
-                parentNode={selectedNodeForSubFlow}
-                open
-                onClose={onCloseBuilderModal}
-                nodesSpec={nodesSpec}
-              />
-            )}
-          </ReactFlow>
-        </ReactFlowProvider>
+              {nodePickerVisibility && (
+                <NodePicker
+                  position={nodePickerVisibility}
+                  filters={getNodePickerFilters(nodes, lastConnectStart)}
+                  onPickNode={handleAddNode}
+                  onClose={closeNodePicker}
+                />
+              )}
+              {nodeMenuVisibility && (
+                <NodeMenu
+                  isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                  deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
+                  deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                  handleAlignLefts={handleAlignLeft}
+                  handleAlignRights={handleAlignRight}
+                  deleteNode={deleteNodesAndEdges}
+                  duplicateNode={handleCopyNodes}
+                  position={nodeMenuVisibility}
+                  node={selectedNode}
+                  nodesSpec={nodesSpec}
+                  onClose={closeNodePicker}
+                  isDoubleClick={isDoubleClick}
+                  handleAddSubFlow={handleAddSubFlow}
+                  selectedNodeForSubFlow={selectedNodeForSubFlow}
+                />
+              )}
+              {!!selectedNodeForSubFlow && isConnectionBuilder && (
+                <ConnectionBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+              )}
+              {isLinkBuilder && (
+                <LinkBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+              )}
+            </ReactFlow>
+          </ReactFlowProvider>
+        )}
       </div>
     </div>
   );
