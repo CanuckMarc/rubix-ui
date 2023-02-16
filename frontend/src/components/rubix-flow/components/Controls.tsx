@@ -40,6 +40,11 @@ type ControlProps = {
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
+const checkIsFocusInput = () => {
+  const activeElement = document.activeElement;
+  return ["input", "textarea"].includes(activeElement?.tagName?.toLowerCase() || "");
+};
+
 const Controls = ({
   settings,
   isChangedFlow,
@@ -86,7 +91,11 @@ const Controls = ({
   };
 
   /* Ctrl + Delete (key): Delete items selected  */
-  useCtrlPressKey("Backspace", deleteSelectNode);
+  useCtrlPressKey("Backspace", () => {
+    if (!checkIsFocusInput()) {
+      deleteSelectNode();
+    }
+  });
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
@@ -155,12 +164,7 @@ const Controls = ({
   useCtrlPressKey("KeyC", copySelectNode);
 
   useCtrlPressKey("KeyV", () => {
-    const activeElement = document.activeElement;
-    if (
-      !["input", "textarea"].includes(activeElement?.tagName?.toLowerCase() || "") &&
-      window.nodesCopied &&
-      window.nodesCopied.length > 0
-    ) {
+    if (!checkIsFocusInput() && window.nodesCopied && window.nodesCopied.length > 0) {
       const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
       const egdes = window.egdesCopied;
       handleDuplicatedNodes(nodes, egdes);

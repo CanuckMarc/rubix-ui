@@ -807,32 +807,41 @@ const Flow = (props: FlowProps) => {
   };
 
   const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const nodeIds: string[] = [];
+    const nodeIdsDeleted: string[] = [];
     for (const node of _nodesDeleted) {
-      nodeIds.push(node.id);
+      nodeIdsDeleted.push(node.id);
       if (node.isParent) {
-        nodeIds.push(...getChildNodeIds(node.id));
+        nodeIdsDeleted.push(...getChildNodeIds(node.id));
       }
     }
-    const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
-    const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
 
-    const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
+    // delete nodes in tabs
+    const tabState = localStorage.getItem(NODES_IN_TAB);
+    const newTabState = tabState === null ? {} : JSON.parse(tabState);
+    if (newTabState[tabId]) {
+      newTabState[tabId] = newTabState[tabId].filter((id: string) => !nodeIdsDeleted.includes(id));
+      localStorage.setItem(NODES_IN_TAB, JSON.stringify(newTabState));
+    }
+
+    const childNode = window.allFlow.nodes.filter((n) => nodeIdsDeleted.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIdsDeleted.includes(n.source));
+
+    const remainingNodes = nodes.filter((item) => !nodeIdsDeleted.includes(item.id));
     const remainingEdges = edges.filter(
       (item) =>
         !_edgesDeleted.some((item2) => item.id === item2.id) &&
-        !nodeIds.includes(item.target) &&
-        !nodeIds.includes(item.source)
+        !nodeIdsDeleted.includes(item.target) &&
+        !nodeIdsDeleted.includes(item.source)
     );
 
-    const allRemainingNodes = window.allFlow.nodes.filter((n) => !nodeIds.includes(n.id));
+    const allRemainingNodes = window.allFlow.nodes.filter((n) => !nodeIdsDeleted.includes(n.id));
     window.allFlow = {
       nodes: allRemainingNodes,
       edges: window.allFlow.edges.filter(
         (item) =>
           !_edgesDeleted.some((item2) => item.id === item2.id) &&
-          !nodeIds.includes(item.target) &&
-          !nodeIds.includes(item.source)
+          !nodeIdsDeleted.includes(item.target) &&
+          !nodeIdsDeleted.includes(item.source)
       ),
     };
     setNodes(remainingNodes);
@@ -1051,11 +1060,15 @@ const Flow = (props: FlowProps) => {
       return nodes.find((node2: NodeInterface) => node2.id === node.id) || node;
     });
 
+    const nodeIdsByTab = getNodeIdsOfTab();
+
     // get nodes and edges by sub flow or level 1 from all nodes and edges saved
     // when change sub flow
-    const newNodes = window.allFlow.nodes.filter((node) => {
-      return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
-    });
+    const newNodes = window.allFlow.nodes
+      .filter((node) => nodeIdsByTab.includes(node.id))
+      .filter((node) => {
+        return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
+      });
 
     window.allFlow.nodes.forEach((node1) => {
       const hasParent = newNodes.some((node2) => {
@@ -1102,7 +1115,7 @@ const Flow = (props: FlowProps) => {
         const edgesL1 = _edges.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
         // tracking all nodes and edges to save
-        if (windowTab === MAIN_TABS.PrimaryTab && tabId === "0") {
+        if (windowTab === MAIN_TABS.PrimaryTab && tabId === "PrimaryTab-0") {
           window.allFlow = { nodes: newNodes, edges: _edges };
         }
 

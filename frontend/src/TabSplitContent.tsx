@@ -175,10 +175,6 @@ export function TabSplitContent({
     } else {
       setItems(getItemsWithChildren(items));
     }
-
-    return () => {
-      localStorage.removeItem(windowTab);
-    };
   }, []);
 
   const togglePaneBtn = (

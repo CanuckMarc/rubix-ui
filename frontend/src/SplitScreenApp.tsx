@@ -20,6 +20,7 @@ const SplitScreenApp: React.FC = () => {
           window.allFlow.nodes = window.allFlow.nodes.filter((n) => !tabsWithNodes[id]?.includes(n.id));
         }
       });
+      localStorage.removeItem("SecondaryTab");
     }
     localStorage.setItem(SplitPanelKey, JSON.stringify(!showSplit));
     setShowSplit(!showSplit);
