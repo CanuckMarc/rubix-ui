@@ -1140,6 +1140,34 @@ export const CREATE_LOGS_HEADERS = [
   },
 ];
 
+export const SNAPSHOTS_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    key: "size",
+    title: "Size",
+    dataIndex: "size",
+  },
+  {
+    key: "size_readable",
+    title: "Size Readable",
+    dataIndex: "size_readable",
+  },
+  {
+    key: "created_at_readable",
+    title: "Created At Readable",
+    dataIndex: "created_at_readable",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
 //--------------schema-------------//
 
 export const WIRES_CONNECTION_SCHEMA = {

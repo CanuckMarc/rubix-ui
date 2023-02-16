@@ -19,7 +19,7 @@ export const TakeSnapshot = () => {
 
   const factory = new SnapShotFactory();
 
-  const getCreateLogs = async () => {
+  const fetch = async () => {
     try {
       setIsFetching(true);
       const res = await factory.EdgeGetSnapshotsCreateLogs(connUUID, hostUUID);
@@ -32,11 +32,11 @@ export const TakeSnapshot = () => {
   const create = async () => {
     const { message } = await factory.EdgeCreateSnapshot(connUUID, hostUUID);
     openNotificationWithIcon("success", message);
-    getCreateLogs();
+    fetch();
   };
 
   useEffect(() => {
-    getCreateLogs();
+    fetch();
   }, []);
 
   return (
