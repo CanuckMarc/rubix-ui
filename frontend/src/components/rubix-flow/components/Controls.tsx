@@ -199,20 +199,20 @@ const Controls = ({
         {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
         {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
       </div>
-      <LoadModal
-        open={loadModalOpen}
-        onClose={() => setLoadModalOpen(false)}
-        handleLoadNodesAndEdges={handleLoadNodesAndEdges}
-      />
-      <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
-      <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
-      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
-      <FlowSettingsModal
-        settings={settings}
-        open={settingRefreshModalOpen}
-        onClose={() => setSettingRefreshModalOpen(false)}
-        onSaveSettings={onSaveSettings}
-      />
+      {loadModalOpen && (
+        <LoadModal open onClose={() => setLoadModalOpen(false)} handleLoadNodesAndEdges={handleLoadNodesAndEdges} />
+      )}
+      {saveModalOpen && <SaveModal open onClose={() => setSaveModalOpen(false)} />}
+      {helpModalOpen && <HelpModal open onClose={() => setHelpModalOpen(false)} />}
+      {clearModalOpen && <ClearModal open onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />}
+      {settingRefreshModalOpen && (
+        <FlowSettingsModal
+          settings={settings}
+          open
+          onClose={() => setSettingRefreshModalOpen(false)}
+          onSaveSettings={onSaveSettings}
+        />
+      )}
     </>
   );
 };
