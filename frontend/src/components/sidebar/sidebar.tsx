@@ -1,4 +1,4 @@
-import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip } from "antd";
+import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip, Space } from "antd";
 import {
   ApartmentOutlined,
   CloudServerOutlined,
@@ -9,6 +9,7 @@ import {
   ToolOutlined,
   UserOutlined,
   ReloadOutlined,
+  UpOutlined
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -16,6 +17,7 @@ import logo from "../../assets/images/nube-frog-green.png";
 import { ROUTES } from "../../constants/routes";
 import { DARK_THEME, getShowWires, LIGHT_THEME, SHOW_WIRES, useTheme } from "../../themes/use-theme";
 import { SettingsFactory } from "../settings/factory";
+import { ReleasesFactory } from "../release/factory";
 import { useSettings } from "../settings/use-settings";
 import { TokenModal } from "../settings/views/token-modal";
 import { openNotificationWithIcon } from "../../utils/utils";
@@ -35,6 +37,7 @@ const { Option } = Select;
 const locationFactory = new LocationFactory();
 const connectionFactory = new ConnectionFactory();
 const settingsFactory = new SettingsFactory();
+const releasesFactory = new ReleasesFactory();
 
 interface TDataNode extends DataNode {
   name?: string;
@@ -222,6 +225,13 @@ const ShowWiresMenuItem = () => {
   );
 };
 
+interface VersionType {
+  LatestFlowFrameworkVersion: string;
+  LatestReleaseVersion: string;
+  LatestRubixAssistVersion: string;
+  LatestRubixEdgeVersion: string;
+}
+
 export const MenuSidebar = () => {
   const location = useLocation();
   const [isBlockMenu, setIsBlockMenu, isMiniMenu, setIsMiniMenu] = useTheme();
@@ -234,6 +244,7 @@ export const MenuSidebar = () => {
   const [allKeyMenus, setAllKeyMenus] = useState<string[]>([]);
   const [openingKeys, setOpenningKeys] = useState<string[]>([]);
   const [activeMenu, setActiveMenu] = useState<string>("");
+  const [versions, setVersions] = useState<VersionType | undefined>(undefined);
 
   const sidebarItems = [
     {
@@ -376,6 +387,12 @@ export const MenuSidebar = () => {
         c.locations = locations;
       }
       const route = getTreeDataIterative(enabledConnections);
+
+      const versionRes = await releasesFactory.LatestVersions();
+      if (versionRes) {
+        setVersions(versionRes);
+      }
+
       updateRouteData(route);
     } finally {
       setIsFetching(false);
@@ -471,6 +488,14 @@ export const MenuSidebar = () => {
     }
   }, [location.pathname]);
 
+  const versionItems = (
+    <div style={{display: 'flex', flexDirection: 'column', rowGap: '6px', alignItems: 'flex-start', marginLeft: '48px'}}>
+      <strong>Rubix edge: {`${versions ? versions.LatestRubixEdgeVersion : 'Failed to fetch'}`}</strong>
+      <strong>Rubix assist: {`${versions ? versions.LatestRubixAssistVersion : 'Failed to fetch'}`}</strong>
+      <strong>Flow framework: {`${versions ? versions.LatestFlowFrameworkVersion : 'Failed to fetch'}`}</strong>
+    </div>
+  );
+
   return (
     <Sider
       id="sidebarMenu"
@@ -487,24 +512,43 @@ export const MenuSidebar = () => {
         </div>
       ) : (
         <>
-          <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
-          <DividerLock
-            collapsed={collapsed}
-            collapseDisabled={collapseDisabled}
-            setCollapseDisabled={handleBlock}
-            refresh={fetchConnections}
-          />
-          <Menu
-            mode="inline"
-            theme="dark"
-            className="rubix-menu"
-            items={menu}
-            selectedKeys={[activeMenu]}
-            activeKey={activeMenu}
-            openKeys={openingKeys}
-            onOpenChange={onOpenChange}
-          />
-          <AvatarDropdown setIsModalVisible={setIsModalVisible} />
+          <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+            <div>
+              <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
+              <DividerLock
+                collapsed={collapsed}
+                collapseDisabled={collapseDisabled}
+                setCollapseDisabled={handleBlock}
+                refresh={fetchConnections}
+              />
+              <Menu
+                mode="inline"
+                theme="dark"
+                className="rubix-menu"
+                items={menu}
+                selectedKeys={[activeMenu]}
+                activeKey={activeMenu}
+                openKeys={openingKeys}
+                onOpenChange={onOpenChange}
+              />
+              <AvatarDropdown setIsModalVisible={setIsModalVisible} />
+            </div>
+            <div style={{position: 'fixed', bottom: '20px', width: 280}}>
+              <div style={{position: 'relative', display: 'flex', flexDirection: 'column', rowGap: '10px'}}>
+                
+                <Dropdown overlay={ versionItems }>
+                  <a onClick={(e) => e.preventDefault()}>
+                    <Space>
+                      <strong>Latest release: {`${versions ? versions.LatestReleaseVersion : 'Failed to fetch'}`}</strong>
+                      <UpOutlined />
+                    </Space>
+                  </a>
+                </Dropdown>
+
+              </div>
+
+            </div>
+          </div>
 
           <TokenModal isModalVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
         </>
