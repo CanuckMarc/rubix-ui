@@ -389,7 +389,6 @@ export const MenuSidebar = () => {
       const route = getTreeDataIterative(enabledConnections);
 
       const versionRes = await releasesFactory.LatestVersions();
-      console.log('versions are: ', versionRes);
       if (versionRes) {
         setVersions(versionRes);
       }
