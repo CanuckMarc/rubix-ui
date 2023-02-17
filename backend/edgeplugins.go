@@ -137,10 +137,6 @@ func (inst *App) EdgeInstallPlugin(connUUID, hostUUID string, pluginName string)
 	if _, err = assistClient.EdgeMoveFromDownloadToInstallPlugins(hostUUID); err != nil {
 		return inst.fail(err)
 	}
-
-	if err = inst.restartFlowFramework(assistClient, hostUUID); err != nil {
-		inst.fail(err)
-	}
 	return inst.success(fmt.Sprintf("successfully installed plugin %s", pluginName))
 }
 
