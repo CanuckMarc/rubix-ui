@@ -132,11 +132,11 @@ export const FlowPointsTable = (props: any) => {
                 <GoldOutlined style={{ color: "#fa8c16" }} />
               </a>
             </Tooltip>
-            <Tooltip title="Update history">
+            {/* <Tooltip title="Update history">
               <a onClick={() => showUpdateHistoryModal(point)}>
                 <HistoryOutlined />
               </a>
-            </Tooltip>
+            </Tooltip> */}
           </Space>
         ),
       },
