@@ -1,5 +1,5 @@
-import { Alert, Button, Col, Dropdown, Form, FormInstance, Input, Menu, Modal, Row, Space } from "antd";
-import { createRef, useEffect, useState } from "react";
+import { Alert, Button, Col, Dropdown, Form, FormInstance, Input, Menu, Modal, Popconfirm, Row, Space } from "antd";
+import React, { createRef, useEffect, useState } from "react";
 import TokenView from "./token-view";
 import { amodel, externaltoken, storage } from "../../../wailsjs/go/models";
 import { PlusOutlined, } from "@ant-design/icons";
@@ -25,6 +25,8 @@ enum FormState {
 }
 
 export const TokenModal = (props: ITokenModel) => {
+  const [form] = Form.useForm();
+
   const { isModalVisible, displayName, onCloseModal, factory, selectedItem } = props;
   const [settings] = useSettings();
 
@@ -73,8 +75,8 @@ export const TokenModal = (props: ITokenModel) => {
   async function login(username: string, password: string) {
     setResultState({ state: ResultState.loading, message: "Login in..." });
     const response = await factory.Login(username, password);
-
     if (response) {
+      form.resetFields();
       setResultState({ state: ResultState.success });
       setState(FormState.LIST);
       if (response?.access_token) {
@@ -91,6 +93,7 @@ export const TokenModal = (props: ITokenModel) => {
     setResultState({ state: ResultState.loading, message: "Updating..." });
     const response = await factory.UpdateUser(jwtToken, username, password);
     if (response) {
+      form.resetFields();
       setResultState({ state: ResultState.success });
       setState(FormState.LIST);
     } else {
@@ -133,11 +136,14 @@ export const TokenModal = (props: ITokenModel) => {
     {jwtToken &&
       <Col flex="110px">
         <Dropdown.Button placement="bottomRight" type="primary" overlay={
-          <Menu>
-            <Menu.Item key="update-user" onClick={toggleUpdateUser}>
-              Update User
-            </Menu.Item>
-          </Menu>
+          <Menu items={[{
+            key: 'update-user',
+            label: (
+              <a onClick={toggleUpdateUser}>
+                Update User
+              </a>
+            ),
+          }]} />
         } onClick={showTokenGenerateModal}>
           <PlusOutlined />
         </Dropdown.Button>
@@ -157,6 +163,7 @@ export const TokenModal = (props: ITokenModel) => {
       width="50%"
     >
       {state != FormState.LIST && <Form
+        form={form}
         name="basic"
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 16 }}
@@ -192,12 +199,22 @@ export const TokenModal = (props: ITokenModel) => {
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
           <Space wrap>
-            <Button type="primary" htmlType="submit" loading={resultState.state == ResultState.loading}>
-              {state ? "Update User" : "Login"}
-            </Button>
-            {state == FormState.UPDATE_USER && <Button onClick={toggleUpdateUser}>
-              Cancel
-            </Button>}
+            {state == FormState.LOGIN &&
+              <Button type="primary" htmlType="submit" loading={resultState.state == ResultState.loading}>
+                Login
+              </Button>}
+            {state == FormState.UPDATE_USER && <>
+              <Popconfirm
+                title={`Are you sure to update user?`}
+                onConfirm={() => form.submit()}
+              >
+                <Button type="primary" htmlType="submit" loading={resultState.state == ResultState.loading}>
+                  Update User
+                </Button>
+              </Popconfirm>
+              <Button onClick={toggleUpdateUser}>
+                Cancel
+              </Button></>}
           </Space>
         </Form.Item>
       </Form>}

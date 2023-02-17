@@ -75,7 +75,7 @@ export const HostsTable = (props: any) => {
               <DownloadOutlined />
             </a>
           </Tooltip>
-          <Tooltip title="Tokens">
+          <Tooltip title="Login">
             <a onClick={(e) => showTokenModal(host, e)}>
               <ScanOutlined />
             </a>
