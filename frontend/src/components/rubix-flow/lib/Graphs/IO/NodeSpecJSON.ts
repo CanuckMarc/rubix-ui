@@ -8,6 +8,7 @@ export type InputSocketSpecJSON = {
   defaultValue?: any;
   dataType?: string;
   nodeId?: string;
+  value?: any;
   hideInput?: boolean;
 };
 
