@@ -8,6 +8,7 @@ import { externaltoken } from "../../../../wailsjs/go/models";
 import { LIGHT_THEME } from "../../../themes/use-theme";
 
 import ExternalToken = externaltoken.ExternalToken;
+import { Result, ResultState } from "../../../common/state/state";
 
 export const TokenForm = (props: any) => {
   const { factory, selectedItem, hostOrConn } = props;
@@ -126,15 +127,6 @@ export const TokenForm = (props: any) => {
         </Form.Item>
       </Form>
 
-      <TokenView
-        jwtToken={jwtToken}
-        tokens={tokens}
-        isLoading={isLoading}
-        factory={factory}
-        selectedItem={selectedItem}
-        fetchToken={fetchToken}
-        setIsLoading={setIsLoading}
-      />
       {isTokenGenerateModalVisible && (
         <TokenGeneratorModal
           isModalVisible={true}
