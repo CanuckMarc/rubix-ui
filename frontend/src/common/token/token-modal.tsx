@@ -1,17 +1,16 @@
-import { Alert, Button, Card, Col, Dropdown, Form, FormInstance, Input, Menu, Modal, PageHeader, Row, Space } from "antd";
+import { Alert, Button, Col, Dropdown, Form, FormInstance, Input, Menu, Modal, Row, Space } from "antd";
 import { createRef, useEffect, useState } from "react";
 import TokenView from "./token-view";
 import { amodel, externaltoken, storage } from "../../../wailsjs/go/models";
-import { PlusOutlined, MoreOutlined, } from "@ant-design/icons";
+import { PlusOutlined, } from "@ant-design/icons";
 import TokenGeneratorModal from "./token-generator-modal";
 import { useSettings } from "../../components/settings/use-settings";
 import { LIGHT_THEME } from "../../themes/use-theme";
 import { CommonTokenFactory } from "./factory";
-
+import { Result, ResultState } from "../state/state";
 import ExternalToken = externaltoken.ExternalToken;
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
-import { Result, ResultState } from "../state/state";
 
 interface ITokenModel {
   isModalVisible: boolean;
@@ -22,7 +21,7 @@ interface ITokenModel {
 }
 
 enum FormState {
-  LOGIN, CHANGE_PASSWORD, LIST
+  LOGIN, UPDATE_USER, LIST
 }
 
 export const TokenModal = (props: ITokenModel) => {
@@ -30,7 +29,7 @@ export const TokenModal = (props: ITokenModel) => {
   const [settings] = useSettings();
 
   const [jwtToken, setJwtToken] = useState("");
-  const [state, setState] = useState(FormState.LOGIN)
+  const [state, setState] = useState(FormState.LOGIN);
   const [tokens, setTokens] = useState<ExternalToken[]>([]);
   const [resultState, setResultState] = useState<Result>({ state: ResultState.initital });
   const [listResultState, setListResultState] = useState<Result>({ state: ResultState.initital });
@@ -42,7 +41,7 @@ export const TokenModal = (props: ITokenModel) => {
     setResultState({ state: ResultState.initital });
     setListResultState({ state: ResultState.initital });
     setTokens([]);
-    setState(FormState.LOGIN)
+    setState(FormState.LOGIN);
     setIsTokenGenerateModalVisible(false);
     loginFormRef?.current?.resetFields();
     onCloseModal();
@@ -52,22 +51,24 @@ export const TokenModal = (props: ITokenModel) => {
     setIsTokenGenerateModalVisible(false);
   };
 
-  const toggleChangePassword = () => {
-    if (state == FormState.CHANGE_PASSWORD) {
-      setState(FormState.LIST)
+  const toggleUpdateUser = () => {
+    if (state == FormState.UPDATE_USER) {
+      setState(FormState.LIST);
     } else {
-      setState(FormState.CHANGE_PASSWORD)
-      setResultState({ state: ResultState.initital })
+      setState(FormState.UPDATE_USER);
+      setResultState({ state: ResultState.initital });
     }
-  }
+  };
 
   const getSubtitle = () => {
     switch (state) {
-      case FormState.LOGIN: return "Login"
-      case FormState.CHANGE_PASSWORD: return "Change Password"
+      case FormState.LOGIN:
+        return "Login";
+      case FormState.UPDATE_USER:
+        return "Update User";
     }
-    return ""
-  }
+    return "Tokens List";
+  };
 
   async function login(username: string, password: string) {
     try {
@@ -76,7 +77,7 @@ export const TokenModal = (props: ITokenModel) => {
 
       if (response) {
         setResultState({ state: ResultState.success });
-        setState(FormState.LIST)
+        setState(FormState.LIST);
         if (response?.access_token) {
           setJwtToken(response?.access_token);
         } else {
@@ -90,13 +91,13 @@ export const TokenModal = (props: ITokenModel) => {
     }
   }
 
-  async function changePassword(username: string, password: string) {
+  async function updateUser(username: string, password: string) {
     try {
       setResultState({ state: ResultState.loading, message: "Loading login" });
       // TODO : Change password
       const response = {} as any;
       setResultState({ state: ResultState.success });
-      setState(FormState.LIST)
+      setState(FormState.LIST);
     } catch (e) {
       setResultState({ state: ResultState.failure, message: `Failed login` });
     }
@@ -105,8 +106,8 @@ export const TokenModal = (props: ITokenModel) => {
   const onFinish = async (values: any) => {
     if (state == FormState.LOGIN) {
       await login(values.username, values.password);
-    } else if (state == FormState.CHANGE_PASSWORD) {
-      await changePassword(values.username, values.password);
+    } else if (state == FormState.UPDATE_USER) {
+      await updateUser(values.username, values.password);
     }
   };
 
@@ -131,25 +132,22 @@ export const TokenModal = (props: ITokenModel) => {
     fetchToken().catch(console.error);
   }, [jwtToken]);
 
-  const titleWidget = <Row align="middle" style={{ marginTop: - 2 }}>
-    <Col className="ant-page-header-heading-title">{displayName + `: Tokens`}</Col>
+  const titleWidget = <Row align="middle" style={{ marginTop: -2 }}>
+    <Col className="ant-page-header-heading-title">{displayName}</Col>
     <Col className="ant-page-header-heading-sub-title" flex="auto" style={{ marginTop: 4 }}>{getSubtitle()}</Col>
     {jwtToken &&
       <Col flex="110px">
-        <Dropdown.Button placement="bottomRight" type="primary"
-          overlay={
-            <Menu>
-              <Menu.Item key="change-password" onClick={toggleChangePassword}>
-                Change Password
-              </Menu.Item>
-            </Menu>
-          }
-          onClick={showTokenGenerateModal}
-        >
+        <Dropdown.Button placement="bottomRight" type="primary" overlay={
+          <Menu>
+            <Menu.Item key="update-user" onClick={toggleUpdateUser}>
+              Update User
+            </Menu.Item>
+          </Menu>
+        } onClick={showTokenGenerateModal}>
           <PlusOutlined />
         </Dropdown.Button>
       </Col>}
-  </Row>
+  </Row>;
 
   return (
     <Modal
@@ -200,9 +198,9 @@ export const TokenModal = (props: ITokenModel) => {
         <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
           <Space wrap>
             <Button type="primary" htmlType="submit" loading={resultState.state == ResultState.loading}>
-              Submit
+              {state ? "Update User" : "Login"}
             </Button>
-            {state == FormState.CHANGE_PASSWORD && <Button onClick={toggleChangePassword}>
+            {state == FormState.UPDATE_USER && <Button onClick={toggleUpdateUser}>
               Cancel
             </Button>}
           </Space>

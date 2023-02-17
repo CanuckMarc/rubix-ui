@@ -3,9 +3,9 @@ import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
+  DiffOutlined,
   EyeOutlined,
   RedoOutlined,
-  PlusOutlined, DiffOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import copy from "copy-to-clipboard";
@@ -15,11 +15,10 @@ import { CommonTokenFactory } from "./factory";
 import { useParams } from "react-router-dom";
 import { ConnectionFactory } from "../../components/connections/factory";
 import { HostsFactory } from "../../components/hosts/factory";
-
+import { Result, ResultState } from "../state/state";
 import ExternalToken = externaltoken.ExternalToken;
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
-import { Result, ResultState } from "../state/state";
 
 interface ITokenView {
   jwtToken: string;
@@ -164,14 +163,13 @@ export const TokenView = (props: ITokenView) => {
               </Popconfirm>,
             ]}
           >
-            <List.Item.Meta title={item.name} description={renderName(item)} >
+            <List.Item.Meta title={item.name} description={renderName(item)}>
             </List.Item.Meta>
           </List.Item>
         )}
       />
     </Spin>
   );
-
 };
 
 export default TokenView;
