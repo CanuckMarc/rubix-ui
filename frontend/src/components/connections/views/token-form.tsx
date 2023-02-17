@@ -2,13 +2,12 @@ import { Button, Card, Form, FormInstance, Input } from "antd";
 import { createRef, useEffect, useState } from "react";
 import TokenView from "../../../common/token/token-view";
 import TokenGeneratorModal from "../../../common/token/token-generator-modal";
-import { useSettings } from "../../../components/settings/use-settings";
+import { useSettings } from "../../settings/use-settings";
 import { PlusOutlined } from "@ant-design/icons";
 import { externaltoken } from "../../../../wailsjs/go/models";
 import { LIGHT_THEME } from "../../../themes/use-theme";
-
-import ExternalToken = externaltoken.ExternalToken;
 import { Result, ResultState } from "../../../common/state/state";
+import ExternalToken = externaltoken.ExternalToken;
 
 export const TokenForm = (props: any) => {
   const { factory, selectedItem, hostOrConn } = props;
@@ -16,29 +15,29 @@ export const TokenForm = (props: any) => {
   const [jwtToken, setJwtToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [tokens, setTokens] = useState<ExternalToken[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [listResultState, setListResultState] = useState<Result>({ state: ResultState.initital });
   const [isTokenGenerateModalVisible, setIsTokenGenerateModalVisible] = useState(false);
   const loginFormRef = createRef<FormInstance>();
 
   useEffect(() => {
     if (hostOrConn === 'host') factory.hostUUID = selectedItem.uuid;
     if (hostOrConn === 'conn') factory.connectionUUID = selectedItem.uuid;
-  }, [selectedItem])
+  }, [selectedItem]);
 
   const handleClose = () => {
     setJwtToken("");
     setLoading(false);
+    setListResultState({ state: ResultState.initital });
     setTokens([]);
-    setIsLoading(false);
     setIsTokenGenerateModalVisible(false);
     loginFormRef?.current?.resetFields();
   };
 
   useEffect(() => {
     return () => {
-      handleClose()
-    }
-  }, [])
+      handleClose();
+    };
+  }, []);
 
   const onCloseTokenGeneratorModal = () => {
     setIsTokenGenerateModalVisible(false);
@@ -64,12 +63,13 @@ export const TokenForm = (props: any) => {
 
   const fetchToken = async () => {
     if (jwtToken != "") {
-      setIsLoading(true);
+      setListResultState({ state: ResultState.loading, message: "Loading fetch" });
       try {
         const tokens = await factory.Tokens(jwtToken);
         setTokens(tokens || undefined); // restrict to pass null to child
+        setListResultState({ state: ResultState.success });
       } finally {
-        setIsLoading(false);
+        setListResultState({ state: ResultState.failure, message: "Something went wrong" });
       }
     }
   };
@@ -127,6 +127,16 @@ export const TokenForm = (props: any) => {
         </Form.Item>
       </Form>
 
+      <TokenView
+        jwtToken={jwtToken}
+        tokens={tokens}
+        resultState={listResultState}
+        factory={factory}
+        selectedItem={selectedItem}
+        fetchToken={fetchToken}
+        setResultState={setListResultState}
+        style={{ minHeight: 154, maxHeight: 300, overflowY: "auto" }}
+      />
       {isTokenGenerateModalVisible && (
         <TokenGeneratorModal
           isModalVisible={true}
@@ -137,5 +147,5 @@ export const TokenForm = (props: any) => {
         />
       )}
     </Card>
-  )
-}
+  );
+};
