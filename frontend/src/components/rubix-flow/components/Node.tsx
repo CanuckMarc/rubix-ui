@@ -258,9 +258,7 @@ export const Node = memo((props: NodeProps) => {
           ((input.valueType === "number" && newData[input.name] !== 0) ||
             (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          nodeInputs?.forEach((item: any) => {
-            return newData[input.name] = item.value;
-          })
+          newData[input.name] = input.defaultValue
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";

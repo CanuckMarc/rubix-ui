@@ -15,14 +15,27 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
     }
 
     const newInput = (node.data?.inputs || []).reduce(
-      (obj: { [key: string]: any }, item: { value: string; pin: string }) => {
+      (
+        obj: { [key: string]: any },
+        item: {
+          value: string;
+          defaultValue: any;
+          pin: string;
+          position: number;
+          overridePosition: boolean;
+        }, 
+        index: number
+      ) => {
         return {
           ...obj,
           [item.pin]: {
-            ...item,
+            position: item.position || index,
+            overridePosition: item.overridePosition || false,
             value:
               node.data[item.pin] !== undefined
                 ? node.data[item.pin]
+                : item.value === undefined
+                ? item.defaultValue
                 : item.value,
           },
         };
