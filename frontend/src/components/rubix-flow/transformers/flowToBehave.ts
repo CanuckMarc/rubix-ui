@@ -13,6 +13,23 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
     if (node.type === undefined) {
       return;
     }
+
+    const newInput = node.data.inputs.reduce(
+      (obj: { [key: string]: any }, item: { value: string; pin: string }) => {
+        return {
+          ...obj,
+          [item.pin]: {
+            ...item,
+            value:
+              node.data[item.pin] !== undefined
+                ? node.data[item.pin]
+                : item.value,
+          },
+        };
+      },
+      {}
+    );
+
     const behaveNode: NodeJSON = {
       id: node.id,
       type: node.type,
@@ -23,35 +40,12 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
       },
       settings: node.settings,
       nodeName: node.info?.nodeName,
+      inputs: newInput,
     };
 
     if (node.parentId) behaveNode.parentId = node.parentId;
 
     if (node.style && !isObjectEmpty(node.style)) behaveNode.style = node.style;
-    const newData = {
-      ...node.data,
-      inputs: [
-        ...node.data.inputs.map((item: { value: string; pin: string }) => {
-          return {
-            ...item,
-            value:
-              node.data[item.pin] !== undefined
-                ? node.data[item.pin]
-                : item.value,
-          };
-        }),
-      ],
-    };
-
-    Object.entries(newData).forEach(([key, value]) => {
-      if (behaveNode.inputs === undefined) {
-        behaveNode.inputs = {};
-      }
-      behaveNode.inputs = {
-        ...behaveNode.inputs,
-        [key]: { value: value as string },
-      } as any;
-    });
 
     edges
       .filter((edge) => edge.target === node.id)
