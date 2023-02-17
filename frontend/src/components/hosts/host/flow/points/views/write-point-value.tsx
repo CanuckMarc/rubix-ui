@@ -48,7 +48,7 @@ export const WritePointValueModal = (props: any) => {
     }
   };
   const onChange = (value: number | null, priorityKey: string) => {
-    formData[priorityKey] = value ? Number(value) : null;
+    formData[priorityKey] = value;
     setFormData(formData);
   };
 
@@ -103,7 +103,11 @@ export const WritePointValueModal = (props: any) => {
               defaultValue={formData[priorityKey]}
               onChange={(v: number | null) => onChange(v, priorityKey)}
               disabled={
-                pluginName === "bacnetmaster" && priorityKey !== "_7" && priorityKey !== "_14" && priorityKey !== "_15" && priorityKey !== "_16"
+                pluginName === "bacnetmaster" &&
+                priorityKey !== "_7" &&
+                priorityKey !== "_14" &&
+                priorityKey !== "_15" &&
+                priorityKey !== "_16"
               }
             />
           </Col>
