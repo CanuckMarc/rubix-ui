@@ -106,7 +106,6 @@ export const EdgeAppInfo = (props: any) => {
   }
 
   const onMenuClick = (actionType: string, serviceName: string, appName: string) => {
-    console.log('action type is: ', actionType)
     updateActionLoading((prevState: any) => ({
       ...prevState,
       [serviceName]: true,

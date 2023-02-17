@@ -7,6 +7,7 @@ import { FlowPluginFactory } from "../factory";
 import { PluginDownloadModal } from "./plugin-download-modal";
 import { RbRefreshButton } from "../../../../../../common/rb-table-actions";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
+import { RestartFFModal } from "./restart-flow-framework-modal";
 
 const { confirm } = Modal;
 
@@ -17,6 +18,7 @@ export const PluginDistributionTable = () => {
   const [pluginName, setPluginName] = useState<any>();
   const [isFetching, setIsFetching] = useState(false);
   const [isInstallModalVisible, setIsInstallModalVisible] = useState(false);
+  const [isRestartFFModalVisible, setIsRestartFFModalVisible] = useState(false);
 
   const config = {
     originData: plugins,
@@ -104,8 +106,15 @@ export const PluginDistributionTable = () => {
       <PluginDownloadModal
         isModalVisible={isInstallModalVisible}
         pluginName={pluginName}
+        setIsRestartFFModalVisible = {setIsRestartFFModalVisible}
         handleClose={() => setIsInstallModalVisible(false)}
         refreshList={fetchPlugins}
+      />
+      <RestartFFModal 
+        pluginName={pluginName}
+        refreshList={fetchPlugins}
+        isModalVisible={isRestartFFModalVisible}
+        handleClose={() => setIsRestartFFModalVisible(false)}
       />
     </>
   );
