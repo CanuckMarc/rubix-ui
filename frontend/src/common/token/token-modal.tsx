@@ -71,35 +71,30 @@ export const TokenModal = (props: ITokenModel) => {
   };
 
   async function login(username: string, password: string) {
-    try {
-      setResultState({ state: ResultState.loading, message: "Loading login" });
-      const response = await factory.Login(username, password);
+    setResultState({ state: ResultState.loading, message: "Login in..." });
+    const response = await factory.Login(username, password);
 
-      if (response) {
-        setResultState({ state: ResultState.success });
-        setState(FormState.LIST);
-        if (response?.access_token) {
-          setJwtToken(response?.access_token);
-        } else {
-          setTokens([]);
-        }
+    if (response) {
+      setResultState({ state: ResultState.success });
+      setState(FormState.LIST);
+      if (response?.access_token) {
+        setJwtToken(response?.access_token);
       } else {
-        setResultState({ state: ResultState.failure, message: "Failed login" });
+        setTokens([]);
       }
-    } catch (e) {
-      setResultState({ state: ResultState.failure, message: `Failed login` });
+    } else {
+      setResultState({ state: ResultState.failure, message: "Login failed!" });
     }
   }
 
   async function updateUser(username: string, password: string) {
-    try {
-      setResultState({ state: ResultState.loading, message: "Loading login" });
-      // TODO : Change password
-      const response = {} as any;
+    setResultState({ state: ResultState.loading, message: "Updating..." });
+    const response = await factory.UpdateUser(jwtToken, username, password);
+    if (response) {
       setResultState({ state: ResultState.success });
       setState(FormState.LIST);
-    } catch (e) {
-      setResultState({ state: ResultState.failure, message: `Failed login` });
+    } else {
+      setResultState({ state: ResultState.failure, message: `Update User failed!` });
     }
   }
 
