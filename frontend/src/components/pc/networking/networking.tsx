@@ -29,7 +29,7 @@ export const PcNetworking = () => {
   return (
     <>
       <Title level={3} style={{ textAlign: "left" }}>
-        Rubix Scanner
+        Networking
       </Title>
       <RbRefreshButton refreshList={fetch} />
       <ScannerTable data={data} isFetching={isFetching} />
