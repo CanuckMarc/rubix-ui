@@ -14,4 +14,6 @@ export interface CommonTokenFactory {
   TokenRegenerate(jwtToken: string, uuid: string): Promise<any>;
 
   TokenDelete(jwtToken: string, uuid: string): Promise<any>;
+
+  UpdateUser(jwtToken: string, username: string, password: string): Promise<any>;
 }
