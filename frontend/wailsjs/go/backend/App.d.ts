@@ -190,6 +190,8 @@ export function EdgeBiosTokenRegenerate(arg1:string,arg2:string,arg3:string,arg4
 
 export function EdgeBiosTokens(arg1:string,arg2:string,arg3:string):Promise<externaltoken.ExternalToken>;
 
+export function EdgeBiosUpdateUser(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<boolean>;
+
 export function EdgeCreateSnapshot(arg1:string,arg2:string):Promise<assistcli.Message>;
 
 export function EdgeDHCPPortExists(arg1:string,arg2:string,arg3:system.NetworkingBody):Promise<system.DHCPPortExists>;
@@ -553,6 +555,8 @@ export function RubixAssistTokenGenerate(arg1:string,arg2:string,arg3:string):Pr
 export function RubixAssistTokenRegenerate(arg1:string,arg2:string,arg3:string):Promise<externaltoken.ExternalToken>;
 
 export function RubixAssistTokens(arg1:string,arg2:string):Promise<externaltoken.ExternalToken>;
+
+export function RubixAssistUpdateUser(arg1:string,arg2:string,arg3:string,arg4:string):Promise<boolean>;
 
 export function Scanner(arg1:string,arg2:string,arg3:number,arg4:Array<string>):Promise<any>;
 

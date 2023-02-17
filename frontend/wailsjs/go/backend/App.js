@@ -338,6 +338,10 @@ export function EdgeBiosTokens(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeBiosTokens'](arg1, arg2, arg3);
 }
 
+export function EdgeBiosUpdateUser(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['EdgeBiosUpdateUser'](arg1, arg2, arg3, arg4, arg5);
+}
+
 export function EdgeCreateSnapshot(arg1, arg2) {
   return window['go']['backend']['App']['EdgeCreateSnapshot'](arg1, arg2);
 }
@@ -1064,6 +1068,10 @@ export function RubixAssistTokenRegenerate(arg1, arg2, arg3) {
 
 export function RubixAssistTokens(arg1, arg2) {
   return window['go']['backend']['App']['RubixAssistTokens'](arg1, arg2);
+}
+
+export function RubixAssistUpdateUser(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['RubixAssistUpdateUser'](arg1, arg2, arg3, arg4);
 }
 
 export function Scanner(arg1, arg2, arg3, arg4) {
