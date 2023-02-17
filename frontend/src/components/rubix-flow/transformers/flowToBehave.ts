@@ -13,7 +13,6 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
     if (node.type === undefined) {
       return;
     }
-
     const behaveNode: NodeJSON = {
       id: node.id,
       type: node.type,
@@ -29,8 +28,22 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
     if (node.parentId) behaveNode.parentId = node.parentId;
 
     if (node.style && !isObjectEmpty(node.style)) behaveNode.style = node.style;
+    const newData = {
+      ...node.data,
+      inputs: [
+        ...node.data.inputs.map((item: { value: string; pin: string }) => {
+          return {
+            ...item,
+            value:
+              node.data[item.pin] !== undefined
+                ? node.data[item.pin]
+                : item.value,
+          };
+        }),
+      ],
+    };
 
-    Object.entries(node.data).forEach(([key, value]) => {
+    Object.entries(newData).forEach(([key, value]) => {
       if (behaveNode.inputs === undefined) {
         behaveNode.inputs = {};
       }
