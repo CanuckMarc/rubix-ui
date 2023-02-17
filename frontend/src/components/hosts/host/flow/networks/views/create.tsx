@@ -95,6 +95,7 @@ export const CreateModal = (props: any) => {
 
   useEffect(() => {
     setSchema({});
+    fetchPlugins();
     setSelectedPlugin("please enable and select plugin....");
   }, [isModalVisible]);
 
