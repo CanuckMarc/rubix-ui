@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { FlowPluginFactory } from "../factory";
 
 export const PluginDownloadModal = (props: any) => {
-  const { isModalVisible, handleClose, pluginName, refreshList } = props;
+  const { isModalVisible, handleClose, pluginName, refreshList, setIsRestartFFModalVisible } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [confirmLoading, setConfirmloading] = useState(false);
 
@@ -20,6 +20,7 @@ export const PluginDownloadModal = (props: any) => {
       await factory.InstallPlugin(connUUID, hostUUID, pluginName);
       refreshList();
       handleClose();
+      setIsRestartFFModalVisible(true);
     } finally {
       setConfirmloading(false);
     }
