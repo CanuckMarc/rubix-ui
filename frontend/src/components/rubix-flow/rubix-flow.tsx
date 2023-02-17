@@ -626,10 +626,13 @@ const Flow = (props: FlowProps) => {
 
   const handleNodeContextMenu = (event: React.MouseEvent, node: NodeInterface) => {
     if (event.ctrlKey) {
-      if (node.isParent) {
+      if (node.isParent && ((event as any).which === 3 || event.button === 2)) {
         event.preventDefault();
         event.stopPropagation();
         handlePushSelectedNodeForSubFlow(node);
+        setNodeMenuSelectVisibility(undefined);
+        setNodeMenuVisibility(undefined);
+        setMenuOpenFromNodeTree(false);
       }
     } else {
       const { x, y } = setMousePosition(event);
@@ -639,10 +642,13 @@ const Flow = (props: FlowProps) => {
   };
 
   const handleSelectContextMenu = (event: ReactMouseEvent) => {
-    const { x, y } = setMousePosition(event);
-    setNodeMenuSelectVisibility({ x, y });
-    const nodeSelect = nodes.filter((item) => item.selected === true);
-    setNodeSelect(nodeSelect);
+    const nodeSelect = nodes.filter((item) => item.selected);
+
+    if (nodeSelect.length > 1) {
+      const { x, y } = setMousePosition(event);
+      setNodeMenuSelectVisibility({ x, y });
+      setNodeSelect(nodeSelect);
+    }
   };
 
   const setMousePosition = useCallback(
