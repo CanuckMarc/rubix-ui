@@ -1,4 +1,22 @@
-import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip, Space } from "antd";
+import {
+  Avatar,
+  Divider,
+  Dropdown,
+  Image,
+  Layout,
+  Menu,
+  MenuProps,
+  Row,
+  Select,
+  Spin,
+  Switch,
+  Tooltip,
+  Space,
+  InputNumber,
+  Modal,
+  Popover,
+  Button,
+} from "antd";
 import {
   ApartmentOutlined,
   CloudServerOutlined,
@@ -9,7 +27,7 @@ import {
   ToolOutlined,
   UserOutlined,
   ReloadOutlined,
-  UpOutlined
+  UpOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -18,7 +36,7 @@ import { ROUTES } from "../../constants/routes";
 import { DARK_THEME, getShowWires, LIGHT_THEME, SHOW_WIRES, useTheme } from "../../themes/use-theme";
 import { SettingsFactory } from "../settings/factory";
 import { ReleasesFactory } from "../release/factory";
-import { useSettings } from "../settings/use-settings";
+import { getTimeSetting, setTimeSetting, useSettings } from "../settings/use-settings";
 import { TokenModal } from "../settings/views/token-modal";
 import { openNotificationWithIcon } from "../../utils/utils";
 import { LocationFactory } from "../locations/factory";
@@ -111,6 +129,10 @@ const AvatarDropdown = (props: any) => {
         {
           key: "4",
           label: ShowWiresMenuItem(),
+        },
+        {
+          key: "5",
+          label: TimeSettingMenuItem(),
         },
       ]}
     />
@@ -222,6 +244,47 @@ const ShowWiresMenuItem = () => {
       <Switch style={{ marginRight: "10px" }} checked={isEnable} onChange={handleChangeEnable} />
       Show Wires
     </div>
+  );
+};
+
+const TimeSettingMenuItem = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [time, setTime] = useState(0);
+
+  const onChangeTimeSetting = (value: number | null) => {
+    setTime(value || 5);
+  };
+
+  const handleOk = () => {
+    setTimeSetting(time * 1000);
+    handleClose();
+    openNotificationWithIcon("info", "Please refresh page to apply");
+  };
+
+  const handleClose = () => {
+    setIsVisible(false);
+  };
+
+  const handleOpen = () => {
+    setIsVisible(true);
+    setTime(getTimeSetting() / 1000);
+  };
+
+  return (
+    <>
+      <div onClick={handleOpen}>Time Setting</div>
+
+      <Modal
+        title="Time Setting"
+        className="text-start"
+        visible={isVisible}
+        onOk={handleOk}
+        onCancel={handleClose}
+        width={250}
+      >
+        <InputNumber defaultValue={time} onChange={onChangeTimeSetting} style={{ width: "100%" }} addonAfter="sec" />
+      </Modal>
+    </>
   );
 };
 
@@ -376,26 +439,29 @@ export const MenuSidebar = () => {
     }
   };
 
-  const fetchConnections = async () => {
-    try {
-      setIsFetching(true);
-      const connections = ((await connectionFactory.GetAll()) || []) as any[];
-      const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
-      for (const c of enabledConnections) {
-        let locations = [];
-        locations = await getLocations(c.uuid);
-        c.locations = locations;
+  const fetchConnections = () => {
+    setTimeout(async () => {
+      try {
+        setIsFetching(true);
+        const connections = ((await connectionFactory.GetAll()) || []) as any[];
+        const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
+        for (const c of enabledConnections) {
+          let locations = [];
+          locations = await getLocations(c.uuid);
+          c.locations = locations;
+        }
+        const route = getTreeDataIterative(enabledConnections);
+        updateRouteData(route);
+      } finally {
+        setIsFetching(false);
       }
-      const route = getTreeDataIterative(enabledConnections);
+    }, getTimeSetting());
+  };
 
-      const versionRes = await releasesFactory.LatestVersions();
-      if (versionRes) {
-        setVersions(versionRes);
-      }
-
-      updateRouteData(route);
-    } finally {
-      setIsFetching(false);
+  const fetchLatestVersions = async () => {
+    const versionRes = await releasesFactory.LatestVersions();
+    if (versionRes) {
+      setVersions(versionRes);
     }
   };
 
@@ -467,6 +533,7 @@ export const MenuSidebar = () => {
 
   useEffect(() => {
     fetchConnections();
+    fetchLatestVersions();
   }, []);
 
   useEffect(() => {
@@ -489,10 +556,20 @@ export const MenuSidebar = () => {
   }, [location.pathname]);
 
   const versionItems = (
-    <div id="versions-dropdown" style={{display: 'flex', flexDirection: 'column', rowGap: '6px', alignItems: 'flex-start', width: 280, paddingLeft: '48px'}}>
-      <strong>Rubix edge: {`${versions ? versions.LatestRubixEdgeVersion : 'Failed to fetch'}`}</strong>
-      <strong>Rubix assist: {`${versions ? versions.LatestRubixAssistVersion : 'Failed to fetch'}`}</strong>
-      <strong>Flow framework: {`${versions ? versions.LatestFlowFrameworkVersion : 'Failed to fetch'}`}</strong>
+    <div
+      id="versions-dropdown"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: "6px",
+        alignItems: "flex-start",
+        width: 280,
+        paddingLeft: "48px",
+      }}
+    >
+      <strong>Rubix edge: {`${versions ? versions.LatestRubixEdgeVersion : "Failed to fetch"}`}</strong>
+      <strong>Rubix assist: {`${versions ? versions.LatestRubixAssistVersion : "Failed to fetch"}`}</strong>
+      <strong>Flow framework: {`${versions ? versions.LatestFlowFrameworkVersion : "Failed to fetch"}`}</strong>
     </div>
   );
 
@@ -512,7 +589,7 @@ export const MenuSidebar = () => {
         </div>
       ) : (
         <>
-          <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div>
               <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
               <DividerLock
@@ -533,18 +610,22 @@ export const MenuSidebar = () => {
               />
               <AvatarDropdown setIsModalVisible={setIsModalVisible} />
             </div>
-            <div style={{position: 'fixed', bottom: '0px', width: 280}}>
-              <div id="versions-dropdown" style={{position: 'relative', display: 'flex', flexDirection: 'column', rowGap: '10px', width: 280}}> 
-                <Dropdown overlay={ versionItems } overlayStyle={{width: 280}}>
+            <div style={{ position: "fixed", bottom: "0px", width: 280 }}>
+              <div
+                id="versions-dropdown"
+                style={{ position: "relative", display: "flex", flexDirection: "column", rowGap: "10px", width: 280 }}
+              >
+                <Dropdown overlay={versionItems} overlayStyle={{ width: 280 }}>
                   <a onClick={(e) => e.preventDefault()}>
                     <Space>
-                      <strong>Latest release: {`${versions ? versions.LatestReleaseVersion : 'Failed to fetch'}`}</strong>
+                      <strong>
+                        Latest release: {`${versions ? versions.LatestReleaseVersion : "Failed to fetch"}`}
+                      </strong>
                       <UpOutlined />
                     </Space>
                   </a>
                 </Dropdown>
               </div>
-
             </div>
           </div>
 
