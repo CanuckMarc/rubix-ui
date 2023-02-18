@@ -14,8 +14,6 @@ import {
   Space,
   InputNumber,
   Modal,
-  Popover,
-  Button,
 } from "antd";
 import {
   ApartmentOutlined,
@@ -28,6 +26,7 @@ import {
   UserOutlined,
   ReloadOutlined,
   UpOutlined,
+  FieldTimeOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -120,7 +119,7 @@ const AvatarDropdown = (props: any) => {
         },
         {
           key: "2",
-          label: TokenMenuItem(props),
+          label: ShowWiresMenuItem(),
         },
         {
           key: "3",
@@ -128,7 +127,7 @@ const AvatarDropdown = (props: any) => {
         },
         {
           key: "4",
-          label: ShowWiresMenuItem(),
+          label: TokenMenuItem(props),
         },
         {
           key: "5",
@@ -272,7 +271,9 @@ const TimeSettingMenuItem = () => {
 
   return (
     <>
-      <div onClick={handleOpen}>Time Setting</div>
+      <div onClick={handleOpen}>
+        <FieldTimeOutlined /> Time Setting
+      </div>
 
       <Modal
         title="Time Setting"
@@ -576,6 +577,7 @@ export const MenuSidebar = () => {
   return (
     <Sider
       id="sidebarMenu"
+      className="sidebar-menu"
       width={280}
       style={{ height: "calc(100vh - 40px)" }}
       collapsed={collapsed}
