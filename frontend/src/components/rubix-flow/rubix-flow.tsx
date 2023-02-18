@@ -51,6 +51,7 @@ import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
+import { formatParentNodesWithInputsOutputs } from "./util/flow";
 import "./rubix-flow.css";
 import "reactflow/dist/style.css";
 
@@ -102,7 +103,7 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -720,16 +721,26 @@ const Flow = (props: FlowProps) => {
     if (outputNodes && outputNodes.length === 0) return prevNodes;
 
     return prevNodes.map((node: NodeInterface) => {
-      const index = outputNodes.findIndex((item) => item.nodeId === node.id);
-      if (index > -1) {
-        node.data.inputs = !node.data.inputs
-          ? outputNodes[index]?.inputs
-          : handleBeforeAddOutput(node.data.inputs, outputNodes[index]?.inputs);
-        node.data.out = !node.data.out
-          ? outputNodes[index]?.outputs
-          : handleBeforeAddOutput(node.data.out, outputNodes[index]?.outputs);
-        node.status = outputNodes[index]?.status;
-        node.info = { ...node.info, ...outputNodes[index]?.info };
+      if (node.isParent) {
+        const nodeOut = outputNodes.find((nodeO) => nodeO.nodeId === node.id);
+        const outs = (nodeOut?.outputs || []).filter(
+          (out: { pin: string }) => !node.data.out.some((dI: { pin: string }) => dI.pin === out.pin)
+        );
+
+        node.data.out = [...node.data.out, ...outs];
+      } else {
+        const index = outputNodes.findIndex((item) => item.nodeId === node.id);
+
+        if (index > -1) {
+          node.data.inputs = !node.data.inputs
+            ? outputNodes[index]?.inputs
+            : handleBeforeAddOutput(node.data.inputs, outputNodes[index]?.inputs);
+          node.data.out = !node.data.out
+            ? outputNodes[index]?.outputs
+            : handleBeforeAddOutput(node.data.out, outputNodes[index]?.outputs);
+          node.status = outputNodes[index]?.status;
+          node.info = { ...node.info, ...outputNodes[index]?.info };
+        }
       }
 
       return node;
@@ -785,6 +796,8 @@ const Flow = (props: FlowProps) => {
       handleFlowChange();
     }
   };
+
+  console.log("___nodes", nodes);
 
   const handleRedo = () => {
     const lastFuture = undoState.future.pop();
@@ -966,7 +979,9 @@ const Flow = (props: FlowProps) => {
 
   const handleRefreshValues = async () => {
     const _outputNodes = (await fetchOutput()) || [];
-    setNodes((prevNodes) => addOutputToNodes(_outputNodes, prevNodes));
+    setTimeout(() => {
+      setNodes((prevNodes) => addOutputToNodes(_outputNodes, prevNodes));
+    }, 100);
   };
 
   const onSaveFlowSettings = (config: FlowSettings) => {
@@ -1098,30 +1113,28 @@ const Flow = (props: FlowProps) => {
       window.allFlow = { nodes: [], edges: [] };
     }
 
+    if (isFetching) return;
+
     // save all nodes with latest values
     window.allFlow.nodes = window.allFlow.nodes.map((node) => {
       return nodes.find((node2: NodeInterface) => node2.id === node.id) || node;
     });
 
+    const nodesFormatted = formatParentNodesWithInputsOutputs(window.allFlow.nodes, nodesSpec as Array<any>);
+
     // get nodes and edges by sub flow or level 1 from all nodes and edges saved
     // when change sub flow
-    const newNodes = window.allFlow.nodes.filter((node) => {
+    const nodesL1 = nodesFormatted.filter((node) => {
       return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
     });
 
-    window.allFlow.nodes.forEach((node1) => {
-      const hasParent = newNodes.some((node2) => {
-        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
-      });
-      if (hasParent) {
-        newNodes.push(node1);
-      }
-    });
+    console.log("nodesL1", nodesL1);
+
     const edgesL1 = window.allFlow.edges.filter((e) =>
-      newNodes.some((node) => node.id === e.target || node.id === e.source)
+      nodesL1.some((node) => node.id === e.target || node.id === e.source)
     );
 
-    setNodes(newNodes.map((n) => ({ ...n, selected: false })));
+    setNodes(nodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
     handleRefreshValues();
     setTimeout(() => {
@@ -1132,22 +1145,17 @@ const Flow = (props: FlowProps) => {
 
   useEffect(() => {
     closeNodePicker();
-    setIsFetching(true);
     factory
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
         const [_nodes, _edges] = behaveToFlow(res) as [NodeInterface[], Edge[]];
-        const newNodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
+        let newNodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
+
+        console.log("__FETCHED__", newNodes);
+        const nodesFormatted = formatParentNodesWithInputsOutputs(newNodes, nodesSpec as Array<any>);
 
         // just show nodes and edges at level 1
-        const nodesL1 = newNodes.filter((node) => !node.parentId);
-
-        newNodes.forEach((node1) => {
-          const hasParent = nodesL1.some((node2) => !!node1.parentId && node2.id === node1.parentId);
-          if (hasParent) {
-            nodesL1.push(node1);
-          }
-        });
+        const nodesL1 = nodesFormatted.filter((node) => !node.parentId);
         const edgesL1 = _edges.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
         // tracking all nodes and edges to save
@@ -1162,17 +1170,17 @@ const Flow = (props: FlowProps) => {
       .catch(() => {
         setIsFetching(false);
       });
-  }, [connUUID, hostUUID]);
+  }, []);
 
-  useEffect(() => {
-    if (refreshInterval.current) clearInterval(refreshInterval.current);
+  // useEffect(() => {
+  //   if (refreshInterval.current) clearInterval(refreshInterval.current);
 
-    refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
+  //   refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
 
-    return () => {
-      if (refreshInterval.current) clearInterval(refreshInterval.current);
-    };
-  }, [flowSettings.refreshTimeout]);
+  //   return () => {
+  //     if (refreshInterval.current) clearInterval(refreshInterval.current);
+  //   };
+  // }, [flowSettings.refreshTimeout]);
 
   const saveCurrentFlowForUndo = () => {
     setUndoState((s) => ({
@@ -1453,7 +1461,7 @@ export const RubixFlow = () => {
   };
 
   const customEdgeTypes = {
-    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
+    default: (props: EdgeProps) => <CustomEdge {...props} />,
   };
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {
