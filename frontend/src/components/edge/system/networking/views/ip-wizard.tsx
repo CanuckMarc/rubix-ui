@@ -4,25 +4,52 @@ import { Modal, Spin, Steps, Button, StepsProps, Select, Form, Input } from "ant
 import { openNotificationWithIcon } from "../../../../../utils/utils";
 import { HostNetworkingFactory } from "../factory";
 import { backend } from "../../../../../../wailsjs/go/models";
+import { HostSystemFactory } from "../../../../edge/system/factory-system";
 import RcNetworkBody = backend.RcNetworkBody;
 const { Step } = Steps;
 
+interface FormDataType {
+  ip: string;
+  gateway: string;
+  netmask: string;
+}
+
+const formItemLayout = { labelCol: { span: 10 }, wrapperCol: { span: 15 } };
+
 export const IpWizard = (props: any) => {
-  const { refreshList, isModalVisible, onCloseModal } = props;
+  const { currentItem, prefix, refreshList, isModalVisible, onCloseModal } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
-//   const [newConnection, setNewConnection] = useState({} as RubixConnection)
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
-  // const [errorAtPing, setErrorAtPing] = useState(false);
-  
-
   const [select, setSelect] = useState<string | undefined>(undefined);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [selectedData, setSelectedData] = useState({} as RcNetworkBody);
+  const [initData, setInitData] = useState({} as FormDataType);
+  const [isRebooting, setIsRebooting] = useState(false);
   const [form] = Form.useForm();
 
+  const hostSystemFactory = new HostSystemFactory();
   const factory = new HostNetworkingFactory();
   factory.connectionUUID = connUUID;
   factory.hostUUID = hostUUID;
+
+  useEffect(() => {
+    setSelectedData(currentItem);
+    setInitData({ip: currentItem.ip, gateway: currentItem.gateway, netmask: currentItem.netmask})
+    console.log('current item is: ', currentItem)
+  }, [currentItem]);
+
+  useEffect(() => {
+    setStepStatus('process');
+  }, [isModalVisible])
+
+  useEffect(() => {
+    form.setFieldsValue({
+      ip: initData.ip,
+      netmask: initData.netmask,
+      gateway: initData.gateway
+    })
+  }, [initData])
 
   const handleSelectChange = (value: string) => {
     setSelect(value);
@@ -30,6 +57,7 @@ export const IpWizard = (props: any) => {
 
   const handleStepOneNext = () => {
     if (select) {
+      setStepStatus('process');
       setCurrentStep(currentStep + 1);
     } else {
       setStepStatus('error');
@@ -41,25 +69,39 @@ export const IpWizard = (props: any) => {
     if (select === 'static') {
       form.submit();
     } else {
-      setCurrentStep(currentStep + 1);
+      handleSubmit(undefined)
     }
   }
 
-  // const handleConvertBody = (item: any) => {
-  //   let body = {};
-  //   Object.keys(item).forEach((key) => {
-  //     const newKey = prefix + key;
-  //     body = { ...body, [newKey]: item[key] };
-  //   });
-  //   return body;
-  // };
-
-  const handleSubmit = async (formValues: any) => {
+  const handleSubmit = async (formValues: FormDataType | undefined) => {
+    // console.log('formvalues is: ', formValues)
+    let combinedPayload = {};
+    if (formValues) {
+      combinedPayload = {
+        ...selectedData, 
+        ip_settings: select, 
+        ip_settings_state: '', 
+        ip: formValues.ip,
+        netmask: formValues.netmask,
+        gateway: formValues.gateway
+      }
+    } else {
+      combinedPayload = {
+        ...selectedData, 
+        ip_settings: select, 
+        ip_settings_state: '', 
+        ip: '',
+        netmask: '',
+        gateway: ''
+      }
+    }
+    // console.log('combined payload is: ', combinedPayload)
     try {
       setConfirmLoading(true);
-      // const payload = handleConvertBody(item) as RcNetworkBody;
-      const payload = {} as RcNetworkBody;
+      const payload = handleConvertBody(combinedPayload) as RcNetworkBody;
+      // console.log('payload is: ', payload)
       await factory.RcSetNetworks(payload);
+      setCurrentStep(currentStep + 1);
       refreshList();
     } catch (error) {
       console.log(error);
@@ -68,15 +110,36 @@ export const IpWizard = (props: any) => {
     }
   }
 
+  const handleConvertBody = (item: any) => {
+    let body = {};
+    Object.keys(item).forEach((key) => {
+      const newKey = prefix + key;
+      body = { ...body, [newKey]: item[key] };
+    });
+    return body;
+  };
 
-  
+  const rebootHost = async () => {
+    try {
+      setIsRebooting(true);
+      await hostSystemFactory.EdgeHostReboot(connUUID, hostUUID);
+    } finally {
+      setIsRebooting(false);
+    }
+  };
+
+  const handleStepThree = async () => {
+    rebootHost();
+    handleWizardClose();
+  }
+
   const data = [
     { id: "1", name: "Step 1", text: 'Select network type', content: (
-      <div style={{width: '35vw'}}>
-        <div style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
+      <div style={{display: 'flex', flexDirection: 'column', rowGap: '20px', alignItems: 'center', width: '35vw'}}>
+        <div style={{display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center',}}>
           <strong>Select type: </strong>
           <Select
-            style={{ width: 120 }}
+            style={{ width: 240 }}
             onChange={handleSelectChange}
             options={[
                 { value: 'static', label: 'static' },
@@ -88,10 +151,10 @@ export const IpWizard = (props: any) => {
         <Button type='primary' onClick={handleStepOneNext} style={{width: '120px'}}>Next</Button>
       </div>
     ) },
-    { id: "2", name: "Step 2", text: 'Ping connection', content: (
+    { id: "2", name: "Step 2", text: 'IP settings', content: (
       <div style={{display: 'flex', flexDirection: 'column', rowGap: '20px', alignItems:'center'}}>
         {select === 'static' && (
-          <Form labelAlign="left" form={form} onFinish={handleSubmit}>
+          <Form {...formItemLayout} form={form} onFinish={handleSubmit}>
             <Form.Item
               label="IP address:"
               name="ip"
@@ -117,22 +180,13 @@ export const IpWizard = (props: any) => {
             </Form.Item>
           </Form>
         )}
-        <Button type='primary' onClick={handleStepTwoNext} style={{width: '120px'}}>Next</Button>
+        <Button type='primary' onClick={handleStepTwoNext} loading={confirmLoading} style={{width: '120px'}}>Next</Button>
       </div>
     ) },
-    { id: "3", name: "Step 3", text: 'Configure tokens', content: (
+    { id: "3", name: "Step 3", text: 'Reboot device', content: (
       <div style={{width: '35vw', display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
-        {/* {newConnection.external_token === '' ? (
-          <TokenForm 
-            factory={tokenFactory}
-            selectedItem={newConnection}
-            hostOrConn={'conn'}
-          />
-        ) : (
-          <strong>Token already included!</strong>
-        )} */}
-        <strong>Step three</strong>
-        <Button type='primary' onClick={() => handleWizardClose()} style={{width: '120px'}}>Finish</Button>
+        <strong>Warning: This will reboot the device!</strong>
+        <Button type='primary' loading={isRebooting} onClick={handleStepThree} style={{width: '120px'}}>Reboot</Button>
       </div>
     ) }
   ];
@@ -140,13 +194,14 @@ export const IpWizard = (props: any) => {
   const onStepsChange = (value: number) => {
     if (stepStatus === 'error') {
       setStepStatus('process');
-      // setErrorAtPing(false);
     }
     setCurrentStep(value);
   };
 
   const handleWizardClose = () => {
-    // setNewConnection({} as RubixConnection);
+    setSelectedData({} as RcNetworkBody);
+    setInitData({} as FormDataType);
+    setSelect(undefined);
     setCurrentStep(0);
     onCloseModal();
     refreshList();

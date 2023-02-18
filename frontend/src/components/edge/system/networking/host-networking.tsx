@@ -109,6 +109,8 @@ export const HostNetworking = () => {
         refreshList={fetch}
       /> */}
       <IpWizard 
+        currentItem={currentItem}
+        prefix={prefix}
         refreshList={fetch}
         isModalVisible={isModalVisible}
         onCloseModal={() => setIsModalVisible(false)}
