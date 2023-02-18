@@ -231,7 +231,7 @@ export const Node = memo((props: NodeProps) => {
                 {...input}
                 value={input.valueOfChild || data[input.name]}
                 onChange={handleChange}
-                connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
+                connected={node.isParent || isHandleConnected(edges, input.nodeId || id, input.name, "target")}
                 minWidth={widthInput}
                 onSetWidthInput={handleSetWidthInput}
                 dataInput={data.inputs}
