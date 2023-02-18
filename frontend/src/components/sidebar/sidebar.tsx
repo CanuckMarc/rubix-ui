@@ -439,23 +439,21 @@ export const MenuSidebar = () => {
     }
   };
 
-  const fetchConnections = () => {
-    setTimeout(async () => {
-      try {
-        setIsFetching(true);
-        const connections = ((await connectionFactory.GetAll()) || []) as any[];
-        const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
-        for (const c of enabledConnections) {
-          let locations = [];
-          locations = await getLocations(c.uuid);
-          c.locations = locations;
-        }
-        const route = getTreeDataIterative(enabledConnections);
-        updateRouteData(route);
-      } finally {
-        setIsFetching(false);
+  const fetchConnections = async () => {
+    try {
+      setIsFetching(true);
+      const connections = ((await connectionFactory.GetAll()) || []) as any[];
+      const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
+      for (const c of enabledConnections) {
+        let locations = [];
+        locations = await getLocations(c.uuid);
+        c.locations = locations;
       }
-    }, getTimeSetting());
+      const route = getTreeDataIterative(enabledConnections);
+      updateRouteData(route);
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   const fetchLatestVersions = async () => {
@@ -532,7 +530,9 @@ export const MenuSidebar = () => {
   eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
 
   useEffect(() => {
-    fetchConnections();
+    setTimeout(async () => {
+      fetchConnections();
+    }, getTimeSetting());
     fetchLatestVersions();
   }, []);
 
