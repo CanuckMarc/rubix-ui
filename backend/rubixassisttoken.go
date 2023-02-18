@@ -10,17 +10,16 @@ import (
 func (inst *App) RubixAssistLogin(connUUID, username, password string) *model.TokenResponse {
 	resp, err := inst.rubixAssistLogin(connUUID, username, password)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
-	inst.uiSuccessMessage("Step 1: on the add button generate a new token")
 	return resp
 }
 
 func (inst *App) RubixAssistTokens(connUUID, jwtToken string) *[]externaltoken.ExternalToken {
 	resp, err := inst.rubixAssistTokens(connUUID, jwtToken)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -29,7 +28,7 @@ func (inst *App) RubixAssistTokens(connUUID, jwtToken string) *[]externaltoken.E
 func (inst *App) RubixAssistToken(connUUID, jwtToken, uuid string) *externaltoken.ExternalToken {
 	resp, err := inst.rubixAssistToken(connUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -38,7 +37,7 @@ func (inst *App) RubixAssistToken(connUUID, jwtToken, uuid string) *externaltoke
 func (inst *App) RubixAssistTokenGenerate(connUUID, jwtToken, name string) *externaltoken.ExternalToken {
 	resp, err := inst.rubixAssistTokenGenerate(connUUID, jwtToken, name)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	inst.uiSuccessMessage("Step 1: copy the token & Step 2: edit the connection and paste in the generated token")
@@ -48,7 +47,7 @@ func (inst *App) RubixAssistTokenGenerate(connUUID, jwtToken, name string) *exte
 func (inst *App) RubixAssistTokenBlock(connUUID, jwtToken, uuid string, state bool) *externaltoken.ExternalToken {
 	resp, err := inst.rubixAssistTokenBlock(connUUID, jwtToken, uuid, state)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -57,7 +56,7 @@ func (inst *App) RubixAssistTokenBlock(connUUID, jwtToken, uuid string, state bo
 func (inst *App) RubixAssistTokenRegenerate(connUUID, jwtToken, uuid string) *externaltoken.ExternalToken {
 	resp, err := inst.rubixAssistTokenRegenerate(connUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -66,9 +65,19 @@ func (inst *App) RubixAssistTokenRegenerate(connUUID, jwtToken, uuid string) *ex
 func (inst *App) RubixAssistTokenDelete(connUUID, jwtToken, uuid string) bool {
 	resp, err := inst.rubixAssistTokenDelete(connUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return false
 	}
+	return resp
+}
+
+func (inst *App) RubixAssistUpdateUser(connUUID, jwtToken, username, password string) bool {
+	resp, err := inst.rubixAssistUpdateUser(connUUID, jwtToken, username, password)
+	if err != nil {
+		inst.uiErrorMessage(err)
+		return false
+	}
+	inst.uiSuccessMessage(fmt.Sprintf("Successfully updated user %s", username))
 	return resp
 }
 
@@ -131,4 +140,12 @@ func (inst *App) rubixAssistTokenDelete(connUUID, jwtToken, uuid string) (bool, 
 		return false, err
 	}
 	return client.RubixAssistTokenDelete(jwtToken, uuid)
+}
+
+func (inst *App) rubixAssistUpdateUser(connUUID, jwtToken, username, password string) (bool, error) {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return false, err
+	}
+	return client.RubixAssistUpdateUser(jwtToken, username, password)
 }

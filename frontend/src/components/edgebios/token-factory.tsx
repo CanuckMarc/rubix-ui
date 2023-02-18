@@ -5,7 +5,8 @@ import {
   EdgeBiosTokenDelete,
   EdgeBiosTokenGenerate,
   EdgeBiosTokenRegenerate,
-  EdgeBiosTokens
+  EdgeBiosTokens,
+  EdgeBiosUpdateUser
 } from "../../../wailsjs/go/backend/App";
 import { CommonTokenFactory } from "../../common/token/factory";
 
@@ -42,5 +43,9 @@ export class EdgeBiosTokenFactory implements CommonTokenFactory {
 
   public TokenDelete(jwtToken: string, uuid: string): Promise<any> {
     return EdgeBiosTokenDelete(this.connectionUUID, this.hostUUID, jwtToken, uuid);
+  }
+
+  public UpdateUser(jwtToken: string, username: string, password: string): Promise<any> {
+    return EdgeBiosUpdateUser(this.connectionUUID, this.hostUUID, jwtToken, username, password);
   }
 }
