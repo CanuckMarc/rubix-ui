@@ -31,8 +31,6 @@ const getValueOptions = (value: number) => {
       return false;
     case 1:
       return true;
-    case -1:
-      return null;
     default:
       return false;
   }
