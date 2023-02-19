@@ -36,7 +36,6 @@ export const IpWizard = (props: any) => {
   useEffect(() => {
     setSelectedData(currentItem);
     setInitData({ip: currentItem.ip, gateway: currentItem.gateway, netmask: currentItem.netmask})
-    console.log('current item is: ', currentItem)
   }, [currentItem]);
 
   useEffect(() => {
@@ -74,7 +73,6 @@ export const IpWizard = (props: any) => {
   }
 
   const handleSubmit = async (formValues: FormDataType | undefined) => {
-    // console.log('formvalues is: ', formValues)
     let combinedPayload = {};
     if (formValues) {
       combinedPayload = {
@@ -95,11 +93,9 @@ export const IpWizard = (props: any) => {
         gateway: ''
       }
     }
-    // console.log('combined payload is: ', combinedPayload)
     try {
       setConfirmLoading(true);
       const payload = handleConvertBody(combinedPayload) as RcNetworkBody;
-      // console.log('payload is: ', payload)
       await factory.RcSetNetworks(payload);
       setCurrentStep(currentStep + 1);
       refreshList();
@@ -131,6 +127,28 @@ export const IpWizard = (props: any) => {
   const handleStepThree = async () => {
     rebootHost();
     handleWizardClose();
+  }
+
+  const onStepsChange = (value: number) => {
+    if (stepStatus === 'error') {
+      setStepStatus('process');
+    }
+
+    if (!select) {
+      setStepStatus('error');
+      openNotificationWithIcon('warning', 'please select an IP type.')
+    } else {
+      setCurrentStep(value);
+    }
+  };
+
+  const handleWizardClose = () => {
+    setSelectedData({} as RcNetworkBody);
+    setInitData({} as FormDataType);
+    setSelect(undefined);
+    setCurrentStep(0);
+    onCloseModal();
+    refreshList();
   }
 
   const data = [
@@ -185,27 +203,14 @@ export const IpWizard = (props: any) => {
     ) },
     { id: "3", name: "Step 3", text: 'Reboot device', content: (
       <div style={{width: '35vw', display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
-        <strong>Warning: This will reboot the device!</strong>
-        <Button type='primary' loading={isRebooting} onClick={handleStepThree} style={{width: '120px'}}>Reboot</Button>
+        <strong style={{color: 'orange'}}>Warning: This will reboot the device!</strong>
+        <div style={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
+          <Button type='primary' loading={isRebooting} onClick={handleStepThree} style={{width: '120px'}}>Reboot</Button>
+          <Button type='dashed' loading={isRebooting} onClick={handleWizardClose} style={{width: '120px'}}>Skip</Button>
+        </div>
       </div>
     ) }
   ];
-
-  const onStepsChange = (value: number) => {
-    if (stepStatus === 'error') {
-      setStepStatus('process');
-    }
-    setCurrentStep(value);
-  };
-
-  const handleWizardClose = () => {
-    setSelectedData({} as RcNetworkBody);
-    setInitData({} as FormDataType);
-    setSelect(undefined);
-    setCurrentStep(0);
-    onCloseModal();
-    refreshList();
-  }
   
   return (
     <Modal
