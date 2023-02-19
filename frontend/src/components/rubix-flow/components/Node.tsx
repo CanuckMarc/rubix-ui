@@ -72,8 +72,6 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
     if (!isExist) {
       newInputs.push({
         name: item.pin,
-        valueOfChild: item.valueOfChild,
-        nodeId: item.nodeId,
         subName: item.subName,
         valueType: item.dataType,
         defaultValue: item.value,
@@ -109,8 +107,6 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node:
       newOutputs.push({
         name: item.pin,
         subName: item.subName,
-        valueOfChild: item.valueOfChild || item.value,
-        nodeId: item.nodeId,
         valueType: item.dataType,
       } as OutputSocketSpecJSON);
     } else {
@@ -118,7 +114,6 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node:
       if (!isExistInNewOutput) {
         newOutputs.push({
           name: item.pin,
-          valueOfChild: item.valueOfChild || item.value,
           valueType: item.dataType,
         });
       }
@@ -229,9 +224,9 @@ export const Node = memo((props: NodeProps) => {
             {input && (
               <InputSocket
                 {...input}
-                value={input.valueOfChild || data[input.name]}
+                value={data[input.name]}
                 onChange={handleChange}
-                connected={node.isParent || isHandleConnected(edges, input.nodeId || id, input.name, "target")}
+                connected={isHandleConnected(edges, id, input.name, "target")}
                 minWidth={widthInput}
                 onSetWidthInput={handleSetWidthInput}
                 dataInput={data.inputs}
@@ -245,13 +240,7 @@ export const Node = memo((props: NodeProps) => {
                 minWidth={widthOutput}
                 dataOut={data.out}
                 onSetWidthInput={handleSetWidthOutput}
-                connected={isHandleConnected(
-                  edges,
-                  // if have node id that mean id of child node in sub flow and present for output of parent node
-                  output.nodeId || id,
-                  output.nodeId ? "in" : output.name,
-                  output.nodeId ? "target" : "source"
-                )}
+                connected={isHandleConnected(edges, id, output.name, "source")}
               />
             )}
           </div>

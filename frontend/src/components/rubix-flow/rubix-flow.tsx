@@ -105,7 +105,7 @@ const Flow = (props: FlowProps) => {
   } = props;
   const [isFetching, setIsFetching] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeInterface[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
@@ -415,6 +415,7 @@ const Flow = (props: FlowProps) => {
   const onHandelSaveFlow = async () => {
     setIsSaving(true);
     const allNodes: NodeInterface[] = [...nodes];
+
     window.allFlow.nodes.forEach((node) => {
       const isExist = allNodes.some((n) => n.id === node.id);
       if (!isExist) {
@@ -433,18 +434,8 @@ const Flow = (props: FlowProps) => {
     try {
       // save nodes and edges
       await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
-
-      // filter nodes at level 1 or in sub flow
-      const newNodesL1 = newNodesFiltered.filter((node) => {
-        return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
-      });
-
-      const edgesL1 = window.allFlow.edges.filter((e) =>
-        newNodesL1.some((node) => node.id === e.target || node.id === e.source)
-      );
-
-      setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
-      setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
+      setNodes((n) => n.map((item) => ({ ...item, selected: false })));
+      setEdges((e) => e.map((item) => ({ ...item, selected: false })));
       window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
       setIsChangedFlow(false);
       handleRefreshValues();
@@ -578,7 +569,20 @@ const Flow = (props: FlowProps) => {
 
           const edgesAdded = [newEdge];
           const nodeTarget: NodeInterface = nodes.find((n) => n.id === nodeId)!!;
-          if (nodeTarget.isParent) {
+          const nodeSource: NodeInterface = nodes.find((n) => n.id === lastConnectStartNodeId)!!;
+
+          // create edge connect to child nodes if have
+          if (nodeTarget.isParent && nodeSource.isParent) {
+            const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
+            const output = nodeSource.data.out.find((item: any) => item.pin === lastConnectStartHandleId);
+            edgesAdded.push({
+              id: generateUuid(),
+              source: isTarget ? output.nodeId : input.nodeId,
+              sourceHandle: isTarget ? "output" : "input",
+              target: isTarget ? input.nodeId : output.nodeId,
+              targetHandle: isTarget ? "input" : "output",
+            });
+          } else if (nodeTarget.isParent) {
             if (isTarget) {
               const input = nodeTarget.data.inputs.find((item: any) => item.pin === handleId);
               edgesAdded.push({
@@ -587,6 +591,18 @@ const Flow = (props: FlowProps) => {
                 sourceHandle: lastConnectStartHandleId,
                 target: input.nodeId,
                 targetHandle: "input",
+              });
+            }
+          } else if (nodeSource.isParent) {
+            const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === lastConnectStartHandleId);
+            if (outputIndex >= 0) {
+              const outItem = nodeSource.data.out[outputIndex];
+              edgesAdded.push({
+                id: generateUuid(),
+                source: outItem.nodeId,
+                sourceHandle: "output",
+                target: targetNodeId,
+                targetHandle: targetHandleId,
               });
             }
           }
@@ -855,12 +871,15 @@ const Flow = (props: FlowProps) => {
 
   const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
     const nodeIds: string[] = [];
+    const _edgesDeletedClone = [..._edgesDeleted];
+
     for (const node of _nodesDeleted) {
       nodeIds.push(node.id);
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
     }
+
     const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
     const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
 
@@ -873,14 +892,38 @@ const Flow = (props: FlowProps) => {
     );
 
     const allRemainingNodes = window.allFlow.nodes.filter((n) => !nodeIds.includes(n.id));
+
+    _edgesDeleted.forEach((item) => {
+      const { source, target, targetHandle, sourceHandle } = item;
+      const nodeTarget: NodeInterface | undefined = nodes.find((n) => n.id === target);
+      const nodeSource: NodeInterface | undefined = nodes.find((n) => n.id === source);
+      let itemDeleted = null;
+
+      if (nodeTarget?.isParent && nodeSource?.isParent) {
+        const outputOfSource = nodeSource.data.out.find((item: any) => item.pin === sourceHandle);
+        const inputOfTarget = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.target === inputOfTarget.nodeId && item.source === outputOfSource.nodeId
+        );
+      } else if (nodeSource?.isParent) {
+        const outputOfSource = nodeSource.data.out.find((item: any) => item.pin === sourceHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.source === outputOfSource?.nodeId && item.sourceHandle === "output" && item.target === target
+        );
+      } else if (nodeTarget?.isParent) {
+        const inputOfTarget = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.target === inputOfTarget?.nodeId && item.targetHandle === "input" && item.source === source
+        );
+      }
+      if (itemDeleted) {
+        _edgesDeletedClone.push(itemDeleted);
+      }
+    });
+
     window.allFlow = {
       nodes: allRemainingNodes,
-      edges: window.allFlow.edges.filter(
-        (item) =>
-          !_edgesDeleted.some((item2) => item.id === item2.id) &&
-          !nodeIds.includes(item.target) &&
-          !nodeIds.includes(item.source)
-      ),
+      edges: window.allFlow.edges.filter((item) => !_edgesDeletedClone.some((item2) => item.id === item2.id)),
     };
     setNodes(remainingNodes);
     setEdges(remainingEdges);
@@ -1147,9 +1190,7 @@ const Flow = (props: FlowProps) => {
     const nodesL1 = nodesFormatted.filter((node) => {
       return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
     });
-    const edgesL1 = edgesFormatted.filter((e) =>
-      nodesL1.some((node) => node.id === e.target || node.id === e.source)
-    );
+    const edgesL1 = edgesFormatted.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
     setNodes(nodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
@@ -1457,7 +1498,7 @@ const Flow = (props: FlowProps) => {
 };
 
 export const RubixFlow = () => {
-  const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [nodesSpec, , isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
