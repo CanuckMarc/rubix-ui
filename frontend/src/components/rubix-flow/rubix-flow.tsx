@@ -460,16 +460,13 @@ const Flow = (props: FlowProps) => {
 
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     if (lastConnectStart) {
-      const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
+      const {
+        nodeid: targetNodeId,
+        handleid: targetHandleId,
+        handlepos: position,
+      } = (evt.target as HTMLDivElement).dataset;
+      const { nodeId: sourceNodeId, handleId: sourceHandleId, handleType: sourceHandleType } = lastConnectStart;
       const isTarget = position === "left";
-
-      const [targetHandleId, targetNodeId] = handleId?.includes(SPLIT_KEY)
-        ? handleId.split(SPLIT_KEY)
-        : [handleId, nodeId];
-
-      const [lastConnectStartHandleId, lastConnectStartNodeId] = lastConnectStart.handleId?.includes(SPLIT_KEY)
-        ? lastConnectStart.handleId.split(SPLIT_KEY)
-        : [lastConnectStart.handleId, lastConnectStart.nodeId];
 
       if (
         targetNodeId &&
@@ -485,14 +482,14 @@ const Flow = (props: FlowProps) => {
       }
 
       const edgeByTarget: Edge | undefined = window.allFlow.edges.find((e) =>
-        isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === lastConnectStartNodeId
+        isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === sourceNodeId
       );
 
-      const isSameTarget = lastConnectStart.handleType === "target" && isTarget;
+      const isSameTarget = sourceHandleType === "target" && isTarget;
 
-      if (edgeByTarget && !isSameTarget && nodeId) {
-        const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
-        const newSourceHandle = isTarget ? lastConnectStartHandleId!! : targetHandleId!!;
+      if (edgeByTarget && !isSameTarget && targetNodeId) {
+        const newSourceId = isTarget ? sourceNodeId!! : targetNodeId!!;
+        const newSourceHandle = isTarget ? sourceHandleId : targetHandleId!!;
 
         if (newSourceId !== edgeByTarget.target) {
           edgeByTarget.source = newSourceId;
@@ -512,9 +509,8 @@ const Flow = (props: FlowProps) => {
 
       const isDragSelected = edges.some((item) => {
         if (item.selected) {
-          const isChangeTarget =
-            lastConnectStart.handleType === "target" && item.targetHandle === lastConnectStartHandleId;
-          const isChangeSource = lastConnectStartHandleId && item.source === lastConnectStartNodeId;
+          const isChangeTarget = sourceHandleType === "target" && item.targetHandle === sourceHandleId;
+          const isChangeSource = sourceHandleId && item.source === sourceNodeId;
 
           return isChangeTarget || isChangeSource;
         }
@@ -527,7 +523,7 @@ const Flow = (props: FlowProps) => {
         if (targetNodeId) {
           // update selected lines to new node if start and end are same type
           newEdges = edges.map((item: Edge) => {
-            if (item.selected && lastConnectStartNodeId === item[lastConnectStart.handleType!!]) {
+            if (item.selected && sourceNodeId === item[sourceHandleType!!]) {
               const updateKey = isTarget ? "target" : "source";
               item[`${updateKey}Handle`] = targetHandleId;
               item[updateKey as keyof Edge] = targetNodeId;
@@ -558,23 +554,23 @@ const Flow = (props: FlowProps) => {
           const { x, y } = setMousePosition(evt);
           setNodePickerVisibility({ x, y });
         }
-        if (!isSameTarget && targetNodeId && lastConnectStartNodeId) {
+        if (!isSameTarget && targetNodeId && sourceNodeId) {
           const newEdge = {
             id: generateUuid(),
-            source: lastConnectStartNodeId,
-            sourceHandle: lastConnectStartHandleId,
+            source: sourceNodeId,
+            sourceHandle: sourceHandleId,
             target: targetNodeId,
             targetHandle: targetHandleId,
           };
 
           const edgesAdded = [newEdge];
-          const nodeTarget: NodeInterface = nodes.find((n) => n.id === nodeId)!!;
-          const nodeSource: NodeInterface = nodes.find((n) => n.id === lastConnectStartNodeId)!!;
+          const nodeTarget: NodeInterface = nodes.find((n) => n.id === targetNodeId)!!;
+          const nodeSource: NodeInterface = nodes.find((n) => n.id === sourceNodeId)!!;
 
           // create edge connect to child nodes if have
           if (nodeTarget.isParent && nodeSource.isParent) {
             const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
-            const output = nodeSource.data.out.find((item: any) => item.pin === lastConnectStartHandleId);
+            const output = nodeSource.data.out.find((item: any) => item.pin === sourceHandleId);
             edgesAdded.push({
               id: generateUuid(),
               source: isTarget ? output.nodeId : input.nodeId,
@@ -584,17 +580,17 @@ const Flow = (props: FlowProps) => {
             });
           } else if (nodeTarget.isParent) {
             if (isTarget) {
-              const input = nodeTarget.data.inputs.find((item: any) => item.pin === handleId);
+              const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
               edgesAdded.push({
                 id: generateUuid(),
-                source: lastConnectStartNodeId,
-                sourceHandle: lastConnectStartHandleId,
+                source: sourceNodeId,
+                sourceHandle: sourceHandleId,
                 target: input.nodeId,
                 targetHandle: "input",
               });
             }
           } else if (nodeSource.isParent) {
-            const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === lastConnectStartHandleId);
+            const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === sourceHandleId);
             if (outputIndex >= 0) {
               const outItem = nodeSource.data.out[outputIndex];
               edgesAdded.push({
