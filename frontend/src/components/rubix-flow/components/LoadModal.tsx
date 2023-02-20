@@ -1,13 +1,11 @@
 import { FC, useState } from "react";
 import { Edge } from "react-flow-renderer";
-import { useParams } from "react-router-dom";
 
 import { behaveToFlow } from "../transformers/behaveToFlow";
 import { autoLayout } from "../util/autoLayout";
 import { hasPositionMetaData } from "../util/hasPositionMetaData";
 import { Modal } from "./Modal";
 import { GraphJSON } from "../lib";
-import { handleNodesEmptySettings } from "../util/handleSettings";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type LoadModalProps = {
@@ -17,7 +15,6 @@ type LoadModalProps = {
 };
 
 export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose, handleLoadNodesAndEdges }) => {
-  const { connUUID = "", hostUUID = "" } = useParams();
   const [value, setValue] = useState<string>();
 
   const handleLoad = async () => {
@@ -28,13 +25,12 @@ export const LoadModal: FC<LoadModalProps> = ({ open = false, onClose, handleLoa
 
     if (graph === undefined) return;
 
-    let [nodes, edges] = behaveToFlow(graph);
+    const [nodes, edges] = behaveToFlow(graph);
 
     if (hasPositionMetaData(graph) === false) {
       autoLayout(nodes, edges);
     }
 
-    nodes = await handleNodesEmptySettings(connUUID, hostUUID, !!connUUID && !!hostUUID, nodes);
     handleLoadNodesAndEdges(nodes, edges);
     handleClose();
   };

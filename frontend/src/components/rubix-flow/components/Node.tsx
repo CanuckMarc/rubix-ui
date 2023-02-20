@@ -48,7 +48,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
         const item = {
           pin: `in${i}`,
           dataType: nodeInputs[0]?.dataType,
-          value: nodeInputs[0]?.defaultValue,
+          value: nodeInputs[0]?.value,
         };
         if (newData) {
           newData.push(item);
@@ -242,7 +242,7 @@ export const Node = memo((props: NodeProps) => {
       isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
-      nodeName={node?.info?.nodeName?.replace('{parent.name}', '') || ""}
+      nodeName={node?.info?.nodeName?.replace("{parent.name}", "") || ""}
       category={spec.category}
       selected={selected}
       height={node?.height ?? 30}
@@ -258,7 +258,7 @@ export const Node = memo((props: NodeProps) => {
           ((input.valueType === "number" && newData[input.name] !== 0) ||
             (input.valueType === "boolean" && newData[input.name] === undefined))
         ) {
-          newData[input.name] = input.defaultValue;
+          newData[input.name] = input.defaultValue
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";

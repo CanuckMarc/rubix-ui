@@ -21,7 +21,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = !!connUUID && !!hostUUID;
   const nodes = useNodes();
-  const nodeIDs = flowcli.NodesList;
+
   const handleCopy = () => {
     if (ref.current) {
       ref.current.select();
@@ -76,7 +76,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
         });
       });
 
-      setCountExport(data.nodes.length);
+      setCountExport(data.nodes?.length || 0);
       setNodeRender(JSON.stringify(data, null, 2));
     } catch (error) {
       console.log("error", error);

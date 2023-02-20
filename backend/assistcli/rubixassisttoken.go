@@ -99,3 +99,15 @@ func (inst *Client) RubixAssistTokenDelete(jwtToken string, uuid string) (bool, 
 	}
 	return resp.String() == "true", nil
 }
+
+func (inst *Client) RubixAssistUpdateUser(jwtToken, username, password string) (bool, error) {
+	url := "/api/users"
+	_, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("Authorization", jwtToken).
+		SetBody(map[string]string{"username": username, "password": password}).
+		Put(url))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

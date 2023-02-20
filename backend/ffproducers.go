@@ -68,6 +68,10 @@ func (inst *App) GetProducer(connUUID, hostUUID, uuid string, withWriterClones b
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	if producers == nil {
+		inst.uiErrorMessage("failed to find producer")
+		return nil
+	}
 	return producers
 }
 
@@ -79,6 +83,10 @@ func (inst *App) GetProducerByThingUUID(connUUID, hostUUID, thingUUID string) *m
 	}
 	producers, err := client.GetProducerByThingUUID(hostUUID, thingUUID)
 	if err != nil {
+		return nil
+	}
+	if producers == nil {
+		inst.uiErrorMessage("failed to find producer")
 		return nil
 	}
 	return producers
@@ -122,7 +130,6 @@ func (inst *App) EditProducerHistory(connUUID, hostUUID, pointUUID, historyType 
 	producer.HistoryType = model.HistoryType(historyType)
 	producer.EnableHistory = boolean.New(historyEnable)
 	producer.HistoryInterval = integer.New(interval)
-
 	producers, err := client.EditProducer(hostUUID, producer.UUID, producer)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))

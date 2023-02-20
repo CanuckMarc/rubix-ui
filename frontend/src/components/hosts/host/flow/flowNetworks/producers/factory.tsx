@@ -3,7 +3,8 @@ import {
   AddProducer,
   DeleteProducer,
   DeleteProducerBulk,
-  EditProducer, EditProducerHistory,
+  EditProducer,
+  GetProducerByThingUUID,
   GetStream,
 } from "../../../../../../../wailsjs/go/backend/App";
 
@@ -33,16 +34,8 @@ export class FlowProducerFactory {
     return await DeleteProducerBulk(this.connectionUUID, this.hostUUID, uuids);
   }
 
-
-  //EditProducerHistory
-  // valid type historyType
-  // historyTypeCov            string = "COV"
-  // historyTypeInterval       string = "INTERVAL"
-  // historyTypeCovAndInterval string = "COV_AND_INTERVAL"
-
-
-  async EditProducerHistory(connUUID: string, hostUUID: string, pointUUID: string, historyType: string, historyEnable: boolean, interval: number): Promise<model.Producer> {
-    return await EditProducerHistory(connUUID, hostUUID, pointUUID, historyType, historyEnable, interval);
+  //GetProducerByThingUUID for the thingUUID for example pass in the pointUUID
+  async GetProducerByThingUUID(connUUID: string, hostUUID: string, thingUUID: string): Promise<model.Producer> {
+    return await GetProducerByThingUUID(connUUID, hostUUID, thingUUID);
   }
-
 }

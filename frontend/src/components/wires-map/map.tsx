@@ -14,7 +14,7 @@ const { Title } = Typography;
 const { TabPane } = Tabs;
 
 const flownetTab = "Flow network mapping";
-const bacnetTab = "Bacnet mapping";
+const bacnetTab = "BACnet mapping";
 
 export interface SelectOptionType {
   value: string;
@@ -113,7 +113,7 @@ export const WiresMap = () => {
   return (
     <>
       <Title level={3} style={{ textAlign: "left" }}>
-          Wires Map
+          Mapping
       </Title>
       <Card bordered={false}>
         <Tabs defaultActiveKey="1">

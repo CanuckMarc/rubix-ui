@@ -54,7 +54,7 @@ type Eth0 struct {
 	Eth0Interface       schema.Interface `json:"eth0_interface"`
 	Eth0Ip              schema.Ip        `json:"eth0_ip"`
 	Eth0Netmask         schema.Netmask   `json:"eth0_netmask"`
-	Eth0Gateway         schema.Ip        `json:"eth0_gateway"`
+	Eth0Gateway         schema.Gateway   `json:"eth0_gateway"`
 }
 
 type Eth1 struct {
@@ -63,7 +63,7 @@ type Eth1 struct {
 	Eth1Interface       schema.Interface `json:"eth1_interface"`
 	Eth1Ip              schema.Ip        `json:"eth1_ip"`
 	Eth1Netmask         schema.Netmask   `json:"eth1_netmask"`
-	Eth1Gateway         schema.Ip        `json:"eth1_gateway"`
+	Eth1Gateway         schema.Gateway   `json:"eth1_gateway"`
 }
 
 type RcNetwork struct {

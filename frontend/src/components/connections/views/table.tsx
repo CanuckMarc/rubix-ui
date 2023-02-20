@@ -171,7 +171,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
                 <FormOutlined />
               </a>
             </Tooltip>
-            <Tooltip title="Tokens">
+            <Tooltip title="Login">
               <a onClick={(e) => showTokenModal(conn, e)}>
                 <ScanOutlined />
               </a>

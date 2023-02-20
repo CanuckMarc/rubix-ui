@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-auth-go/externaltoken"
 	"github.com/NubeIO/nubeio-rubix-lib-auth-go/user"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
@@ -10,7 +9,7 @@ import (
 func (inst *App) EdgeBiosLogin(connUUID, hostUUID, username, password string) *model.TokenResponse {
 	resp, err := inst.edgeBiosLogin(connUUID, hostUUID, username, password)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -19,7 +18,7 @@ func (inst *App) EdgeBiosLogin(connUUID, hostUUID, username, password string) *m
 func (inst *App) EdgeBiosTokens(connUUID, hostUUID, jwtToken string) *[]externaltoken.ExternalToken {
 	resp, err := inst.edgeBiosTokens(connUUID, hostUUID, jwtToken)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -28,7 +27,7 @@ func (inst *App) EdgeBiosTokens(connUUID, hostUUID, jwtToken string) *[]external
 func (inst *App) EdgeBiosToken(connUUID, hostUUID, jwtToken, uuid string) *externaltoken.ExternalToken {
 	resp, err := inst.edgeBiosToken(connUUID, hostUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -37,7 +36,7 @@ func (inst *App) EdgeBiosToken(connUUID, hostUUID, jwtToken, uuid string) *exter
 func (inst *App) EdgeBiosTokenGenerate(connUUID, hostUUID, jwtToken, name string) *externaltoken.ExternalToken {
 	resp, err := inst.edgeBiosTokenGenerate(connUUID, hostUUID, jwtToken, name)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -46,7 +45,7 @@ func (inst *App) EdgeBiosTokenGenerate(connUUID, hostUUID, jwtToken, name string
 func (inst *App) EdgeBiosTokenBlock(connUUID, hostUUID, jwtToken, uuid string, state bool) *externaltoken.ExternalToken {
 	resp, err := inst.edgeBiosTokenBlock(connUUID, hostUUID, jwtToken, uuid, state)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -55,7 +54,7 @@ func (inst *App) EdgeBiosTokenBlock(connUUID, hostUUID, jwtToken, uuid string, s
 func (inst *App) EdgeBiosTokenRegenerate(connUUID, hostUUID, jwtToken, uuid string) *externaltoken.ExternalToken {
 	resp, err := inst.edgeBiosTokenRegenerate(connUUID, hostUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return nil
 	}
 	return resp
@@ -64,13 +63,22 @@ func (inst *App) EdgeBiosTokenRegenerate(connUUID, hostUUID, jwtToken, uuid stri
 func (inst *App) EdgeBiosTokenDelete(connUUID, hostUUID, jwtToken, uuid string) bool {
 	resp, err := inst.edgeBiosTokenDelete(connUUID, hostUUID, jwtToken, uuid)
 	if err != nil {
-		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		inst.uiErrorMessage(err)
 		return false
 	}
 	return resp
 }
 
-func (inst *App) edgeBiosLogin(connUUID, hostUUID string, username, password string) (*model.TokenResponse, error) {
+func (inst *App) EdgeBiosUpdateUser(connUUID, hostUUID, jwtToken, username, password string) bool {
+	resp, err := inst.edgeBiosUpdateUser(connUUID, hostUUID, jwtToken, username, password)
+	if err != nil {
+		inst.uiErrorMessage(err)
+		return false
+	}
+	return resp
+}
+
+func (inst *App) edgeBiosLogin(connUUID, hostUUID, username, password string) (*model.TokenResponse, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
 		return nil, err
@@ -129,4 +137,12 @@ func (inst *App) edgeBiosTokenDelete(connUUID, hostUUID, jwtToken, uuid string) 
 		return false, err
 	}
 	return client.EdgeBiosTokenDelete(hostUUID, jwtToken, uuid)
+}
+
+func (inst *App) edgeBiosUpdateUser(connUUID, hostUUID, jwtToken, username, password string) (bool, error) {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return false, err
+	}
+	return client.EdgeBiosUpdateUser(hostUUID, jwtToken, username, password)
 }

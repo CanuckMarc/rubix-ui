@@ -73,13 +73,15 @@ func (inst *App) getLatestVersions() {
 	if len(assistVersions) > 0 {
 		inst.LatestRubixAssistVersion = assistVersions[0]
 	}
-	version, err := inst.getLatestReleaseVersion()
-	if err != nil {
-		return
-	}
+
 	flowVersions := inst.EdgeFlowFrameworkVersions()
 	if len(assistVersions) > 0 {
 		inst.LatestFlowFrameworkVersion = flowVersions[0]
+	}
+
+	version, err := inst.getLatestReleaseVersion()
+	if err != nil {
+		return
 	}
 
 	if version != inst.LatestReleaseVersion {
@@ -87,11 +89,10 @@ func (inst *App) getLatestVersions() {
 		inst.GitDownloadReleases()
 	}
 
-	log.Infof("lastest rubix-edge version: %s", inst.LatestRubixEdgeVersion)
-	log.Infof("lastest rubix-assist version: %s", inst.LatestRubixAssistVersion)
-	log.Infof("lastest release version: %s", inst.LatestReleaseVersion)
-	log.Infof("lastest flow-framework version: %s", inst.LatestFlowFrameworkVersion)
-
+	log.Infof("latest rubix-edge version: %s", inst.LatestRubixEdgeVersion)
+	log.Infof("latest rubix-assist version: %s", inst.LatestRubixAssistVersion)
+	log.Infof("latest release version: %s", inst.LatestReleaseVersion)
+	log.Infof("latest flow-framework version: %s", inst.LatestFlowFrameworkVersion)
 }
 
 // OnStartup is called when the app starts. The context is saved, so we can call the runtime methods

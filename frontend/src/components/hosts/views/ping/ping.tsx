@@ -15,7 +15,7 @@ export const Ping = (props: IPing) => {
     factory.uuid = host.uuid;
     try {
       const res = await factory.PingHost();
-      if (res) openNotificationWithIcon("success", "successfully pinged host!");
+      
     } catch (err) {
       console.error(err);
       openNotificationWithIcon("error", "failed to ping host!");

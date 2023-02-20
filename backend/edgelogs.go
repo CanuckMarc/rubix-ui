@@ -29,17 +29,6 @@ func pluginLogs(pluginName string) []string {
 	return stringFilters
 }
 
-func appLogs(pluginName string) string {
-	var serviceName string
-	switch pluginName {
-	case constants.BacnetServerDriver:
-		serviceName = constants.BacnetServerServiceName
-	case constants.FlowFramework:
-		serviceName = constants.FlowFrameworkServiceName
-	}
-	return serviceName
-}
-
 func (inst *App) edgeCreateLog(connUUID, hostUUID, serviceName string, duration int, filters []string) (*streamlog.Log, error) {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	if err != nil {
@@ -87,6 +76,25 @@ func (inst *App) FlowNetworkNewLog(connUUID, hostUUID, pluginName string, durati
 	}
 	return logs
 
+}
+
+func appLogs(pluginName string) string {
+	var serviceName string
+	switch pluginName {
+	case constants.BacnetServerDriver:
+		serviceName = constants.BacnetServerServiceName
+	case constants.FlowFramework:
+		serviceName = constants.FlowFrameworkServiceName
+	case constants.RubixEdgeWires:
+		serviceName = constants.RubixEdgeWiresServiceName
+	case constants.LoRaSerialApp:
+		serviceName = constants.LoRaSerialAppServiceName
+	case constants.LoRaModbusBrideApp:
+		serviceName = constants.LoRaModbusBrideAppServiceName
+	case constants.RubixIOApp:
+		serviceName = constants.RubixIOAppServiceName
+	}
+	return serviceName
 }
 
 // EdgeAppNewLog let user get network driver logs from flow framework

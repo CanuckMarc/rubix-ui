@@ -9,6 +9,7 @@ import { LORAWAN_REMOTE_HEADERS } from "../../../constants/headers";
 import { ChirpFactory } from "../factory";
 import { CreateEditModal } from "./create";
 import { ActiveModal } from "./active-modal";
+import { AddDeviceWizard } from "./lorawan-wizard";
 
 import DevicesResult = chirpstack.DevicesResult;
 
@@ -20,6 +21,7 @@ export const LorawanTable = () => {
   const [isActiveModalVisible, setIsActiveModalVisible] = useState(false);
   const [currentItem, setCurrentItem] = useState<DevicesResult | undefined>(undefined);
   const [lastSeenAtString, setLastSeenAtString] = useState<string>("");
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
 
   const columns = [
     {
@@ -69,8 +71,8 @@ export const LorawanTable = () => {
   };
 
   const fetchGateway = async () => {
-    const { lastSeenAtString } = await factory.CSGetGateway(connUUID, hostUUID);
-    setLastSeenAtString(lastSeenAtString);
+    const res = await factory.CSGetGateway(connUUID, hostUUID);
+    setLastSeenAtString(res?.lastSeenAtString || "");
   };
 
   const showModal = (dev: DevicesResult | undefined) => {
@@ -97,7 +99,7 @@ export const LorawanTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
-      <RbAddButton handleClick={() => showModal(undefined)} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       {lastSeenAtString && (
         <div className="text-end ">
           Gateway last seen: <b>{lastSeenAtString}</b>
@@ -121,6 +123,11 @@ export const LorawanTable = () => {
         isModalVisible={isActiveModalVisible}
         refreshList={fetch}
         onCloseModal={handleClose}
+      />
+      <AddDeviceWizard 
+        refreshList={fetch}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
       />
     </>
   );
