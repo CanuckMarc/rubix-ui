@@ -85,7 +85,7 @@ func (inst *Client) DeleteFlowNetwork(hostIDName, uuid string) (bool, error) {
 }
 
 func (inst *Client) SyncFlowNetworks(hostIDName string) (*[]rumodel.SyncModel, error) {
-	url := "proxy/ff/api/flow_networks/sync"
+	url := "proxy/ff/api/flow_networks/sync?with_streams=true&with_producers=true&with_writer_clones=true"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
