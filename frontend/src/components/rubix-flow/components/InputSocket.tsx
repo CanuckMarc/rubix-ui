@@ -197,6 +197,7 @@ export const InputSocket = ({
                   className={cx(classnames ? classnames : "bg-gray-600 disabled:bg-gray-700 py-1 px-2 nodrag")}
                   onChange={onChangeInputBoolean}
                   style={{ paddingRight: 18 }}
+                  disabled={true}
                 >
                   <option value="1">true</option>
                   <option value="0">false</option>
