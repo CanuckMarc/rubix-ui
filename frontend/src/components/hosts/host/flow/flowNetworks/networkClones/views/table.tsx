@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbRefreshButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
+import { RbRefreshButton, RbDeleteButton, RbSyncButton } from "../../../../../../../common/rb-table-actions";
 import { FLOW_NETWORK_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkCloneFactory } from "../factory";
@@ -12,6 +12,8 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 
 import UUIDs = backend.UUIDs;
 import FlowNetworkClone = model.FlowNetworkClone;
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 
 export const NetworkClonesTable = () => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
@@ -80,6 +82,23 @@ export const NetworkClonesTable = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync();
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch()
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
@@ -92,6 +111,7 @@ export const NetworkClonesTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
+      <RbSyncButton onClick={sync} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {networks?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 

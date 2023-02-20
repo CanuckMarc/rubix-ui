@@ -10,7 +10,7 @@ import { openNotificationWithIcon } from "../../../../../utils/utils";
 import RbxBreadcrumb from "../../../../breadcrumbs/breadcrumbs";
 import { FLOW_POINT_HEADERS } from "../../../../../constants/headers";
 import { PLUGINS } from "../../../../../constants/plugins";
-import { RbRefreshButton } from "../../../../../common/rb-table-actions";
+import { RbRefreshButton, RbSyncButton } from "../../../../../common/rb-table-actions";
 import { BacnetWhoIsTable } from "../bacnet/table";
 import { FlowPointsTable } from "./views/table";
 import { FlowDeviceFactory } from "../devices/factory";
@@ -18,6 +18,7 @@ import { useSettings } from "../../../../settings/use-settings";
 import useTitlePrefix from "../../../../../hooks/usePrefixedTitle";
 import { setDataLocalStorage } from "../flow-service";
 import Point = model.Point;
+import { hasError } from "../../../../../utils/response";
 
 const flowDeviceFactory = new FlowDeviceFactory();
 
@@ -139,6 +140,21 @@ export const FlowPoints = () => {
     }
   };
 
+  const syncPoints = async () => {
+    try {
+      setIsFetching(true);
+      const res = await flowPointFactory.SyncPoints(deviceUUID)
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   useEffect(() => {
     fetchWithSpinningWheel();
     flowDeviceFactory.GetOne(false).then((flowDevice) => {
@@ -161,6 +177,7 @@ export const FlowPoints = () => {
         <Tabs defaultActiveKey={points}>
           <TabPane tab={points} key={points}>
             <RbRefreshButton refreshList={fetchWithSpinningWheel} />
+            <RbSyncButton onClick={syncPoints} />
             <FlowPointsTable
               data={data}
               isFetching={isFetching}

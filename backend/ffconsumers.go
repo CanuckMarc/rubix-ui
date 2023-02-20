@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *App) AddConsumer(connUUID, hostUUID string, body *model.Consumer) *model.Consumer {
@@ -120,4 +121,16 @@ func (inst *App) DeleteConsumerBulk(connUUID, hostUUID string, uuids []UUIDs) in
 		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
 	}
 	return nil
+}
+
+func (inst *App) SyncConsumers(connUUID, hostUUID, streamCloneUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncConsumers(hostUUID, streamCloneUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced consumers")
 }

@@ -5,7 +5,7 @@ import {
   DeleteConsumerBulk,
   EditConsumer,
   GetProducersUnderStreamClone,
-  GetStreamClone,
+  GetStreamClone, SyncConsumers,
 } from "../../../../../../../wailsjs/go/backend/App";
 
 export class FlowConsumerFactory {
@@ -35,5 +35,9 @@ export class FlowConsumerFactory {
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
     return await DeleteConsumerBulk(this.connectionUUID, this.hostUUID, uuids)
+  }
+
+  async Sync(streamCloneUUID: string): Promise<rumodel.Response> {
+    return SyncConsumers(this.connectionUUID, this.hostUUID, streamCloneUUID);
   }
 }

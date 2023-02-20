@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *App) CreateWriter(connUUID, hostUUID string, body *model.Writer) *model.Writer {
@@ -84,4 +85,16 @@ func (inst *App) DeleteWritersBulk(connUUID, hostUUID string, UUIDs []UUIDs) int
 		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
 	}
 	return nil
+}
+
+func (inst *App) SyncWriters(connUUID, hostUUID, consumerUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncWriters(hostUUID, consumerUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced writers")
 }

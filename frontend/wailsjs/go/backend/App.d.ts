@@ -302,7 +302,7 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
@@ -561,6 +561,28 @@ export function RubixAssistUpdateUser(arg1:string,arg2:string,arg3:string,arg4:s
 export function Scanner(arg1:string,arg2:string,arg3:number,arg4:Array<string>):Promise<any>;
 
 export function SetGitToken(arg1:string):Promise<rumodel.Response>;
+
+export function SyncConsumers(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncDevices(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncFlowNetworkClones(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncFlowNetworks(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncNetworks(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncPoints(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncProducers(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncStreamClones(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncStreams(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncWriterClones(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncWriters(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<rumodel.Response>;
 

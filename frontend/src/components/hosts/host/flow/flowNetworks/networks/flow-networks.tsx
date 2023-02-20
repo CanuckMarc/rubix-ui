@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { FlowFrameworkNetworkFactory } from "./factory";
 import { model } from "../../../../../../../wailsjs/go/models";
 import { FlowNetworksTable } from "./views/table";
-
+import { hasError } from "../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import FlowNetwork = model.FlowNetwork;
 
 export const FlowNetworks = () => {
@@ -24,8 +25,21 @@ export const FlowNetworks = () => {
       setIsFetching(true);
       let res = (await factory.GetAll(false)) || [];
       setNetworks(res);
-    } catch (error) {
-      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync();
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
     } finally {
       setIsFetching(false);
     }
@@ -36,6 +50,7 @@ export const FlowNetworks = () => {
       data={networks}
       isFetching={isFetching}
       refreshList={fetch}
+      sync={sync}
     />
   );
 };

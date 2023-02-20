@@ -6,6 +6,8 @@ import { model } from "../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../constants/routes";
 import RbxBreadcrumb from "../../../../../breadcrumbs/breadcrumbs";
 import { StreamsTable } from "./views/table";
+import { hasError } from "../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import Stream = model.Stream;
 
 const { Title } = Typography;
@@ -66,13 +68,30 @@ export const Streams = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync(flNetworkUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   return (
     <>
       <Title level={3} style={{ textAlign: "left" }}>
         Flow Network Streams
       </Title>
       <RbxBreadcrumb routes={routes} />
-      <StreamsTable data={streams} isFetching={isFetching} refreshList={fetch} />
+      <StreamsTable data={streams} isFetching={isFetching} refreshList={fetch} sync={sync} />
     </>
   );
 };

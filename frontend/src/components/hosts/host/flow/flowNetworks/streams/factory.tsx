@@ -1,9 +1,11 @@
-import {backend, model} from "../../../../../../../wailsjs/go/models";
+import { backend, model, rumodel } from "../../../../../../../wailsjs/go/models";
 import {
   AddStream,
   DeleteStream,
   DeleteStreamBulk,
-  EditStream, GetFlowNetwork,
+  EditStream,
+  GetFlowNetwork,
+  SyncStreams,
 } from "../../../../../../../wailsjs/go/backend/App";
 
 export class FlowStreamFactory {
@@ -15,11 +17,11 @@ export class FlowStreamFactory {
   }
 
   async Add(flowNetworkUUID: string, body: model.Stream): Promise<model.Stream> {
-    return AddStream(this.connectionUUID, this.hostUUID, flowNetworkUUID, body)
+    return AddStream(this.connectionUUID, this.hostUUID, flowNetworkUUID, body);
   }
 
   async Update(uuid: string, body: model.Stream): Promise<model.Stream> {
-    return EditStream(this.connectionUUID, this.hostUUID, uuid, body)
+    return EditStream(this.connectionUUID, this.hostUUID, uuid, body);
   }
 
   async Delete(uuid: string): Promise<model.Stream> {
@@ -28,5 +30,9 @@ export class FlowStreamFactory {
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<any> {
     return DeleteStreamBulk(this.connectionUUID, this.hostUUID, uuids);
+  }
+
+  async Sync(flowNetworkUUID: string): Promise<rumodel.Response> {
+    return SyncStreams(this.connectionUUID, this.hostUUID, flowNetworkUUID);
   }
 }

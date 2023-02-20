@@ -6,12 +6,13 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { STREAM_CLONE_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import { RbDeleteButton, RbRefreshButton, RbSyncButton } from "../../../../../../../common/rb-table-actions";
 import { ArrowRightOutlined } from "@ant-design/icons";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 import UUIDs = backend.UUIDs;
 import StreamClone = model.StreamClone;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const StreamClonesTable = () => {
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkCloneUUID = "" } = useParams();
@@ -81,6 +82,23 @@ export const StreamClonesTable = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync(flNetworkCloneUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   useEffect(() => {
     fetch();
   }, []);
@@ -88,6 +106,7 @@ export const StreamClonesTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
+      <RbSyncButton onClick={sync} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {streamClones?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
