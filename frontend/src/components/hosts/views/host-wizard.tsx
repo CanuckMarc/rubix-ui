@@ -14,6 +14,10 @@ export const CreateHostWizard = (props: any) => {
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
   const [errorAtPing, setErrorAtPing] = useState(false);
 
+  useEffect(() => {
+    setStepStatus('process');
+  }, [isWizardModalVisible])
+
   const pingHost = async (newHost: Host) => {
     hostsFactory.uuid = newHost.uuid;
     try {
