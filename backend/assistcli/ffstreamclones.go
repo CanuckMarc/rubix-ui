@@ -67,3 +67,16 @@ func (inst *Client) SyncStreamClones(hostIDName, fncUUID string) (*[]rumodel.Syn
 	}
 	return resp.Result().(*[]rumodel.SyncModel), nil
 }
+
+func (inst *Client) SyncWriterClones(hostIDName, consumerUUID string) (*[]rumodel.SyncModel, error) {
+	url := fmt.Sprintf("proxy/ff/api/producers/%s/sync/writer_clones", consumerUUID)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
+}

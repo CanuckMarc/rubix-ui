@@ -5,8 +5,10 @@ import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { WriterClonesFactory } from "../factory";
 import { WRITER_CLONE_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import { RbDeleteButton, RbRefreshButton, RbSyncButton } from "../../../../../../../common/rb-table-actions";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 import UUIDs = backend.UUIDs;
 import WriterClone = model.WriterClone;
 
@@ -46,6 +48,24 @@ export const WriterClonesTable = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync(producerUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
@@ -58,6 +78,7 @@ export const WriterClonesTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
+      <RbSyncButton onClick={sync} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {writerClones?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
