@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
 )
@@ -137,7 +138,6 @@ func (inst *App) exportNetworksBulk(connUUID, hostUUID, userComment string, netw
 	return backup, nil
 }
 
-//
 func (inst *App) importNewNetwork(connUUID, hostUUID string, body *model.Network) {
 	devices := body.Devices
 	if devices != nil {
@@ -311,4 +311,16 @@ func (inst *App) GetNetworkBackupsByPlugin(application, subApplication, pluginNa
 		}
 	}
 	return backups
+}
+
+func (inst *App) SyncNetworks(connUUID, hostUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncNetworks(hostUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced networks")
 }

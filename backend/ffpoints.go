@@ -7,6 +7,7 @@ import (
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	pprint "github.com/NubeIO/rubix-ui/backend/helpers/print"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
 	log "github.com/sirupsen/logrus"
@@ -314,4 +315,16 @@ func (inst *App) exportPointBulk(connUUID, hostUUID, userComment, deviceUUID str
 		return nil, err
 	}
 	return backup, nil
+}
+
+func (inst *App) SyncPoints(connUUID, hostUUID, deviceUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncPoints(hostUUID, deviceUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced points")
 }

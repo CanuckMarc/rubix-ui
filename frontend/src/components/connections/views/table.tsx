@@ -62,7 +62,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     setIsLoadingForm(true);
     const jsonSchema = await factory.Schema();
     setConnectionSchema(jsonSchema);
-    getTableHeaders(jsonSchema.properties);
+    getTableHeaders({...jsonSchema.properties});
     setIsLoadingForm(false);
   };
 

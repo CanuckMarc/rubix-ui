@@ -1,9 +1,4 @@
-import {
-  backend,
-  model,
-  storage,
-  store, system,
-} from "../../../../../../wailsjs/go/models";
+import { backend, model, rumodel, storage, } from "../../../../../../wailsjs/go/models";
 import {
   AddPoint,
   AddPointsBulk,
@@ -12,11 +7,14 @@ import {
   EditPoint,
   ExportPointBulk,
   GetFlowPointSchema,
-  GetPoint, GetPointListPayload, GetPointPriority,
+  GetPoint,
+  GetPointListPayload,
+  GetPointPriority,
   GetPoints,
   GetPointsForDevice,
   ImportPointBulk,
-  WritePointValue,
+  SyncPoints,
+  WritePointValue
 } from "../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../helpers/checks";
 
@@ -199,5 +197,11 @@ export class FlowPointFactory {
       this.hostUUID,
       pointUUID,
     );
+  }
+
+  async SyncPoints(deviceUUID: string): Promise<rumodel.Response> {
+    hasUUID(this.connectionUUID);
+    hasUUID(this.hostUUID);
+    return SyncPoints(this.connectionUUID, this.hostUUID, deviceUUID);
   }
 }

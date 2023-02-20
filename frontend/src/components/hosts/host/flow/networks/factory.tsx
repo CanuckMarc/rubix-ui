@@ -1,4 +1,4 @@
-import {backend, model, storage, store} from "../../../../../../wailsjs/go/models";
+import { backend, model, rumodel, storage } from "../../../../../../wailsjs/go/models";
 import {
   AddNetwork,
   DeleteNetwork,
@@ -7,8 +7,11 @@ import {
   ExportNetworksBulk,
   GetFlowNetworkSchema,
   GetNetwork,
-  GetNetworks, GetNetworksWithPointsDisplay, GetNetworkWithPoints,
+  GetNetworks,
+  GetNetworksWithPointsDisplay,
+  GetNetworkWithPoints,
   ImportNetworksBulk,
+  SyncNetworks,
 } from "../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../helpers/checks";
 
@@ -23,13 +26,13 @@ export class FlowNetworkFactory {
   async GetAll(withDevice: boolean): Promise<Array<model.Network>> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    return GetNetworks(this.connectionUUID, this.hostUUID, withDevice)
+    return GetNetworks(this.connectionUUID, this.hostUUID, withDevice);
   }
 
   async GetOne(uuid: string, withDevice: boolean): Promise<model.Network> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    return GetNetwork(this.connectionUUID, this.hostUUID, uuid, withDevice)
+    return GetNetwork(this.connectionUUID, this.hostUUID, uuid, withDevice);
   }
 
   async GetNetworkWithPoints(uuid: string): Promise<model.Network> {
@@ -47,7 +50,7 @@ export class FlowNetworkFactory {
   async Add(body: model.Network): Promise<model.Network> {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
-    return AddNetwork(this.connectionUUID, this.hostUUID, body)
+    return AddNetwork(this.connectionUUID, this.hostUUID, body);
   }
 
   async Update(uuid: string, body: model.Network): Promise<model.Network> {
@@ -99,5 +102,11 @@ export class FlowNetworkFactory {
     const res = JSON.parse(resp || "{}");
     res.plugin_name = setPluginName;
     return res;
+  }
+
+  async Sync(): Promise<rumodel.Response> {
+    hasUUID(this.connectionUUID);
+    hasUUID(this.hostUUID);
+    return SyncNetworks(this.connectionUUID, this.hostUUID);
   }
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *Client) AddDevice(hostIDName string, device *model.Device) (*model.Device, error) {
@@ -82,4 +83,17 @@ func (inst *Client) DeleteDevice(hostIDName, uuid string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (inst *Client) SyncDevices(hostIDName, networkUUID string) (*[]rumodel.SyncModel, error) {
+	url := fmt.Sprintf("proxy/ff/api/networks/%s/sync/devices?with_points=true", networkUUID)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
 }

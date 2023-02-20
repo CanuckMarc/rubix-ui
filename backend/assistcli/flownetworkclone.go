@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/utils/urls"
 )
 
@@ -53,4 +54,17 @@ func (inst *Client) DeleteFlowNetworkClone(hostIDName, uuid string) (bool, error
 		return false, err
 	}
 	return true, nil
+}
+
+func (inst *Client) SyncFlowNetworkClones(hostIDName string) (*[]rumodel.SyncModel, error) {
+	url := "proxy/ff/api/flow_network_clones/sync?with_stream_clones=true&with_consumers=true&with_writers=true"
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
 }

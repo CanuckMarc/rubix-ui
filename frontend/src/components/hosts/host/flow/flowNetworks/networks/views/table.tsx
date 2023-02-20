@@ -4,7 +4,12 @@ import { useParams, Link } from "react-router-dom";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../../../../../common/rb-table-actions";
+import {
+  RbRefreshButton,
+  RbAddButton,
+  RbDeleteButton,
+  RbSyncButton
+} from "../../../../../../../common/rb-table-actions";
 import { FLOW_NETWORK_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkFactory } from "../factory";
@@ -15,7 +20,7 @@ import UUIDs = backend.UUIDs;
 import FlowNetwork = model.FlowNetwork;
 
 export const FlowNetworksTable = (props: any) => {
-  const { data, isFetching, refreshList } = props;
+  const { data, isFetching, refreshList, sync } = props;
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [filteredData, setFilteredData] = useState(data);
@@ -92,6 +97,7 @@ export const FlowNetworksTable = (props: any) => {
   return (
     <>
       <RbRefreshButton refreshList={refreshList} />
+      <RbSyncButton onClick={sync} />
       <RbAddButton handleClick={() => showModal({} as FlowNetwork)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}

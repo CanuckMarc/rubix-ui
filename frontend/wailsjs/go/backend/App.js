@@ -1082,6 +1082,50 @@ export function SetGitToken(arg1) {
   return window['go']['backend']['App']['SetGitToken'](arg1);
 }
 
+export function SyncConsumers(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncConsumers'](arg1, arg2, arg3);
+}
+
+export function SyncDevices(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncDevices'](arg1, arg2, arg3);
+}
+
+export function SyncFlowNetworkClones(arg1, arg2) {
+  return window['go']['backend']['App']['SyncFlowNetworkClones'](arg1, arg2);
+}
+
+export function SyncFlowNetworks(arg1, arg2) {
+  return window['go']['backend']['App']['SyncFlowNetworks'](arg1, arg2);
+}
+
+export function SyncNetworks(arg1, arg2) {
+  return window['go']['backend']['App']['SyncNetworks'](arg1, arg2);
+}
+
+export function SyncPoints(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncPoints'](arg1, arg2, arg3);
+}
+
+export function SyncProducers(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncProducers'](arg1, arg2, arg3);
+}
+
+export function SyncStreamClones(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncStreamClones'](arg1, arg2, arg3);
+}
+
+export function SyncStreams(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncStreams'](arg1, arg2, arg3);
+}
+
+export function SyncWriterClones(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncWriterClones'](arg1, arg2, arg3);
+}
+
+export function SyncWriters(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncWriters'](arg1, arg2, arg3);
+}
+
 export function UpdateConnection(arg1, arg2) {
   return window['go']['backend']['App']['UpdateConnection'](arg1, arg2);
 }

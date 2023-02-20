@@ -1,4 +1,4 @@
-import { backend, model } from "../../../../../../../wailsjs/go/models";
+import { backend, model, rumodel } from "../../../../../../../wailsjs/go/models";
 import {
   AddProducer,
   DeleteProducer,
@@ -6,6 +6,7 @@ import {
   EditProducer,
   GetProducerByThingUUID,
   GetStream,
+  SyncProducers,
 } from "../../../../../../../wailsjs/go/backend/App";
 
 export class FlowProducerFactory {
@@ -37,5 +38,9 @@ export class FlowProducerFactory {
   //GetProducerByThingUUID for the thingUUID for example pass in the pointUUID
   async GetProducerByThingUUID(connUUID: string, hostUUID: string, thingUUID: string): Promise<model.Producer> {
     return await GetProducerByThingUUID(connUUID, hostUUID, thingUUID);
+  }
+
+  async Sync(streamUUID: string): Promise<rumodel.Response> {
+    return SyncProducers(this.connectionUUID, this.hostUUID, streamUUID);
   }
 }

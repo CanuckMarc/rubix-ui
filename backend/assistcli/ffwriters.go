@@ -5,6 +5,7 @@ import (
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"strconv"
 )
 
@@ -146,4 +147,17 @@ func (inst *Client) DeleteWriterClone(hostIDName, uuid string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (inst *Client) SyncWriters(hostIDName, consumerUUID string) (*[]rumodel.SyncModel, error) {
+	url := fmt.Sprintf("proxy/ff/api/consumers/%s/sync/writers", consumerUUID)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
 }
