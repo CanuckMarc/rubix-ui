@@ -53,11 +53,29 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
       const selectedNodeIds: string[] = nodes.filter((item: NodeInterface) => item.selected).map((item) => item.id);
       let n = new flowcli.NodesList();
       n.nodes = selectedNodeIds;
+
       const data = await (window.selectedNodeForExport
         ? factory.GetSubFlow(connUUID, hostUUID, window.selectedNodeForExport.id, isRemote)
         : selectedNodeIds.length > 0
         ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
         : factory.GetFlow(connUUID, hostUUID, isRemote));
+
+      data.nodes.forEach((item: any) => {
+        Object.entries(item?.inputs).forEach(([key, value]: any) => {
+          if (value.links) {
+            item.inputs = {
+              ...item.inputs,
+              [key]: value,
+            };
+          } else {
+            item.inputs = {
+              ...item.inputs,
+              [key]: { overridePosition: false, position: 0 },
+            };
+          }
+        });
+      });
+
       setCountExport(data.nodes.length);
       setNodeRender(JSON.stringify(data, null, 2));
     } catch (error) {

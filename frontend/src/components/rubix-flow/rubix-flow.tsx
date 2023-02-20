@@ -716,7 +716,7 @@ const Flow = (props: FlowProps) => {
       window.allFlow.nodes = [
         ...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)),
         ...nodeAdded,
-        ...nodeChillAdd
+        ...nodeChillAdd,
       ];
 
       const edgeAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
@@ -728,7 +728,7 @@ const Flow = (props: FlowProps) => {
       window.allFlow.edges = [
         ...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)),
         ...edgeAdded,
-        ...edgeChillAdd
+        ...edgeChillAdd,
       ];
 
       setNodes(lastPast.nodes);
@@ -820,7 +820,7 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges);
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
 
     newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
 
