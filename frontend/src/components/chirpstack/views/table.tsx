@@ -1,10 +1,10 @@
-import { Space, Tooltip, Spin, Popconfirm } from "antd";
+import { Space, Tooltip, Spin, Popconfirm, Button } from "antd";
 import { DeleteOutlined, FormOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { chirpstack } from "../../../../wailsjs/go/models";
 import RbTable from "../../../common/rb-table";
-import { RbRefreshButton, RbAddButton } from "../../../common/rb-table-actions";
+import { RbRefreshButton, RbAddButton, RbDeleteButton } from "../../../common/rb-table-actions";
 import { LORAWAN_REMOTE_HEADERS } from "../../../constants/headers";
 import { ChirpFactory } from "../factory";
 import { CreateEditModal } from "./create";
@@ -22,6 +22,7 @@ export const LorawanTable = () => {
   const [currentItem, setCurrentItem] = useState<DevicesResult | undefined>(undefined);
   const [lastSeenAtString, setLastSeenAtString] = useState<string>("");
   const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const columns = [
     {
@@ -96,10 +97,29 @@ export const LorawanTable = () => {
     fetchGateway();
   }, [connUUID, hostUUID]);
 
+  const handleBulkDelete = () => {
+    selectedRowKeys.forEach(async(key: React.Key) => {
+      await factory.CSDeleteDevice(connUUID, hostUUID, `${key}`);
+    })
+    fetch();
+  }
+
+  const hasSelected = selectedRowKeys.length > 0;
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
       <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
+      <RbDeleteButton disabled={!hasSelected} bulkDelete={handleBulkDelete}/>
       {lastSeenAtString && (
         <div className="text-end ">
           Gateway last seen: <b>{lastSeenAtString}</b>
@@ -108,6 +128,7 @@ export const LorawanTable = () => {
 
       <RbTable
         rowKey="devEUI"
+        rowSelection={rowSelection}
         dataSource={data}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
