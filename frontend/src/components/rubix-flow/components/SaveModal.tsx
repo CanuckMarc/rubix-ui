@@ -75,7 +75,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
           }
         });
       });
-
+      
       setCountExport(data.nodes?.length || 0);
       setNodeRender(JSON.stringify(data, null, 2));
     } catch (error) {
