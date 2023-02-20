@@ -133,7 +133,7 @@ func (inst *Client) FFEditNetwork(hostIDName, uuid string, body *model.Network) 
 }
 
 func (inst *Client) SyncNetworks(hostIDName string) (*[]rumodel.SyncModel, error) {
-	url := "proxy/ff/api/networks/sync"
+	url := "proxy/ff/api/networks/sync?with_devices=true&with_points=true"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
