@@ -162,11 +162,10 @@ const Controls = ({
   // Copy selected node
   const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
-    const egdesCopied = instance.getEdges().filter((edge) => edge.selected);
-    
+    const edgesCopied = instance.getEdges().filter((edge) => edge.selected);
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
-      window.egdesCopied = egdesCopied;
+      window.edgesCopied = edgesCopied;
     }
     const newNodes= {
       nodes: nodesCopied,
@@ -188,9 +187,8 @@ const Controls = ({
       window.nodesCopied.length > 0
     ) {
       const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
-      const egdes = window.egdesCopied;
-      
-      handleDuplicatedNodes(nodes, egdes);
+      const edges = window.edgesCopied;
+      handleDuplicatedNodes(nodes, edges);
     }
     window.nodesCopied = [];
   });

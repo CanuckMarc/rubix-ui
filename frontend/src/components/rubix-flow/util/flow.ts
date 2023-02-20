@@ -81,49 +81,51 @@ export const formatEdgesWithParentNode = (nodes: NodeInterface[], edges: Edge[])
     const nodeByTarget = nodes.find(node => node.id === target);
     const nodeBySource = nodes.find(node => node.id === source);
 
-    if (nodeByTarget?.parentId && nodeBySource?.parentId) {
-      const childNodesOfTarget = nodes.filter(node => node.parentId === nodeByTarget.parentId);
-      const inputNodes = childNodesOfTarget.filter(node => isInputFlow(node.type!!));
-      const inputIndex = inputNodes.findIndex(input => input.id === nodeByTarget.id);
+    if (nodeByTarget?.parentId !== nodeBySource?.parentId) {
+      if (nodeByTarget?.parentId && nodeBySource?.parentId) {
+        const childNodesOfTarget = nodes.filter(node => node.parentId === nodeByTarget.parentId);
+        const inputNodes = childNodesOfTarget.filter(node => isInputFlow(node.type!!));
+        const inputIndex = inputNodes.findIndex(input => input.id === nodeByTarget.id);
 
-      const childNodesOfSource = nodes.filter(node => node.parentId === nodeBySource.parentId);
-      const outNodes = childNodesOfSource.filter(node => isOutputFlow(node.type!!));
-      const outIndex = outNodes.findIndex(input => input.id === nodeBySource.id);
+        const childNodesOfSource = nodes.filter(node => node.parentId === nodeBySource.parentId);
+        const outNodes = childNodesOfSource.filter(node => isOutputFlow(node.type!!));
+        const outIndex = outNodes.findIndex(input => input.id === nodeBySource.id);
 
-      const edgeClone = {
-        id: generateUuid(),
-        source: nodeBySource.parentId,
-        sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output',
-        target: nodeByTarget.parentId,
-        targetHandle: inputNodes.length > 1 ? `input${inputIndex + 1}` : 'input'
-      };
-      allEdges.push(edgeClone);
-    } else if (nodeByTarget?.parentId) {
-      const childNodes = nodes.filter(node => node.parentId === nodeByTarget.parentId);
-      const inputNodes = childNodes.filter(node => isInputFlow(node.type!!));
-      const inputIndex = inputNodes.findIndex(input => input.id === nodeByTarget.id);
-
-      if (inputIndex !== -1) {
         const edgeClone = {
-          ...edge,
           id: generateUuid(),
+          source: nodeBySource.parentId,
+          sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output',
           target: nodeByTarget.parentId,
           targetHandle: inputNodes.length > 1 ? `input${inputIndex + 1}` : 'input'
         };
         allEdges.push(edgeClone);
-      }
-    } else if (nodeBySource?.parentId) {
-      const childNodes = nodes.filter(node => node.parentId === nodeBySource.parentId);
-      const outNodes = childNodes.filter(node => isOutputFlow(node.type!!));
-      const outIndex = outNodes.findIndex(input => input.id === nodeBySource.id);
-      if (outIndex !== -1) {
-        const edgeClone = {
-          ...edge,
-          id: generateUuid(),
-          source: nodeBySource.parentId,
-          sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output'
-        };
-        allEdges.push(edgeClone);
+      } else if (nodeByTarget?.parentId) {
+        const childNodes = nodes.filter(node => node.parentId === nodeByTarget.parentId);
+        const inputNodes = childNodes.filter(node => isInputFlow(node.type!!));
+        const inputIndex = inputNodes.findIndex(input => input.id === nodeByTarget.id);
+
+        if (inputIndex !== -1) {
+          const edgeClone = {
+            ...edge,
+            id: generateUuid(),
+            target: nodeByTarget.parentId,
+            targetHandle: inputNodes.length > 1 ? `input${inputIndex + 1}` : 'input'
+          };
+          allEdges.push(edgeClone);
+        }
+      } else if (nodeBySource?.parentId) {
+        const childNodes = nodes.filter(node => node.parentId === nodeBySource.parentId);
+        const outNodes = childNodes.filter(node => isOutputFlow(node.type!!));
+        const outIndex = outNodes.findIndex(input => input.id === nodeBySource.id);
+        if (outIndex !== -1) {
+          const edgeClone = {
+            ...edge,
+            id: generateUuid(),
+            source: nodeBySource.parentId,
+            sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output'
+          };
+          allEdges.push(edgeClone);
+        }
       }
     }
   });

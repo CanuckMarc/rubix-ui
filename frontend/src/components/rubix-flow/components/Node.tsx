@@ -1,7 +1,7 @@
 import { NodeProps as FlowNodeProps, useEdges, useNodes } from "reactflow";
 import { memo, useCallback, useEffect, useState } from "react";
 
-import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
+import { useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { InputSocketSpecJSON, NodeSpecJSON, OutputSocketSpecJSON } from "../lib";
