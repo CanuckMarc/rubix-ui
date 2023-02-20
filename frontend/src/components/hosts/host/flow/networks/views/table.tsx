@@ -1,5 +1,5 @@
-import { Space, Spin, Tooltip, Modal } from "antd";
-import { ArrowRightOutlined, FormOutlined, BookOutlined } from "@ant-design/icons";
+import { Modal, Space, Spin, Tooltip } from "antd";
+import { ArrowRightOutlined, BookOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
@@ -11,6 +11,7 @@ import {
   RbImportButton,
   RbRefreshButton,
   RbRestartButton,
+  RbSyncButton,
 } from "../../../../../../common/rb-table-actions";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import { NETWORK_HEADERS } from "../../../../../../constants/headers";
@@ -20,10 +21,11 @@ import { FlowNetworkFactory } from "../factory";
 import { CreateModal, EditModal } from "./create";
 import { ExportModal, ImportModal } from "./import-export";
 import "./style.css";
-import UUIDs = backend.UUIDs;
-import Network = model.Network;
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { LogTable } from "./logTable";
+import { hasError } from "../../../../../../utils/response";
+import UUIDs = backend.UUIDs;
+import Network = model.Network;
 
 export interface LogTablePropType {
   pluginName: string | undefined;
@@ -112,7 +114,21 @@ export const FlowNetworkTable = () => {
       const res = (await networkFactory.GetAll(false)) || [];
       setNetworks(res);
       setFilteredData(res);
-    } catch (error) {
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const syncNetworks = async () => {
+    try {
+      setIsFetching(true);
+      const res = await networkFactory.Sync();
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data)
+      }
+      await fetchNetworks();
     } finally {
       setIsFetching(false);
     }
@@ -191,6 +207,7 @@ export const FlowNetworkTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetchNetworks} />
+      <RbSyncButton onClick={syncNetworks} />
       <RbAddButton handleClick={() => setIsCreateModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
