@@ -12,13 +12,12 @@ import ReactFlow, {
   EdgeProps,
   ReactFlowInstance,
   MiniMap,
-  ReactFlowProvider
+  ReactFlowProvider,
 } from "reactflow";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
-import 'reactflow/dist/style.css';
+import "reactflow/dist/style.css";
 
-// import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
@@ -27,7 +26,6 @@ import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
-// import {  } from "react-flow-renderer";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
 import { Spin } from "antd";
 import { NodeSpecJSON } from "./lib";
@@ -1140,16 +1138,15 @@ const Flow = (props: FlowProps) => {
   }, [saveCurrentFlowForUndo]);
 
   const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
-  // console.log('-----show minimap-----: ', flowSettings.showMiniMap);
 
   const nodeColor = (node: any) => {
     switch (node.selected) {
       case true:
-        return '#6ede87';
+        return "#6ede87";
       case false:
-        return '#555';
+        return "#555";
       default:
-        return '#555';
+        return "#555";
     }
   };
 
@@ -1227,7 +1224,15 @@ const Flow = (props: FlowProps) => {
               <LoadBacnetMap />
               <DragSelection />
               {flowSettings.showMiniMap && (
-                <MiniMap nodeColor={nodeColor} nodeStrokeWidth={3} zoomable pannable />
+                <MiniMap
+                  className={cx("absolute", {
+                    "top-20 right-4 h-60": flowSettings.positionMiniMap === "top",
+                  })}
+                  nodeColor={nodeColor}
+                  nodeStrokeWidth={3}
+                  zoomable
+                  pannable
+                />
               )}
               <ControlUndoable
                 canUndo={undoState.past.length > 0}
