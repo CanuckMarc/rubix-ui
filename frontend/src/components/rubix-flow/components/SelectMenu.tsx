@@ -1,4 +1,4 @@
-import { XYPosition } from "react-flow-renderer/nocss";
+import { XYPosition } from "reactflow";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type MenuProps = {

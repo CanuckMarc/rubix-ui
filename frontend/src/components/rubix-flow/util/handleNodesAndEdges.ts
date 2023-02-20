@@ -1,6 +1,7 @@
-import { Edge } from "react-flow-renderer";
-import { uniqArray } from "../../../utils/utils";
+import { Edge } from "reactflow";
+
 import { NodeSpecJSON } from "../lib";
+import { uniqArray } from '../../../utils/utils';
 import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 

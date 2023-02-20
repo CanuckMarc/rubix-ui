@@ -1,4 +1,4 @@
-import { Connection, ReactFlowInstance } from "react-flow-renderer/nocss";
+import { Connection, ReactFlowInstance } from "reactflow";
 import { getSocketsByNodeTypeAndHandleType } from "./getSocketsByNodeTypeAndHandleType";
 import { getSpecJson } from "../use-nodes-spec";
 

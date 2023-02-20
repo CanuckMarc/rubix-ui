@@ -6,7 +6,7 @@ import {
   useStoreApi,
   getRectOfNodes,
   useReactFlow,
-} from "react-flow-renderer/nocss";
+} from "reactflow";
 import {
   createUseGesture,
   UserHandlers,
