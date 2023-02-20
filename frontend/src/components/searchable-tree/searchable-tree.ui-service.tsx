@@ -126,12 +126,13 @@ const getTreeObject = (item: any, next: string | undefined, prependName?: string
 };
 
 const objectMap = (treeObj: TreeObj) => {
+  console.log('treeobj is: ', treeObj)
   const isDisabledTooltip =
     treeObj.key && treeObj.key.split("/").length < 5 && treeObj.key.split("/")[1] === "connections";
   treeObj.label = isDisabledTooltip ? (
     <>{treeObj.label}</>
   ) : (
-    <Tooltip placement="right" title={treeObj.name}>
+    <Tooltip placement="right" title={treeObj.label}>
       {treeObj.label}
     </Tooltip>
   );
