@@ -27,14 +27,12 @@ export const REGEX_NUMBER = new RegExp("^$|^-?(\\d+)?(\\.?\\d*)?$");
 
 const getValueOptions = (value: number) => {
   switch (value) {
-    case 0:
-      return false;
     case 1:
       return true;
     case -1:
-      return null;
+      return false;
     default:
-      return true;
+      return false;
   }
 };
 
