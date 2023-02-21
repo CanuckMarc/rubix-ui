@@ -986,12 +986,12 @@ const Flow = (props: FlowProps) => {
 
     const newNodes = formatParentNodesWithInputsOutputs(newFlow.nodes, nodesSpec as any);
     const newEdges = formatEdgesWithParentNode(newNodes, newFlow.edges);
-    const nodesL1 = newNodes.filter(node => {
+    const nodesL1 = newNodes.filter((node) => {
       if (!node.parentId) {
         return true;
       }
-      return !(!!newNodes.find(item => item.id === node.parentId));
-    })
+      return !newNodes.find((item) => item.id === node.parentId);
+    });
 
     // unique items and delete oldId field
     const nodesUniq = uniqArray([...nodes, ...nodesL1]).map(({ oldId, ...node }: NodeInterface) => node);
