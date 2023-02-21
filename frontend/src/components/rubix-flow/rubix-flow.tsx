@@ -854,6 +854,9 @@ const Flow = (props: FlowProps) => {
     
     const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
     const nodeIsParent = _nodesDeleted.map((item: NodeInterface) => item.isParent);
+
+    const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
     
     const remainingNodes = nodeIsParent
       ? nodes.filter((item) => !nodeId.includes(item.id))
@@ -875,6 +878,10 @@ const Flow = (props: FlowProps) => {
     };
     setNodes(remainingNodes);
     setEdges(remainingEdges);
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
+      future: s.future,
+    }));
   };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
