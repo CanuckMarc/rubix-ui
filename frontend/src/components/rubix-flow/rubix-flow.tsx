@@ -843,6 +843,40 @@ const Flow = (props: FlowProps) => {
     handleFlowChange();
   };
 
+  const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+    const nodeIds: string[] = [];
+    for (const node of _nodesDeleted) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+    
+    const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
+    const nodeIsParent = _nodesDeleted.map((item: NodeInterface) => item.isParent);
+    
+    const remainingNodes = nodeIsParent
+      ? nodes.filter((item) => !nodeId.includes(item.id))
+      : window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeIds.includes(item.target) &&
+        !nodeIds.includes(item.source)
+    );
+    window.allFlow = {
+      nodes: remainingNodes,
+      edges: window.allFlow.edges.filter(
+        (item) =>
+          !_edgesDeleted.some((item2) => item.id === item2.id) &&
+          !nodeId.includes(item.target) &&
+          !nodeId.includes(item.source)
+      ),
+    };
+    setNodes(remainingNodes);
+    setEdges(remainingEdges);
+  };
+
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
     /* Unselected nodes, edges */
     nodes.forEach((item) => (item.selected = false));
@@ -1236,6 +1270,7 @@ const Flow = (props: FlowProps) => {
                 isSaving={isSaving}
                 isChangedFlow={isChangedFlow}
                 deleteNodesAndEdges={deleteNodesAndEdges}
+                deleteNodesAndEdgesCtrX={deleteNodesAndEdgesCtrX}
                 onCopyNodes={handleCopyNodes}
                 onUndo={handleUndo}
                 onRedo={handleRedo}

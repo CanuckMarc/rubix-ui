@@ -29,6 +29,7 @@ type ControlProps = {
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
+  deleteNodesAndEdgesCtrX: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -48,6 +49,7 @@ const Controls = ({
   isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
+  deleteNodesAndEdgesCtrX,
   onCopyNodes,
   onUndo,
   onRedo,
@@ -86,6 +88,15 @@ const Controls = ({
     const edgesDeleted = _edges.filter((item) => item.selected);
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
+  };
+  const deleteSelectNodeCtrX = () => {
+    const _nodes = instance.getNodes();
+    const _edges = instance.getEdges();
+
+    const nodesDeleted = _nodes.filter((item) => item.selected);
+    const edgesDeleted = _edges.filter((item) => item.selected);
+
+    deleteNodesAndEdgesCtrX(nodesDeleted, edgesDeleted);
   };
 
   /* Ctrl + Delete (key): Delete items selected  */
@@ -142,7 +153,7 @@ const Controls = ({
   /* Ctrl + X (key): Refresh node values */
   useCtrlPressKey("KeyX", () => {
     copySelectNode();
-    deleteSelectNode();
+    deleteSelectNodeCtrX();
   });
 
   // Copy selected node
