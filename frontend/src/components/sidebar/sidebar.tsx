@@ -531,8 +531,9 @@ export const MenuSidebar = () => {
   eventEmit.on("openAllMenus", (data: any) => onUpdateOpenKeys(data));
 
   useEffect(() => {
+    fetchConnections();
     setTimeout(async () => {
-      fetchConnections();
+      setIsFetching(false);
     }, getTimeSetting());
     fetchLatestVersions();
   }, []);
