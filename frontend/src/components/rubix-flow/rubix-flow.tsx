@@ -842,7 +842,8 @@ const Flow = (props: FlowProps) => {
     }));
     handleFlowChange();
   };
-
+  
+  // delete nodes when CtrX
   const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
     const nodeIds: string[] = [];
     for (const node of _nodesDeleted) {
@@ -853,14 +854,13 @@ const Flow = (props: FlowProps) => {
     }
     
     const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
-    const nodeIsParent = _nodesDeleted.map((item: NodeInterface) => item.isParent);
 
-    const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
-    const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
+    const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
     
-    const remainingNodes = nodeIsParent
-      ? nodes.filter((item) => !nodeId.includes(item.id))
-      : window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
+    const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
+
     const remainingEdges = edges.filter(
       (item) =>
         !_edgesDeleted.some((item2) => item.id === item2.id) &&
@@ -868,7 +868,7 @@ const Flow = (props: FlowProps) => {
         !nodeIds.includes(item.source)
     );
     window.allFlow = {
-      nodes: remainingNodes,
+      nodes: remainingNodesAll,
       edges: window.allFlow.edges.filter(
         (item) =>
           !_edgesDeleted.some((item2) => item.id === item2.id) &&
@@ -882,6 +882,7 @@ const Flow = (props: FlowProps) => {
       past: [...s.past, { edges, nodes, childNode, childEdge }],
       future: s.future,
     }));
+    handleFlowChange();
   };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
