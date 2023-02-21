@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *App) AddStream(connUUID, hostUUID string, flowNetworkUUID string, body *model.Stream) *model.Stream {
@@ -116,4 +117,16 @@ func (inst *App) DeleteStreamBulk(connUUID, hostUUID string, uuids []UUIDs) inte
 		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
 	}
 	return nil
+}
+
+func (inst *App) SyncStreams(connUUID, hostUUID, flowNetworkUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncStreams(hostUUID, flowNetworkUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced streams")
 }

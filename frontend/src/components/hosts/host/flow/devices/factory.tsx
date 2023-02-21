@@ -1,6 +1,7 @@
-import {backend, model, storage} from "../../../../../../wailsjs/go/models";
+import { backend, model, rumodel, storage } from "../../../../../../wailsjs/go/models";
 import {
-  AddDevice, AddDevicesBulk, AddPointsBulk,
+  AddDevice,
+  AddDevicesBulk,
   DeleteDevice,
   DeleteDeviceBulk,
   EditDevice,
@@ -10,6 +11,7 @@ import {
   GetFlowDeviceSchema,
   GetNetworkDevices,
   ImportDevicesBulk,
+  SyncDevices,
 } from "../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../helpers/checks";
 
@@ -69,7 +71,7 @@ export class FlowDeviceFactory {
     hasUUID(this.connectionUUID);
     hasUUID(this.hostUUID);
     hasUUID(networkUUID);
-    body.network_uuid = networkUUID
+    body.network_uuid = networkUUID;
     return await AddDevice(this.connectionUUID, this.hostUUID, body);
   }
 
@@ -152,5 +154,11 @@ export class FlowDeviceFactory {
       networkUUID,
       uuids
     );
+  }
+
+  async SyncDevices(networkUUID: string): Promise<rumodel.Response> {
+    hasUUID(this.connectionUUID);
+    hasUUID(this.hostUUID);
+    return SyncDevices(this.connectionUUID, this.hostUUID, networkUUID);
   }
 }

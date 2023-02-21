@@ -21,10 +21,10 @@ export const useNodesSpec = () => {
 
   const setDefaultInputValue = (inputs: InputSocketSpecJSON[]) => {
     return inputs.map((input) => {
-      let defaultValue = null;
+      let defaultValue;
       switch (input?.valueType) {
         case "number":
-          defaultValue = null;
+          defaultValue = input?.defaultValue;
           break;
         case "string":
           defaultValue = "";

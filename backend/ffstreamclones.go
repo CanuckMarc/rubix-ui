@@ -76,3 +76,15 @@ func (inst *App) DeleteStreamBulkClones(connUUID, hostUUID string, uuids []UUIDs
 	}
 	return nil
 }
+
+func (inst *App) SyncStreamClones(connUUID, hostUUID, fncUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncStreamClones(hostUUID, fncUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced stream-clones")
+}

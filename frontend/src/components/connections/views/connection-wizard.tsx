@@ -16,6 +16,10 @@ export const CreateConnectionWizard = (props: any) => {
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
   const [errorAtPing, setErrorAtPing] = useState(false);
 
+  useEffect(() => {
+    setStepStatus('process');
+  }, [isWizardModalVisible])
+
   const pingConnection = (conn: RubixConnection) => {
     PingRubixAssist(conn.uuid).then((ok) => {
       if (ok) {

@@ -4,9 +4,10 @@ import {
   DeleteFlowNetwork,
   DeleteFlowNetworkBulk,
   EditFlowNetwork,
-  FFToken,
   FFSystemPing,
+  FFToken,
   GetFlowNetworks,
+  SyncFlowNetworks,
 } from "../../../../../../../wailsjs/go/backend/App";
 import { Helpers } from "../../../../../../helpers/checks";
 
@@ -58,5 +59,11 @@ export class FlowFrameworkNetworkFactory {
     hasUUID(this.connectionUUID);
     hasUUID(hostUUID);
     return FFToken(this.connectionUUID, hostUUID, remoteHostUUID, username, password);
+  }
+
+  async Sync(): Promise<rumodel.Response> {
+    hasUUID(this.connectionUUID);
+    hasUUID(this.hostUUID);
+    return SyncFlowNetworks(this.connectionUUID, this.hostUUID);
   }
 }

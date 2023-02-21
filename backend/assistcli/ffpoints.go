@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *Client) EdgeGetPoints(hostIDName string) ([]model.Point, error) {
@@ -118,4 +119,17 @@ func (inst *Client) EditPoint(hostIDName, uuid string, body *model.Point) (*mode
 		return nil, err
 	}
 	return resp.Result().(*model.Point), nil
+}
+
+func (inst *Client) SyncPoints(hostIDName, deviceUUID string) (*[]rumodel.SyncModel, error) {
+	url := fmt.Sprintf("proxy/ff/api/devices/%s/sync/points", deviceUUID)
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
 }

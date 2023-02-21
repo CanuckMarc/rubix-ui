@@ -110,3 +110,15 @@ func (inst *App) DeleteFlowNetworkBulk(connUUID, hostUUID string, uuids []UUIDs)
 	}
 	return nil
 }
+
+func (inst *App) SyncFlowNetworks(connUUID, hostUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncFlowNetworks(hostUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced flow-networks")
+}

@@ -1,5 +1,11 @@
-import { backend, model } from "../../../../../../../wailsjs/go/models";
-import { CreateWriter, DeleteWritersBulk, EditWriter, GetConsumer } from "../../../../../../../wailsjs/go/backend/App";
+import { backend, model, rumodel } from "../../../../../../../wailsjs/go/models";
+import {
+  CreateWriter,
+  DeleteWritersBulk,
+  EditWriter,
+  GetConsumer,
+  SyncWriters
+} from "../../../../../../../wailsjs/go/backend/App";
 
 export class WritersFactory {
   connectionUUID!: string;
@@ -26,5 +32,9 @@ export class WritersFactory {
 
   async BulkDelete(uuids: Array<backend.UUIDs>): Promise<model.Writer> {
     return await DeleteWritersBulk(this.connectionUUID, this.hostUUID, uuids);
+  }
+
+  async Sync(consumerUUID: string): Promise<rumodel.Response> {
+    return SyncWriters(this.connectionUUID, this.hostUUID, consumerUUID);
   }
 }

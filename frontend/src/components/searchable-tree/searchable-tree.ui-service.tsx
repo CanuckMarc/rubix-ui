@@ -131,7 +131,7 @@ const objectMap = (treeObj: TreeObj) => {
   treeObj.label = isDisabledTooltip ? (
     <>{treeObj.label}</>
   ) : (
-    <Tooltip placement="right" title={treeObj.name}>
+    <Tooltip placement="right" title={treeObj.label}>
       {treeObj.label}
     </Tooltip>
   );

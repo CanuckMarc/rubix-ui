@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { ScannerTable } from "../../../pc/networking/scanner-table";
 import { HostNetworkingFactory } from "./factory";
 import { EditModal } from "./views/edit";
+import { IpWizard } from "./views/ip-wizard";
 
 export const HostNetworking = () => {
   const { connUUID = "", hostUUID = "" } = useParams();
@@ -99,13 +100,20 @@ export const HostNetworking = () => {
     <>
       <ScannerTable rowKey="id" data={data} isFetching={isFetching} extraColumns={extraColumns} />
 
-      <EditModal
+      {/* <EditModal
         currentItem={currentItem}
         isModalVisible={isModalVisible}
         schema={schema}
         prefix={prefix}
         onCloseModal={() => setIsModalVisible(false)}
         refreshList={fetch}
+      /> */}
+      <IpWizard 
+        currentItem={currentItem}
+        prefix={prefix}
+        refreshList={fetch}
+        isModalVisible={isModalVisible}
+        onCloseModal={() => setIsModalVisible(false)}
       />
     </>
   );

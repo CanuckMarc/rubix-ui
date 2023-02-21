@@ -1,8 +1,9 @@
-import { backend, model } from "../../../../../../../wailsjs/go/models";
+import { backend, model, rumodel } from "../../../../../../../wailsjs/go/models";
 import {
-  DeleteStreamBulkClones, GetFlowNetworkClone,
+  DeleteStreamBulkClones,
+  GetFlowNetworkClone,
+  SyncStreamClones,
 } from "../../../../../../../wailsjs/go/backend/App";
-
 import UUIDs = backend.UUIDs;
 
 export class FlowStreamCloneFactory {
@@ -11,10 +12,14 @@ export class FlowStreamCloneFactory {
   flowNetworkCloneUUID!: string;
 
   async GetAll(): Promise<model.FlowNetworkClone> {
-    return GetFlowNetworkClone(this.connectionUUID, this.hostUUID, this.flowNetworkCloneUUID, true)
+    return GetFlowNetworkClone(this.connectionUUID, this.hostUUID, this.flowNetworkCloneUUID, true);
   }
 
   async BulkDelete(uuids: Array<UUIDs>): Promise<any> {
-    return DeleteStreamBulkClones(this.connectionUUID, this.hostUUID, uuids)
+    return DeleteStreamBulkClones(this.connectionUUID, this.hostUUID, uuids);
+  }
+
+  async Sync(fncUUID: string): Promise<rumodel.Response> {
+    return SyncStreamClones(this.connectionUUID, this.hostUUID, fncUUID);
   }
 }
