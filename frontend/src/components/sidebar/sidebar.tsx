@@ -441,8 +441,11 @@ export const MenuSidebar = () => {
   };
 
   const fetchConnections = async () => {
+    setIsFetching(true);
+    setTimeout(async () => {
+      setIsFetching(false);
+    }, getTimeSetting());
     try {
-      setIsFetching(true);
       const connections = ((await connectionFactory.GetAll()) || []) as any[];
       const enabledConnections = connections.filter((c: RubixConnection) => c.enable);
       for (const c of enabledConnections) {
@@ -532,9 +535,6 @@ export const MenuSidebar = () => {
 
   useEffect(() => {
     fetchConnections();
-    setTimeout(async () => {
-      setIsFetching(false);
-    }, getTimeSetting());
     fetchLatestVersions();
   }, []);
 
