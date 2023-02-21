@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Edge, XYPosition } from "react-flow-renderer/nocss";
+import { Edge, XYPosition } from "reactflow";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
 import { SettingsModal } from "./SettingsModal";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useBacnetStore, useIsLoading } from '../../../App';
-import { Edge, useReactFlow } from "react-flow-renderer/nocss";
+import { Edge, useReactFlow } from "reactflow";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { handleGetSettingType } from "../util/handleSettings";
 import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../use-nodes-spec";

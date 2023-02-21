@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useReactFlow, XYPosition } from "react-flow-renderer/nocss";
+import { useReactFlow, XYPosition } from "reactflow";
 import { useOnPressKey } from "../hooks/useOnPressKey";
 import { NodeSpecJSON } from "../lib";
 import { useNodesSpec } from "../use-nodes-spec";

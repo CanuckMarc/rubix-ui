@@ -1,6 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { Position } from "react-flow-renderer";
-import { Edge, EdgeProps, getBezierPath, useEdges, useNodes } from "react-flow-renderer/nocss";
+import { Edge, EdgeProps, getBezierPath, useEdges, useNodes, Position } from "reactflow";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { isInputFlow, isOutputFlow } from "./Node";
 
@@ -207,7 +206,7 @@ export const CustomEdge = memo((props: EdgeProps & { parentNodeId?: string }) =>
     }
 
     if ((show || showConnectBetweenSubAndNode) && pathObj && refPath1.current && refPath2.current) {
-      const path = getBezierPath(pathObj);
+      const [path] = getBezierPath(pathObj);
       refPath1.current.setAttribute("d", path);
       refPath2.current.setAttribute("d", path);
     }

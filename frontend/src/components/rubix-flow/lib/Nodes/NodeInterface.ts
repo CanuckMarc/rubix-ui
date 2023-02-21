@@ -5,7 +5,7 @@ import {
   CoordinateExtent,
   internalsSymbol,
   NodeHandleBounds,
-} from "react-flow-renderer";
+} from "reactflow";
 
 export type NodeInterfaceInfo = {
   nodeName?: string;

@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Edge } from "react-flow-renderer";
+import { Edge } from "reactflow";
 
 import { behaveToFlow } from "../transformers/behaveToFlow";
 import { autoLayout } from "../util/autoLayout";
