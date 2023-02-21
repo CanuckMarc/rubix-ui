@@ -1148,7 +1148,7 @@ const Flow = (props: FlowProps) => {
           flowSettings={flowSettings}
         />
       )}
-      {/* {!isFetching && flowSettings.showDrivers && (
+      {!isFetching && flowSettings.showDrivers && (
         <DriversPallet
           nodes={window.allFlow?.nodes || []}
           selectedSubFlowId={selectedNodeForSubFlow?.id}
@@ -1157,7 +1157,7 @@ const Flow = (props: FlowProps) => {
           gotoNode={gotoNode}
           flowSettings={flowSettings}
         />
-      )} */}
+      )}
       {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}

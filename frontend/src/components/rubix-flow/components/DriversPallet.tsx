@@ -1,13 +1,30 @@
-import { Layout, Tooltip } from "antd";
+import { Layout, Tooltip, Collapse, Switch } from "antd";
 import { CaretRightOutlined, CaretDownOutlined } from "@ant-design/icons";
 import { ChangeEvent, useEffect, useState } from "react";
 
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeTreeItem } from "./NodeTreeItem";
 import { NodeSpecJSON } from '../lib';
-import { FlowSettings} from "./FlowSettingsModal";
+import { FlowSettings } from "./FlowSettingsModal";
+
+import { FlowPointFactory } from '../../../components/hosts/host/flow/points/factory';
+import { backend, model, rumodel, storage, } from "../../../../wailsjs/go/models";
+import { PointTableType } from "../../../App";
+import { useParams } from "react-router-dom";
+const pointFactory = new FlowPointFactory();
 
 const { Sider } = Layout;
+const { Panel } = Collapse;
+
+interface PluginTableDataType {
+  uuid: string;
+  name: string;
+  plugin_name: string;
+  network_name: string;
+  device_name: string;
+  point_name: string;
+  isRead: boolean;
+}
 
 type NodeProps = {
   nodes: NodeInterface[];
@@ -18,26 +35,67 @@ type NodeProps = {
   flowSettings: FlowSettings;
 };
 
-export const DriversPallet = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings}: NodeProps) => {
+export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
-  const [nodesFiltered, setNodesFiltered] = useState<{ nodesL1: NodeInterface[]; remainingNodes: NodeInterface[] }>({
-    nodesL1: [],
-    remainingNodes: [],
-  });
+  
+  
+  let { connUUID = "", hostUUID = "" } = useParams();
+  const [allPoints, setAllPoints] = useState<PluginTableDataType[] | undefined>(undefined);
+  const [displayObj, setDisplayObj] = useState<any>(undefined)
 
-  const changeKeys = (key: string) => {
-    const isExist = panelKeys.includes(key);
-    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
+  const [isFetchingPoints, setIsFetchingPoints] = useState(false);
+
+  useEffect(() => {
+    pointFactory.connectionUUID = connUUID;
+    pointFactory.hostUUID = hostUUID;
+    fetchFlowPoints();
+  }, [connUUID, hostUUID]);
+
+  const fetchFlowPoints = async() => {
+    try {
+      setIsFetchingPoints(true)
+      const res = await pointFactory.GetPointListPayload(connUUID, hostUUID)
+      if (res) {
+        console.log("all points are: ", res)
+        setAllPoints(res.map((item: backend.PointListPayload) => {
+          return {...item, isRead: false}
+        }));
+      }
+    } catch (err) {
+      console.log("error on fetching: ", err)
+    } finally {
+      setIsFetchingPoints(false)
+    }
+  }
+
+  useEffect(() => {    
+    if (allPoints) {
+      let localDisplayObj = {} as any;
+      let usedNames: string[] = [];
+      allPoints.forEach((point: backend.PointListPayload) => {
+        if (usedNames.includes(point.plugin_name)) {
+          localDisplayObj[`${point.plugin_name}`].push(point);
+        } else {
+          usedNames.push(point.plugin_name);
+          localDisplayObj[`${point.plugin_name}`] = [point];
+        }
+      })
+      setDisplayObj(localDisplayObj)
+      console.log('localDisplayObj is: ', localDisplayObj)
+    }
+  }, [allPoints])
+
+  const onDragStart = (event: any, name: any, isRead: boolean) => {
+    // const data = { isParent, nodeType };
+    // event.dataTransfer.setData("from-node-sidebar", JSON.stringify(data));
+    // event.dataTransfer.effectAllowed = "move";
   };
+
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-  };
-
-  const handleNodeContextMenu = (event: { x: number; y: number }, node: NodeInterface) => {
-    openNodeMenu({ x: event.x, y: event.y }, node);
   };
 
   const onChangeOpenPanels = (isExpanded: boolean) => () => {
@@ -47,52 +105,16 @@ export const DriversPallet = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, o
     setPanelKeys(ids);
   };
 
-  useEffect(() => {
-    const key = search.toLowerCase().trim();
-    const ids = {} as { [key: string]: string };
-
-    const filtered =
-      key.length > 0
-        ? nodes.filter((node) => {
-          const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
-          return nodeType.toLowerCase().includes(key);
-        })
-        : nodes;
-
-    const allNodes = [...filtered];
-
-    const findParentNode = (id: string) => {
-      ids[id] = id;
-      const parentNode = nodes.find((e) => e.id === id);
-
-      if (parentNode) {
-        const isExisted = allNodes.some((n) => n.id === parentNode.id);
-        if (!isExisted) {
-          allNodes.push(parentNode);
-        }
-
-        if (parentNode.parentId) {
-          findParentNode(parentNode.parentId);
-        }
+  const onSwitchChange = (checked: boolean, itemUUID: string) => {
+    const mappedAllPoints = allPoints?.map((point: PluginTableDataType) => {
+      if (point.uuid === itemUUID) {
+        return {...point, isRead: checked}
+      } else {
+        return point
       }
-    };
-
-    filtered.forEach((item) => {
-      if (item.parentId) {
-        findParentNode(item.parentId);
-      }
-    });
-
-    const nodeLevel1 = allNodes.filter((n) => !n.parentId);
-    const remainingNodes = allNodes.filter((n) => !nodeLevel1.some((n2) => n2.id === n.id));
-    setNodesFiltered({ nodesL1: nodeLevel1, remainingNodes });
-    setPanelKeys(Object.keys(ids));
-    setIsExpandedAll(true);
-  }, [search, nodes]);
-
-  useEffect(() => {
-    setPanelKeys([...(window.subFlowIds || [])]);
-  }, [selectedSubFlowId]);
+    })
+    setAllPoints(mappedAllPoints)
+  }
 
   return (
     <div>
@@ -118,21 +140,40 @@ export const DriversPallet = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, o
           />
         </div>
         <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
-          {nodesFiltered.nodesL1.map((node, index) => (
-            <NodeTreeItem
-              key={node.id}
-              node={node}
-              nodesSpec={nodesSpec}
-              gotoNode={gotoNode}
-              nodeIndex={index}
-              panelKeys={panelKeys}
-              onChangeKey={changeKeys}
-              allNodes={nodesFiltered.remainingNodes}
-              selectedSubFlowId={selectedSubFlowId}
-              handleNodeContextMenu={handleNodeContextMenu}
-              flowSettings={flowSettings}
-            />
-          ))}
+          <Collapse
+            defaultActiveKey={['1']}
+            expandIconPosition="right"
+            // onChange={onChangeOpenPanels}
+            className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
+          >
+            {displayObj && Object.keys(displayObj).map((pluginName: string) => (
+              <Panel header={pluginName} key={pluginName} className="panel-no-padding border-gray-600">
+                <div className="bg-gray-800">
+                  {displayObj[`${pluginName}`].map((item: PluginTableDataType, index: number) => (
+                    <div
+                    key={`${item.name}`}
+                    className={`py-2 cursor-po inter text-white flex flex-row justify-between
+                      border-gray-600 text-left ant-menu-item ${index === 0 ? "" : "border-t"}`}
+                    draggable={true}
+                    onDragStart={(event) => onDragStart(event, item.name, item.isRead)}
+                    style={{ paddingLeft: 24 }}
+                  >
+                    <div>
+                      {item.device_name && item.point_name && (
+                        <span className="pr-3" style={{ fontSize: 12 }}>
+                          {`${item.device_name}-${item.point_name}`}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <Switch checked={item.isRead} onChange={(checked) => onSwitchChange(checked, item.uuid)} />
+                    </div>
+                  </div>
+                  ))}
+                </div>
+              </Panel>
+            ))}
+          </Collapse>
         </div>
       </Sider>
     </div>

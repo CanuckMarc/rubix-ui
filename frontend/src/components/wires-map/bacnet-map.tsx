@@ -253,7 +253,6 @@ export const BacnetMap = (props: BacnetMapPropType) => {
   };
 
   const handleSearchPointName = () => {
-    console.log('search value is: ', search)
     setPointsPaneSearch(search)
   }
 
