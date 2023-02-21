@@ -4,8 +4,8 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeTreeItem } from "./NodeTreeItem";
-import { NodeSpecJSON } from '../lib';
-import { FlowSettings} from "./FlowSettingsModal";
+import { NodeSpecJSON } from "../lib";
+import { FlowSettings } from "./FlowSettingsModal";
 
 const { Sider } = Layout;
 
@@ -16,22 +16,29 @@ type NodeProps = {
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
   flowSettings: FlowSettings;
+  panelKeys: string[];
+  setPanelKeys: React.Dispatch<React.SetStateAction<string[]>>;
+  changeKeys: (key: string) => void;
 };
 
-export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings}: NodeProps) => {
-  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+export const NodesTree = ({
+  nodes,
+  nodesSpec,
+  selectedSubFlowId,
+  gotoNode,
+  openNodeMenu,
+  flowSettings,
+  panelKeys,
+  setPanelKeys,
+  changeKeys,
+}: NodeProps) => {
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
   const [nodesFiltered, setNodesFiltered] = useState<{ nodesL1: NodeInterface[]; remainingNodes: NodeInterface[] }>({
     nodesL1: [],
     remainingNodes: [],
   });
-
-  const changeKeys = (key: string) => {
-    const isExist = panelKeys.includes(key);
-    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
-  };
-
+  
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
@@ -54,9 +61,9 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
     const filtered =
       key.length > 0
         ? nodes.filter((node) => {
-          const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
-          return nodeType.toLowerCase().includes(key);
-        })
+            const nodeType = `${node.type!!.split("/")[1]}${node.info?.nodeName ? ` (${node.info.nodeName})` : ""}`;
+            return nodeType.toLowerCase().includes(key);
+          })
         : nodes;
 
     const allNodes = [...filtered];

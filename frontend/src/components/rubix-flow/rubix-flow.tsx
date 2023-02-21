@@ -123,6 +123,8 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+  const [panelKeysNew, setPanelKeysNew] = useState<string[]>([]);
   const [isLinkBuilder, setIsLinkBuilder] = useState(false);
   const [undoState, setUndoState] = useState<{ past: UndoStateType[]; future: UndoStateType[] }>({
     past: [],
@@ -183,6 +185,13 @@ const Flow = (props: FlowProps) => {
       isDragSelection.current = true;
     },
   });
+
+  // Subflow nodes are open
+  const changeKeys = (key: string) => {
+    const isExist = panelKeys.includes(key);
+    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
+    setPanelKeysNew(isExist ? panelKeys.filter((item) => item === key) : [key]);
+  };
 
   // delete selected wires
   useOnPressKey("Backspace", () => {
@@ -1159,6 +1168,9 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
+          panelKeys={panelKeys}
+          setPanelKeys={setPanelKeys}
+          changeKeys={changeKeys}
           flowSettings={flowSettings}
         />
       )}
@@ -1173,6 +1185,7 @@ const Flow = (props: FlowProps) => {
             selectedSubflow={selectedNodeForSubFlow}
             goSubFlow={handleAddSubFlow}
             onBackToMain={onBackToMain}
+            panelKeysNew={panelKeysNew}
           />
         )}
         {isFetching ? (
