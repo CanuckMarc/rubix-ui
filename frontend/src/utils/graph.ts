@@ -1,4 +1,4 @@
-import type { Box, Rect } from "react-flow-renderer";
+import type { Box, Rect } from "reactflow";
 
 const getBoundsOfBoxes = (box1: Box, box2: Box): Box => ({
   x: Math.min(box1.x, box2.x),

@@ -8,11 +8,16 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
   XYPosition,
-} from "react-flow-renderer/nocss";
+  Edge,
+  EdgeProps,
+  ReactFlowInstance,
+  MiniMap,
+  ReactFlowProvider,
+} from "reactflow";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
+import "reactflow/dist/style.css";
 
-import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
@@ -21,7 +26,6 @@ import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
-import { Edge, EdgeProps, ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
 import { Spin } from "antd";
 import { NodeSpecJSON } from "./lib";
@@ -450,7 +454,7 @@ const Flow = (props: FlowProps) => {
     setIsSaving(false);
   };
 
-  const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
+  const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
   };
 
@@ -1146,6 +1150,17 @@ const Flow = (props: FlowProps) => {
 
   const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
 
+  const nodeColor = (node: any) => {
+    switch (node.selected) {
+      case true:
+        return "#6ede87";
+      case false:
+        return "#555";
+      default:
+        return "#555";
+    }
+  };
+
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1231,18 +1246,13 @@ const Flow = (props: FlowProps) => {
               <DragSelection />
               {flowSettings.showMiniMap && (
                 <MiniMap
-                  nodes={nodes.filter((node: NodeInterface) => {
-                    if (selectedNodeForSubFlow) {
-                      return node.parentId === selectedNodeForSubFlow.id;
-                    }
-                    return !node.parentId;
-                  })}
-                  shouldUpdate={shouldUpdateMiniMap}
                   className={cx("absolute", {
-                    "top-20 right-4": flowSettings.positionMiniMap === "top",
+                    "top-20 right-4 h-60": flowSettings.positionMiniMap === "top",
                   })}
-                  nodeColor={handleMinimapNodeColor}
-                  nodeStrokeColor={handleMinimapBorderColor}
+                  nodeColor={nodeColor}
+                  nodeStrokeWidth={3}
+                  zoomable
+                  pannable
                 />
               )}
               <ControlUndoable
