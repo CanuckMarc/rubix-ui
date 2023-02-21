@@ -7,7 +7,7 @@ import { NodeTreeItem } from "./NodeTreeItem";
 import { NodeSpecJSON } from '../lib';
 import { FlowSettings } from "./FlowSettingsModal";
 
-import { FlowPointFactory } from '../../../components/hosts/host/flow/points/factory';
+import { FlowPointFactory } from '../../hosts/host/flow/points/factory';
 import { backend, model, rumodel, storage, } from "../../../../wailsjs/go/models";
 import { PointTableType } from "../../../App";
 import { useParams } from "react-router-dom";
@@ -23,7 +23,7 @@ interface PluginTableDataType {
   network_name: string;
   device_name: string;
   point_name: string;
-  isRead: boolean;
+  isWrite: boolean;
 }
 
 type NodeProps = {
@@ -35,7 +35,7 @@ type NodeProps = {
   flowSettings: FlowSettings;
 };
 
-export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
+export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -43,8 +43,9 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
   
   let { connUUID = "", hostUUID = "" } = useParams();
   const [allPoints, setAllPoints] = useState<PluginTableDataType[] | undefined>(undefined);
-  const [displayObj, setDisplayObj] = useState<any>(undefined)
-
+  const [allPointsBeforeSearch, setAllPointsBeforeSearch] = useState<PluginTableDataType[] | undefined>(undefined);
+  const [displayObj, setDisplayObj] = useState<any>({});
+  const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
   const [isFetchingPoints, setIsFetchingPoints] = useState(false);
 
   useEffect(() => {
@@ -53,15 +54,20 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
     fetchFlowPoints();
   }, [connUUID, hostUUID]);
 
+  useEffect(() => {
+    fetchFlowPoints();
+  }, [])
+
   const fetchFlowPoints = async() => {
     try {
       setIsFetchingPoints(true)
       const res = await pointFactory.GetPointListPayload(connUUID, hostUUID)
       if (res) {
-        console.log("all points are: ", res)
-        setAllPoints(res.map((item: backend.PointListPayload) => {
-          return {...item, isRead: false}
-        }));
+        const mappedRes = res.map((item: backend.PointListPayload) => {
+          return {...item, isWrite: false}
+        });
+        setAllPoints(mappedRes)
+        setAllPointsBeforeSearch(mappedRes)
       }
     } catch (err) {
       console.log("error on fetching: ", err)
@@ -83,14 +89,27 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
         }
       })
       setDisplayObj(localDisplayObj)
-      console.log('localDisplayObj is: ', localDisplayObj)
+      // console.log('localDisplayObj is: ', localDisplayObj)
     }
   }, [allPoints])
 
-  const onDragStart = (event: any, name: any, isRead: boolean) => {
-    // const data = { isParent, nodeType };
-    // event.dataTransfer.setData("from-node-sidebar", JSON.stringify(data));
-    // event.dataTransfer.effectAllowed = "move";
+  useEffect(() => {
+    if (search === "") {
+      setAllPoints(allPointsBeforeSearch)
+    } else {
+      const key = search.toLowerCase().trim();
+      const searchRes = allPoints?.filter((item: PluginTableDataType) => {
+        return item.name.includes(key) ? true : false;
+      })
+      setAllPoints(searchRes);
+    }
+  }, [search])
+
+  const onDragStart = (event: any, namePallet: any, isWrite: boolean) => {
+    const nodeTypePallet = isWrite ? 'flow/flow-point-write' : 'flow/flow-point';
+    const data = { namePallet, nodeTypePallet };
+    event.dataTransfer.setData("from-point-pallet", JSON.stringify(data));
+    event.dataTransfer.effectAllowed = "move";
   };
 
 
@@ -98,17 +117,14 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
     setSearch(e.target.value);
   };
 
-  const onChangeOpenPanels = (isExpanded: boolean) => () => {
-    const ids = nodes.filter((n) => (isExpanded ? n.isParent : false)).map((n) => n.id);
-
-    setIsExpandedAll(isExpanded);
-    setPanelKeys(ids);
+  const onChangeOpenPanels = (key: string | string[]) => {
+    setActiveKeyPanel(typeof key === "string" ? [key] : key);
   };
 
   const onSwitchChange = (checked: boolean, itemUUID: string) => {
     const mappedAllPoints = allPoints?.map((point: PluginTableDataType) => {
       if (point.uuid === itemUUID) {
-        return {...point, isRead: checked}
+        return {...point, isWrite: checked}
       } else {
         return point
       }
@@ -120,14 +136,16 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
         <div className="p-2">
-          Drivers {flowSettings.showCount ? `(${nodes.length})` : ""}
-          <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
-            {isExpandedAll ? (
-              <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
-            ) : (
-              <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
-            )}
-          </Tooltip>
+          Points 
+          {activeKeyPanel.length !== Object.keys(displayObj).length ? (
+            <Tooltip title={"expand all"}>
+                <CaretRightOutlined className="title-icon" onClick={() => onChangeOpenPanels(Object.keys(displayObj))} />
+            </Tooltip>
+          ) : (
+            <Tooltip title={"collapse all"}>
+                <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
+            </Tooltip>
+          )}  
         </div>
         <div className="p-2">
           <input
@@ -141,9 +159,9 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
         </div>
         <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
           <Collapse
-            defaultActiveKey={['1']}
+            activeKey={activeKeyPanel}
             expandIconPosition="right"
-            // onChange={onChangeOpenPanels}
+            onChange={onChangeOpenPanels}
             className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
           >
             {displayObj && Object.keys(displayObj).map((pluginName: string) => (
@@ -153,22 +171,33 @@ export const DriversPallet = ({ nodes, flowSettings}: NodeProps) => {
                     <div
                     key={`${item.name}`}
                     className={`py-2 cursor-po inter text-white flex flex-row justify-between
-                      border-gray-600 text-left ant-menu-item ${index === 0 ? "" : "border-t"}`}
+                      border-gray-600 text-left ${index === 0 ? "" : "border-t"}`}
                     draggable={true}
-                    onDragStart={(event) => onDragStart(event, item.name, item.isRead)}
-                    style={{ paddingLeft: 24 }}
-                  >
-                    <div>
-                      {item.device_name && item.point_name && (
-                        <span className="pr-3" style={{ fontSize: 12 }}>
-                          {`${item.device_name}-${item.point_name}`}
-                        </span>
-                      )}
+                    onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
+                    style={{ padding: 14, minHeight: '60px', alignItems: 'center' }}
+                    >
+                      <div style={{display: 'flex', flexDirection: 'column'}}>
+                        {item.device_name && (
+                          <span style={{fontSize: 10}}>
+                            {`${item.device_name}`}
+                          </span>
+                        )}
+                        {item.point_name && (
+                          <span style={{ fontSize: 14}}>
+                            {`${item.point_name}`}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <Switch 
+                          size={'small'} 
+                          checkedChildren="Write" 
+                          unCheckedChildren="Read"
+                          checked={item.isWrite} 
+                          onChange={(checked) => onSwitchChange(checked, item.uuid)} 
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Switch checked={item.isRead} onChange={(checked) => onSwitchChange(checked, item.uuid)} />
-                    </div>
-                  </div>
                   ))}
                 </div>
               </Panel>
