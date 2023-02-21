@@ -33,6 +33,7 @@ import { handleGetSettingType } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
 import { NodesTree } from "./components/NodesTree";
+import { DriversPallet } from "./components/DriversPallet";
 import { NodeSideBar } from "./components/NodeSidebar";
 import "./rubix-flow.css";
 import { categoryColorMap } from "./util/colors";
@@ -1147,6 +1148,16 @@ const Flow = (props: FlowProps) => {
           flowSettings={flowSettings}
         />
       )}
+      {/* {!isFetching && flowSettings.showDrivers && (
+        <DriversPallet
+          nodes={window.allFlow?.nodes || []}
+          selectedSubFlowId={selectedNodeForSubFlow?.id}
+          openNodeMenu={openNodeMenu}
+          nodesSpec={nodesSpec}
+          gotoNode={gotoNode}
+          flowSettings={flowSettings}
+        />
+      )} */}
       {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
