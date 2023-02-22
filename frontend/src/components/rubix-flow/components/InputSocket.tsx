@@ -27,14 +27,12 @@ export const REGEX_NUMBER = new RegExp("^$|^-?(\\d+)?(\\.?\\d*)?$");
 
 const getValueOptions = (value: number) => {
   switch (value) {
-    case 0:
-      return false;
     case 1:
       return true;
     case -1:
-      return null;
+      return false;
     default:
-      return true;
+      return false;
   }
 };
 
@@ -125,6 +123,8 @@ export const InputSocket = ({
       return getNumberOptions(input.value);
     } else if (valueType === "number") {
       return input.value === null || input.value === undefined ? "null" : `${input.value}`;
+    }else if (valueType === "number") {
+      return input.value === null || input.value === undefined || input.value === "" ? "null" : `${input.value}`;
     }
 
     return input.value;
@@ -172,7 +172,7 @@ export const InputSocket = ({
                 type="text"
                 autoFocus={autoFocus}
                 className={cx(classnames ? classnames : "bg-gray-600 disabled:bg-gray-700 py-1 px-2 nodrag")}
-                value={getDataByConnected(value || "")}
+                value={getDataByConnected(value === undefined ? (value = null) : value)}
                 onChangeInput={handleChangeInput}
               />
             )}
