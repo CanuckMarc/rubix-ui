@@ -1,9 +1,5 @@
 import { useState } from "react";
-import { ClearModal } from "./ClearModal";
-import { HelpModal } from "./HelpModal";
-import { LoadModal } from "./LoadModal";
-import { SaveModal } from "./SaveModal";
-import { useReactFlow } from "react-flow-renderer/nocss";
+import { useReactFlow, Edge } from "reactflow";
 import {
   QuestionCircleOutlined,
   DownloadOutlined,
@@ -17,11 +13,15 @@ import {
   CloseCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
+import { Spin } from "antd";
+
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import { Edge } from "react-flow-renderer";
-import { Spin } from "antd";
+import { ClearModal } from "./ClearModal";
+import { HelpModal } from "./HelpModal";
+import { LoadModal } from "./LoadModal";
+import { SaveModal } from "./SaveModal";
 
 type ControlProps = {
   isChangedFlow: boolean;

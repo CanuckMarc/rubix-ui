@@ -1,4 +1,4 @@
-import { Node, OnConnectStartParams } from "react-flow-renderer/nocss";
+import { Node, OnConnectStartParams } from "reactflow";
 import { NodePickerFilters } from "../components/NodePicker";
 import { getSocketsByNodeTypeAndHandleType } from "./getSocketsByNodeTypeAndHandleType";
 import { getSpecJson } from "../use-nodes-spec";

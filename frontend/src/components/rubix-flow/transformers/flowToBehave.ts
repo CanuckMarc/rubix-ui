@@ -1,4 +1,4 @@
-import { Edge, Node } from "react-flow-renderer/nocss";
+import { Edge, Node } from "reactflow";
 import { isObjectEmpty } from "../../../utils/utils";
 import { GraphJSON, NodeJSON } from "../lib";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";

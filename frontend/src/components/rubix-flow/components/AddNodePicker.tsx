@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ReactFlowInstance, XYPosition } from "react-flow-renderer/nocss";
+import { ReactFlowInstance, XYPosition } from "reactflow";
 
 import { generateUuid } from "../lib/generateUuid";
 import { FlowFactory } from "../factory";

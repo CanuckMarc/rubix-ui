@@ -1,4 +1,4 @@
-import { Edge } from "react-flow-renderer/nocss";
+import { Edge } from "reactflow";
 import { SPLIT_KEY } from '../hooks/useChangeNodeData';
 
 export const isHandleConnected = (
