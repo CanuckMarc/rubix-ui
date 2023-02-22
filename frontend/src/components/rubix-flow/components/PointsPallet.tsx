@@ -191,8 +191,8 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
                       <div>
                         <Switch 
                           size={'small'} 
-                          checkedChildren="Write" 
-                          unCheckedChildren="Read"
+                          checkedChildren={<span style={{fontSize: '10px'}}>Write</span>} 
+                          unCheckedChildren={<span style={{fontSize: '10px'}}>Read</span>} 
                           checked={item.isWrite} 
                           onChange={(checked) => onSwitchChange(checked, item.uuid)} 
                         />
