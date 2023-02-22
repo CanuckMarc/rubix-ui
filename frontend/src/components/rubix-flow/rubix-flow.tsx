@@ -8,7 +8,6 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
   XYPosition,
-  Edge,
   EdgeProps,
   ReactFlowInstance,
   MiniMap,
@@ -31,7 +30,7 @@ import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
 import ControlUndoable from "./components/ControlUndoable";
-import { NodeInterface } from "./lib/Nodes/NodeInterface";
+import { NodeInterface, EdgeInterface as Edge } from "./lib/Nodes/NodeInterface";
 import { handleGetSettingType } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
@@ -457,13 +456,76 @@ const Flow = (props: FlowProps) => {
     [edges, setEdges]
   );
 
+  const createNewConnection = (
+    start: { sourceNodeId: string; sourceHandleId: string },
+    end: { targetNodeId: string; targetHandleId: string },
+    isTarget: boolean
+  ) => {
+    console.log("---createNewConnection", { start, end });
+
+    const { sourceNodeId, sourceHandleId } = start;
+    const { targetNodeId, targetHandleId } = end;
+    const edgesAdded: Edge[] = [
+      {
+        id: generateUuid(),
+        source: sourceNodeId,
+        sourceHandle: sourceHandleId,
+        target: targetNodeId,
+        targetHandle: targetHandleId,
+      },
+    ];
+
+    const nodeTarget: NodeInterface = nodes.find((n) => n.id === targetNodeId)!!;
+    const nodeSource: NodeInterface = nodes.find((n) => n.id === sourceNodeId)!!;
+    console.log("GENERATED EDGE", { nodeTarget, nodeSource });
+
+    // create edge connect to child nodes if have
+    if (nodeTarget?.isParent && nodeSource?.isParent) {
+      const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
+      const output = nodeSource.data.out.find((item: any) => item.pin === sourceHandleId);
+      edgesAdded.push({
+        id: generateUuid(),
+        source: isTarget ? output.nodeId : input.nodeId,
+        sourceHandle: isTarget ? "output" : "input",
+        target: isTarget ? input.nodeId : output.nodeId,
+        targetHandle: isTarget ? "input" : "output",
+      });
+    } else if (nodeTarget?.isParent) {
+      if (isTarget) {
+        const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
+        edgesAdded.push({
+          id: generateUuid(),
+          source: sourceNodeId,
+          sourceHandle: sourceHandleId,
+          target: input.nodeId,
+          targetHandle: "input",
+        });
+      }
+    } else if (nodeSource?.isParent) {
+      console.log("NODE_SOURCE is parent");
+
+      const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === sourceHandleId);
+      if (outputIndex >= 0) {
+        const outItem = nodeSource.data.out[outputIndex];
+        edgesAdded.push({
+          id: generateUuid(),
+          source: outItem.nodeId,
+          sourceHandle: "output",
+          target: targetNodeId,
+          targetHandle: targetHandleId,
+        });
+      }
+    }
+
+    return edgesAdded;
+  };
+
   const onConnectEnd = (evt: ReactMouseEvent | any) => {
     if (lastConnectStart) {
       const { nodeid, handleid, handlepos: position } = (evt.target as HTMLDivElement).dataset;
       const { handleType } = lastConnectStart;
       const isTarget = position === "left";
 
-      // this is correct
       const { targetNodeId, targetHandleId } = {
         targetNodeId: isTarget ? nodeid : lastConnectStart.nodeId,
         targetHandleId: isTarget ? handleid : lastConnectStart.handleId,
@@ -473,133 +535,73 @@ const Flow = (props: FlowProps) => {
         sourceHandleId: !isTarget ? handleid : lastConnectStart.handleId!!,
       };
 
-      if (
-        targetNodeId &&
-        targetHandleId &&
-        !isValidConnection(
-          window.allFlow.nodes,
-          { nodeId: sourceNodeId!!, handleId: sourceHandleId!!, handleType },
-          { nodeId: targetNodeId, handleId: targetHandleId },
-          isTarget
-        )
-      ) {
-        return;
-      }
+      let isRemoveEdge = false;
+      const edgeIdsWillBeRemoved: string[] = [];
+      const edgesAdded: Edge[] = [];
 
-      const edgesDeletedWithSameTarget = window.allFlow.edges.filter(
-        (e) => e.target === targetNodeId && e.targetHandle === targetHandleId
-      );
-      const edgeIdsDeleted: string[] = edgesDeletedWithSameTarget.map((e) => e.id);
-      edgeIdsDeleted.push(...getEdgeIdsDeleted(edgesDeletedWithSameTarget, nodes));
-
-      const isDragSelected = edges.some((item) => {
-        if (item.selected) {
-          const isChangeTarget = handleType === "target" && item.targetHandle === sourceHandleId;
-          const isChangeSource = sourceHandleId && item.source === sourceNodeId;
-
-          return isChangeTarget || isChangeSource;
-        }
-
-        return false;
+      const edgeNeedToUpdated: Edge | undefined = edges.find((item) => {
+        return (
+          item.selected &&
+          (item.source === targetNodeId ||
+            item.target === sourceNodeId ||
+            (!sourceNodeId && item.target === targetNodeId))
+        );
       });
 
-      if (isDragSelected) {
-        let newEdges: Edge[] = [];
+      console.log("END CONNECTION", {
+        targetNodeId,
+        targetHandleId,
+        sourceNodeId,
+        sourceHandleId,
+        handleType,
+        isTarget,
+        edgeNeedToUpdated,
+      });
 
-        if (targetNodeId) {
-          // update selected lines to new node if start and end are same type
-          newEdges = edges.map((item: Edge) => {
-            if (item.selected && sourceNodeId === item[handleType!!]) {
-              const updateKey = isTarget ? "target" : "source";
-              item[`${updateKey}Handle`] = targetHandleId;
-              item[updateKey as keyof Edge] = targetNodeId;
-            }
-            return item;
-          });
-          // remove edges have same target
-          newEdges = newEdges.filter(
-            (edge, index) => index === newEdges.findIndex((edge2) => edge2.target === edge.target)
-          );
-        } else {
-          // remove selected lines
-          newEdges = edges.filter((item) => !item.selected);
-        }
-
-        setEdges(newEdges);
-        window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
-        setUndoState((s) => ({
-          past: [...s.past, { edges, nodes }],
-          future: s.future,
-        }));
-        handleFlowChange();
-      } else {
-        const element = evt.target as HTMLElement;
-        if (element.classList.contains("react-flow__pane")) {
-          const { x, y } = setMousePosition(evt);
-          setNodePickerVisibility({ x, y });
-        }
-        if (targetNodeId && sourceNodeId) {
-          const newEdge = {
-            id: generateUuid(),
-            source: sourceNodeId,
-            sourceHandle: sourceHandleId,
-            target: targetNodeId,
-            targetHandle: targetHandleId,
-          };
-
-          const edgesAdded = [newEdge];
-          const nodeTarget: NodeInterface = nodes.find((n) => n.id === targetNodeId)!!;
-          const nodeSource: NodeInterface = nodes.find((n) => n.id === sourceNodeId)!!;
-
-          // create edge connect to child nodes if have
-          if (nodeTarget.isParent && nodeSource.isParent) {
-            const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
-            const output = nodeSource.data.out.find((item: any) => item.pin === sourceHandleId);
-            edgesAdded.push({
-              id: generateUuid(),
-              source: isTarget ? output.nodeId : input.nodeId,
-              sourceHandle: isTarget ? "output" : "input",
-              target: isTarget ? input.nodeId : output.nodeId,
-              targetHandle: isTarget ? "input" : "output",
-            });
-          } else if (nodeTarget.isParent) {
-            if (isTarget) {
-              const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
-              edgesAdded.push({
-                id: generateUuid(),
-                source: sourceNodeId,
-                sourceHandle: sourceHandleId,
-                target: input.nodeId,
-                targetHandle: "input",
-              });
-            }
-          } else if (nodeSource.isParent) {
-            const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === sourceHandleId);
-            if (outputIndex >= 0) {
-              const outItem = nodeSource.data.out[outputIndex];
-              edgesAdded.push({
-                id: generateUuid(),
-                source: outItem.nodeId,
-                sourceHandle: "output",
-                target: targetNodeId,
-                targetHandle: targetHandleId,
-              });
-            }
-          }
-
-          const newEdges = edges.filter((edge) => !edgeIdsDeleted.includes(edge.id));
-          const allEdges = window.allFlow.edges.filter((e) => !edgeIdsDeleted.includes(e.id));
-          allEdges.push(...edgesAdded);
-
-          setEdges([...newEdges, newEdge]);
-          setUndoState((s) => ({
-            past: [...s.past, { edges, nodes }],
-            future: s.future,
-          }));
-          handleFlowChange();
-          window.allFlow.edges = allEdges;
+      // update target or source
+      if (edgeNeedToUpdated) {
+        isRemoveEdge = !sourceNodeId;
+        edgeIdsWillBeRemoved.push(edgeNeedToUpdated.id);
+        if (edgeNeedToUpdated.originEdgeId) {
+          edgeIdsWillBeRemoved.push(edgeNeedToUpdated.originEdgeId);
         }
       }
+
+      if (!isRemoveEdge) {
+        const isValidConnect = isValidConnection(
+          window.allFlow.nodes,
+          { nodeId: sourceNodeId!!, handleId: sourceHandleId!!, handleType },
+          { nodeId: targetNodeId!!, handleId: targetHandleId!! },
+          isTarget
+        );
+
+        if (isValidConnect) {
+          edgesAdded.push(
+            ...createNewConnection(
+              {
+                sourceNodeId: edgeNeedToUpdated ? edgeNeedToUpdated.source : sourceNodeId!!,
+                sourceHandleId: edgeNeedToUpdated ? edgeNeedToUpdated.sourceHandle!! : sourceHandleId!!,
+              },
+              { targetNodeId: targetNodeId!!, targetHandleId: targetHandleId!! },
+              isTarget
+            )
+          );
+        }
+      }
+
+      console.log("RESULT => edges", { edgeIdsWillBeRemoved, edgesAdded });
+
+      const newEdges = edges.filter((edge) => !edgeIdsWillBeRemoved.includes(edge.id));
+      const allEdges = window.allFlow.edges.filter((e) => !edgeIdsWillBeRemoved.includes(e.id));
+      allEdges.push(...edgesAdded);
+      window.allFlow.edges = allEdges;
+
+      setEdges([...newEdges, ...edgesAdded]);
+      setUndoState((s) => ({
+        past: [...s.past, { edges, nodes }],
+        future: s.future,
+      }));
+      handleFlowChange();
     }
 
     setLastConnectStart(undefined);

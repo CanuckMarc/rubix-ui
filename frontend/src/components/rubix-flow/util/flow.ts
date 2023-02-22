@@ -93,6 +93,7 @@ export const formatEdgesWithParentNode = (nodes: NodeInterface[], edges: Edge[])
 
         const edgeClone = {
           id: generateUuid(),
+          originEdgeId: edge.id,
           source: nodeBySource.parentId,
           sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output',
           target: nodeByTarget.parentId,
@@ -108,6 +109,7 @@ export const formatEdgesWithParentNode = (nodes: NodeInterface[], edges: Edge[])
           const edgeClone = {
             ...edge,
             id: generateUuid(),
+            originEdgeId: edge.id,
             target: nodeByTarget.parentId,
             targetHandle: inputNodes.length > 1 ? `input${inputIndex + 1}` : 'input'
           };
@@ -121,6 +123,7 @@ export const formatEdgesWithParentNode = (nodes: NodeInterface[], edges: Edge[])
           const edgeClone = {
             ...edge,
             id: generateUuid(),
+            originEdgeId: edge.id,
             source: nodeBySource.parentId,
             sourceHandle: outNodes.length > 1 ? `output${outIndex + 1}` : 'output'
           };
