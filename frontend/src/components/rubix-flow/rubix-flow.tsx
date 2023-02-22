@@ -1006,7 +1006,7 @@ const Flow = (props: FlowProps) => {
       future: s.future,
     }));
     window.allFlow = {
-      nodes: [...window.allFlow.nodes, ...newNodes],
+      nodes: [...window.allFlow.nodes, ...newFlow.nodes],
       edges: [...window.allFlow.edges, ...newEdges],
     };
     handleFlowChange();
