@@ -1,4 +1,4 @@
-import { Layout, Tooltip, Collapse, Switch } from "antd";
+import { Layout, Tooltip, Collapse, Switch, Spin } from "antd";
 import { CaretRightOutlined, CaretDownOutlined } from "@ant-design/icons";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -27,17 +27,14 @@ interface PluginTableDataType {
 }
 
 interface NodePalletPropType {
+  selectedSubflow: NodeInterface<any> | undefined;
   hidePointsPallet: boolean;
   setHidePointsPallet: Function;
 }
 
-export const PointsPallet = ({ hidePointsPallet, setHidePointsPallet }: NodePalletPropType) => {
-  const [panelKeys, setPanelKeys] = useState<string[]>([]);
-  const [search, setSearch] = useState("");
-  const [isExpandedAll, setIsExpandedAll] = useState(false);
-  
-  
+export const PointsPallet = ({ selectedSubflow, hidePointsPallet, setHidePointsPallet }: NodePalletPropType) => {
   let { connUUID = "", hostUUID = "" } = useParams();
+  const [search, setSearch] = useState("");
   const [allPoints, setAllPoints] = useState<PluginTableDataType[] | undefined>(undefined);
   const [allPointsBeforeSearch, setAllPointsBeforeSearch] = useState<PluginTableDataType[] | undefined>(undefined);
   const [displayObj, setDisplayObj] = useState<any>({});
@@ -53,6 +50,12 @@ export const PointsPallet = ({ hidePointsPallet, setHidePointsPallet }: NodePall
   useEffect(() => {
     fetchFlowPoints();
   }, [])
+
+  useEffect(() => {
+    if (!selectedSubflow || selectedSubflow.type !== "flow/flow-network") {
+      if (!hidePointsPallet) setHidePointsPallet(true)
+    }
+  }, [selectedSubflow])
 
   const fetchFlowPoints = async() => {
     try {
@@ -165,51 +168,57 @@ export const PointsPallet = ({ hidePointsPallet, setHidePointsPallet }: NodePall
           />
         </div>
         <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
-          <Collapse
-            activeKey={activeKeyPanel}
-            expandIconPosition="right"
-            onChange={onChangeOpenPanels}
-            className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
-          >
-            {displayObj && Object.keys(displayObj).map((pluginName: string) => (
-              <Panel header={pluginName} key={pluginName} className="panel-no-padding border-gray-600">
-                <div className="bg-gray-800">
-                  {displayObj[`${pluginName}`].map((item: PluginTableDataType, index: number) => (
-                    <div
-                    key={`${item.name}`}
-                    className={`py-2 cursor-po inter text-white flex flex-row justify-between
-                      border-gray-600 text-left ${index === 0 ? "" : "border-t"}`}
-                    draggable={true}
-                    onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
-                    style={{ padding: 14, minHeight: '60px', alignItems: 'center', cursor: 'pointer' }}
-                    >
-                      <div style={{display: 'flex', flexDirection: 'column'}}>
-                        {item.device_name && (
-                          <span style={{fontSize: 10}}>
-                            {`${item.device_name}`}
-                          </span>
-                        )}
-                        {item.point_name && (
-                          <span style={{ fontSize: 14}}>
-                            {`${item.point_name}`}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <Switch 
-                          size={'small'} 
-                          checkedChildren={<span style={{fontSize: '10px'}}>Write</span>} 
-                          unCheckedChildren={<span style={{fontSize: '10px'}}>Read</span>} 
-                          checked={item.isWrite} 
-                          onChange={(checked) => onSwitchChange(checked, item.uuid)} 
-                        />
-                      </div>
+          <Spin spinning={isFetchingPoints}>
+            {isFetchingPoints ? (
+              <div style={{height: '80vh'}}></div>
+            ) : (
+              <Collapse
+                activeKey={activeKeyPanel}
+                expandIconPosition="right"
+                onChange={onChangeOpenPanels}
+                className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
+              >
+                {displayObj && Object.keys(displayObj).map((pluginName: string) => (
+                  <Panel header={pluginName} key={pluginName} className="panel-no-padding border-gray-600">
+                    <div className="bg-gray-800">
+                      {displayObj[`${pluginName}`].map((item: PluginTableDataType, index: number) => (
+                        <div
+                        key={`${item.name}`}
+                        className={`py-2 cursor-po inter text-white flex flex-row justify-between
+                          border-gray-600 text-left ${index === 0 ? "" : "border-t"}`}
+                        draggable={true}
+                        onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
+                        style={{ padding: 14, minHeight: '60px', alignItems: 'center', cursor: 'pointer' }}
+                        >
+                          <div style={{display: 'flex', flexDirection: 'column'}}>
+                            {item.device_name && (
+                              <span style={{fontSize: 10}}>
+                                {`${item.device_name}`}
+                              </span>
+                            )}
+                            {item.point_name && (
+                              <span style={{ fontSize: 14}}>
+                                {`${item.point_name}`}
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <Switch 
+                              size={'small'} 
+                              checkedChildren={<span style={{fontSize: '10px'}}>Write</span>} 
+                              unCheckedChildren={<span style={{fontSize: '10px'}}>Read</span>} 
+                              checked={item.isWrite} 
+                              onChange={(checked) => onSwitchChange(checked, item.uuid)} 
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </Panel>
-            ))}
-          </Collapse>
+                  </Panel>
+                ))}
+              </Collapse>
+            )}
+          </Spin>
         </div>
       </Sider>
     </div>

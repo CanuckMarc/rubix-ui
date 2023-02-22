@@ -1171,6 +1171,12 @@ const Flow = (props: FlowProps) => {
   }, [hidePointsPallet])
 
   useEffect(() => {
+    if (flowSettings.showPointPallet) {
+      setHidePointsPallet(false)
+    }
+  }, [flowSettings])
+
+  useEffect(() => {
     if (hideNodeSidebar) {
       setFlowSettings({...flowSettings, showNodesPallet: false})
       setHideNodeSidebar(false)
@@ -1183,7 +1189,7 @@ const Flow = (props: FlowProps) => {
       setHideNodeTree(false)
     }
   }, [hideNodeTree])
-
+  
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1200,6 +1206,7 @@ const Flow = (props: FlowProps) => {
       )}
       {!isFetching && (flowSettings.showPointPallet && !hidePointsPallet) && (
         <PointsPallet
+          selectedSubflow={selectedNodeForSubFlow}
           hidePointsPallet={hidePointsPallet}
           setHidePointsPallet={setHidePointsPallet}
         />
