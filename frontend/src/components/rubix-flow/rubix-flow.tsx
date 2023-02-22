@@ -130,6 +130,9 @@ const Flow = (props: FlowProps) => {
     future: [],
   });
   const [isChangedFlow, setIsChangedFlow] = useState(false);
+  const [hidePointsPallet, setHidePointsPallet] = useState(false);
+  const [hideNodeSidebar, setHideNodeSidebar] = useState(false);
+  const [hideNodeTree, setHideNodeTree] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -1160,6 +1163,33 @@ const Flow = (props: FlowProps) => {
     }
   };
 
+  useEffect(() => {
+    if (hidePointsPallet) {
+      setFlowSettings({...flowSettings, showPointPallet: false})
+      setHidePointsPallet(false)
+    }
+  }, [hidePointsPallet])
+
+  useEffect(() => {
+    if (flowSettings.showPointPallet) {
+      setHidePointsPallet(false)
+    }
+  }, [flowSettings])
+
+  useEffect(() => {
+    if (hideNodeSidebar) {
+      setFlowSettings({...flowSettings, showNodesPallet: false})
+      setHideNodeSidebar(false)
+    }
+  }, [hideNodeSidebar])
+
+  useEffect(() => {
+    if (hideNodeTree) {
+      setFlowSettings({...flowSettings, showNodesTree: false})
+      setHideNodeTree(false)
+    }
+  }, [hideNodeTree])
+  
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1170,19 +1200,24 @@ const Flow = (props: FlowProps) => {
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
           flowSettings={flowSettings}
+          hideNodeTree={hideNodeTree}
+          setHideNodeTree={setHideNodeTree}
         />
       )}
-      {!isFetching && flowSettings.showPointPallet && (
+      {!isFetching && (flowSettings.showPointPallet && !hidePointsPallet) && (
         <PointsPallet
-          nodes={window.allFlow?.nodes || []}
-          selectedSubFlowId={selectedNodeForSubFlow?.id}
-          openNodeMenu={openNodeMenu}
-          nodesSpec={nodesSpec}
-          gotoNode={gotoNode}
-          flowSettings={flowSettings}
+          selectedSubflow={selectedNodeForSubFlow}
+          hidePointsPallet={hidePointsPallet}
+          setHidePointsPallet={setHidePointsPallet}
         />
       )}
-      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
+      {!isFetching && flowSettings.showNodesPallet && (
+        <NodeSideBar 
+          nodesSpec={nodesSpec} 
+          hideNodeSidebar={hideNodeSidebar} 
+          setHideNodeSidebar={setHideNodeSidebar} 
+        />
+      )}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
