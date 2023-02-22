@@ -62,40 +62,6 @@
     background-color: rgba(255, 255, 255, 1);
 }
 
-
-.ant-layout-sider-children>ul {
-    margin-left: -10px;
-}
-
-.ant-layout-sider-children>ul {
-    max-height: calc(100vh - 210px);
-    overflow-y: auto;
-}
-
-.menu-toggle>.ant-switch-inner {
-    font-size: larger;
-}
-
-.logo {
-    padding-left: 24px;
-    margin-top: 24px;
-}
-
-.logo>.ant-image {
-    margin-right: 15px;
-}
-
-.logo>.title {
-    margin: auto 0;
-    color: #fff;
-    align-self: center;
-    font-size: 1.7rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 70%;
-}
-
 .react-flow .react-flow__edges {
     overflow: visible;
     pointer-events: none;
