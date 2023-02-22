@@ -65,7 +65,7 @@ export const IpWizard = (props: any) => {
   }
 
   const handleStepTwoNext = () => {
-    if (select === 'static') {
+    if (select === 'static-fixed') {
       form.submit();
     } else {
       handleSubmit(undefined)
@@ -160,8 +160,8 @@ export const IpWizard = (props: any) => {
             style={{ width: 240 }}
             onChange={handleSelectChange}
             options={[
-                { value: 'static', label: 'static' },
-                { value: 'DHCP', label: 'DHCP' }
+                { value: 'static-fixed', label: 'static' },
+                { value: 'dhcp-dynamic', label: 'DHCP' }
             ]}
           />
 
@@ -171,7 +171,7 @@ export const IpWizard = (props: any) => {
     ) },
     { id: "2", name: "Step 2", text: 'IP settings', content: (
       <div style={{display: 'flex', flexDirection: 'column', rowGap: '20px', alignItems:'center'}}>
-        {select === 'static' && (
+        {select === 'static-fixed' && (
           <Form {...formItemLayout} form={form} onFinish={handleSubmit}>
             <Form.Item
               label="IP address:"
