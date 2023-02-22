@@ -71,3 +71,34 @@ aside .active {
     z-index: 1000 !important;
     background-color: rgba(32, 32, 32, 255) !important;
 }
+
+.rubix-menu {
+    max-height: calc(100vh - 240px);
+    overflow-y: auto;
+    margin-left: -10px;
+}
+
+.menu-toggle>.ant-switch-inner {
+    font-size: larger;
+}
+
+
+.logo {
+    padding-left: 24px;
+    margin-top: 24px;
+}
+
+.logo>.ant-image {
+    margin-right: 15px;
+}
+
+.logo>.title {
+    margin: auto 0;
+    color: #fff;
+    align-self: center;
+    font-size: 1.7rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 70%;
+}
