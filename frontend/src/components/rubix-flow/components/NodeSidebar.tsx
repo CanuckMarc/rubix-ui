@@ -1,4 +1,4 @@
-import { Collapse, Layout, Modal, Tooltip } from "antd";
+import { Collapse, Layout, Switch, Tooltip } from "antd";
 import { CaretRightOutlined, CaretDownOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useState, ChangeEvent, useEffect, memo } from "react";
 import { NodeSpecJSON } from "../lib";
@@ -9,9 +9,11 @@ const { Sider } = Layout;
 
 type NodeSiderBarProps = {
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
+  hideNodeSidebar: boolean;
+  setHideNodeSidebar: Function;
 };
 
-export const NodeSideBar = memo(({ nodesSpec }: NodeSiderBarProps) => {
+export const NodeSideBar = memo(({ nodesSpec, hideNodeSidebar, setHideNodeSidebar }: NodeSiderBarProps) => {
   const [search, setSearch] = useState("");
   const [nodes, setNodes] = useState<{ [key: string]: NodeSpecJSON[] }>({});
   const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
@@ -56,18 +58,31 @@ export const NodeSideBar = memo(({ nodesSpec }: NodeSiderBarProps) => {
     setNodes(types);
   }, [search, nodesSpec]);
 
+  const onPanelSwitchChange = () => {
+    if (!hideNodeSidebar) setHideNodeSidebar(true)
+  }
+
   return (
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
-        <div className="p-2">
-          Add Node
+        <div className="p-2" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+          <span style={{fontSize: '14px'}}>Add Node</span>
+          <div>
+            <span style={{fontSize: '12px', marginLeft: '15px'}}>hide:</span>
+            <Switch 
+              size={'small'}
+              checked={hideNodeSidebar}
+              style={{marginLeft: '2px'}}
+              onChange={onPanelSwitchChange} 
+            />
+          </div>
           {activeKeyPanel.length !== Object.keys(nodes).length ? (
             <Tooltip title="expand all">
-              <CaretRightOutlined className="title-icon" onClick={() => onChangeOpenPanels(Object.keys(nodes))} />
+              <CaretRightOutlined onClick={() => onChangeOpenPanels(Object.keys(nodes))} />
             </Tooltip>
           ) : (
             <Tooltip title="collapse all">
-              <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
+              <CaretDownOutlined onClick={() => onChangeOpenPanels([])} />
             </Tooltip>
           )}
         </div>

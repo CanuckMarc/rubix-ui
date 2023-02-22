@@ -26,16 +26,12 @@ interface PluginTableDataType {
   isWrite: boolean;
 }
 
-type NodeProps = {
-  nodes: NodeInterface[];
-  gotoNode: (node: NodeInterface) => void;
-  nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>;
-  selectedSubFlowId?: string;
-  openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
-  flowSettings: FlowSettings;
-};
+interface NodePalletPropType {
+  hidePointsPallet: boolean;
+  setHidePointsPallet: Function;
+}
 
-export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
+export const PointsPallet = ({ hidePointsPallet, setHidePointsPallet }: NodePalletPropType) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -89,7 +85,6 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
         }
       })
       setDisplayObj(localDisplayObj)
-      // console.log('localDisplayObj is: ', localDisplayObj)
     }
   }, [allPoints])
 
@@ -97,8 +92,8 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
     if (search === "") {
       setAllPoints(allPointsBeforeSearch)
     } else {
-      const key = search.toLowerCase().trim();
-      const searchRes = allPoints?.filter((item: PluginTableDataType) => {
+      const key = search.toLowerCase();
+      const searchRes = allPointsBeforeSearch?.filter((item: PluginTableDataType) => {
         return item.name.includes(key) ? true : false;
       })
       setAllPoints(searchRes);
@@ -111,7 +106,6 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
     event.dataTransfer.setData("from-point-pallet", JSON.stringify(data));
     event.dataTransfer.effectAllowed = "move";
   };
-
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -132,20 +126,33 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
     setAllPoints(mappedAllPoints)
   }
 
+  const onPanelSwitchChange = () => {
+    if (!hidePointsPallet) setHidePointsPallet(true)
+  }
+
   return (
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
-        <div className="p-2">
-          Points 
+        <div className="p-2" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+          <span style={{fontSize: '14px'}}>Points</span>
+          <div>
+            <span style={{fontSize: '12px', marginLeft: '20px'}}>hide:</span>
+            <Switch 
+              size={'small'}
+              checked={hidePointsPallet}
+              style={{marginLeft: '2px'}}
+              onChange={onPanelSwitchChange} 
+            />
+          </div>
           {activeKeyPanel.length !== Object.keys(displayObj).length ? (
             <Tooltip title={"expand all"}>
-                <CaretRightOutlined className="title-icon" onClick={() => onChangeOpenPanels(Object.keys(displayObj))} />
+                <CaretRightOutlined onClick={() => onChangeOpenPanels(Object.keys(displayObj))} />
             </Tooltip>
           ) : (
             <Tooltip title={"collapse all"}>
-                <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
+                <CaretDownOutlined onClick={() => onChangeOpenPanels([])} />
             </Tooltip>
-          )}  
+          )}
         </div>
         <div className="p-2">
           <input
