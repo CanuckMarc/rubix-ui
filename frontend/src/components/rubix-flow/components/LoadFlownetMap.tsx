@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useStore, useIsLoading } from '../../../App';
 
@@ -20,6 +20,11 @@ type NodeGenInputType = {
   y: number;
 }
 
+interface ReturnType {
+  localNodes: NodeInterface[];
+  localEdges: Edge[]
+}
+
 function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
@@ -29,8 +34,6 @@ const y = getRandomArbitrary(-200, 200)
 
 export const LoadWiresMap = () => {
   let { connUUID = "", hostUUID = "" } = useParams();
-  const [newNodes, setNewNodes] = useState<NodeInterface[]>([]);
-  const [newEdges, setNewEdges] = useState<Edge[]>([]);
   const [wiresMapNodes, setWiresMapNodes] = useStore(
     (state) => [state.wiresMapNodes, state.setWiresMapNodes]
   )
@@ -42,62 +45,14 @@ export const LoadWiresMap = () => {
   const flowInstance = useReactFlow();
 
   useEffect(() => {
-    let localNodes: NodeInterface[] = [];
-    let localEdges: Edge[] = [];
-    if (wiresMapNodes.length !== 0) {
-      const parentNode = generateNodes({
-        type: 'flow/flow-network',
-        name: '',
-        isParent: true,
-        parentId: undefined,
-        x: x,
-        y: y
-      })
-
-      const check = wiresMapNodes.some(item => {
-        return item.existingFlowNet === undefined
-      })
-
-      // check for the largest x value among existing nodes
-      // new nodes will be placed to the right of the existing nodes
-      let xTemp: number = 0
-      let yTemp: number = 0
-      if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
-        let largeX = 0
-        window.allFlow.nodes.forEach((item: NodeInterface) => {
-          if (item.position.x > largeX) {
-            largeX = item.position.x
-          }
-        })
-        xTemp = largeX + 200
-      } else {
-        xTemp = x
-        yTemp = y
-      }
-      wiresMapNodes.forEach(item => {
-        xTemp = xTemp + 200
-        yTemp = yTemp + 200
-        const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode, xTemp, yTemp);
-        localNodes = [...localNodes, ...resObj.nodes]
-        localEdges = [...localEdges, ...resObj.edges]
-      })
-      if (check) {
-        setNewNodes([...localNodes, parentNode]);
-      } else {
-        setNewNodes(localNodes);
-      }
-      setNewEdges(localEdges);
-    }
-  }, [])
-
-  useEffect(() => {
     // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
     // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
     if (refreshCounter === 2) {     
-      openNotificationWithIcon("success", 'Rubix flow loading complete!');
       if (wiresMapNodes.length !== 0) {
-        renderPointsToFlowEditor(newNodes, newEdges);
+        const res = startUp();
+        if (res) renderPointsToFlowEditor(res.localNodes, res.localEdges);
         setWiresMapNodes([]);
+        openNotificationWithIcon("success", 'Flownet loading complete!');
       }
     }
   }, [refreshCounter])
@@ -187,6 +142,60 @@ export const LoadWiresMap = () => {
       settings: { ...nodeSettings, point: item.name },
       selected: false,
     };
+  }
+
+  const startUp = () => {
+    let localNodes: NodeInterface[] = [];
+    let localEdges: Edge[] = [];
+    let res: ReturnType = {} as ReturnType;
+    if (wiresMapNodes.length !== 0) {
+      const parentNode = generateNodes({
+        type: 'flow/flow-network',
+        name: '',
+        isParent: true,
+        parentId: undefined,
+        x: x,
+        y: y
+      })
+
+      const check = wiresMapNodes.some(item => {
+        return item.existingFlowNet === undefined
+      })
+
+      // check for the largest x value among existing nodes
+      // new nodes will be placed to the right of the existing nodes
+      let xTemp: number = 0
+      let yTemp: number = 0
+      if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
+        let largeX = 0
+        window.allFlow.nodes.forEach((item: NodeInterface) => {
+          if (item.position.x > largeX) {
+            largeX = item.position.x
+          }
+        })
+        xTemp = largeX + 200
+      } else {
+        xTemp = x
+        yTemp = y
+      }
+      wiresMapNodes.forEach(item => {
+        xTemp = xTemp + 200
+        yTemp = yTemp + 200
+        const resObj = addNewNodesEdges(item, item.existingFlowNet, parentNode, xTemp, yTemp);
+        localNodes = [...localNodes, ...resObj.nodes]
+        localEdges = [...localEdges, ...resObj.edges]
+      })
+
+      if (check) {
+        res.localNodes = [...localNodes, parentNode];
+        res.localEdges = localEdges;
+      } else {
+        res.localNodes = localNodes;
+        res.localEdges = localEdges;
+      }
+
+      return res;
+    }
   }
 
   return null;

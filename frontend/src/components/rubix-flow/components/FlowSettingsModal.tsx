@@ -12,6 +12,7 @@ export const getFlowSettings = () => {
     showSubFlowTabs: config?.showSubFlowTabs === undefined ? true : config?.showSubFlowTabs,
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
     showNodesTree: config?.showNodesTree === undefined ? true : config?.showNodesTree,
+    showPointPallet: config?.showPointPallet === undefined ? true : config?.showPointPallet,
     showNodesPallet: config?.showNodesPallet === undefined ? true : config?.showNodesPallet,
     showCount: config?.showCount === undefined ? true : config?.showCount,
     positionMiniMap: config?.positionMiniMap === undefined ? "bottom" : config?.positionMiniMap,
@@ -23,6 +24,7 @@ export type FlowSettings = {
   showMiniMap: boolean;
   showSubFlowTabs: boolean;
   showNodesTree: boolean;
+  showPointPallet: boolean;
   showCount: boolean;
   showNodesPallet: boolean;
   positionMiniMap: string;
@@ -93,6 +95,7 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
       <Space direction="vertical" align="start">
         {renderConfigs("Show Mini Map", "showMiniMap")}
         {renderConfigs("Show Nodes Tree", "showNodesTree")}
+        {renderConfigs("Show Points Pallet", "showPointPallet")}
         {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
         {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
         <Space direction="horizontal">
