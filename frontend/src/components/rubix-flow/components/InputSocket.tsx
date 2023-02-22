@@ -73,6 +73,7 @@ export const InputSocket = memo(
     classnames,
   }: InputSocketProps) => {
     const instance = useReactFlow();
+    const [typedValue, setTypedValue] = useState(false);
     const [inputNumber, setInputNumber] = useState(handleConvertInputNumber(value));
     const refName = useRef<HTMLDivElement>(null);
 
@@ -83,8 +84,11 @@ export const InputSocket = memo(
     const handleChangeInput = (value: string) => onChange(name, value);
 
     const onChangeInputNumber = (value: string) => {
-      if (value.match(REGEX_NUMBER)) onChange(name, Number(value));
+      if (value.match(REGEX_NUMBER)) {
+        onChange(name, Number(value));
+      }
       setInputNumber(value);
+      setTypedValue(true);
     };
 
     const onBlurInputNumber = (e: React.FormEvent<HTMLInputElement>) => {
@@ -154,6 +158,15 @@ export const InputSocket = memo(
         onSetWidthInput && onSetWidthInput(_width + 1);
       }
     }, [refName]);
+
+    useEffect(() => {
+      if (valueType === "number" && !typedValue) {
+        const nextValue = handleConvertInputNumber(value);
+        if (inputNumber !== nextValue) {
+          setInputNumber(nextValue);
+        }
+      }
+    }, [value, typedValue]);
 
     return (
       <div className="flex grow items-center justify-start h-7">

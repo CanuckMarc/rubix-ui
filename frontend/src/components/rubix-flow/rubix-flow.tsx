@@ -739,6 +739,7 @@ const Flow = (props: FlowProps) => {
         inputs.forEach((input, idx) => {
           const inputData = outputNodes.find((o) => o.nodeId === input.id);
           if (inputData) {
+            node.data[`input${inputs.length > 1 ? idx + 1 : ""}`] = inputData.inputs[0].value;
             node.data.inputs[idx].value = inputData.inputs[0].value;
           }
         });
@@ -973,11 +974,18 @@ const Flow = (props: FlowProps) => {
     // get nodes original
     const newNodesCopy = _copied.nodes.map((node) => window.allFlow.nodes.find((item) => item.id === node.id) || node);
 
+    console.log("newNodesCopy", newNodesCopy);
+
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges({ ..._copied, nodes: newNodesCopy }, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
+    const newFlow = handleCopyNodesAndEdges(
+      { ..._copied, nodes: newNodesCopy },
+      window.allFlow.nodes,
+      window.allFlow.edges,
+      true
+    );
 
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
