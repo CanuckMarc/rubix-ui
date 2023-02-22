@@ -936,7 +936,6 @@ const Flow = (props: FlowProps) => {
 
     if (event.dataTransfer.getData("from-point-pallet") !== '') {
       const { namePallet, nodeTypePallet } = JSON.parse(event.dataTransfer.getData("from-point-pallet"));
-      console.log('nodeType from namePallet: ', nodeTypePallet);
       const position = setMousePosition(event, true);
       handleAddNode(false, null, nodeTypePallet, position, namePallet);
     }

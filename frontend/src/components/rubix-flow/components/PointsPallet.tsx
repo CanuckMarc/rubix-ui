@@ -174,7 +174,7 @@ export const PointsPallet = ({ nodes, flowSettings}: NodeProps) => {
                       border-gray-600 text-left ${index === 0 ? "" : "border-t"}`}
                     draggable={true}
                     onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
-                    style={{ padding: 14, minHeight: '60px', alignItems: 'center' }}
+                    style={{ padding: 14, minHeight: '60px', alignItems: 'center', cursor: 'pointer' }}
                     >
                       <div style={{display: 'flex', flexDirection: 'column'}}>
                         {item.device_name && (
