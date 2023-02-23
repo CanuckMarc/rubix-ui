@@ -2,16 +2,13 @@ import { Button, Card, Form, FormInstance, Input } from "antd";
 import { createRef, useEffect, useState } from "react";
 import TokenView from "../../../common/token/token-view";
 import TokenGeneratorModal from "../../../common/token/token-generator-modal";
-import { useSettings } from "../../settings/use-settings";
 import { PlusOutlined } from "@ant-design/icons";
 import { externaltoken } from "../../../../wailsjs/go/models";
-import { LIGHT_THEME } from "../../../themes/use-theme";
 import { Result, ResultState } from "../../../common/state/state";
 import ExternalToken = externaltoken.ExternalToken;
 
 export const TokenForm = (props: any) => {
   const { factory, selectedItem, hostOrConn } = props;
-  const [settings] = useSettings();
   const [jwtToken, setJwtToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [tokens, setTokens] = useState<ExternalToken[]>([]);
@@ -20,8 +17,8 @@ export const TokenForm = (props: any) => {
   const loginFormRef = createRef<FormInstance>();
 
   useEffect(() => {
-    if (hostOrConn === 'host') factory.hostUUID = selectedItem.uuid;
-    if (hostOrConn === 'conn') factory.connectionUUID = selectedItem.uuid;
+    if (hostOrConn === "host") factory.hostUUID = selectedItem.uuid;
+    if (hostOrConn === "conn") factory.connectionUUID = selectedItem.uuid;
   }, [selectedItem]);
 
   const handleClose = () => {
@@ -81,7 +78,7 @@ export const TokenForm = (props: any) => {
   return (
     <Card
       title="Tokens"
-      style={{ backgroundColor: settings.theme == LIGHT_THEME ? "fff" : "", width: '35vw' }}
+      style={{ width: "35vw", backgroundColor: "transparent" }}
       extra={
         jwtToken && <Button type="primary" icon={<PlusOutlined />} size="small" onClick={showTokenGenerateModal} />
       }
