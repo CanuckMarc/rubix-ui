@@ -64,9 +64,9 @@ export const CreateHostForm = (props: any) => {
       operation = "added";
     }
     if (!hasError(res)) {
-      setNewHost(res.data)
+      setNewHost(res.data);
       openNotificationWithIcon("success", `successfully ${operation} host ${res.data.name}!`);
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
       handleClose();
     } else {
       openNotificationWithIcon("error", res.msg);
@@ -75,22 +75,23 @@ export const CreateHostForm = (props: any) => {
   };
 
   const handleCreateButton = () => {
-    handleSubmit(formData)
+    handleSubmit(formData);
     setFormData({} as Host);
-  }
+  };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center'}}>
+    <div style={{ display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center' }}>
       <Spin spinning={isLoadingForm}>
         <JsonForm
           formData={formData}
           setFormData={setFormData}
           jsonSchema={hostSchema}
           setValidationError={setValidationError}
-          style={{width: '100%'}}
+          style={{ width: '100%' }}
         />
       </Spin>
-      <Button type='primary' onClick={handleCreateButton} style={{width: '100px'}}>{isUpdate ? 'Update' : 'Create'}</Button>
+      <Button type="primary" onClick={handleCreateButton}
+              style={{ width: '100px' }}>{isUpdate ? 'Update' : 'Create'}</Button>
     </div>
   );
 };
