@@ -78,7 +78,7 @@ export const handleCopyNodesAndEdges = (
   });
 
   const allNodes = uniqArray([...newNodes, ...subNodes]).map((node) => {
-    if (!node.isParent) {
+    if (node.isParent) {
       node.data = {};
     }
     return node;
