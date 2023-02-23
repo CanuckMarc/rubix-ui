@@ -1,19 +1,15 @@
 import { Card, Select, Spin, Button, Table, Input } from "antd";
 import { useState, useEffect } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PointsPane } from "./views/pointsPane";
-import { MappingFactory } from "./factory";
-import { FlowPointFactory } from '../../components/hosts/host/flow/points/factory';
-import { useStore, useIsLoading, PointTableTypeRecord, PointTableType } from '../../App';
+import { useStore, PointTableTypeRecord, PointTableType } from '../../App';
 import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
 import { generateUuid } from "../rubix-flow/lib/generateUuid";
 import { openNotificationWithIcon } from "../../utils/utils";
-import { SelectOptionType, AddedPointType, FlownetMapPropType } from "./map";
-
-const { Search } = Input;
+import { AddedPointType, FlownetMapPropType } from "./map";
 
 const filterForFullObj = (pointList: PointTableType[], selectedPoints: PointTableType) => {
   const filteredPoint = pointList.filter(item => {
@@ -186,14 +182,13 @@ export const FlownetMap = (props: FlownetMapPropType) => {
           </div>
           <div style={{display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center'}}>
             <strong>Search by point name: </strong>
-            <Search 
+            <Input 
               placeholder="search by point name"
-              enterButton="Search"
               disabled={pointList.length === 0}
               allowClear={true} 
               value={search} 
               onChange={onSearchBarChange} 
-              onSearch={handleSearchPointName} 
+              onPressEnter={handleSearchPointName} 
               style={{ width: '500px' }} 
             />
           </div>
