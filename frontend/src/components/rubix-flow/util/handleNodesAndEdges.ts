@@ -18,7 +18,8 @@ export const handleCopyNodesAndEdges = (
   isAutoSelected = true,
   nodesSpec: boolean | NodeSpecJSON[] | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>
 ) => {
-  let newEdges: Edge[] = [...flow.edges];
+
+  let newEdges: Edge[] = [...edges];
   const subNodes: NodeWithOldId[] = [];
   const subEdges: Edge[] = [];
 
@@ -110,7 +111,7 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  edges.forEach((edge) => {
+  flow.edges.forEach((edge) => {
     const itemClone = subNodes.find(
       (node: NodeWithOldId) =>
         node.oldId === edge.target || node.oldId === edge.source

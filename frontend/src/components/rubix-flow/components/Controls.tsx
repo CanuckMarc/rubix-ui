@@ -66,6 +66,8 @@ const Controls = ({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [copyNodesC, setCopyNodesC] = useState(false);
+  const [newNodes, setNewNode] = useState({} as any);
   const [settingRefreshModalOpen, setSettingRefreshModalOpen] = useState(false);
   const instance = useReactFlow();
 
@@ -134,7 +136,7 @@ const Controls = ({
 
     onCopyNodes({
       nodes: nodesCopied,
-      edges: edgesCopied,
+      edges: copyNodesC ? edgesCopied : newNodes.edges,
     });
   };
 
@@ -152,6 +154,7 @@ const Controls = ({
 
   /* Ctrl + X (key): Refresh node values */
   useCtrlPressKey("KeyX", () => {
+    setCopyNodesC(false);
     copySelectNode();
     deleteSelectNodeCtrX();
   });
@@ -160,13 +163,22 @@ const Controls = ({
   const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
     const egdesCopied = instance.getEdges().filter((edge) => edge.selected);
+    
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
       window.egdesCopied = egdesCopied;
     }
+    const newNodes= {
+      nodes: nodesCopied,
+      edges: instance.getEdges(),
+    };  
+    setNewNode(newNodes);   
   };
-
-  useCtrlPressKey("KeyC", copySelectNode);
+  
+  useCtrlPressKey("KeyC", () => {
+    setCopyNodesC(true);
+    copySelectNode();
+  });
 
   useCtrlPressKey("KeyV", () => {
     const activeElement = document.activeElement;
@@ -177,7 +189,8 @@ const Controls = ({
     ) {
       const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
       const egdes = window.egdesCopied;
-      handleDuplicatedNodes(nodes, egdes);
+      
+      copyNodesC ? handleDuplicatedNodes(nodes, egdes) : handleDuplicatedNodes(newNodes.nodes, newNodes.egdes);
     }
     window.nodesCopied = [];
   });
