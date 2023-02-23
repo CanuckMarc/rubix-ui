@@ -8,11 +8,16 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
   XYPosition,
-} from "react-flow-renderer/nocss";
+  Edge,
+  EdgeProps,
+  ReactFlowInstance,
+  MiniMap,
+  ReactFlowProvider,
+} from "reactflow";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
+import "reactflow/dist/style.css";
 
-import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
@@ -21,7 +26,6 @@ import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
-import { Edge, EdgeProps, ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
 import { Spin } from "antd";
 import { NodeSpecJSON } from "./lib";
@@ -33,6 +37,7 @@ import { handleGetSettingType } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
 import { NodesTree } from "./components/NodesTree";
+import { PointsPallet } from "./components/PointsPallet";
 import { NodeSideBar } from "./components/NodeSidebar";
 import "./rubix-flow.css";
 import { categoryColorMap } from "./util/colors";
@@ -193,12 +198,13 @@ const Flow = (props: FlowProps) => {
   const handleFlowChange = () => setIsChangedFlow(true);
 
   const handleAddNode = useCallback(
-    async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
+    async (isParent: boolean, style: any, nodeType: string, position: XYPosition, name?: string) => {
       closeNodePicker();
       const nodeSettings = await handleGetSettingType(connUUID, hostUUID, isRemote, nodeType);
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
       const newNode = {
         id: generateUuid(),
+        info: { nodeName: name ? name : "" },
         isParent,
         style,
         type: nodeType,
@@ -208,7 +214,7 @@ const Flow = (props: FlowProps) => {
           out: convertDataSpec(spec.outputs || []),
         },
         parentId: selectedNodeForSubFlow?.id || undefined,
-        settings: nodeSettings,
+        settings: name ? { ...nodeSettings, point: name } : nodeSettings,
         selected: false,
       };
 
@@ -448,7 +454,7 @@ const Flow = (props: FlowProps) => {
     setIsSaving(false);
   };
 
-  const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
+  const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
   };
 
@@ -894,7 +900,7 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true);
 
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
@@ -964,22 +970,17 @@ const Flow = (props: FlowProps) => {
   };
 
   const onDrop = (event: any) => {
-    const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
-    const position = setMousePosition(event, true);
-    handleAddNode(isParent, null, nodeType, position);
-  };
-
-  const handleMinimapNodeColor = (node: NodeInterface) => {
-    if (node.type) {
-      const category = node.type.split("/")[0] as NodeCategory;
-      return categoryColorMap[category] || "gray";
+    if (event.dataTransfer.getData("from-node-sidebar") !== "") {
+      const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
+      const position = setMousePosition(event, true);
+      handleAddNode(isParent, null, nodeType, position);
     }
-    return "gray";
-  };
 
-  const handleMinimapBorderColor = (node: NodeInterface) => {
-    if (node.selected) return "red";
-    return "none";
+    if (event.dataTransfer.getData("from-point-pallet") !== "") {
+      const { namePallet, nodeTypePallet } = JSON.parse(event.dataTransfer.getData("from-point-pallet"));
+      const position = setMousePosition(event, true);
+      handleAddNode(false, null, nodeTypePallet, position, namePallet);
+    }
   };
 
   const onEdgeClick = useCallback(
@@ -1177,6 +1178,26 @@ const Flow = (props: FlowProps) => {
 
   const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
 
+  const nodeColor = useCallback((node: any) => {
+    if (node.selected) {
+      return "#6ede87";
+    }
+    return "#555";
+  }, []);
+
+  // useEffect(() => {
+  //   if (disablePointsPallet) {
+  //     setFlowSettings({...flowSettings, showPointPallet: false})
+  //     setDisablePointsPallet(false)
+  //   }
+  // }, [disablePointsPallet])
+
+  // useEffect(() => {
+  //   if (flowSettings.showPointPallet) {
+  //     setDisablePointsPallet(false)
+  //   }
+  // }, [flowSettings])
+  
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1189,7 +1210,18 @@ const Flow = (props: FlowProps) => {
           flowSettings={flowSettings}
         />
       )}
-      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
+      {!isFetching && flowSettings.showPointPallet && (
+        <PointsPallet
+          selectedSubflow={selectedNodeForSubFlow}
+          // disablePointsPallet={disablePointsPallet}
+          // setDisablePointsPallet={setDisablePointsPallet}
+        />
+      )}
+      {!isFetching && flowSettings.showNodesPallet && (
+        <NodeSideBar 
+          nodesSpec={nodesSpec}
+        />
+      )}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
@@ -1252,18 +1284,13 @@ const Flow = (props: FlowProps) => {
               <DragSelection />
               {flowSettings.showMiniMap && (
                 <MiniMap
-                  nodes={nodes.filter((node: NodeInterface) => {
-                    if (selectedNodeForSubFlow) {
-                      return node.parentId === selectedNodeForSubFlow.id;
-                    }
-                    return !node.parentId;
-                  })}
-                  shouldUpdate={shouldUpdateMiniMap}
                   className={cx("absolute", {
-                    "top-20 right-4": flowSettings.positionMiniMap === "top",
+                    "top-20 right-4 h-60": flowSettings.positionMiniMap === "top",
                   })}
-                  nodeColor={handleMinimapNodeColor}
-                  nodeStrokeColor={handleMinimapBorderColor}
+                  nodeColor={nodeColor}
+                  nodeStrokeWidth={3}
+                  zoomable
+                  pannable
                 />
               )}
               <ControlUndoable

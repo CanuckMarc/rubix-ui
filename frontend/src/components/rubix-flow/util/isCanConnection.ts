@@ -1,4 +1,4 @@
-import { Edge, OnConnectStartParams } from "react-flow-renderer/nocss";
+import { Edge, OnConnectStartParams } from "reactflow";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 type LastConnectParams = {

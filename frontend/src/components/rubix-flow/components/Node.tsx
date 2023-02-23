@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
+import { NodeProps as FlowNodeProps, useEdges, useNodes } from "reactflow";
 
 import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";

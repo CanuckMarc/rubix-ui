@@ -1,4 +1,4 @@
-import { Node, OnConnectStartParams } from "react-flow-renderer/nocss";
+import { Node, OnConnectStartParams } from "reactflow";
 import { getSocketsByNodeTypeAndHandleType } from "./getSocketsByNodeTypeAndHandleType";
 import { generateUuid } from "../lib/generateUuid";
 import { getSpecJson } from "../use-nodes-spec";

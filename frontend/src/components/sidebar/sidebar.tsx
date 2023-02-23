@@ -1,4 +1,18 @@
-import { Avatar, Divider, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Spin, Switch, Tooltip, Space } from "antd";
+import {
+  Avatar,
+  Divider,
+  Dropdown,
+  Image,
+  Layout,
+  Menu,
+  MenuProps,
+  Row,
+  Select,
+  Spin,
+  Switch,
+  Tooltip,
+  Space,
+} from "antd";
 import {
   ApartmentOutlined,
   CloudServerOutlined,
@@ -9,7 +23,7 @@ import {
   ToolOutlined,
   UserOutlined,
   ReloadOutlined,
-  UpOutlined
+  UpOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -489,10 +503,20 @@ export const MenuSidebar = () => {
   }, [location.pathname]);
 
   const versionItems = (
-    <div id="versions-dropdown" style={{display: 'flex', flexDirection: 'column', rowGap: '6px', alignItems: 'flex-start', width: 280, paddingLeft: '48px'}}>
-      <strong>Rubix edge: {`${versions ? versions.LatestRubixEdgeVersion : 'Failed to fetch'}`}</strong>
-      <strong>Rubix assist: {`${versions ? versions.LatestRubixAssistVersion : 'Failed to fetch'}`}</strong>
-      <strong>Flow framework: {`${versions ? versions.LatestFlowFrameworkVersion : 'Failed to fetch'}`}</strong>
+    <div
+      id="versions-dropdown"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: "6px",
+        alignItems: "flex-start",
+        width: 280,
+        paddingLeft: "48px",
+      }}
+    >
+      <strong>Rubix edge: {`${versions ? versions.LatestRubixEdgeVersion : "Failed to fetch"}`}</strong>
+      <strong>Rubix assist: {`${versions ? versions.LatestRubixAssistVersion : "Failed to fetch"}`}</strong>
+      <strong>Flow framework: {`${versions ? versions.LatestFlowFrameworkVersion : "Failed to fetch"}`}</strong>
     </div>
   );
 
@@ -512,7 +536,7 @@ export const MenuSidebar = () => {
         </div>
       ) : (
         <>
-          <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div>
               <HeaderSider collapsed={collapsed} collapseDisabled={collapseDisabled} setCollapsed={handleCollapse} />
               <DividerLock
@@ -533,18 +557,22 @@ export const MenuSidebar = () => {
               />
               <AvatarDropdown setIsModalVisible={setIsModalVisible} />
             </div>
-            <div style={{position: 'fixed', bottom: '0px', width: 280}}>
-              <div id="versions-dropdown" style={{position: 'relative', display: 'flex', flexDirection: 'column', rowGap: '10px', width: 280}}> 
-                <Dropdown overlay={ versionItems } overlayStyle={{width: 280}}>
+            <div style={{ position: "fixed", bottom: "0px", width: 280 }}>
+              <div
+                id="versions-dropdown"
+                style={{ position: "relative", display: "flex", flexDirection: "column", rowGap: "10px", width: 280 }}
+              >
+                <Dropdown overlay={versionItems} overlayStyle={{ width: 280 }}>
                   <a onClick={(e) => e.preventDefault()}>
                     <Space>
-                      <strong>Latest release: {`${versions ? versions.LatestReleaseVersion : 'Failed to fetch'}`}</strong>
+                      <strong>
+                        Latest release: {`${versions ? versions.LatestReleaseVersion : "Failed to fetch"}`}
+                      </strong>
                       <UpOutlined />
                     </Space>
                   </a>
                 </Dropdown>
               </div>
-
             </div>
           </div>
 

@@ -3,7 +3,6 @@ import { pluginLogo } from "../utils/utils";
 import imageRC5 from "../assets/images/RC5.png";
 import imageRCIO from "../assets/images/RC-IO.png";
 import imageEdge28 from "../assets/images/Edge-iO-28.png";
-import moment from "moment";
 
 export const FLOW_NETWORK_HEADERS = [
   {
@@ -164,9 +163,9 @@ export const PRODUCER_HEADERS = [
     key: "history_type",
     title: "History Type",
     dataIndex: "history_type",
-    render(plugin_name: string) {
+    render(history_type: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = history_type?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.history_type.localeCompare(b.history_type),
@@ -519,7 +518,7 @@ export const NETWORK_HEADERS = [
     dataIndex: "plugin_name",
     render(plugin_name: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = plugin_name?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.plugin_name.localeCompare(b.plugin_name),
@@ -605,7 +604,7 @@ export const FLOW_POINT_HEADERS = [
     render(object_type: string) {
       if (object_type != undefined) {
         let colour = "#4d4dff";
-        let text = object_type.toUpperCase();
+        let text = object_type?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -630,7 +629,7 @@ export const FLOW_POINT_HEADERS = [
     render(io_number: string) {
       if (io_number != undefined) {
         let colour = "#4d4dff";
-        let text = io_number.toUpperCase();
+        let text = io_number?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -643,7 +642,7 @@ export const FLOW_POINT_HEADERS = [
     render(io_type: string) {
       if (io_type != undefined) {
         let colour = "#4d4dff";
-        let text = io_type.toUpperCase();
+        let text = io_type?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -727,9 +726,9 @@ export const PLUGIN_HEADERS = [
     title: "Name",
     key: "name",
     dataIndex: "name",
-    render(plugin_name: string) {
+    render(name: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = name?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),

@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useBacnetStore, useIsLoading } from '../../../App';
-import { Edge, useReactFlow } from "react-flow-renderer/nocss";
+import { Edge, useReactFlow } from "reactflow";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { handleGetSettingType } from "../util/handleSettings";
 import { useNodesSpec, convertDataSpec, getNodeSpecDetail } from "../use-nodes-spec";
-import { NodeSpecJSON, InputSocketSpecJSON } from "../lib";
+import { NodeSpecJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
-import { node } from "../../../../wailsjs/go/models";
 import { openNotificationWithIcon } from "../../../utils/utils";
 import { BacnetTableDataType } from "../../wires-map/map";
 
@@ -23,6 +22,11 @@ type NodeGenInputType = {
   pointName: string | undefined;
 }
 
+interface ReturnType {
+  localNodes: NodeInterface[];
+  localEdges: Edge[]
+}
+
 function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
@@ -32,12 +36,10 @@ const yRand = getRandomArbitrary(-200, 200)
 
 export const LoadBacnetMap = () => {
     let { connUUID = "", hostUUID = "" } = useParams();
-    const [newNodes, setNewNodes] = useState<NodeInterface[]>([]);
-    const [newEdges, setNewEdges] = useState<Edge[]>([]);
 
     const [bacnetNodes, setBacnetNodes] = useBacnetStore(
         (state) => [state.bacnetNodes, state.setBacnetNodes]
-      )
+    )
     const [refreshCounter, reset, setIsLoadingRubixFlow] = useIsLoading(
       (state) => [state.refreshCounter, state.reset, state.incrementRefreshCounter]
     )
@@ -46,43 +48,14 @@ export const LoadBacnetMap = () => {
     const flowInstance = useReactFlow();
 
     useEffect(() => {
-      let localNodes: NodeInterface[] = [];
-      let localEdges: Edge[] = [];
-      if (bacnetNodes.length !== 0) {
-        let xTemp: number = xRand
-        let yTemp: number = yRand
-
-        if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
-          let largeX = 0
-          window.allFlow.nodes.forEach((item: NodeInterface) => {
-            if (item.position.x > largeX) {
-              largeX = item.position.x
-            }
-          })
-          xTemp = largeX + 400
-        }
-
-        bacnetNodes.forEach((item: BacnetTableDataType) => {
-          xTemp = xTemp + 400
-          yTemp = yTemp + 400
-          const resObj = addNewNodesEdges(item, xTemp, yTemp);
-          localNodes = [...localNodes, ...resObj.nodes]
-          localEdges = [...localEdges, ...resObj.edges]
-        })
-        
-        setNewNodes(localNodes);
-        setNewEdges(localEdges);
-      }
-    }, [])
-
-    useEffect(() => {
       // it takes two refreshes for rubix-flow panel to get ready when navigate to the WIRES_MAP_REMOTE link defined in ROUTE
       // Therefore, it is safe to add new nodes to the flow component after 2 refreshes are done 
       if (refreshCounter === 2) {     
-        openNotificationWithIcon("success", 'Rubix flow loading complete!');
         if (bacnetNodes.length !== 0) {
-          renderPointsToFlowEditor(newNodes, newEdges);
+          const res = startUp();
+          if (res) renderPointsToFlowEditor(res.localNodes, res.localEdges);
           setBacnetNodes([]);
+          openNotificationWithIcon("success", 'Bacnet loading complete!');
         }
       }
     }, [refreshCounter])
@@ -218,6 +191,43 @@ export const LoadBacnetMap = () => {
         settings: updatedSettings,
         selected: false,
       };
+    }
+
+    const startUp = () => {
+      let localNodes: NodeInterface[] = [];
+      let localEdges: Edge[] = [];
+      let res: ReturnType = {} as ReturnType;
+
+      if (bacnetNodes.length !== 0) {
+        let xTemp: number = xRand
+        let yTemp: number = yRand
+
+        if (window.hasOwnProperty('allFlow') && window.allFlow.hasOwnProperty('nodes')) {
+          let largeX = 0
+          window.allFlow.nodes.forEach((item: NodeInterface) => {
+            if (item.position.x > largeX) {
+              largeX = item.position.x
+            }
+          })
+          xTemp = largeX + 400
+        }
+
+        bacnetNodes.forEach((item: BacnetTableDataType) => {
+          xTemp = xTemp + 400
+          yTemp = yTemp + 400
+          const resObj = addNewNodesEdges(item, xTemp, yTemp);
+          localNodes = [...localNodes, ...resObj.nodes]
+          localEdges = [...localEdges, ...resObj.edges]
+        })
+        
+        // setNewNodes(localNodes);
+        // setNewEdges(localEdges);
+
+        res.localNodes = localNodes;
+        res.localEdges = localEdges;
+
+        return res
+      }
     }
 
     return null;

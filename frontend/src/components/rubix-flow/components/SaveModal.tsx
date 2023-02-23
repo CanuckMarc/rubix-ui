@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { useNodes } from "react-flow-renderer/nocss";
+import { useNodes } from "reactflow";
 import { useParams } from "react-router-dom";
 
 import { FlowFactory } from "../factory";

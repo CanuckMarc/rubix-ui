@@ -1,6 +1,6 @@
 import { FC, memo, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
+import { Edge, useEdges, useNodes, useReactFlow } from "reactflow";
 
 import { NodeInterface, OutputNodeValueType } from "../lib/Nodes/NodeInterface";
 import { Modal } from "./Modal";

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { Connection, Handle, Position, useReactFlow } from "react-flow-renderer/nocss";
+import { Connection, Handle, Position, useReactFlow } from "reactflow";
 import cx from "classnames";
 import { colors, valueTypeColorMap } from "../util/colors";
 import { isValidConnection } from "../util/isValidConnection";
@@ -27,14 +27,12 @@ export const REGEX_NUMBER = new RegExp("^$|^-?(\\d+)?(\\.?\\d*)?$");
 
 const getValueOptions = (value: number) => {
   switch (value) {
-    case 0:
-      return false;
     case 1:
       return true;
     case -1:
-      return null;
+      return false;
     default:
-      return true;
+      return false;
   }
 };
 
@@ -89,9 +87,10 @@ export const InputSocket = ({
   };
 
   const onBlurInputNumber = (e: React.FormEvent<HTMLInputElement>) => {
-    if (inputNumber.match(REGEX_NUMBER)) {
+    if (inputNumber.match(REGEX_NUMBER) && inputNumber.trim().length > 0) {
       onChange(name, Number(inputNumber));
-    } else if (inputNumber === "null") {
+    } else if (inputNumber === "null" || inputNumber.trim().length === 0) {
+      setInputNumber("null");
       onChange(name, null);
     } else {
       setInputNumber("0");
@@ -125,6 +124,8 @@ export const InputSocket = ({
       return getNumberOptions(input.value);
     } else if (valueType === "number") {
       return input.value === null || input.value === undefined ? "null" : `${input.value}`;
+    }else if (valueType === "number") {
+      return input.value === null || input.value === undefined || input.value === "" ? "null" : `${input.value}`;
     }
 
     return input.value;
@@ -172,7 +173,7 @@ export const InputSocket = ({
                 type="text"
                 autoFocus={autoFocus}
                 className={cx(classnames ? classnames : "bg-gray-600 disabled:bg-gray-700 py-1 px-2 nodrag")}
-                value={getDataByConnected(value || "")}
+                value={getDataByConnected(value === undefined ? (value = null) : value)}
                 onChangeInput={handleChangeInput}
               />
             )}

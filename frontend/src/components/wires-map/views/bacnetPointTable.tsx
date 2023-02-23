@@ -53,8 +53,6 @@ export const BacnetPointTable = (props: BacnetPointTablePropType) => {
     } else {
       setTableData(beforesearch)
     }
-    // console.log('to show: ', tableData)
-    // console.log('to track: ', beforesearch)
   }, [pointsPaneSearch])
 
   useEffect(() => {

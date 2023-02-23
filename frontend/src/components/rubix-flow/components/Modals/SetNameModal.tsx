@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useReactFlow } from "react-flow-renderer/nocss";
+import { useReactFlow } from "reactflow";
 
 import { NodeInterface } from "../../lib/Nodes/NodeInterface";
 import { InputSocket } from "../InputSocket";
