@@ -1,15 +1,9 @@
 import { Layout, Tooltip, Collapse, Switch, Spin } from "antd";
 import { CaretRightOutlined, CaretDownOutlined } from "@ant-design/icons";
 import { ChangeEvent, useEffect, useState } from "react";
-
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import { NodeTreeItem } from "./NodeTreeItem";
-import { NodeSpecJSON } from '../lib';
-import { FlowSettings } from "./FlowSettingsModal";
-
 import { FlowPointFactory } from '../../hosts/host/flow/points/factory';
-import { backend, model, rumodel, storage, } from "../../../../wailsjs/go/models";
-import { PointTableType } from "../../../App";
+import { backend } from "../../../../wailsjs/go/models";
 import { useParams } from "react-router-dom";
 const pointFactory = new FlowPointFactory();
 
@@ -28,8 +22,6 @@ interface PluginTableDataType {
 
 interface NodePalletPropType {
   selectedSubflow: NodeInterface<any> | undefined;
-  // disablePointsPallet: boolean;
-  // setDisablePointsPallet: Function;
 }
 
 export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {

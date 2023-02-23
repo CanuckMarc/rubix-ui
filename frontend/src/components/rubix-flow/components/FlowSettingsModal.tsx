@@ -94,8 +94,8 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
     >
       <Space direction="vertical" align="start">
         {renderConfigs("Show Mini Map", "showMiniMap")}
-        {renderConfigs("Show Nodes Tree", "showNodesTree")}
         {renderConfigs("Show Points Pallet", "showPointPallet")}
+        {renderConfigs("Show Nodes Tree", "showNodesTree")}
         {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
         {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
         <Space direction="horizontal">

@@ -1159,22 +1159,14 @@ const Flow = (props: FlowProps) => {
         return "#555";
     }
   };
-
-  // useEffect(() => {
-  //   if (disablePointsPallet) {
-  //     setFlowSettings({...flowSettings, showPointPallet: false})
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [disablePointsPallet])
-
-  // useEffect(() => {
-  //   if (flowSettings.showPointPallet) {
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [flowSettings])
   
   return (
     <div className="rubix-flow">
+      {!isFetching && flowSettings.showPointPallet && (
+        <PointsPallet
+          selectedSubflow={selectedNodeForSubFlow}
+        />
+      )}
       {!isFetching && flowSettings.showNodesTree && (
         <NodesTree
           nodes={window.allFlow?.nodes || []}
@@ -1183,13 +1175,6 @@ const Flow = (props: FlowProps) => {
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
           flowSettings={flowSettings}
-        />
-      )}
-      {!isFetching && flowSettings.showPointPallet && (
-        <PointsPallet
-          selectedSubflow={selectedNodeForSubFlow}
-          // disablePointsPallet={disablePointsPallet}
-          // setDisablePointsPallet={setDisablePointsPallet}
         />
       )}
       {!isFetching && flowSettings.showNodesPallet && (
