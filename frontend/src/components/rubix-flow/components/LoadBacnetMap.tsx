@@ -158,8 +158,10 @@ export const LoadBacnetMap = () => {
 
     let updatedSettings: any = {};
     if (!item.pointName && item.topic && !item.instanceNumber) {
-      // updatedSettings = {...nodeSettings, topic: item.type === 'link/link-output-number' ? `num-${item.topic}` : item.topic}
-      updatedSettings = { ...nodeSettings, topic: item.topic };
+      updatedSettings = {
+        ...nodeSettings,
+        topic: item.type === "link/link-output-number" ? `num-${item.topic}` : item.topic,
+      };
     } else if (!item.pointName && !item.topic && item.instanceNumber) {
       updatedSettings = { ...nodeSettings };
       updatedSettings["instance-number"] = item.instanceNumber;
