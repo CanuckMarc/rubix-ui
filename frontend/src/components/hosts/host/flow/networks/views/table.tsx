@@ -24,6 +24,7 @@ import "./style.css";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { LogTable } from "./logTable";
 import { hasError } from "../../../../../../utils/response";
+import { NetworkWizard } from "./network-wizard";
 import UUIDs = backend.UUIDs;
 import Network = model.Network;
 
@@ -58,6 +59,7 @@ export const FlowNetworkTable = () => {
   const [logNetwork, setLogNetwork] = useState<model.Network>();
   const [isLogTableOpen, setIsLogTableOpen] = useState(false);
   const [resetLogTableData, setResetLogTableData] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
 
   const config = {
     originData: networks,
@@ -126,7 +128,7 @@ export const FlowNetworkTable = () => {
       if (hasError(res)) {
         openNotificationWithIcon("error", res.msg);
       } else {
-        openNotificationWithIcon("success", res.data)
+        openNotificationWithIcon("success", res.data);
       }
       await fetchNetworks();
     } finally {
@@ -209,6 +211,7 @@ export const FlowNetworkTable = () => {
       <RbRefreshButton refreshList={fetchNetworks} />
       <RbSyncButton onClick={syncNetworks} />
       <RbAddButton handleClick={() => setIsCreateModalVisible(true)} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
@@ -244,6 +247,11 @@ export const FlowNetworkTable = () => {
         isModalVisible={isImportModalVisible}
         onClose={() => setIsImportModalVisible(false)}
         refreshList={fetchNetworks}
+      />
+      <NetworkWizard
+        refreshList={fetchNetworks}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
       />
       <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
         <LogTable

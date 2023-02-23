@@ -1,18 +1,35 @@
 import { useEffect, useState } from "react";
 import { Modal, Spin, Steps, Button, StepsProps, Image } from "antd";
-import { CreateConnectionForm } from "./create-form";
-import { TokenForm } from "./token-form";
-import { storage } from "../../../../wailsjs/go/models";
-import { openNotificationWithIcon } from "../../../utils/utils";
-import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
-import RubixConnection = storage.RubixConnection;
+import { pluginLogo } from "../../../../../../utils/utils";
+
+// import { CreateConnectionForm } from "./create-form";
+// import { TokenForm } from "./token-form";
+// import { storage } from "../../../../wailsjs/go/models";
+// import { openNotificationWithIcon } from "../../../utils/utils";
+// import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
+// import RubixConnection = storage.RubixConnection;
 
 const { Step } = Steps;
 
-export const CreateConnectionWizard = (props: any) => {
+const loraImage = pluginLogo("lora");
+const bacnetImage = pluginLogo("bacnet");
+const modbusImage = pluginLogo("modbus");
+const imageBoxStyle = {
+  width: 150,
+  height: 100,
+  backgroundColor: "rgba(68,87,96,255)",
+  border: "5px solid gray",
+  padding: "10px",
+  margin: "10px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+export const NetworkWizard = (props: any) => {
   const { connectionSchema, isLoadingForm, refreshList, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } =
     props;
-  const [newConnection, setNewConnection] = useState({} as RubixConnection);
+  //   const [newConnection, setNewConnection] = useState({} as RubixConnection);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps["status"]>("process");
   const [errorAtPing, setErrorAtPing] = useState(false);
@@ -21,35 +38,40 @@ export const CreateConnectionWizard = (props: any) => {
     setStepStatus("process");
   }, [isWizardModalVisible]);
 
-  const pingConnection = (conn: RubixConnection) => {
-    PingRubixAssist(conn.uuid).then((ok) => {
-      if (ok) {
-        openNotificationWithIcon("success", `new connection ${conn.name} is able to access rubix assist server!`);
-        setCurrentStep(currentStep + 1);
-      } else {
-        openNotificationWithIcon("error", `new connection ${conn.name} cannot access rubix assist server!`);
-        setStepStatus("error");
-        setErrorAtPing(true);
-      }
-    });
-  };
+  //   const pingConnection = (conn: RubixConnection) => {
+  //     PingRubixAssist(conn.uuid).then((ok) => {
+  //       if (ok) {
+  //         openNotificationWithIcon("success", `new connection ${conn.name} is able to access rubix assist server!`);
+  //         setCurrentStep(currentStep + 1);
+  //       } else {
+  //         openNotificationWithIcon("error", `new connection ${conn.name} cannot access rubix assist server!`);
+  //         setStepStatus("error");
+  //         setErrorAtPing(true);
+  //       }
+  //     });
+  //   };
 
   const data = [
     {
       id: "1",
       name: "Step 1",
-      text: "Create connection",
+      text: "Network selection",
       content: (
-        <div style={{ width: "35vw" }}>
-          <CreateConnectionForm
-            currentConnection={newConnection}
-            connectionSchema={connectionSchema}
-            isLoadingForm={isLoadingForm}
-            refreshList={refreshList}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-            setNewConnection={setNewConnection}
-          />
+        <div style={{ width: "50vw" }}>
+          <div style={{ display: "flex", flexDirection: "row", gap: "5px" }}>
+            <div style={imageBoxStyle}>
+              <Image width={100} preview={false} src={loraImage} />
+            </div>
+            <div style={imageBoxStyle}>
+              <Image width={100} preview={false} src={bacnetImage} />
+            </div>
+            <div style={imageBoxStyle}>
+              <Image width={100} preview={false} src={modbusImage} />
+            </div>
+            <div style={imageBoxStyle}>
+              <Image width={100} preview={false} src={modbusImage} />
+            </div>
+          </div>
         </div>
       ),
     },
@@ -59,12 +81,7 @@ export const CreateConnectionWizard = (props: any) => {
       text: "Ping connection",
       content: (
         <div style={{ display: "flex", flexDirection: "column", rowGap: "20px", alignItems: "center" }}>
-          <Button type="primary" onClick={() => pingConnection(newConnection)} style={{ width: "160px" }}>
-            Ping new connection
-          </Button>
-          {errorAtPing && (
-            <strong style={{ color: "red" }}>Error accessing rubix assist server, go back to step one.</strong>
-          )}
+          <span>Step2</span>
         </div>
       ),
     },
@@ -74,11 +91,7 @@ export const CreateConnectionWizard = (props: any) => {
       text: "Configure tokens",
       content: (
         <div style={{ width: "35vw", display: "flex", flexDirection: "column", rowGap: "2vh", alignItems: "center" }}>
-          {newConnection.external_token === "" ? (
-            <TokenForm factory={tokenFactory} selectedItem={newConnection} hostOrConn={"conn"} />
-          ) : (
-            <strong>Token already included!</strong>
-          )}
+          <span>step3</span>
           <Button type="primary" onClick={() => handleWizardClose()} style={{ width: "120px" }}>
             Finish
           </Button>
@@ -96,7 +109,7 @@ export const CreateConnectionWizard = (props: any) => {
   };
 
   const handleWizardClose = () => {
-    setNewConnection({} as RubixConnection);
+    // setNewConnection({} as RubixConnection);
     setCurrentStep(0);
     setIsWizardModalVisible(false);
     refreshList();
