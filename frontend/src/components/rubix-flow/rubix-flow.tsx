@@ -130,9 +130,6 @@ const Flow = (props: FlowProps) => {
     future: [],
   });
   const [isChangedFlow, setIsChangedFlow] = useState(false);
-  const [hidePointsPallet, setHidePointsPallet] = useState(false);
-  const [hideNodeSidebar, setHideNodeSidebar] = useState(false);
-  const [hideNodeTree, setHideNodeTree] = useState(false);
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -1163,32 +1160,18 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  useEffect(() => {
-    if (hidePointsPallet) {
-      setFlowSettings({...flowSettings, showPointPallet: false})
-      setHidePointsPallet(false)
-    }
-  }, [hidePointsPallet])
+  // useEffect(() => {
+  //   if (disablePointsPallet) {
+  //     setFlowSettings({...flowSettings, showPointPallet: false})
+  //     setDisablePointsPallet(false)
+  //   }
+  // }, [disablePointsPallet])
 
-  useEffect(() => {
-    if (flowSettings.showPointPallet) {
-      setHidePointsPallet(false)
-    }
-  }, [flowSettings])
-
-  useEffect(() => {
-    if (hideNodeSidebar) {
-      setFlowSettings({...flowSettings, showNodesPallet: false})
-      setHideNodeSidebar(false)
-    }
-  }, [hideNodeSidebar])
-
-  useEffect(() => {
-    if (hideNodeTree) {
-      setFlowSettings({...flowSettings, showNodesTree: false})
-      setHideNodeTree(false)
-    }
-  }, [hideNodeTree])
+  // useEffect(() => {
+  //   if (flowSettings.showPointPallet) {
+  //     setDisablePointsPallet(false)
+  //   }
+  // }, [flowSettings])
   
   return (
     <div className="rubix-flow">
@@ -1200,22 +1183,18 @@ const Flow = (props: FlowProps) => {
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
           flowSettings={flowSettings}
-          hideNodeTree={hideNodeTree}
-          setHideNodeTree={setHideNodeTree}
         />
       )}
-      {!isFetching && (flowSettings.showPointPallet && !hidePointsPallet) && (
+      {!isFetching && flowSettings.showPointPallet && (
         <PointsPallet
           selectedSubflow={selectedNodeForSubFlow}
-          hidePointsPallet={hidePointsPallet}
-          setHidePointsPallet={setHidePointsPallet}
+          // disablePointsPallet={disablePointsPallet}
+          // setDisablePointsPallet={setDisablePointsPallet}
         />
       )}
       {!isFetching && flowSettings.showNodesPallet && (
         <NodeSideBar 
-          nodesSpec={nodesSpec} 
-          hideNodeSidebar={hideNodeSidebar} 
-          setHideNodeSidebar={setHideNodeSidebar} 
+          nodesSpec={nodesSpec}
         />
       )}
       <div

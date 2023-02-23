@@ -16,11 +16,9 @@ type NodeProps = {
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
   flowSettings: FlowSettings;
-  hideNodeTree: boolean;
-  setHideNodeTree: Function;
 };
 
-export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings, hideNodeTree, setHideNodeTree}: NodeProps) => {
+export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings}: NodeProps) => {
   const [panelKeys, setPanelKeys] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
@@ -96,29 +94,16 @@ export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openN
     setPanelKeys([...(window.subFlowIds || [])]);
   }, [selectedSubFlowId]);
 
-  const onPanelSwitchChange = () => {
-    if (!hideNodeTree) setHideNodeTree(true)
-  }
-
   return (
     <div>
       <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
-        <div className="p-2" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-          <span style={{fontSize: '14px'}}>Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}</span>
-          <div>
-            <span style={{fontSize: '12px', marginLeft: '10px'}}>hide:</span>
-            <Switch 
-              size={'small'}
-              checked={hideNodeTree}
-              style={{marginLeft: '2px'}}
-              onChange={onPanelSwitchChange} 
-            />
-          </div>
+        <div className="p-2">
+          Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
           <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
             {isExpandedAll ? (
-              <CaretDownOutlined onClick={onChangeOpenPanels(false)} />
+              <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
             ) : (
-              <CaretRightOutlined onClick={onChangeOpenPanels(true)} />
+              <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
             )}
           </Tooltip>
         </div>
