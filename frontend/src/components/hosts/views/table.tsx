@@ -38,7 +38,6 @@ export const HostsTable = (props: any) => {
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [currentHost, setCurrentHost] = useState({} as Host);
   const [hostSchema, setHostSchema] = useState({});
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoadingForm, setIsLoadingForm] = useState(false);
   const [isInstallRubixEdgeModalVisible, setIsInstallRubixEdgeModalVisible] = useState(false);
   const [isTokenModalVisible, setIsTokenModalVisible] = useState(false);
@@ -66,7 +65,7 @@ export const HostsTable = (props: any) => {
         <Space size="middle">
           <Ping host={host} factory={factory} />
           <Tooltip title="Edit">
-            <a onClick={(e) => showModal(host, e)}>
+            <a onClick={(e) => editWizard(host, e)}>
               <FormOutlined />
             </a>
           </Tooltip>
@@ -119,15 +118,6 @@ export const HostsTable = (props: any) => {
     refreshList();
   };
 
-  const showModal = (host: Host, e: any) => {
-    e.stopPropagation();
-    setCurrentHost(host);
-    setIsModalVisible(true);
-    if (isObjectEmpty(hostSchema)) {
-      getHostSchema();
-    }
-  };
-
   const showWizard = () => {
     if (isObjectEmpty(hostSchema)) {
       getHostSchema();
@@ -135,9 +125,13 @@ export const HostsTable = (props: any) => {
     setIsWizardModalVisible(true);
   };
 
-  const onCloseModal = () => {
-    setIsModalVisible(false);
-    setCurrentHost({} as Host);
+  const editWizard = (host: Host, e: any) => {
+    e.stopPropagation();
+    setCurrentHost(host);
+    if (isObjectEmpty(hostSchema)) {
+      getHostSchema();
+    }
+    setIsWizardModalVisible(true);
   };
 
   const showRubixEdgeInstallModal = (host: Host, e: any) => {
@@ -183,7 +177,6 @@ export const HostsTable = (props: any) => {
     setTokenFactory(_tokenFactory);
   }, [currentHost]);
 
-
   return (
     <div>
       <RbRefreshButton refreshList={refreshList} />
@@ -213,16 +206,6 @@ export const HostsTable = (props: any) => {
         tokenFactory={tokenFactory}
         isWizardModalVisible={isWizardModalVisible}
         setIsWizardModalVisible={setIsWizardModalVisible}
-      />
-
-      <CreateEditModal
-        currentHost={currentHost}
-        hostSchema={hostSchema}
-        isModalVisible={isModalVisible}
-        isLoadingForm={isLoadingForm}
-        connUUID={connUUID}
-        refreshList={refreshList}
-        onCloseModal={onCloseModal}
       />
       <InstallRubixEdgeModal
         isModalVisible={isInstallRubixEdgeModalVisible}

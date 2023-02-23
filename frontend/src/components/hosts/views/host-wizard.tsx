@@ -19,10 +19,14 @@ export const CreateHostWizard = (props: any) => {
     isWizardModalVisible,
     setIsWizardModalVisible
   } = props;
-  const [newHost, setNewHost] = useState({} as Host);
+  const [host, setHost] = useState({} as Host);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps['status']>('process');
   const [errorAtPing, setErrorAtPing] = useState(false);
+
+  useEffect(() => {
+    setHost({ ...currentHost });
+  }, [currentHost]);
 
   useEffect(() => {
     setStepStatus('process');
@@ -33,10 +37,10 @@ export const CreateHostWizard = (props: any) => {
     try {
       const res = await hostsFactory.PingHost();
       if (res) {
-        openNotificationWithIcon("success", `successfully pinged the new host ${newHost.name}!`);
+        openNotificationWithIcon("success", `successfully pinged the host ${newHost.name}!`);
         setCurrentStep(currentStep + 1);
       } else {
-        openNotificationWithIcon("error", `failed to ping new host ${newHost.name}!`);
+        openNotificationWithIcon("error", `failed to ping host ${newHost.name}!`);
         setStepStatus('error');
         setErrorAtPing(true);
       }
@@ -47,36 +51,36 @@ export const CreateHostWizard = (props: any) => {
 
   const data = [
     {
-      id: "1", name: "Step 1", text: 'Create new host', content: (
+      id: "1", name: "Step 1", text: 'Configure host', content: (
         <div style={{ width: '35vw' }}>
           <CreateHostForm
-            currentHost={newHost}
+            currentHost={host}
             hostSchema={hostSchema}
             isLoadingForm={isLoadingForm}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
             refreshList={refreshList}
-            setNewHost={setNewHost}
+            setNewHost={setHost}
           />
         </div>
       )
     },
     {
-      id: "2", name: "Step 2", text: 'Ping new host', content: (
+      id: "2", name: "Step 2", text: 'Ping host', content: (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: '20px', alignItems: 'center' }}>
-          <Button type="primary" onClick={() => pingHost(newHost)} style={{ width: '160px' }}>Ping new host</Button>
+          <Button type="primary" onClick={() => pingHost(host)} style={{ width: '160px' }}>Ping host</Button>
           {errorAtPing && (
-            <strong style={{ color: 'red' }}>Error pinging newly created host, go back to step one.</strong>)}
+            <strong style={{ color: 'red' }}>Error pinging host, go back to step one!</strong>)}
         </div>
       )
     },
     {
       id: "3", name: "Step 3", text: 'Configure tokens', content: (
         <div style={{ width: '35vw', display: 'flex', flexDirection: 'column', rowGap: '2vh', alignItems: 'center' }}>
-          {newHost.external_token === '' ? (
+          {host.external_token === '' ? (
             <TokenForm
               factory={tokenFactory}
-              selectedItem={newHost}
+              selectedItem={host}
               hostOrConn={'host'}
             />
           ) : (
@@ -97,7 +101,7 @@ export const CreateHostWizard = (props: any) => {
   };
 
   const handleWizardClose = () => {
-    setNewHost({} as Host);
+    setHost({} as Host);
     setCurrentStep(0);
     setIsWizardModalVisible(false);
     refreshList();

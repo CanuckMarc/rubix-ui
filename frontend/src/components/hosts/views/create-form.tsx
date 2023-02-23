@@ -20,7 +20,7 @@ export const CreateHostForm = (props: any) => {
     setNewHost
   } = props;
   const [formData, setFormData] = useState(currentHost);
-  const [validationError, setValidationError] = useState(true);
+  const [validationError, setValidationError] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
@@ -30,10 +30,8 @@ export const CreateHostForm = (props: any) => {
   useEffect(() => {
     if (currentHost.uuid) {
       setIsUpdate(true);
-      setValidationError(true);
     } else {
       setIsUpdate(false);
-      setValidationError(false);
     }
   }, [currentHost.uuid]);
 
