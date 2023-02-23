@@ -442,6 +442,7 @@ export const MenuSidebar = () => {
 
   const fetchConnections = async () => {
     setIsFetching(true);
+    setMenu(menuItems);
     setTimeout(async () => {
       setIsFetching(false);
     }, getTimeSetting());
