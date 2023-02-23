@@ -1,8 +1,8 @@
 import { Card, Select, Button, Table, Input, InputNumber, Spin } from "antd";
 import { useState, useEffect, ChangeEvent } from "react";
 import { PlusOutlined, MinusOutlined, UploadOutlined } from '@ant-design/icons';
-import { useParams, useNavigate } from "react-router-dom";
-import { useIsLoading, useBacnetStore, PointTableType } from '../../App';
+import { useNavigate } from "react-router-dom";
+import { useBacnetStore, PointTableType } from '../../App';
 import { ROUTES } from "../../constants/routes";
 import { node } from "../../../wailsjs/go/models";
 import type { ColumnsType } from 'antd/es/table';
@@ -12,8 +12,6 @@ import { BacnetTableDataType, BacnetMapPropType } from "./map";
 import { BacnetPointTable } from "./views/bacnetPointTable";
 import { FlowFactory } from "../rubix-flow/factory"
 import { NodeInterface } from "../rubix-flow/lib/Nodes/NodeInterface";
-
-const { Search } = Input;
 
 export interface BacnetPointTablePropType {
   title: string;
@@ -276,14 +274,13 @@ export const BacnetMap = (props: BacnetMapPropType) => {
 
           <div style={{display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center'}}>
             <strong>Search by point name: </strong>
-            <Search 
+            <Input 
               placeholder="search by point name"
-              enterButton="Search"
               disabled={pointList.length === 0}
               allowClear={true} 
               value={search} 
               onChange={onSearchBarChange} 
-              onSearch={handleSearchPointName} 
+              onPressEnter={handleSearchPointName} 
               style={{ width: '500px' }} 
             />
           </div>

@@ -5,9 +5,6 @@ import { LogTablePropType } from "./table";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
-const { Search } = Input;
-
 export interface LogTableType {
   key: number;
   time: string;
@@ -180,14 +177,13 @@ export const LogTable = (props: LogTablePropType) => {
           Load Logs
         </Button>
       </div>
-      <Search
+      <Input
         placeholder="Search log by message"
-        enterButton="Search"
         disabled={tableData.length === 0}
         allowClear={true}
         value={search}
         onChange={onSearchBarChange}
-        onSearch={handleOnSearch}
+        onPressEnter={handleOnSearch}
         style={{width: '100%'}}
       />
       <Table
