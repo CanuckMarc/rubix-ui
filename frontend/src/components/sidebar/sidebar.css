@@ -68,8 +68,8 @@ aside .active {
 }
 
 #versions-dropdown {
-    z-index: 1000 !important;
-    background-color: rgba(32, 32, 32, 255) !important;
+    background-color: var(--sidebar-background);
+    color: var(--white);
 }
 
 .rubix-menu {
