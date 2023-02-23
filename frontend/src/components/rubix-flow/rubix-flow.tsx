@@ -204,7 +204,7 @@ const Flow = (props: FlowProps) => {
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
       const newNode = {
         id: generateUuid(),
-        info: { nodeName: name ? name : '' },
+        info: { nodeName: name ? name : "" },
         isParent,
         style,
         type: nodeType,
@@ -858,7 +858,7 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true);
 
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
@@ -928,30 +928,17 @@ const Flow = (props: FlowProps) => {
   };
 
   const onDrop = (event: any) => {
-    if (event.dataTransfer.getData("from-node-sidebar") !== '') {
+    if (event.dataTransfer.getData("from-node-sidebar") !== "") {
       const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
       const position = setMousePosition(event, true);
       handleAddNode(isParent, null, nodeType, position);
     }
 
-    if (event.dataTransfer.getData("from-point-pallet") !== '') {
+    if (event.dataTransfer.getData("from-point-pallet") !== "") {
       const { namePallet, nodeTypePallet } = JSON.parse(event.dataTransfer.getData("from-point-pallet"));
       const position = setMousePosition(event, true);
       handleAddNode(false, null, nodeTypePallet, position, namePallet);
     }
-  };
-
-  const handleMinimapNodeColor = (node: NodeInterface) => {
-    if (node.type) {
-      const category = node.type.split("/")[0] as NodeCategory;
-      return categoryColorMap[category] || "gray";
-    }
-    return "gray";
-  };
-
-  const handleMinimapBorderColor = (node: NodeInterface) => {
-    if (node.selected) return "red";
-    return "none";
   };
 
   const onEdgeClick = useCallback(
@@ -1149,16 +1136,12 @@ const Flow = (props: FlowProps) => {
 
   const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
 
-  const nodeColor = (node: any) => {
-    switch (node.selected) {
-      case true:
-        return "#6ede87";
-      case false:
-        return "#555";
-      default:
-        return "#555";
+  const nodeColor = useCallback((node: any) => {
+    if (node.selected) {
+      return "#6ede87";
     }
-  };
+    return "#555";
+  }, []);
 
   // useEffect(() => {
   //   if (disablePointsPallet) {
