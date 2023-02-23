@@ -15,7 +15,8 @@ const { TabPane } = Tabs;
 const pluginsKey = "MODULES";
 const pluginDistribution = "INSTALL PLUGIN";
 
-export const FlowPluginsTable = () => {
+export const FlowPluginsTable = (props: any) => {
+  const { activeKey } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState([] as any);
   const [pluginName, setPluginName] = useState<string>();
@@ -112,8 +113,10 @@ export const FlowPluginsTable = () => {
   };
 
   useEffect(() => {
-    fetchPlugins();
-  }, []);
+    if (activeKey === pluginsKey) {
+      fetchPlugins();
+    }
+  }, [activeKey]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -150,13 +153,21 @@ export const FlowPluginsTable = () => {
 };
 
 export const Plugins = () => {
+  const [activeKey, setActiveKey] = useState(pluginsKey);
+  const onChange = (newActiveKey: string) => {
+    setActiveKey(newActiveKey);
+  };
+
   return (
-    <Tabs defaultActiveKey={pluginsKey}>
+    <Tabs
+      onChange={onChange}
+      activeKey={activeKey}
+    >
       <TabPane tab={pluginsKey} key={pluginsKey}>
-        <FlowPluginsTable />
+        <FlowPluginsTable activeKey={activeKey}/>
       </TabPane>
       <TabPane tab={pluginDistribution} key={pluginDistribution}>
-        <PluginDistributionTable />
+        <PluginDistributionTable activeKey={activeKey} pluginDistribution={pluginDistribution}/>
       </TabPane>
     </Tabs>
   );
