@@ -136,7 +136,7 @@ const Controls = ({
 
     onCopyNodes({
       nodes: nodesCopied,
-      edges: copyNodesC ? edgesCopied : newNodes.edges,
+      edges: copyNodesC ? edgesCopied : newNodes?.edges || edgesCopied,
     });
   };
 

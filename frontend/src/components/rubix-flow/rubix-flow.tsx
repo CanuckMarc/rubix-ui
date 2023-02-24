@@ -105,7 +105,6 @@ const Flow = (props: FlowProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInterface[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
   const [nodeSelect, setNodeSelect] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
@@ -201,8 +200,6 @@ const Flow = (props: FlowProps) => {
       deleteNodesAndEdges([], edgesDeleted);
     }
   });
-
-  const onMove = () => setShouldUpdateMiniMap((s) => !s);
 
   const handleFlowChange = () => setIsChangedFlow(true);
 
@@ -412,7 +409,16 @@ const Flow = (props: FlowProps) => {
 
   const onHandelSaveFlow = async () => {
     setIsSaving(true);
-    const allNodes: NodeInterface[] = [...nodes];
+    const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
+      if (n.isParent) {
+        const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
+        return {
+          ...n,
+          data: originNode?.data || {},
+        };
+      }
+      return n;
+    });
 
     window.allFlow.nodes.forEach((node) => {
       const isExist = allNodes.some((n) => n.id === node.id);
@@ -972,19 +978,29 @@ const Flow = (props: FlowProps) => {
     edges.forEach((item) => (item.selected = false));
 
     // get nodes original
-    const newNodesCopy = _copied.nodes.map((node) => window.allFlow.nodes.find((item) => item.id === node.id) || node);
-
-    console.log("newNodesCopy", newNodesCopy);
+    const newNodesCopied = _copied.nodes.map((node) => {
+      if (node.isParent) {
+        return window.allFlow.nodes.find((item) => item.id === node.id) || node;
+      }
+      return node;
+    });
+    const newEdgesCopied = _copied.edges.map((e) => {
+      if (e.originEdgeId) {
+        return window.allFlow.edges.find((e2) => e2.id === e.originEdgeId) || e;
+      }
+      return e;
+    });
 
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
     const newFlow = handleCopyNodesAndEdges(
-      { ..._copied, nodes: newNodesCopy },
+      { nodes: newNodesCopied, edges: newEdgesCopied },
       window.allFlow.nodes,
       window.allFlow.edges,
-      true
+      true,
+      nodesSpec
     );
 
     // remove connections if have source or target is not belong to new nodes
@@ -1153,19 +1169,22 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const gotoNode = useCallback((node: NodeInterface) => {
-    if (node.parentId) {
-      node.isParent
-        ? handleAddSubFlow(node)
-        : handleAddSubFlow(window.allFlow.nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
-    } else {
-      setSelectedNodeForSubFlow([]);
-    }
-    setTimeout(() => {
-      setNodes((newNodes) => newNodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id })));
-    }, 1000);
-    rubixFlowInstance.fitView(node.position);
-  }, []);
+  const gotoNode = useCallback(
+    (node: NodeInterface) => {
+      if (node.parentId) {
+        node.isParent
+          ? handleAddSubFlow(node)
+          : handleAddSubFlow(window.allFlow.nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
+      } else {
+        setSelectedNodeForSubFlow([]);
+      }
+      setTimeout(() => {
+        setNodes((newNodes) => newNodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id })));
+      }, 1000);
+      rubixFlowInstance?.fitView(node.position);
+    },
+    [rubixFlowInstance]
+  );
 
   useEffect(() => {
     if (!window.allFlow) {
@@ -1375,7 +1394,6 @@ const Flow = (props: FlowProps) => {
               edgeTypes={customEdgeTypes}
               nodes={nodes}
               edges={edges}
-              onMove={onMove}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onSelectionChange={onChangeSelection}
