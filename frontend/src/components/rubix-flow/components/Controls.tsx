@@ -190,7 +190,7 @@ const Controls = ({
       const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
       const egdes = window.egdesCopied;
       
-      copyNodesC ? handleDuplicatedNodes(nodes, egdes) : handleDuplicatedNodes(newNodes.nodes, newNodes.egdes);
+      handleDuplicatedNodes(nodes, egdes);
     }
     window.nodesCopied = [];
   });
