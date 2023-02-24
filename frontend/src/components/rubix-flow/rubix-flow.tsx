@@ -124,6 +124,8 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+  const [panelKeysNew, setPanelKeysNew] = useState<string[]>([]);
   const [isLinkBuilder, setIsLinkBuilder] = useState(false);
   const [undoState, setUndoState] = useState<{ past: UndoStateType[]; future: UndoStateType[] }>({
     past: [],
@@ -184,6 +186,13 @@ const Flow = (props: FlowProps) => {
       isDragSelection.current = true;
     },
   });
+
+  // Subflow nodes are open
+  const changeKeys = (key: string) => {
+    const isExist = panelKeys.includes(key);
+    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
+    setPanelKeysNew(isExist ? panelKeys.filter((item) => item === key) : [key]);
+  };
 
   // delete selected wires
   useOnPressKey("Backspace", () => {
@@ -900,8 +909,8 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true);
-
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
+    
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
       const existSource = newFlow.nodes.some((node: NodeInterface) => node.id === edge.source);
@@ -1207,6 +1216,9 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
+          panelKeys={panelKeys}
+          setPanelKeys={setPanelKeys}
+          changeKeys={changeKeys}
           flowSettings={flowSettings}
         />
       )}
@@ -1232,6 +1244,7 @@ const Flow = (props: FlowProps) => {
             selectedSubflow={selectedNodeForSubFlow}
             goSubFlow={handleAddSubFlow}
             onBackToMain={onBackToMain}
+            panelKeysNew={panelKeysNew}
           />
         )}
         {isFetching ? (
