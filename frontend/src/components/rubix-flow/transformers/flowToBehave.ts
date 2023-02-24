@@ -15,7 +15,7 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
       return;
     }
 
-    const newInput = (node.data?.inputs || []).reduce(
+    const newInput = node.isParent ? {} : (node.data?.inputs || []).reduce(
       (
         obj: { [key: string]: any; },
         item: {
