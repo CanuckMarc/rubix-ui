@@ -93,10 +93,12 @@ export const NodeTreeItem = ({
           className={`py-2 cursor-po inter flex flex-row flex-start gap-2 items-center text-left ant-menu-item border-gray-600 ${
             nodeIndex === 0 ? "" : "border-t"
           }`}
-          style={{ paddingLeft: !node.parentId ? undefined : 26 }}
+          style={{ paddingLeft: !node.parentId ? undefined : 22 }}
         >
-          {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
-          {type}
+          <span className="group-name">
+            {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
+            {type}
+          </span>
         </div>
       )}
     </Collapse>
