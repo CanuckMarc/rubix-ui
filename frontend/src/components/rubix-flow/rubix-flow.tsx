@@ -1158,7 +1158,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <Tabs size="small">
+      <Tabs size="small" centered>
         {!isFetching && flowSettings.showNodesTree && (
           <TabPane tab="Tree" key="Tree">
             <NodesTree
