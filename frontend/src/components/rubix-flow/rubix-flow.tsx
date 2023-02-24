@@ -857,6 +857,48 @@ const Flow = (props: FlowProps) => {
     }));
     handleFlowChange();
   };
+  
+  // delete nodes when CtrX
+  const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+    const nodeIds: string[] = [];
+    for (const node of _nodesDeleted) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+    
+    const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
+
+    const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
+    
+    const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
+
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeIds.includes(item.target) &&
+        !nodeIds.includes(item.source)
+    );
+    window.allFlow = {
+      nodes: remainingNodesAll,
+      edges: window.allFlow.edges.filter(
+        (item) =>
+          !_edgesDeleted.some((item2) => item.id === item2.id) &&
+          !nodeId.includes(item.target) &&
+          !nodeId.includes(item.source)
+      ),
+    };
+    setNodes(remainingNodes);
+    setEdges(remainingEdges);
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
+      future: s.future,
+    }));
+    handleFlowChange();
+  };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
     /* Unselected nodes, edges */
@@ -1272,6 +1314,7 @@ const Flow = (props: FlowProps) => {
                 isSaving={isSaving}
                 isChangedFlow={isChangedFlow}
                 deleteNodesAndEdges={deleteNodesAndEdges}
+                deleteNodesAndEdgesCtrX={deleteNodesAndEdgesCtrX}
                 onCopyNodes={handleCopyNodes}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
