@@ -155,7 +155,7 @@ export const LoadBacnetMap = () => {
   const generateNodes = (item: NodeGenInputType) => {
     const nodeSettings = handleGetSettingType(connUUID, hostUUID, !!connUUID && !!hostUUID, item.type);
     const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, item.type);
-
+    // same solution
     let updatedSettings: any = {};
     if (!item.pointName && item.topic && !item.instanceNumber) {
       updatedSettings = {
