@@ -23,18 +23,20 @@ export const SubFlowTabs: FC<SubFlowTabsProps> = memo(
         goSubFlow(node);
       }
     };
+
     const nodeTabs = nodes.filter((item) => panelKeysNew.includes(item.id));
 
-  return (
-    <div className="subflow-tabs absolute w-full">
-      <Tabs activeKey={selectedSubflow?.id || "main"} type="card" size="small" onChange={onChangeTab}>
-        <Tabs.TabPane tabKey="main" tab="Main" key="main" />
-        {nodes.map((item) => (
-          <Tabs.TabPane tabKey={item.id} tab={item.info?.nodeName || item.type?.split("/")[1]} key={item.id} />
-        ))}
-      </Tabs>
-    </div>
-  );
-});
+    return (
+      <div className="subflow-tabs absolute w-full">
+        <Tabs activeKey={selectedSubflow?.id || "main"} type="card" size="small" onChange={onChangeTab}>
+          <Tabs.TabPane tabKey="main" tab="Main" key="main" />
+          {nodeTabs.map((item) => (
+            <Tabs.TabPane tabKey={item.id} tab={item.info?.nodeName || item.type?.split("/")[1]} key={item.id} />
+          ))}
+        </Tabs>
+      </div>
+    );
+  }
+);
 
 SubFlowTabs.displayName = "SubflowTabs";
