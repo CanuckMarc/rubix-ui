@@ -16,21 +16,28 @@ type NodeProps = {
   selectedSubFlowId?: string;
   openNodeMenu: (position: { x: number; y: number }, node: NodeInterface) => void;
   flowSettings: FlowSettings;
+  panelKeys: string[];
+  setPanelKeys: React.Dispatch<React.SetStateAction<string[]>>;
+  changeKeys: (key: string) => void;
 };
 
-export const NodesTree = ({ nodes, nodesSpec, selectedSubFlowId, gotoNode, openNodeMenu, flowSettings }: NodeProps) => {
-  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+export const NodesTree = ({
+  nodes,
+  nodesSpec,
+  selectedSubFlowId,
+  gotoNode,
+  openNodeMenu,
+  flowSettings,
+  panelKeys,
+  setPanelKeys,
+  changeKeys,
+}: NodeProps) => {
   const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
   const [nodesFiltered, setNodesFiltered] = useState<{ nodesL1: NodeInterface[]; remainingNodes: NodeInterface[] }>({
     nodesL1: [],
     remainingNodes: [],
   });
-
-  const changeKeys = (key: string) => {
-    const isExist = panelKeys.includes(key);
-    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
-  };
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

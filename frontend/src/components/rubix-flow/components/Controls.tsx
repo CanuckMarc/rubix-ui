@@ -29,6 +29,7 @@ type ControlProps = {
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
+  deleteNodesAndEdgesCtrX: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -48,6 +49,7 @@ const Controls = ({
   isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
+  deleteNodesAndEdgesCtrX,
   onCopyNodes,
   onUndo,
   onRedo,
@@ -64,6 +66,8 @@ const Controls = ({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [copyNodesC, setCopyNodesC] = useState(false);
+  const [newNodes, setNewNode] = useState({} as any);
   const [settingRefreshModalOpen, setSettingRefreshModalOpen] = useState(false);
   const instance = useReactFlow();
 
@@ -86,6 +90,15 @@ const Controls = ({
     const edgesDeleted = _edges.filter((item) => item.selected);
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
+  };
+  const deleteSelectNodeCtrX = () => {
+    const _nodes = instance.getNodes();
+    const _edges = instance.getEdges();
+
+    const nodesDeleted = _nodes.filter((item) => item.selected);
+    const edgesDeleted = _edges.filter((item) => item.selected);
+
+    deleteNodesAndEdgesCtrX(nodesDeleted, edgesDeleted);
   };
 
   /* Ctrl + Delete (key): Delete items selected  */
@@ -123,7 +136,7 @@ const Controls = ({
 
     onCopyNodes({
       nodes: nodesCopied,
-      edges: edgesCopied,
+      edges: copyNodesC ? edgesCopied : newNodes.edges,
     });
   };
 
@@ -141,21 +154,31 @@ const Controls = ({
 
   /* Ctrl + X (key): Refresh node values */
   useCtrlPressKey("KeyX", () => {
+    setCopyNodesC(false);
     copySelectNode();
-    deleteSelectNode();
+    deleteSelectNodeCtrX();
   });
 
   // Copy selected node
   const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
     const egdesCopied = instance.getEdges().filter((edge) => edge.selected);
+    
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
       window.egdesCopied = egdesCopied;
     }
+    const newNodes= {
+      nodes: nodesCopied,
+      edges: instance.getEdges(),
+    };  
+    setNewNode(newNodes);   
   };
-
-  useCtrlPressKey("KeyC", copySelectNode);
+  
+  useCtrlPressKey("KeyC", () => {
+    setCopyNodesC(true);
+    copySelectNode();
+  });
 
   useCtrlPressKey("KeyV", () => {
     const activeElement = document.activeElement;
@@ -166,6 +189,7 @@ const Controls = ({
     ) {
       const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
       const egdes = window.egdesCopied;
+      
       handleDuplicatedNodes(nodes, egdes);
     }
     window.nodesCopied = [];

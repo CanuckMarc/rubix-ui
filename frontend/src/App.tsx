@@ -2,7 +2,7 @@ import { Layout } from "antd";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import cx from "classnames";
-import create from 'zustand';
+import create from "zustand";
 import { node } from "../wailsjs/go/models";
 
 import { EventsOff, EventsOn } from "../wailsjs/runtime";
@@ -10,7 +10,8 @@ import AppRoutes from "./AppRoutes";
 import { MenuSidebar } from "./components/sidebar/sidebar";
 import { ThemeProvider } from "./themes/theme-provider";
 import { openNotificationWithIcon } from "./utils/utils";
-import { BacnetTableDataType } from "./components/wires-map/map"
+import { BacnetTableDataType } from "./components/wires-map/map";
+import { ExistingSetTableData } from "./components/wires-map/bacnet-map";
 import "./App.css";
 
 const { Content } = Layout;
@@ -38,18 +39,20 @@ export interface PointTableTypeRecord {
 
 export const useStore = create((set: any) => ({
   wiresMapNodes: [] as PointTableTypeRecord[],
-  setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray})),
+  setWiresMapNodes: (pointArray: PointTableTypeRecord[]) => set(() => ({ wiresMapNodes: pointArray })),
 }));
 
 export const useBacnetStore = create((set: any) => ({
   bacnetNodes: [] as BacnetTableDataType[],
-  setBacnetNodes: (nodesArray: BacnetTableDataType[]) => set(() => ({ bacnetNodes: nodesArray})),
+  setBacnetNodes: (nodesArray: BacnetTableDataType[]) => set(() => ({ bacnetNodes: nodesArray })),
+  bacnetNodesToDelete: [] as ExistingSetTableData[],
+  setBacnetNodesToDelete: (nodesArray: ExistingSetTableData[]) => set(() => ({ bacnetNodesToDelete: nodesArray })),
 }));
 
 export const useIsLoading = create((set: any) => ({
   refreshCounter: 0 as Number,
-  reset: () => set(() => ({ refreshCounter: 0})),
-  incrementRefreshCounter: () => set((state: any) => ({ refreshCounter: state.refreshCounter + 1}))
+  reset: () => set(() => ({ refreshCounter: 0 })),
+  incrementRefreshCounter: () => set((state: any) => ({ refreshCounter: state.refreshCounter + 1 })),
 }));
 
 const getParentKey = (key: React.Key, tree: any): React.Key => {

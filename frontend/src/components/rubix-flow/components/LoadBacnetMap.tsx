@@ -9,6 +9,8 @@ import { NodeSpecJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
 import { openNotificationWithIcon } from "../../../utils/utils";
 import { BacnetTableDataType } from "../../wires-map/map";
+import { node } from "../../../../wailsjs/go/models";
+import { ExistingSetTableData } from "../../wires-map/bacnet-map";
 
 type NodeGenInputType = {
   type: string;
@@ -20,6 +22,7 @@ type NodeGenInputType = {
   name: string | undefined;
   instanceNumber: number | undefined;
   pointName: string | undefined;
+  setId: string;
 };
 
 interface ReturnType {
@@ -34,10 +37,16 @@ function getRandomArbitrary(min: number, max: number) {
 const xRand = getRandomArbitrary(-200, 200);
 const yRand = getRandomArbitrary(-200, 200);
 
-export const LoadBacnetMap = () => {
+export const LoadBacnetMap = (props: any) => {
+  const { deleteNodesAndEdges } = props;
   let { connUUID = "", hostUUID = "" } = useParams();
 
-  const [bacnetNodes, setBacnetNodes] = useBacnetStore((state) => [state.bacnetNodes, state.setBacnetNodes]);
+  const [bacnetNodes, setBacnetNodes, bacnetNodesToDelete, setBacnetNodesToDelete] = useBacnetStore((state) => [
+    state.bacnetNodes,
+    state.setBacnetNodes,
+    state.bacnetNodesToDelete,
+    state.setBacnetNodesToDelete,
+  ]);
   const [refreshCounter, reset, setIsLoadingRubixFlow] = useIsLoading((state) => [
     state.refreshCounter,
     state.reset,
@@ -55,7 +64,17 @@ export const LoadBacnetMap = () => {
         const res = startUp();
         if (res) renderPointsToFlowEditor(res.localNodes, res.localEdges);
         setBacnetNodes([]);
-        openNotificationWithIcon("success", "Bacnet loading complete!");
+        openNotificationWithIcon("success", "Successfully added Bacnet mapping!");
+      }
+
+      if (bacnetNodesToDelete.length !== 0) {
+        let nodesToDelete: (node.Schema | undefined)[] = [];
+        bacnetNodesToDelete.forEach((item: ExistingSetTableData) => {
+          nodesToDelete = [...nodesToDelete, ...item.nodesArray];
+        });
+        deleteNodesAndEdges(nodesToDelete, []);
+        setBacnetNodesToDelete([]);
+        openNotificationWithIcon("success", "Successfully deleted existing Bacnet mapping!");
       }
     }
   }, [refreshCounter]);
@@ -63,6 +82,7 @@ export const LoadBacnetMap = () => {
   const addNewNodesEdges = (setOfNodesToAdd: BacnetTableDataType, x: number, y: number) => {
     const nodes: NodeInterface[] = [];
     let edges: Edge[] = [];
+    const newSetId = generateUuid();
 
     // generate new nodes
     const nodeSpecs: NodeGenInputType[] = [
@@ -76,6 +96,7 @@ export const LoadBacnetMap = () => {
         topic: undefined,
         instanceNumber: undefined,
         pointName: setOfNodesToAdd.selectedPointName,
+        setId: newSetId,
       },
       {
         type: "link/link-input-number",
@@ -87,6 +108,7 @@ export const LoadBacnetMap = () => {
         topic: setOfNodesToAdd.outputTopic,
         instanceNumber: undefined,
         pointName: undefined,
+        setId: newSetId,
       },
       {
         type: "link/link-output-number",
@@ -98,6 +120,7 @@ export const LoadBacnetMap = () => {
         topic: setOfNodesToAdd.outputTopic,
         instanceNumber: undefined,
         pointName: undefined,
+        setId: newSetId,
       },
       {
         type: "bacnet/analog-variable",
@@ -109,6 +132,7 @@ export const LoadBacnetMap = () => {
         topic: undefined,
         instanceNumber: setOfNodesToAdd.instanceNumber,
         pointName: undefined,
+        setId: newSetId,
       },
     ];
 
@@ -191,7 +215,7 @@ export const LoadBacnetMap = () => {
       style: {},
       status: undefined,
       parentId: item.parentId,
-      settings: updatedSettings,
+      settings: { ...updatedSettings, setId: item.setId },
       selected: false,
     };
   };
