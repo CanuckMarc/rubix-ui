@@ -5,12 +5,17 @@
 }
 
 .rubix-flow__node-sidebar {
-  min-width: 210px;
+  width: auto !important;
+  max-width: unset !important;
 }
 
 .rubix-flow__wrapper {
   flex-grow: 1;
   height: calc(100vh - 40px);
+}
+
+.rubix-flow>.ant-tabs>.ant-tabs-nav {
+  padding: 0 5px;
 }
 
 .title-icon {
@@ -20,7 +25,7 @@
   cursor: pointer;
 }
 
-.node-help-modal > .ant-modal-content > .ant-modal-body > div > table {
+.node-help-modal>.ant-modal-content>.ant-modal-body>div>table {
   width: 100%;
 }
 

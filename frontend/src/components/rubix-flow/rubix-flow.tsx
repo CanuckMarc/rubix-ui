@@ -27,7 +27,7 @@ import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
-import { Spin } from "antd";
+import { Spin, Tabs } from "antd";
 import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
@@ -39,9 +39,6 @@ import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowS
 import { NodesTree } from "./components/NodesTree";
 import { PointsPallet } from "./components/PointsPallet";
 import { NodeSideBar } from "./components/NodeSidebar";
-import "./rubix-flow.css";
-import { categoryColorMap } from "./util/colors";
-import { NodeCategory } from "./lib/Nodes/NodeCategory";
 import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
@@ -55,6 +52,9 @@ import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
+import "./rubix-flow.css";
+
+const { TabPane } = Tabs;
 
 type SelectableBoxType = {
   edgeId: string;
@@ -1155,31 +1155,37 @@ const Flow = (props: FlowProps) => {
   //     setDisablePointsPallet(false)
   //   }
   // }, [flowSettings])
-  
+
   return (
     <div className="rubix-flow">
-      {!isFetching && flowSettings.showNodesTree && (
-        <NodesTree
-          nodes={window.allFlow?.nodes || []}
-          selectedSubFlowId={selectedNodeForSubFlow?.id}
-          openNodeMenu={openNodeMenu}
-          nodesSpec={nodesSpec}
-          gotoNode={gotoNode}
-          flowSettings={flowSettings}
-        />
-      )}
-      {!isFetching && flowSettings.showPointPallet && (
-        <PointsPallet
-          selectedSubflow={selectedNodeForSubFlow}
-          // disablePointsPallet={disablePointsPallet}
-          // setDisablePointsPallet={setDisablePointsPallet}
-        />
-      )}
-      {!isFetching && flowSettings.showNodesPallet && (
-        <NodeSideBar 
-          nodesSpec={nodesSpec}
-        />
-      )}
+      <Tabs size="small">
+        {!isFetching && flowSettings.showNodesTree && (
+          <TabPane tab="Tree" key="Tree">
+            <NodesTree
+              nodes={window.allFlow?.nodes || []}
+              selectedSubFlowId={selectedNodeForSubFlow?.id}
+              openNodeMenu={openNodeMenu}
+              nodesSpec={nodesSpec}
+              gotoNode={gotoNode}
+              flowSettings={flowSettings}
+            />
+          </TabPane>
+        )}
+        {!isFetching && flowSettings.showPointPallet && (
+          <TabPane tab="Points" key="Points">
+            <PointsPallet
+              selectedSubflow={selectedNodeForSubFlow}
+              // disablePointsPallet={disablePointsPallet}
+              // setDisablePointsPallet={setDisablePointsPallet}
+            />
+          </TabPane>
+        )}
+        {!isFetching && flowSettings.showNodesPallet && (
+          <TabPane tab="Nodes" key="Nodes">
+            <NodeSideBar nodesSpec={nodesSpec} />
+          </TabPane>
+        )}
+      </Tabs>
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
