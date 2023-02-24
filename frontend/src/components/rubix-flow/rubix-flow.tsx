@@ -1155,7 +1155,7 @@ const Flow = (props: FlowProps) => {
   //     setDisablePointsPallet(false)
   //   }
   // }, [flowSettings])
-  
+
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1175,11 +1175,7 @@ const Flow = (props: FlowProps) => {
           // setDisablePointsPallet={setDisablePointsPallet}
         />
       )}
-      {!isFetching && flowSettings.showNodesPallet && (
-        <NodeSideBar 
-          nodesSpec={nodesSpec}
-        />
-      )}
+      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
@@ -1238,7 +1234,7 @@ const Flow = (props: FlowProps) => {
                 />
               )}
               <LoadWiresMap />
-              <LoadBacnetMap />
+              <LoadBacnetMap deleteNodesAndEdges={deleteNodesAndEdges} />
               <DragSelection />
               {flowSettings.showMiniMap && (
                 <MiniMap
