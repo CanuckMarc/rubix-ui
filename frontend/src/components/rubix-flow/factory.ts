@@ -193,7 +193,7 @@ export class FlowFactory {
     encodedNodes: any,
     restartFlow: boolean
   ) {
-    return await DownloadFlow(
+    return DownloadFlow(
       connUUID,
       hostUUID,
       isRemote,

@@ -627,34 +627,33 @@ const Flow = (props: FlowProps) => {
     closeNodePicker();
   };
 
-  const onChangeSelection = ({
-    nodes: newNodesChange,
-    edges: newEdgesChange,
-  }: {
-    nodes: NodeInterface[];
-    edges: Edge[];
-  }) => {
-    if (changeSelectionRef.current) {
-      clearTimeout(changeSelectionRef.current);
-      changeSelectionRef.current = null;
-    }
+  const onChangeSelection = useCallback(
+    ({ nodes: newNodesChange, edges: newEdgesChange }: { nodes: NodeInterface[]; edges: Edge[] }) => {
+      if (changeSelectionRef.current) {
+        clearTimeout(changeSelectionRef.current);
+        changeSelectionRef.current = null;
+      }
 
-    if (newNodesChange.length > 0 || newEdgesChange.length > 0) {
-      changeSelectionRef.current = setTimeout(() => {
-        const newNodes = nodes.map((node) => {
-          node.selected = newNodesChange.some((i) => i.id === node.id);
-          return node;
-        });
-        const newEdges = edges.map((edge) => {
-          edge.selected = newEdgesChange.some((i) => i.id === edge.id);
-          return edge;
-        });
+      if (newNodesChange.length > 0 || newEdgesChange.length > 0) {
+        changeSelectionRef.current = setTimeout(() => {
+          const nodes = rubixFlowInstance.getNodes();
+          const edges = rubixFlowInstance.getEdges();
+          const newNodes = nodes.map((node: NodeInterface) => {
+            node.selected = newNodesChange.some((i) => i.id === node.id);
+            return node;
+          });
+          const newEdges = edges.map((edge: Edge) => {
+            edge.selected = newEdgesChange.some((i) => i.id === edge.id);
+            return edge;
+          });
 
-        setNodes(newNodes);
-        setEdges(newEdges);
-      }, 50);
-    }
-  };
+          setNodes(newNodes);
+          setEdges(newEdges);
+        }, 50);
+      }
+    },
+    [rubixFlowInstance]
+  );
 
   const handlePaneContextMenu = (event: ReactMouseEvent) => {
     const { x, y } = setMousePosition(event);
@@ -1215,7 +1214,7 @@ const Flow = (props: FlowProps) => {
       rubixFlowInstance?.fitView();
     }, 50);
     setUndoState({ past: [], future: [] });
-  }, [selectedNodeForSubFlow, setNodes, setEdges]);
+  }, [selectedNodeForSubFlow]);
 
   useEffect(() => {
     closeNodePicker();
