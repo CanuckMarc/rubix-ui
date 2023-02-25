@@ -26,6 +26,7 @@ import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
 import { Spin, Tabs } from "antd";
+import { UnorderedListOutlined, NodeIndexOutlined, ApartmentOutlined } from "@ant-design/icons";
 import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
@@ -1206,11 +1207,36 @@ const Flow = (props: FlowProps) => {
   //   }
   // }, [flowSettings])
 
+  const PalletTab = (
+    <>
+      <UnorderedListOutlined />
+      PALLET
+    </>
+  );
+  const NodesTab = (
+    <>
+      <NodeIndexOutlined />
+      NODES
+    </>
+  );
+
+  const PointsTab = (
+    <>
+      <ApartmentOutlined />
+      POINTS
+    </>
+  );
+
   return (
     <div className="rubix-flow">
-      <Tabs size="small" centered>
+      <Tabs size="small" centered className="rubix-flow__tabs">
+        {!isFetching && flowSettings.showNodesPallet && (
+          <TabPane tab={PalletTab} key="Nodes">
+            <NodeSideBar nodesSpec={nodesSpec} />
+          </TabPane>
+        )}
         {!isFetching && flowSettings.showNodesTree && (
-          <TabPane tab="Tree" key="Tree">
+          <TabPane tab={NodesTab} key="Tree">
             <NodesTree
               nodes={window.allFlow?.nodes || []}
               selectedSubFlowId={selectedNodeForSubFlow?.id}
@@ -1225,17 +1251,12 @@ const Flow = (props: FlowProps) => {
           </TabPane>
         )}
         {!isFetching && flowSettings.showPointPallet && (
-          <TabPane tab="Points" key="Points">
+          <TabPane tab={PointsTab} key="Points">
             <PointsPallet
               selectedSubflow={selectedNodeForSubFlow}
               // disablePointsPallet={disablePointsPallet}
               // setDisablePointsPallet={setDisablePointsPallet}
             />
-          </TabPane>
-        )}
-        {!isFetching && flowSettings.showNodesPallet && (
-          <TabPane tab="Nodes" key="Nodes">
-            <NodeSideBar nodesSpec={nodesSpec} />
           </TabPane>
         )}
       </Tabs>

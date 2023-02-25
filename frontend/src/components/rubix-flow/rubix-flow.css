@@ -5,12 +5,32 @@
 }
 
 .rubix-flow__node-sidebar {
-  width: auto !important;
+  width: 270px !important;
+  max-width: unset !important;
 }
 
 .rubix-flow__wrapper {
   flex-grow: 1;
   height: calc(100vh - 40px);
+}
+
+.rubix-flow__tabs>.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab+.ant-tabs-tab {
+  margin: 0 0 0 20px !important;
+}
+
+.rubix-flow__tabs>.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--nube-green) !important;
+  font-weight: 500;
+}
+
+.rubix-flow__tabs>.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab:hover {
+  color: var(--nube-green) !important;
+}
+
+.rubix-flow__tabs>.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-ink-bar {
+  border-bottom: 2px solid var(--nube-green);
+  width: 85px !important;
+  margin: 0 5px 0 -5px;
 }
 
 .title-icon {
@@ -46,14 +66,14 @@
 }
 
 .group-name {
-  width: 170px;
+  width: 240px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .header-name {
-  max-width: 135px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
