@@ -4,11 +4,11 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { NodeTreeItem } from "./NodeTreeItem";
-import { NodeSpecJSON } from '../lib';
+import { NodeSpecJSON } from "../lib";
 import { FlowSettings } from "./FlowSettingsModal";
 
-import { FlowPointFactory } from '../../hosts/host/flow/points/factory';
-import { backend, model, rumodel, storage, } from "../../../../wailsjs/go/models";
+import { FlowPointFactory } from "../../hosts/host/flow/points/factory";
+import { backend, model, rumodel, storage } from "../../../../wailsjs/go/models";
 import { PointTableType } from "../../../App";
 import { useParams } from "react-router-dom";
 const pointFactory = new FlowPointFactory();
@@ -50,35 +50,35 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
 
   useEffect(() => {
     fetchFlowPoints();
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (!selectedSubflow || selectedSubflow.type !== "flow/flow-network") {
-      setDisablePointsPallet(true)
+      setDisablePointsPallet(true);
     } else {
-      setDisablePointsPallet(false)
+      setDisablePointsPallet(false);
     }
-  }, [selectedSubflow])
+  }, [selectedSubflow]);
 
-  const fetchFlowPoints = async() => {
+  const fetchFlowPoints = async () => {
     try {
-      setIsFetchingPoints(true)
-      const res = await pointFactory.GetPointListPayload(connUUID, hostUUID)
+      setIsFetchingPoints(true);
+      const res = await pointFactory.GetPointListPayload(connUUID, hostUUID);
       if (res) {
         const mappedRes = res.map((item: backend.PointListPayload) => {
-          return {...item, isWrite: false}
+          return { ...item, isWrite: false };
         });
-        setAllPoints(mappedRes)
-        setAllPointsBeforeSearch(mappedRes)
+        setAllPoints(mappedRes);
+        setAllPointsBeforeSearch(mappedRes);
       }
     } catch (err) {
-      console.log("error on fetching: ", err)
+      console.log("error on fetching: ", err);
     } finally {
-      setIsFetchingPoints(false)
+      setIsFetchingPoints(false);
     }
-  }
+  };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (allPoints) {
       let localDisplayObj = {} as any;
       let usedNames: string[] = [];
@@ -89,25 +89,25 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
           usedNames.push(point.plugin_name);
           localDisplayObj[`${point.plugin_name}`] = [point];
         }
-      })
-      setDisplayObj(localDisplayObj)
+      });
+      setDisplayObj(localDisplayObj);
     }
-  }, [allPoints])
+  }, [allPoints]);
 
   useEffect(() => {
     if (search === "") {
-      setAllPoints(allPointsBeforeSearch)
+      setAllPoints(allPointsBeforeSearch);
     } else {
       const key = search.toLowerCase();
       const searchRes = allPointsBeforeSearch?.filter((item: PluginTableDataType) => {
         return item.name.includes(key) ? true : false;
-      })
+      });
       setAllPoints(searchRes);
     }
-  }, [search])
+  }, [search]);
 
   const onDragStart = (event: any, namePallet: any, isWrite: boolean) => {
-    const nodeTypePallet = isWrite ? 'flow/flow-point-write' : 'flow/flow-point';
+    const nodeTypePallet = isWrite ? "flow/flow-point-write" : "flow/flow-point";
     const data = { namePallet, nodeTypePallet };
     event.dataTransfer.setData("from-point-pallet", JSON.stringify(data));
     event.dataTransfer.effectAllowed = "move";
@@ -124,27 +124,30 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
   const onSwitchChange = (checked: boolean, itemUUID: string) => {
     const mappedAllPoints = allPoints?.map((point: PluginTableDataType) => {
       if (point.uuid === itemUUID) {
-        return {...point, isWrite: checked}
+        return { ...point, isWrite: checked };
       } else {
-        return point
+        return point;
       }
-    })
-    setAllPoints(mappedAllPoints)
-  }
+    });
+    setAllPoints(mappedAllPoints);
+  };
 
   return (
     <>
-      <div style={disablePointsPallet ? {pointerEvents: "none", opacity: "0.4"} : {}}>
+      <div style={disablePointsPallet ? { pointerEvents: "none", opacity: "0.4" } : {}}>
         <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
           <div className="p-2">
             Points
             {activeKeyPanel.length !== Object.keys(displayObj).length ? (
               <Tooltip title={"expand all"}>
-                  <CaretRightOutlined className="title-icon" onClick={() => onChangeOpenPanels(Object.keys(displayObj))} />
+                <CaretRightOutlined
+                  className="title-icon"
+                  onClick={() => onChangeOpenPanels(Object.keys(displayObj))}
+                />
               </Tooltip>
             ) : (
               <Tooltip title={"collapse all"}>
-                  <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
+                <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
               </Tooltip>
             )}
           </div>
@@ -158,10 +161,10 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
               onChange={onChangeSearch}
             />
           </div>
-          <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
+          <div className="overflow-y-scroll points-menu">
             <Spin spinning={isFetchingPoints}>
               {isFetchingPoints ? (
-                <div style={{height: '80vh'}}></div>
+                <div style={{ height: "80vh" }}></div>
               ) : (
                 <Collapse
                   activeKey={activeKeyPanel}
@@ -169,44 +172,43 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
                   onChange={onChangeOpenPanels}
                   className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
                 >
-                  {displayObj && Object.keys(displayObj).map((pluginName: string) => (
-                    <Panel header={pluginName} key={pluginName} className="panel-no-padding border-gray-600">
-                      <div className="bg-gray-800">
-                        {displayObj[`${pluginName}`].map((item: PluginTableDataType, index: number) => (
-                          <div
-                          key={`${item.name}`}
-                          className={`py-2 cursor-po inter text-white flex flex-row justify-between
-                            border-gray-600 text-left ${index === 0 ? "" : "border-t"}`}
-                          draggable={true}
-                          onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
-                          style={{ padding: 14, minHeight: '60px', alignItems: 'center', cursor: 'pointer' }}
-                          >
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                              {item.device_name && (
-                                <span style={{fontSize: 10}}>
-                                  {`${item.device_name}`}
-                                </span>
-                              )}
-                              {item.point_name && (
-                                <span style={{ fontSize: 14}}>
-                                  {`${item.point_name}`}
-                                </span>
-                              )}
+                  {displayObj &&
+                    Object.keys(displayObj).map((pluginName: string) => (
+                      <Panel
+                        header={pluginName}
+                        key={pluginName}
+                        className="panel-no-padding border-gray-600 node-menu__header"
+                      >
+                        <div className="node-item">
+                          {displayObj[`${pluginName}`].map((item: PluginTableDataType, index: number) => (
+                            <div
+                              key={`${item.name}`}
+                              className={`cursor-po inter text-white border-gray-600 text-left flex flex-row justify-between ${
+                                index === 0 ? "" : "border-t"
+                              }`}
+                              draggable={true}
+                              onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
+                            >
+                              <div style={{ fontFamily: "monospace" }}>
+                                {item.device_name && (
+                                  <span style={{ fontSize: "smaller" }}>{`${item.device_name}`}</span>
+                                )}
+                                {item.point_name && <span>{`${item.point_name}`}</span>}
+                              </div>
+                              <div>
+                                <Switch
+                                  size={"small"}
+                                  checkedChildren={<span style={{ fontSize: "10px" }}>Write</span>}
+                                  unCheckedChildren={<span style={{ fontSize: "10px" }}>Read</span>}
+                                  checked={item.isWrite}
+                                  onChange={(checked) => onSwitchChange(checked, item.uuid)}
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <Switch 
-                                size={'small'} 
-                                checkedChildren={<span style={{fontSize: '10px'}}>Write</span>} 
-                                unCheckedChildren={<span style={{fontSize: '10px'}}>Read</span>} 
-                                checked={item.isWrite} 
-                                onChange={(checked) => onSwitchChange(checked, item.uuid)} 
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </Panel>
-                  ))}
+                          ))}
+                        </div>
+                      </Panel>
+                    ))}
                 </Collapse>
               )}
             </Spin>
@@ -214,9 +216,19 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
         </Sider>
       </div>
       {disablePointsPallet && (
-        <div style={{position: 'fixed', height: '90%', width: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-          <span style={{color: 'orange', fontSize: '16px'}}>Warning</span>
-          <span style={{color: 'orange', fontSize: '14px'}}>Not in a flow network!</span>
+        <div
+          style={{
+            position: "fixed",
+            height: "90%",
+            width: 200,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <span style={{ color: "orange", fontSize: "16px" }}>Warning</span>
+          <span style={{ color: "orange", fontSize: "14px" }}>Not in a flow network!</span>
         </div>
       )}
     </>

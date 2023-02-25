@@ -89,24 +89,19 @@ export const NodeSideBar = memo(({ nodesSpec }: NodeSiderBarProps) => {
             className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
           >
             {Object.keys(nodes).map((category) => (
-              <Panel key={category} header={category} className="panel-no-padding border-gray-600">
-                <div className="bg-gray-800">
+              <Panel key={category} header={category} className="panel-no-padding border-gray-600 node-menu__header">
+                <div className="node-sidebar-item">
                   {nodes[category].map(({ info, type, isParent }, index) => (
                     <div
                       key={`${type}-${index}`}
-                      className={`py-2 cursor-po inter text-white flex flex-row justify-between
+                      className={`cursor-po inter text-white flex flex-row justify-between
                     border-gray-600 text-left ant-menu-item
                     ${index === 0 ? "" : "border-t"}`}
                       onDragStart={(event) => onDragStart(event, isParent, type)}
                       draggable
-                      style={{ paddingLeft: 24 }}
                     >
                       <div>
-                        {info && info.icon && (
-                          <span className="pr-3" style={{ fontSize: 12 }}>
-                            {info.icon}
-                          </span>
-                        )}
+                        {info && info.icon && <span style={{ fontSize: 12 }}>{info.icon}</span>}
                         {type.split("/")[1]}
                       </div>
                       <div>
