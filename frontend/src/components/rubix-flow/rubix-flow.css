@@ -29,6 +29,10 @@
   top: 36px;
 }
 
+.rubix-flow>.ant-tabs>.ant-tabs-nav {
+  margin: 0 !important
+}
+
 .subflow-tabs .ant-tabs-nav {
   margin: 0 !important;
 }
@@ -42,8 +46,39 @@
 }
 
 .group-name {
-  white-space: nowrap;
   width: 170px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.header-name {
+  max-width: 135px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-header-panel>.ant-collapse-header {
+  position: relative !important;
+  padding: 1px 5px !important;
+  padding-right: unset !important;
+}
+
+.node-header-panel>.ant-collapse-content>.ant-collapse-content-box {
+  padding: unset;
+}
+
+.node-tree-item>.ant-menu-inline {
+  height: 24px !important;
+  align-items: center;
+  display: flex;
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity)) !important;
+}
+
+.node-tree-item>.ant-menu-inline>.ant-menu-item {
+  padding: 0 10px !important;
+  line-height: 24px !important;
+  height: 24px !important;
 }
