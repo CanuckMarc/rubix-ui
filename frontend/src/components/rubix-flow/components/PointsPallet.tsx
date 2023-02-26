@@ -30,11 +30,11 @@ interface NodePalletPropType {
   selectedSubflow: NodeInterface<any> | undefined;
   // disablePointsPallet: boolean;
   // setDisablePointsPallet: Function;
+  search: string;
 }
 
-export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
+export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) => {
   let { connUUID = "", hostUUID = "" } = useParams();
-  const [search, setSearch] = useState("");
   const [allPoints, setAllPoints] = useState<PluginTableDataType[] | undefined>(undefined);
   const [allPointsBeforeSearch, setAllPointsBeforeSearch] = useState<PluginTableDataType[] | undefined>(undefined);
   const [displayObj, setDisplayObj] = useState<any>({});
@@ -113,10 +113,6 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
     event.dataTransfer.effectAllowed = "move";
   };
 
-  const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
-
   const onChangeOpenPanels = (key: string | string[]) => {
     setActiveKeyPanel(typeof key === "string" ? [key] : key);
   };
@@ -150,16 +146,6 @@ export const PointsPallet = ({ selectedSubflow }: NodePalletPropType) => {
                 <CaretDownOutlined className="title-icon" onClick={() => onChangeOpenPanels([])} />
               </Tooltip>
             )}
-          </div>
-          <div className="p-2">
-            <input
-              type="text"
-              autoFocus
-              placeholder="Type to filter"
-              className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
-              value={search}
-              onChange={onChangeSearch}
-            />
           </div>
           <div className="overflow-y-scroll points-menu">
             <Spin spinning={isFetchingPoints}>

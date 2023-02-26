@@ -1,4 +1,4 @@
-import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -132,6 +132,7 @@ const Flow = (props: FlowProps) => {
     future: [],
   });
   const [isChangedFlow, setIsChangedFlow] = useState(false);
+  const [search, setSearch] = useState("");
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -1181,6 +1182,10 @@ const Flow = (props: FlowProps) => {
     handleFlowChange();
   };
 
+  const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   useEffect(() => {
     window.saveCurrentFlowForUndo = saveCurrentFlowForUndo;
   }, [saveCurrentFlowForUndo]);
@@ -1219,7 +1224,6 @@ const Flow = (props: FlowProps) => {
       NODES
     </>
   );
-
   const PointsTab = (
     <>
       <ApartmentOutlined />
@@ -1229,37 +1233,53 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      <Tabs size="small" centered className="rubix-flow__tabs">
-        {!isFetching && flowSettings.showNodesPallet && (
-          <TabPane tab={PalletTab} key="Nodes">
-            <NodeSideBar nodesSpec={nodesSpec} />
-          </TabPane>
-        )}
-        {!isFetching && flowSettings.showNodesTree && (
-          <TabPane tab={NodesTab} key="Tree">
-            <NodesTree
-              nodes={window.allFlow?.nodes || []}
-              selectedSubFlowId={selectedNodeForSubFlow?.id}
-              openNodeMenu={openNodeMenu}
-              nodesSpec={nodesSpec}
-              gotoNode={gotoNode}
-              panelKeys={panelKeys}
-              setPanelKeys={setPanelKeys}
-              changeKeys={changeKeys}
-              flowSettings={flowSettings}
+      {!isFetching && (
+        <div>
+          <div className="p-2">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Type to filter"
+              className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
+              value={search}
+              onChange={onChangeSearch}
             />
-          </TabPane>
-        )}
-        {!isFetching && flowSettings.showPointPallet && (
-          <TabPane tab={PointsTab} key="Points">
-            <PointsPallet
-              selectedSubflow={selectedNodeForSubFlow}
-              // disablePointsPallet={disablePointsPallet}
-              // setDisablePointsPallet={setDisablePointsPallet}
-            />
-          </TabPane>
-        )}
-      </Tabs>
+          </div>
+          <Tabs size="small" centered className="rubix-flow__tabs">
+            {flowSettings.showNodesPallet && (
+              <TabPane tab={PalletTab} key="Nodes">
+                <NodeSideBar nodesSpec={nodesSpec} search={search} />
+              </TabPane>
+            )}
+            {flowSettings.showNodesTree && (
+              <TabPane tab={NodesTab} key="Tree">
+                <NodesTree
+                  nodes={window.allFlow?.nodes || []}
+                  selectedSubFlowId={selectedNodeForSubFlow?.id}
+                  openNodeMenu={openNodeMenu}
+                  nodesSpec={nodesSpec}
+                  gotoNode={gotoNode}
+                  panelKeys={panelKeys}
+                  setPanelKeys={setPanelKeys}
+                  changeKeys={changeKeys}
+                  flowSettings={flowSettings}
+                  search={search}
+                />
+              </TabPane>
+            )}
+            {flowSettings.showPointPallet && (
+              <TabPane tab={PointsTab} key="Points">
+                <PointsPallet
+                  selectedSubflow={selectedNodeForSubFlow}
+                  // disablePointsPallet={disablePointsPallet}
+                  // setDisablePointsPallet={setDisablePointsPallet}
+                  search={search}
+                />
+              </TabPane>
+            )}
+          </Tabs>
+        </div>
+      )}
 
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
