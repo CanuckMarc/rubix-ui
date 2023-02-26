@@ -44,7 +44,12 @@ export const NodeTreeItem = ({
   };
 
   const spec = Array.isArray(nodesSpec) ? nodesSpec.find((sp) => sp.type === node.type) : undefined;
-
+  const HeaderPanel = (
+    <>
+      <span className="header-name mr-1">{type}</span>
+      {flowSettings.showCount ? "- " + childNodes.length : ""}
+    </>
+  );
   return (
     <Collapse
       expandIconPosition="right"
@@ -55,8 +60,8 @@ export const NodeTreeItem = ({
       {node.isParent ? (
         <Panel
           key={node.id}
-          header={`${type} ${flowSettings.showCount ? " - " + childNodes.length : ""}`}
-          className={`panel-no-padding border-gray-600 border-t border-b-0  relative ${
+          header={HeaderPanel}
+          className={`border-gray-600 border-t border-b-0 relative node-header-panel ${
             node.id === selectedSubFlowId ? "tree-active" : ""
           }`}
           style={{
@@ -68,7 +73,7 @@ export const NodeTreeItem = ({
             </div>
           }
         >
-          <div className="bg-gray-800">
+          <div className="node-tree-item">
             {childNodes?.map((node, index) => (
               <NodeTreeItem
                 node={node}
@@ -93,10 +98,12 @@ export const NodeTreeItem = ({
           className={`py-2 cursor-po inter flex flex-row flex-start gap-2 items-center text-left ant-menu-item border-gray-600 ${
             nodeIndex === 0 ? "" : "border-t"
           }`}
-          style={{ paddingLeft: !node.parentId ? undefined : 26 }}
+          style={{ paddingLeft: !node.parentId ? undefined : 22 }}
         >
-          {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
-          {type}
+          <span className="group-name">
+            {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
+            {type}
+          </span>
         </div>
       )}
     </Collapse>

@@ -1,4 +1,4 @@
-import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -16,8 +16,6 @@ import ReactFlow, {
 } from "reactflow";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
-import "reactflow/dist/style.css";
-
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
@@ -27,7 +25,8 @@ import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
-import { Spin } from "antd";
+import { Spin, Tabs } from "antd";
+import { UnorderedListOutlined, NodeIndexOutlined, ApartmentOutlined } from "@ant-design/icons";
 import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
@@ -39,9 +38,6 @@ import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowS
 import { NodesTree } from "./components/NodesTree";
 import { PointsPallet } from "./components/PointsPallet";
 import { NodeSideBar } from "./components/NodeSidebar";
-import "./rubix-flow.css";
-import { categoryColorMap } from "./util/colors";
-import { NodeCategory } from "./lib/Nodes/NodeCategory";
 import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
@@ -55,6 +51,10 @@ import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
+import "./rubix-flow.css";
+import "reactflow/dist/style.css";
+
+const { TabPane } = Tabs;
 
 type SelectableBoxType = {
   edgeId: string;
@@ -132,6 +132,7 @@ const Flow = (props: FlowProps) => {
     future: [],
   });
   const [isChangedFlow, setIsChangedFlow] = useState(false);
+  const [search, setSearch] = useState("");
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -857,7 +858,7 @@ const Flow = (props: FlowProps) => {
     }));
     handleFlowChange();
   };
-  
+
   // delete nodes when CtrX
   const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
     const nodeIds: string[] = [];
@@ -867,12 +868,12 @@ const Flow = (props: FlowProps) => {
         nodeIds.push(...getChildNodeIds(node.id));
       }
     }
-    
+
     const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
 
     const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
     const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
-    
+
     const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
     const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
 
@@ -910,7 +911,7 @@ const Flow = (props: FlowProps) => {
      * Add new id source and target of edges copied
      */
     const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
-    
+
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
       const existSource = newFlow.nodes.some((node: NodeInterface) => node.id === edge.source);
@@ -1181,6 +1182,10 @@ const Flow = (props: FlowProps) => {
     handleFlowChange();
   };
 
+  const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   useEffect(() => {
     window.saveCurrentFlowForUndo = saveCurrentFlowForUndo;
   }, [saveCurrentFlowForUndo]);
@@ -1207,29 +1212,75 @@ const Flow = (props: FlowProps) => {
   //   }
   // }, [flowSettings])
 
+  const PalletTab = (
+    <>
+      <UnorderedListOutlined />
+      PALLET
+    </>
+  );
+  const NodesTab = (
+    <>
+      <NodeIndexOutlined />
+      NODES
+    </>
+  );
+  const PointsTab = (
+    <>
+      <ApartmentOutlined />
+      POINTS
+    </>
+  );
+
   return (
     <div className="rubix-flow">
-      {!isFetching && flowSettings.showNodesTree && (
-        <NodesTree
-          nodes={window.allFlow?.nodes || []}
-          selectedSubFlowId={selectedNodeForSubFlow?.id}
-          openNodeMenu={openNodeMenu}
-          nodesSpec={nodesSpec}
-          gotoNode={gotoNode}
-          panelKeys={panelKeys}
-          setPanelKeys={setPanelKeys}
-          changeKeys={changeKeys}
-          flowSettings={flowSettings}
-        />
+      {!isFetching && (
+        <div>
+          <div className="p-2">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Type to filter"
+              className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
+              value={search}
+              onChange={onChangeSearch}
+            />
+          </div>
+          <Tabs size="small" centered className="rubix-flow__tabs">
+            {flowSettings.showNodesPallet && (
+              <TabPane tab={PalletTab} key="Nodes">
+                <NodeSideBar nodesSpec={nodesSpec} search={search} />
+              </TabPane>
+            )}
+            {flowSettings.showNodesTree && (
+              <TabPane tab={NodesTab} key="Tree">
+                <NodesTree
+                  nodes={window.allFlow?.nodes || []}
+                  selectedSubFlowId={selectedNodeForSubFlow?.id}
+                  openNodeMenu={openNodeMenu}
+                  nodesSpec={nodesSpec}
+                  gotoNode={gotoNode}
+                  panelKeys={panelKeys}
+                  setPanelKeys={setPanelKeys}
+                  changeKeys={changeKeys}
+                  flowSettings={flowSettings}
+                  search={search}
+                />
+              </TabPane>
+            )}
+            {flowSettings.showPointPallet && (
+              <TabPane tab={PointsTab} key="Points">
+                <PointsPallet
+                  selectedSubflow={selectedNodeForSubFlow}
+                  // disablePointsPallet={disablePointsPallet}
+                  // setDisablePointsPallet={setDisablePointsPallet}
+                  search={search}
+                />
+              </TabPane>
+            )}
+          </Tabs>
+        </div>
       )}
-      {!isFetching && flowSettings.showPointPallet && (
-        <PointsPallet
-          selectedSubflow={selectedNodeForSubFlow}
-          // disablePointsPallet={disablePointsPallet}
-          // setDisablePointsPallet={setDisablePointsPallet}
-        />
-      )}
-      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
+
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
