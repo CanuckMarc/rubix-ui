@@ -50,7 +50,7 @@
 }
 
 .rubix-flow>.ant-tabs>.ant-tabs-nav,
-.rubix-flow__tabs>.ant-tabs>.ant-tabs-nav {
+.rubix-flow__tabs>.ant-tabs-nav {
   margin: 0 !important
 }
 
