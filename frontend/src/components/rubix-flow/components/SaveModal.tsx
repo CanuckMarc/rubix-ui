@@ -61,19 +61,21 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
         : factory.GetFlow(connUUID, hostUUID, isRemote));
 
       data.nodes.forEach((item: any) => {
-        Object.entries(item?.inputs).forEach(([key, value]: any) => {
-          if (value.links) {
-            item.inputs = {
-              ...item.inputs,
-              [key]: value,
-            };
-          } else {
-            item.inputs = {
-              ...item.inputs,
-              [key]: { overridePosition: false, position: 0 },
-            };
-          }
-        });
+        if (item.inputs !== null) {
+          Object.entries(item?.inputs).forEach(([key, value]: any) => {
+            if (value.links) {
+              item.inputs = {
+                ...item.inputs,
+                [key]: value,
+              };
+            } else {
+              item.inputs = {
+                ...item.inputs,
+                [key]: { overridePosition: false, position: 0 },
+              };
+            }
+          });
+        }
       });
       
       setCountExport(data.nodes?.length || 0);

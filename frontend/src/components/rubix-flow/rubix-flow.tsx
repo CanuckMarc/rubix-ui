@@ -124,6 +124,8 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+  const [panelKeysNew, setPanelKeysNew] = useState<string[]>([]);
   const [isLinkBuilder, setIsLinkBuilder] = useState(false);
   const [undoState, setUndoState] = useState<{ past: UndoStateType[]; future: UndoStateType[] }>({
     past: [],
@@ -184,6 +186,13 @@ const Flow = (props: FlowProps) => {
       isDragSelection.current = true;
     },
   });
+
+  // Subflow nodes are open
+  const changeKeys = (key: string) => {
+    const isExist = panelKeys.includes(key);
+    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
+    setPanelKeysNew(isExist ? panelKeys.filter((item) => item === key) : [key]);
+  };
 
   // delete selected wires
   useOnPressKey("Backspace", () => {
@@ -848,6 +857,48 @@ const Flow = (props: FlowProps) => {
     }));
     handleFlowChange();
   };
+  
+  // delete nodes when CtrX
+  const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+    const nodeIds: string[] = [];
+    for (const node of _nodesDeleted) {
+      nodeIds.push(node.id);
+      if (node.isParent) {
+        nodeIds.push(...getChildNodeIds(node.id));
+      }
+    }
+    
+    const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
+
+    const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
+    
+    const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
+
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeIds.includes(item.target) &&
+        !nodeIds.includes(item.source)
+    );
+    window.allFlow = {
+      nodes: remainingNodesAll,
+      edges: window.allFlow.edges.filter(
+        (item) =>
+          !_edgesDeleted.some((item2) => item.id === item2.id) &&
+          !nodeId.includes(item.target) &&
+          !nodeId.includes(item.source)
+      ),
+    };
+    setNodes(remainingNodes);
+    setEdges(remainingEdges);
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
+      future: s.future,
+    }));
+    handleFlowChange();
+  };
 
   const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
     /* Unselected nodes, edges */
@@ -858,8 +909,8 @@ const Flow = (props: FlowProps) => {
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true);
-
+    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges, true, nodesSpec);
+    
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
       const existSource = newFlow.nodes.some((node: NodeInterface) => node.id === edge.source);
@@ -1155,7 +1206,7 @@ const Flow = (props: FlowProps) => {
   //     setDisablePointsPallet(false)
   //   }
   // }, [flowSettings])
-  
+
   return (
     <div className="rubix-flow">
       {!isFetching && flowSettings.showNodesTree && (
@@ -1165,6 +1216,9 @@ const Flow = (props: FlowProps) => {
           openNodeMenu={openNodeMenu}
           nodesSpec={nodesSpec}
           gotoNode={gotoNode}
+          panelKeys={panelKeys}
+          setPanelKeys={setPanelKeys}
+          changeKeys={changeKeys}
           flowSettings={flowSettings}
         />
       )}
@@ -1175,11 +1229,7 @@ const Flow = (props: FlowProps) => {
           // setDisablePointsPallet={setDisablePointsPallet}
         />
       )}
-      {!isFetching && flowSettings.showNodesPallet && (
-        <NodeSideBar 
-          nodesSpec={nodesSpec}
-        />
-      )}
+      {!isFetching && flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
       <div
         className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
         ref={rubixFlowWrapper}
@@ -1190,6 +1240,7 @@ const Flow = (props: FlowProps) => {
             selectedSubflow={selectedNodeForSubFlow}
             goSubFlow={handleAddSubFlow}
             onBackToMain={onBackToMain}
+            panelKeysNew={panelKeysNew}
           />
         )}
         {isFetching ? (
@@ -1238,7 +1289,7 @@ const Flow = (props: FlowProps) => {
                 />
               )}
               <LoadWiresMap />
-              <LoadBacnetMap />
+              <LoadBacnetMap deleteNodesAndEdges={deleteNodesAndEdges} />
               <DragSelection />
               {flowSettings.showMiniMap && (
                 <MiniMap
@@ -1263,6 +1314,7 @@ const Flow = (props: FlowProps) => {
                 isSaving={isSaving}
                 isChangedFlow={isChangedFlow}
                 deleteNodesAndEdges={deleteNodesAndEdges}
+                deleteNodesAndEdgesCtrX={deleteNodesAndEdgesCtrX}
                 onCopyNodes={handleCopyNodes}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
