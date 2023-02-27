@@ -4,6 +4,7 @@ import { NodeSpecJSON } from "../lib";
 import { uniqArray } from "../../../utils/utils";
 import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { convertDataSpec } from '../use-nodes-spec';
 
 type NodeWithOldId = NodeInterface & { oldId: string; };
 
@@ -34,21 +35,12 @@ export const handleCopyNodesAndEdges = (
     childNodes.forEach((item: NodeInterface) => {
       const childNodeId = generateUuid();
       const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
-      const { inputs, outputs } = specNOde!!;
 
       subNodes.push({
         ...item,
         data: {
-          inputs: (inputs || []).map(inp => ({
-            pin: inp.name,
-            dataType: inp.valueType,
-            value: inp.defaultValue,
-          })),
-          out: (outputs || []).map((out: any) => ({
-            pin: out.name,
-            dataType: out.valueType,
-            value: out.defaultValue
-          })),
+          inputs: convertDataSpec(specNOde!!.inputs || []),
+          out: convertDataSpec(specNOde!!.outputs || []),
         },
         oldId: item.id,
         id: childNodeId,
@@ -65,19 +57,10 @@ export const handleCopyNodesAndEdges = (
   const newNodes: NodeInterface[] = flow.nodes.map((item) => {
     const newNodeId = generateUuid();
     const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
-    const { inputs, outputs } = specNOde!!;
 
     item.data = {
-      inputs: (inputs || []).map(inp => ({
-        pin: inp.name,
-        dataType: inp.valueType,
-        value: inp.defaultValue,
-      })),
-      out: (outputs || []).map((out: any) => ({
-        pin: out.name,
-        dataType: out.valueType,
-        value: out.defaultValue
-      })),
+      inputs: convertDataSpec(specNOde!!.inputs || []),
+      out: convertDataSpec(specNOde!!.outputs || []),
     };
 
     subNodes.push({ ...item, id: newNodeId, oldId: item.id });
