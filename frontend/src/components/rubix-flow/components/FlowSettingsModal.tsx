@@ -44,6 +44,7 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
 
   const handleBlurValue = (e: ChangeEvent<HTMLInputElement>) => {
     const value = isNaN(+e.target.value) ? 1 : Math.max(1, Math.min(60, Number(e.target.value)));
+    console.log("value",value);
 
     setConfigs({ ...configs, refreshTimeout: value });
   };

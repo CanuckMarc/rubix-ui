@@ -409,6 +409,9 @@ const Flow = (props: FlowProps) => {
 
   const onHandelSaveFlow = async () => {
     setIsSaving(true);
+    // stop the loop when user downloads a flow
+    if (refreshInterval.current) clearInterval(refreshInterval.current);
+
     const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
       if (n.isParent) {
         const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
@@ -446,8 +449,32 @@ const Flow = (props: FlowProps) => {
     } catch (error) {
       console.log("__ERROR__", error);
     }
+
     setIsSaving(false);
+
+    //after a download wait 5 seconds before allowing this loop to start
+    setTimeout(() => {
+      refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
+    }, 5000);
   };
+
+  // if node count is > 500 then make the minimum loop time 10 seconds.
+  // if node count is > 1000 then make the minimum loop time 30 seconds.
+  useEffect(() => {
+    const nodeLength = window.allFlow?.nodes?.length || 0;
+    let newTimeOut = null;
+
+    if (nodeLength >= 1000) {
+      newTimeOut = 30;
+    } else if (nodeLength >= 500) {
+      newTimeOut = 10;
+    }
+    if (newTimeOut !== null) {
+      flowSettings.refreshTimeout = newTimeOut;
+      localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
+      setFlowSettings(flowSettings);
+    }
+  }, [window.allFlow?.nodes?.length]);
 
   const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
@@ -1454,6 +1481,7 @@ const Flow = (props: FlowProps) => {
                   isDoubleClick={isDoubleClick}
                   handleAddSubFlow={handleAddSubFlow}
                   selectedNodeForSubFlow={selectedNodeForSubFlow}
+                  changeKeys={changeKeys}
                 />
               )}
               {!!selectedNodeForSubFlow && isConnectionBuilder && (
