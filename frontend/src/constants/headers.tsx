@@ -547,21 +547,6 @@ export const FLOW_DEVICE_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "Auto Mapping Enable",
-    key: "auto_mapping_enable",
-    dataIndex: "auto_mapping_enable",
-    render(enable: boolean) {
-      let colour = "blue";
-      let text = "disabled";
-      if (enable) {
-        colour = "orange";
-        text = "enable";
-      }
-      return <Tag color={colour}>{text}</Tag>;
-    },
-    sorter: (a: any, b: any) => a.enable - b.enable,
-  },
-  {
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
