@@ -919,35 +919,33 @@ const Flow = (props: FlowProps) => {
 
   // delete nodes when CtrX
   const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const nodeIds: string[] = [];
+    const nodeWithChildIds: string[] = [];
     for (const node of _nodesDeleted) {
-      nodeIds.push(node.id);
+      nodeWithChildIds.push(node.id);
       if (node.isParent) {
-        nodeIds.push(...getChildNodeIds(node.id));
+        nodeWithChildIds.push(...getChildNodeIds(node.id));
       }
     }
 
-    const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
-
-    const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
-    const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
-
-    const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
-    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
-
+    const nodeIdsDeleted = _nodesDeleted.map((item: NodeInterface) => item.id);
+    const childNode = window.allFlow.nodes.filter((n) => nodeIdsDeleted.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIdsDeleted.includes(n.source));
+    const remainingNodes = nodes.filter((item) => !nodeIdsDeleted.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeIdsDeleted.includes(n.id));
     const remainingEdges = edges.filter(
       (item) =>
         !_edgesDeleted.some((item2) => item.id === item2.id) &&
-        !nodeIds.includes(item.target) &&
-        !nodeIds.includes(item.source)
+        !nodeWithChildIds.includes(item.target) &&
+        !nodeWithChildIds.includes(item.source)
     );
+
     window.allFlow = {
       nodes: remainingNodesAll,
       edges: window.allFlow.edges.filter(
         (item) =>
           !_edgesDeleted.some((item2) => item.id === item2.id) &&
-          !nodeId.includes(item.target) &&
-          !nodeId.includes(item.source)
+          !nodeIdsDeleted.includes(item.target) &&
+          !nodeIdsDeleted.includes(item.source)
       ),
     };
     setNodes(remainingNodes);

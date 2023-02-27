@@ -13,6 +13,31 @@ type NodesAndEdgesType = {
   edges: Edge[];
 };
 
+const cloneEdges = (edges: Edge[], subNodes: NodeWithOldId[]): Edge[] => {
+  const edgesCloned: Edge[] = [];
+  edges.forEach((edge) => {
+    const itemClone = subNodes.find(
+      (node: NodeWithOldId) =>
+        node.oldId === edge.target || node.oldId === edge.source
+    );
+    if (itemClone) {
+      const target = subNodes.find(
+        (node: NodeWithOldId) => node.oldId === edge.target
+      );
+      const source = subNodes.find(
+        (node: NodeWithOldId) => node.oldId === edge.source
+      );
+      edgesCloned.push({
+        ...edge,
+        id: generateUuid(),
+        source: source?.id || edge.source,
+        target: target?.id || edge.target,
+      });
+    }
+  });
+  return edgesCloned;
+};
+
 export const handleCopyNodesAndEdges = (
   flow: NodesAndEdgesType,
   nodes: NodeInterface[] = [],
@@ -88,26 +113,8 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  edges.forEach((edge) => {
-    const itemClone = subNodes.find(
-      (node: NodeWithOldId) =>
-        node.oldId === edge.target || node.oldId === edge.source
-    );
-    if (itemClone) {
-      const target = subNodes.find(
-        (node: NodeWithOldId) => node.oldId === edge.target
-      );
-      const source = subNodes.find(
-        (node: NodeWithOldId) => node.oldId === edge.source
-      );
-      subEdges.push({
-        ...edge,
-        id: generateUuid(),
-        source: source?.id || edge.source,
-        target: target?.id || edge.target,
-      });
-    }
-  });
+  subEdges.push(...cloneEdges(edges, subNodes));
+  subEdges.push(...cloneEdges(flow.edges, subNodes));
 
   const allNodes = uniqArray([...newNodes, ...subNodes]).map((node) => {
     if (node.isParent) {
