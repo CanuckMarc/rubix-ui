@@ -4,6 +4,8 @@ import { pluginLogo } from "../../../../../../utils/utils";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { useParams } from "react-router-dom";
 import { LoraForm } from "./lora-form";
+import { BacnetForm } from "./bacnet-form";
+import { ModbusForm } from "./modbus-form";
 import { FlowNetworkFactory } from "../factory";
 import { ReleasesFactory } from "../../../../../release/factory";
 
@@ -88,7 +90,6 @@ export const NetworkWizard = (props: any) => {
 
   useEffect(() => {
     if (selectedWizard) {
-      console.log("the current selected wizard is: ", selectedWizard);
       setCurrentStep(currentStep + 1);
     }
   }, [selectedWizard]);
@@ -103,7 +104,6 @@ export const NetworkWizard = (props: any) => {
         });
         resArray.push({ name: name, isInstalled: resObj.is_installed });
       });
-      console.log("filtered list is: ", resArray);
       setPluginStatusArray(resArray);
     }
   }, [plugins]);
@@ -112,9 +112,7 @@ export const NetworkWizard = (props: any) => {
     try {
       setIsFetching(true);
       const { data = [] } = await factory.GetPluginsDistribution(connUUID, hostUUID);
-      console.log("plugins are: ", data);
       setPlugins(data);
-      // setFilteredData(data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -170,7 +168,7 @@ export const NetworkWizard = (props: any) => {
     {
       id: "1",
       name: "Step 1",
-      text: "Network selection & Plugin installation",
+      text: "Network type selection",
       content: (
         <div style={{ width: "50vw" }}>
           <div style={{ display: "flex", flexDirection: "row", gap: "5px", justifyContent: "center" }}>
@@ -212,7 +210,7 @@ export const NetworkWizard = (props: any) => {
       text: "Configure new network",
       content: (
         <div style={{ width: "40vw" }}>
-          {selectedWizard === WizardTypes.lora && (
+          {selectedWizard === WizardTypes.lora ? (
             <LoraForm
               connUUID={connUUID}
               hostUUID={hostUUID}
@@ -223,23 +221,47 @@ export const NetworkWizard = (props: any) => {
               confirmInstall={confirmInstall}
               handleWizardClose={handleWizardClose}
             />
+          ) : selectedWizard === WizardTypes.bacnet ? (
+            <BacnetForm
+              connUUID={connUUID}
+              hostUUID={hostUUID}
+              refreshList={refreshList}
+              factory={networkFactory}
+              isPluginInstalled={isPluginInstalled}
+              installPlugin={installPlugin}
+              confirmInstall={confirmInstall}
+              handleWizardClose={handleWizardClose}
+            />
+          ) : selectedWizard === WizardTypes.modbusSerial ? (
+            <ModbusForm
+              type={WizardTypes.modbusSerial}
+              connUUID={connUUID}
+              hostUUID={hostUUID}
+              refreshList={refreshList}
+              factory={networkFactory}
+              isPluginInstalled={isPluginInstalled}
+              installPlugin={installPlugin}
+              confirmInstall={confirmInstall}
+              handleWizardClose={handleWizardClose}
+            />
+          ) : selectedWizard === WizardTypes.modbusTcp ? (
+            <ModbusForm
+              type={WizardTypes.modbusTcp}
+              connUUID={connUUID}
+              hostUUID={hostUUID}
+              refreshList={refreshList}
+              factory={networkFactory}
+              isPluginInstalled={isPluginInstalled}
+              installPlugin={installPlugin}
+              confirmInstall={confirmInstall}
+              handleWizardClose={handleWizardClose}
+            />
+          ) : (
+            <span>Does not exist.</span>
           )}
         </div>
       ),
     },
-    // {
-    //   id: "3",
-    //   name: "Step 3",
-    //   text: "Configure tokens",
-    //   content: (
-    //     <div style={{ width: "35vw", display: "flex", flexDirection: "column", rowGap: "2vh", alignItems: "center" }}>
-    //       <span>step3</span>
-    //       <Button type="primary" onClick={() => handleWizardClose()} style={{ width: "120px" }}>
-    //         Finish
-    //       </Button>
-    //     </div>
-    //   ),
-    // },
   ];
 
   return (
