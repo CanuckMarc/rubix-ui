@@ -11,7 +11,8 @@ import { RestartFFModal } from "./restart-flow-framework-modal";
 
 const { confirm } = Modal;
 
-export const PluginDistributionTable = () => {
+export const PluginDistributionTable = (props: any) => {
+  const { activeKey, pluginDistribution } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -89,8 +90,10 @@ export const PluginDistributionTable = () => {
   };
 
   useEffect(() => {
-    fetchPlugins();
-  }, []);
+    if (activeKey === pluginDistribution) {
+      fetchPlugins();
+    }
+  }, [activeKey]);
 
   return (
     <>
