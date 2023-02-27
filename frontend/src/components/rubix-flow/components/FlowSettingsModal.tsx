@@ -116,7 +116,7 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
           <input
             type="number"
             className="border border-gray-300 p-2"
-            value={configs.refreshTimeout === null ? 5 : configs.refreshTimeout}
+            value={configs.refreshTimeout}
             onChange={onChangeTimeout}
             onBlur={handleBlurValue}
           />
