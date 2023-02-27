@@ -5,7 +5,7 @@ import { uniqArray } from "../../../utils/utils";
 import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
-type NodeWithOldId = NodeInterface & { oldId: string };
+type NodeWithOldId = NodeInterface & { oldId: string; };
 
 type NodesAndEdgesType = {
   nodes: NodeInterface[];
@@ -22,15 +22,9 @@ export const handleCopyNodesAndEdges = (
     | NodeSpecJSON[]
     | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>
 ) => {
-
   let newEdges: Edge[] = [...edges];
   const subNodes: NodeWithOldId[] = [];
   const subEdges: Edge[] = [];
-
-  const typeNode = nodes.map((item) => item.type);
-  const nodeSpec = (nodesSpec as NodeSpecJSON[]).filter((item: any) =>
-    typeNode.includes(item.type)
-  );
 
   const copyAllNode = (id: string, newId: string) => {
     const childNodes = nodes.filter(
@@ -39,8 +33,23 @@ export const handleCopyNodesAndEdges = (
 
     childNodes.forEach((item: NodeInterface) => {
       const childNodeId = generateUuid();
+      const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
+      const { inputs, outputs } = specNOde!!;
+
       subNodes.push({
         ...item,
+        data: {
+          inputs: (inputs || []).map(inp => ({
+            pin: inp.name,
+            dataType: inp.valueType,
+            value: inp.defaultValue,
+          })),
+          out: (outputs || []).map((out: any) => ({
+            pin: out.name,
+            dataType: out.valueType,
+            value: out.defaultValue
+          })),
+        },
         oldId: item.id,
         id: childNodeId,
         parentId: newId,
@@ -51,36 +60,24 @@ export const handleCopyNodesAndEdges = (
       }
     });
   };
-  let newInput: any = [];
-  nodeSpec.forEach((itemx: any) => {
-    newInput = (itemx.inputs || []).map((item: any) => {
-      return {
-        pin: item.name,
-        dataType: item.valueType,
-        value: item.defaultValue,
-      };
-    });
-  });
 
-  const nodeSelectId = flow.nodes.map((item) => item.type);
-  const nodeSpecSelect = nodeSpec.filter((item: any) =>
-    nodeSelectId.includes(item.type)
-  );
-
-  let newOutput: any = [];
-  nodeSpecSelect.forEach((itemx: any) => {
-    newOutput = (itemx.outputs || []).map((item: any) => ({
-      pin: item.name,
-      dataType: item.valueType,
-      value: item.defaultValue,
-    }));
-  });
   /* Generate new id of nodes */
   const newNodes: NodeInterface[] = flow.nodes.map((item) => {
     const newNodeId = generateUuid();
+    const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
+    const { inputs, outputs } = specNOde!!;
+
     item.data = {
-      inputs: newInput,
-      out: newOutput,
+      inputs: (inputs || []).map(inp => ({
+        pin: inp.name,
+        dataType: inp.valueType,
+        value: inp.defaultValue,
+      })),
+      out: (outputs || []).map((out: any) => ({
+        pin: out.name,
+        dataType: out.valueType,
+        value: out.defaultValue
+      })),
     };
 
     subNodes.push({ ...item, id: newNodeId, oldId: item.id });
@@ -108,7 +105,7 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  flow.edges.forEach((edge) => {
+  edges.forEach((edge) => {
     const itemClone = subNodes.find(
       (node: NodeWithOldId) =>
         node.oldId === edge.target || node.oldId === edge.source
@@ -137,7 +134,7 @@ export const handleCopyNodesAndEdges = (
   });
 
   return {
-    nodes: uniqArray([...newNodes, ...subNodes]),
+    nodes: uniqArray(allNodes),
     edges: uniqArray([...newEdges, ...subEdges]),
   };
 };
