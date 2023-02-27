@@ -210,7 +210,7 @@ export const FlowNetworkTable = () => {
     <>
       <RbRefreshButton refreshList={fetchNetworks} />
       <RbSyncButton onClick={syncNetworks} />
-      <RbAddButton handleClick={() => setIsCreateModalVisible(true)} />
+      {/* <RbAddButton handleClick={() => setIsCreateModalVisible(true)} /> */}
       <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
