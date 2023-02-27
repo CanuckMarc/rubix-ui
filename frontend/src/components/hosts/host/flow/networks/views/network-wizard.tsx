@@ -211,7 +211,7 @@ export const NetworkWizard = (props: any) => {
       name: "Step 2",
       text: "Configure new network",
       content: (
-        <div>
+        <div style={{ width: "40vw" }}>
           {selectedWizard === WizardTypes.lora && (
             <LoraForm
               connUUID={connUUID}

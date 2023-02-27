@@ -118,8 +118,8 @@ export const LoraForm = (props: LoraFormPropType) => {
           <Form
             form={form}
             name="New LoRa network configuration"
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 20 }}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 15 }}
             onFinish={onFinish}
             autoComplete="off"
             initialValues={{
