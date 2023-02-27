@@ -8,11 +8,12 @@ import { PluginDownloadModal } from "./plugin-download-modal";
 import { RbRefreshButton } from "../../../../../../common/rb-table-actions";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { RestartFFModal } from "./restart-flow-framework-modal";
+import { pluginsKey } from "../../../host";
 
 const { confirm } = Modal;
 
 export const PluginDistributionTable = (props: any) => {
-  const { activeKey, pluginDistribution } = props;
+  const { activeKey, activeKeyLocal, pluginDistribution } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -90,10 +91,10 @@ export const PluginDistributionTable = (props: any) => {
   };
 
   useEffect(() => {
-    if (activeKey === pluginDistribution) {
+    if (activeKeyLocal === pluginDistribution && activeKey === pluginsKey) {
       fetchPlugins();
     }
-  }, [activeKey]);
+  }, [activeKey, activeKeyLocal]);
 
   return (
     <>
@@ -109,11 +110,11 @@ export const PluginDistributionTable = (props: any) => {
       <PluginDownloadModal
         isModalVisible={isInstallModalVisible}
         pluginName={pluginName}
-        setIsRestartFFModalVisible = {setIsRestartFFModalVisible}
+        setIsRestartFFModalVisible={setIsRestartFFModalVisible}
         handleClose={() => setIsInstallModalVisible(false)}
         refreshList={fetchPlugins}
       />
-      <RestartFFModal 
+      <RestartFFModal
         pluginName={pluginName}
         refreshList={fetchPlugins}
         isModalVisible={isRestartFFModalVisible}

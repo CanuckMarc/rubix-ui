@@ -2,6 +2,7 @@ import { Button, Form, Input, Spin, Checkbox, Select, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { FlowNetworkFactory } from "../factory";
+import { FlowPluginFactory } from "../../plugins/factory";
 import { model } from "../../../../../../../wailsjs/go/models";
 
 import Network = model.Network;
@@ -12,6 +13,7 @@ interface ModbusFormPropType {
   hostUUID: string;
   refreshList: Function;
   factory: FlowNetworkFactory;
+  pluginFactory: FlowPluginFactory;
   isPluginInstalled: Function;
   installPlugin: Function;
   confirmInstall: boolean;
@@ -35,6 +37,7 @@ export const ModbusForm = (props: ModbusFormPropType) => {
     hostUUID,
     refreshList,
     factory,
+    pluginFactory,
     isPluginInstalled,
     installPlugin,
     confirmInstall,
@@ -115,6 +118,7 @@ export const ModbusForm = (props: ModbusFormPropType) => {
   const onFinish = async (values: Network) => {
     try {
       setConfirmLoading(true);
+      await pluginFactory.BulkEnable(["modbus"]);
       values.plugin_name = "modbus";
       values.transport_type = type === "modbusSerial" ? "serial" : "ip";
       if (!values.name) values.name = "Modbus";

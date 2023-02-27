@@ -1,11 +1,12 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Modal, Spin, Steps, Button, StepsProps, Image, Card } from "antd";
+import { useEffect, useState } from "react";
+import { Modal, Spin, Steps, StepsProps, Image, Card } from "antd";
 import { pluginLogo } from "../../../../../../utils/utils";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { useParams } from "react-router-dom";
 import { LoraForm } from "./lora-form";
 import { BacnetForm } from "./bacnet-form";
 import { ModbusForm } from "./modbus-form";
+import { SystemForm } from "./system-form";
 import { FlowNetworkFactory } from "../factory";
 import { ReleasesFactory } from "../../../../../release/factory";
 
@@ -35,12 +36,14 @@ interface PluginInstalledType {
 }
 
 enum WizardTypes {
+  system = "system",
   lora = "lora",
   bacnet = "bacnet",
   modbusSerial = "modbusSerial",
   modbusTcp = "modbusTcp",
 }
 
+const systemImage = pluginLogo("system");
 const loraImage = pluginLogo("lora");
 const bacnetImage = pluginLogo("bacnet");
 const modbusImage = pluginLogo("modbus");
@@ -63,23 +66,21 @@ const labelStyle: LabelStyleType = {
 };
 
 export const NetworkWizard = (props: any) => {
-  const { connectionSchema, isLoadingForm, refreshList, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } =
-    props;
+  const { refreshList, isWizardModalVisible, setIsWizardModalVisible } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps["status"]>("process");
-  const [errorAtPing, setErrorAtPing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [confirmInstall, setConfirmInstall] = useState(false);
   const [plugins, setPlugins] = useState<any[]>([]);
   const [pluginStatusArray, setPluginStatusArray] = useState<PluginInstalledType[] | undefined>(undefined);
   const [selectedWizard, setSelectedWizard] = useState<WizardTypes | undefined>(undefined);
 
-  const factory = new FlowPluginFactory();
+  const pluginFactory = new FlowPluginFactory();
   const networkFactory = new FlowNetworkFactory();
   const releaseFactory = new ReleasesFactory();
-  networkFactory.connectionUUID = connUUID;
-  networkFactory.hostUUID = hostUUID;
+  networkFactory.connectionUUID = pluginFactory.connectionUUID = connUUID;
+  networkFactory.hostUUID = pluginFactory.hostUUID = hostUUID;
 
   useEffect(() => {
     setStepStatus("process");
@@ -95,7 +96,7 @@ export const NetworkWizard = (props: any) => {
   }, [selectedWizard]);
 
   useEffect(() => {
-    const names = ["lora", "bacnetmaster", "modbus"];
+    const names = ["lora", "bacnetmaster", "modbus", "system"];
     if (plugins.length !== 0) {
       let resArray: PluginInstalledType[] = [];
       names.forEach((name: string) => {
@@ -111,7 +112,7 @@ export const NetworkWizard = (props: any) => {
   const fetchPlugins = async () => {
     try {
       setIsFetching(true);
-      const { data = [] } = await factory.GetPluginsDistribution(connUUID, hostUUID);
+      const { data = [] } = await pluginFactory.GetPluginsDistribution(connUUID, hostUUID);
       setPlugins(data);
     } catch (error) {
       console.log(error);
@@ -124,7 +125,7 @@ export const NetworkWizard = (props: any) => {
     if (pluginName) {
       try {
         setConfirmInstall(true);
-        await factory.InstallPlugin(connUUID, hostUUID, pluginName);
+        await pluginFactory.InstallPlugin(connUUID, hostUUID, pluginName);
         await releaseFactory.EdgeServiceAction(
           "restart",
           connUUID,
@@ -153,7 +154,6 @@ export const NetworkWizard = (props: any) => {
   const onStepsChange = (value: number) => {
     if (stepStatus === "error") {
       setStepStatus("process");
-      // setErrorAtPing(false);
     }
     setCurrentStep(value);
   };
@@ -170,8 +170,15 @@ export const NetworkWizard = (props: any) => {
       name: "Step 1",
       text: "Network type selection",
       content: (
-        <div style={{ width: "50vw" }}>
+        <div style={{ width: "55vw" }}>
           <div style={{ display: "flex", flexDirection: "row", gap: "5px", justifyContent: "center" }}>
+            <NetworkCard
+              setSelectedWizard={setSelectedWizard}
+              isFetching={isFetching}
+              type={WizardTypes.system}
+              name={"System"}
+              image={systemImage}
+            />
             <NetworkCard
               setSelectedWizard={setSelectedWizard}
               isFetching={isFetching}
@@ -216,6 +223,7 @@ export const NetworkWizard = (props: any) => {
               hostUUID={hostUUID}
               refreshList={refreshList}
               factory={networkFactory}
+              pluginFactory={pluginFactory}
               isPluginInstalled={isPluginInstalled}
               installPlugin={installPlugin}
               confirmInstall={confirmInstall}
@@ -227,6 +235,7 @@ export const NetworkWizard = (props: any) => {
               hostUUID={hostUUID}
               refreshList={refreshList}
               factory={networkFactory}
+              pluginFactory={pluginFactory}
               isPluginInstalled={isPluginInstalled}
               installPlugin={installPlugin}
               confirmInstall={confirmInstall}
@@ -239,6 +248,7 @@ export const NetworkWizard = (props: any) => {
               hostUUID={hostUUID}
               refreshList={refreshList}
               factory={networkFactory}
+              pluginFactory={pluginFactory}
               isPluginInstalled={isPluginInstalled}
               installPlugin={installPlugin}
               confirmInstall={confirmInstall}
@@ -251,6 +261,17 @@ export const NetworkWizard = (props: any) => {
               hostUUID={hostUUID}
               refreshList={refreshList}
               factory={networkFactory}
+              pluginFactory={pluginFactory}
+              isPluginInstalled={isPluginInstalled}
+              installPlugin={installPlugin}
+              confirmInstall={confirmInstall}
+              handleWizardClose={handleWizardClose}
+            />
+          ) : selectedWizard === WizardTypes.system ? (
+            <SystemForm
+              refreshList={refreshList}
+              factory={networkFactory}
+              pluginFactory={pluginFactory}
               isPluginInstalled={isPluginInstalled}
               installPlugin={installPlugin}
               confirmInstall={confirmInstall}
@@ -268,7 +289,7 @@ export const NetworkWizard = (props: any) => {
     <Modal
       title={"Create Connection"}
       visible={isWizardModalVisible}
-      width={"50vw"}
+      width={"60vw"}
       onCancel={handleWizardClose}
       footer={null}
       destroyOnClose={true}
@@ -280,7 +301,7 @@ export const NetworkWizard = (props: any) => {
           direction="horizontal"
           current={currentStep}
           onChange={onStepsChange}
-          style={{ width: "45vw" }}
+          style={{ width: "55vw" }}
           status={stepStatus}
         >
           {data.map((item, index) => (

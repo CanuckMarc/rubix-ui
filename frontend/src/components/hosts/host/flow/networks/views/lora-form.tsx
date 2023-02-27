@@ -2,6 +2,7 @@ import { Button, Form, Input, Spin, Checkbox, Select } from "antd";
 import { useEffect, useState } from "react";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { FlowNetworkFactory } from "../factory";
+import { FlowPluginFactory } from "../../plugins/factory";
 import { model } from "../../../../../../../wailsjs/go/models";
 
 import Network = model.Network;
@@ -11,6 +12,7 @@ interface LoraFormPropType {
   hostUUID: string;
   refreshList: Function;
   factory: FlowNetworkFactory;
+  pluginFactory: FlowPluginFactory;
   isPluginInstalled: Function;
   installPlugin: Function;
   confirmInstall: boolean;
@@ -33,6 +35,7 @@ export const LoraForm = (props: LoraFormPropType) => {
     hostUUID,
     refreshList,
     factory,
+    pluginFactory,
     isPluginInstalled,
     installPlugin,
     confirmInstall,
@@ -86,6 +89,7 @@ export const LoraForm = (props: LoraFormPropType) => {
   const onFinish = async (values: Network) => {
     try {
       setConfirmLoading(true);
+      await pluginFactory.BulkEnable(["lora"]);
       values.plugin_name = "lora";
       if (!values.name) values.name = "LoRa";
       if (!values.description) values.description = "LoRa Network";

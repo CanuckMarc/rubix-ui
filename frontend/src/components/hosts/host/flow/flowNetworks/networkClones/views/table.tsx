@@ -9,13 +9,15 @@ import { FLOW_NETWORK_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { FlowFrameworkNetworkCloneFactory } from "../factory";
 import { ArrowRightOutlined } from "@ant-design/icons";
+import { flowNetworkClonesKey } from "../../../../host";
 
 import UUIDs = backend.UUIDs;
 import FlowNetworkClone = model.FlowNetworkClone;
 import { hasError } from "../../../../../../../utils/response";
 import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 
-export const NetworkClonesTable = () => {
+export const NetworkClonesTable = (props: any) => {
+  const { activeKey } = props;
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
   const [networks, setNetworks] = useState([] as Array<UUIDs>);
@@ -91,7 +93,7 @@ export const NetworkClonesTable = () => {
       } else {
         openNotificationWithIcon("success", res.data);
       }
-      await fetch()
+      await fetch();
     } catch (error) {
       console.log(error);
     } finally {
@@ -105,8 +107,8 @@ export const NetworkClonesTable = () => {
   };
 
   useEffect(() => {
-    fetch();
-  }, []);
+    activeKey === flowNetworkClonesKey && fetch();
+  }, [activeKey]);
 
   return (
     <>

@@ -25,6 +25,7 @@ import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { LogTable } from "./logTable";
 import { hasError } from "../../../../../../utils/response";
 import { NetworkWizard } from "./network-wizard";
+import { networksKey } from "../../../host";
 import UUIDs = backend.UUIDs;
 import Network = model.Network;
 
@@ -42,7 +43,8 @@ export interface ExternalWindowParamType {
   logNetwork: string | undefined;
 }
 
-export const FlowNetworkTable = () => {
+export const FlowNetworkTable = (props: any) => {
+  const { activeKey } = props;
   let { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [currentItem, setCurrentItem] = useState({});
   const [networkSchema, setNetworkSchema] = useState({});
@@ -193,8 +195,8 @@ export const FlowNetworkTable = () => {
   };
 
   useEffect(() => {
-    fetchNetworks();
-  }, []);
+    activeKey === networksKey && fetchNetworks();
+  }, [activeKey]);
 
   const handleOk = () => {
     setIsLogTableOpen(false);

@@ -2,12 +2,14 @@ import { Button, Form, Input, Spin, Checkbox, Select, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { FlowNetworkFactory } from "../factory";
+import { FlowPluginFactory } from "../../plugins/factory";
 
 interface BacnetFormPropType {
   connUUID: string;
   hostUUID: string;
   refreshList: Function;
   factory: FlowNetworkFactory;
+  pluginFactory: FlowPluginFactory;
   isPluginInstalled: Function;
   installPlugin: Function;
   confirmInstall: boolean;
@@ -25,6 +27,7 @@ export const BacnetForm = (props: BacnetFormPropType) => {
     hostUUID,
     refreshList,
     factory,
+    pluginFactory,
     isPluginInstalled,
     installPlugin,
     confirmInstall,
@@ -69,6 +72,7 @@ export const BacnetForm = (props: BacnetFormPropType) => {
   const onFinish = async (values: any) => {
     try {
       setConfirmLoading(true);
+      await pluginFactory.BulkEnable(["bacnetmaster"]);
       values.plugin_name = "bacnetmaster";
       if (!values.name) values.name = "BACnet";
       if (!values.description) values.description = "BACnet Network";
