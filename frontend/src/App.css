@@ -119,12 +119,6 @@ svg {
     gap: 15px;
 }
 
-.flow-setting-modal-labels {
-    display: inline-block;
-    width: 150px;
-    text-align: right;
-}
-
 hr.solid {
     border-top: 1px solid #dcdcdc;
 }

@@ -103,6 +103,10 @@ export const NodesTree = memo(
       setPanelKeys([...(window.subFlowIds || [])]);
     }, [selectedSubFlowId]);
 
+    useEffect(() => {
+      setIsExpandedAll(false);
+    }, []);
+
     return (
       <div>
         <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">

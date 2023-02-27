@@ -1271,19 +1271,6 @@ const Flow = (props: FlowProps) => {
     return "#555";
   }, []);
 
-  // useEffect(() => {
-  //   if (disablePointsPallet) {
-  //     setFlowSettings({...flowSettings, showPointPallet: false})
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [disablePointsPallet])
-
-  // useEffect(() => {
-  //   if (flowSettings.showPointPallet) {
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [flowSettings])
-
   const PalletTab = (
     <>
       <UnorderedListOutlined />
@@ -1305,7 +1292,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      {!isFetching && (
+      {!isFetching && flowSettings.showNodesPallet && (
         <div>
           <div className="p-2">
             <input
@@ -1318,37 +1305,31 @@ const Flow = (props: FlowProps) => {
             />
           </div>
           <Tabs size="small" centered className="rubix-flow__tabs">
-            {flowSettings.showNodesPallet && (
-              <TabPane tab={PalletTab} key="Nodes">
-                <NodeSideBar nodesSpec={nodesSpec} search={search} />
-              </TabPane>
-            )}
-            {flowSettings.showNodesTree && (
-              <TabPane tab={NodesTab} key="Tree">
-                <NodesTree
-                  nodes={window.allFlow?.nodes || []}
-                  selectedSubFlowId={selectedNodeForSubFlow?.id}
-                  openNodeMenu={openNodeMenu}
-                  nodesSpec={nodesSpec}
-                  gotoNode={gotoNode}
-                  panelKeys={panelKeys}
-                  setPanelKeys={setPanelKeys}
-                  changeKeys={changeKeys}
-                  flowSettings={flowSettings}
-                  search={search}
-                />
-              </TabPane>
-            )}
-            {flowSettings.showPointPallet && (
-              <TabPane tab={PointsTab} key="Points">
-                <PointsPallet
-                  selectedSubflow={selectedNodeForSubFlow}
-                  // disablePointsPallet={disablePointsPallet}
-                  // setDisablePointsPallet={setDisablePointsPallet}
-                  search={search}
-                />
-              </TabPane>
-            )}
+            <TabPane tab={PalletTab} key="Nodes">
+              <NodeSideBar nodesSpec={nodesSpec} search={search} />
+            </TabPane>
+            <TabPane tab={NodesTab} key="Tree">
+              <NodesTree
+                nodes={window.allFlow?.nodes || []}
+                selectedSubFlowId={selectedNodeForSubFlow?.id}
+                openNodeMenu={openNodeMenu}
+                nodesSpec={nodesSpec}
+                gotoNode={gotoNode}
+                panelKeys={panelKeys}
+                setPanelKeys={setPanelKeys}
+                changeKeys={changeKeys}
+                flowSettings={flowSettings}
+                search={search}
+              />
+            </TabPane>
+            <TabPane tab={PointsTab} key="Points">
+              <PointsPallet
+                selectedSubflow={selectedNodeForSubFlow}
+                // disablePointsPallet={disablePointsPallet}
+                // setDisablePointsPallet={setDisablePointsPallet}
+                search={search}
+              />
+            </TabPane>
           </Tabs>
         </div>
       )}
