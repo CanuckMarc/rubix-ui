@@ -19,6 +19,7 @@ type NodeProps = {
   panelKeys: string[];
   setPanelKeys: React.Dispatch<React.SetStateAction<string[]>>;
   changeKeys: (key: string) => void;
+  search: string;
 };
 
 export const NodesTree = ({
@@ -31,17 +32,13 @@ export const NodesTree = ({
   panelKeys,
   setPanelKeys,
   changeKeys,
+  search,
 }: NodeProps) => {
-  const [search, setSearch] = useState("");
   const [isExpandedAll, setIsExpandedAll] = useState(false);
   const [nodesFiltered, setNodesFiltered] = useState<{ nodesL1: NodeInterface[]; remainingNodes: NodeInterface[] }>({
     nodesL1: [],
     remainingNodes: [],
   });
-  
-  const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
 
   const handleNodeContextMenu = (event: { x: number; y: number }, node: NodeInterface) => {
     openNodeMenu({ x: event.x, y: event.y }, node);
@@ -102,46 +99,34 @@ export const NodesTree = ({
   }, [selectedSubFlowId]);
 
   return (
-    <div>
-      <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
-        <div className="p-2">
-          Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
-          <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
-            {isExpandedAll ? (
-              <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
-            ) : (
-              <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
-            )}
-          </Tooltip>
-        </div>
-        <div className="p-2">
-          <input
-            type="text"
-            autoFocus
-            placeholder="Type to filter"
-            className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
-            value={search}
-            onChange={onChangeSearch}
+    <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
+      <div className="p-2">
+        Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
+        <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
+          {isExpandedAll ? (
+            <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
+          ) : (
+            <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
+          )}
+        </Tooltip>
+      </div>
+      <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
+        {nodesFiltered.nodesL1.map((node, index) => (
+          <NodeTreeItem
+            key={node.id}
+            node={node}
+            nodesSpec={nodesSpec}
+            gotoNode={gotoNode}
+            nodeIndex={index}
+            panelKeys={panelKeys}
+            onChangeKey={changeKeys}
+            allNodes={nodesFiltered.remainingNodes}
+            selectedSubFlowId={selectedSubFlowId}
+            handleNodeContextMenu={handleNodeContextMenu}
+            flowSettings={flowSettings}
           />
-        </div>
-        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
-          {nodesFiltered.nodesL1.map((node, index) => (
-            <NodeTreeItem
-              key={node.id}
-              node={node}
-              nodesSpec={nodesSpec}
-              gotoNode={gotoNode}
-              nodeIndex={index}
-              panelKeys={panelKeys}
-              onChangeKey={changeKeys}
-              allNodes={nodesFiltered.remainingNodes}
-              selectedSubFlowId={selectedSubFlowId}
-              handleNodeContextMenu={handleNodeContextMenu}
-              flowSettings={flowSettings}
-            />
-          ))}
-        </div>
-      </Sider>
-    </div>
+        ))}
+      </div>
+    </Sider>
   );
 };
