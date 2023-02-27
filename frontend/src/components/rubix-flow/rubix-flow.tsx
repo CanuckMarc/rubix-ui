@@ -409,6 +409,9 @@ const Flow = (props: FlowProps) => {
 
   const onHandelSaveFlow = async () => {
     setIsSaving(true);
+    // stop the loop when user downloads a flow
+    if (refreshInterval.current) clearInterval(refreshInterval.current);
+    
     const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
       if (n.isParent) {
         const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
@@ -446,8 +449,28 @@ const Flow = (props: FlowProps) => {
     } catch (error) {
       console.log("__ERROR__", error);
     }
+
     setIsSaving(false);
+
+    //after a download wait 5 seconds before allowing this loop to start
+    setTimeout(() => {
+      refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
+    }, 5000);
   };
+
+  // if node count is > 500 then make the minimum loop time 10 seconds.
+  // if node count is > 1000 then make the minimum loop time 30 seconds.
+  useEffect(() => {
+    const allNumberNode = nodes.length;
+    if (allNumberNode > 1000) {
+      flowSettings.refreshTimeout = 30;
+    } else if (allNumberNode > 500) {
+      flowSettings.refreshTimeout = 10;
+    }
+
+    localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
+    setFlowSettings(flowSettings);
+  },[nodes]);
 
   const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
@@ -1047,6 +1070,12 @@ const Flow = (props: FlowProps) => {
   };
 
   const onSaveFlowSettings = (config: FlowSettings) => {
+    if (config?.refreshTimeout < 5) {
+      config = {
+        ...config,
+        refreshTimeout: 5,
+      };
+    }
     localStorage.setItem(FLOW_SETTINGS, JSON.stringify(config));
     setFlowSettings(config);
   };
