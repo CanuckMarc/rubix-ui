@@ -461,16 +461,21 @@ const Flow = (props: FlowProps) => {
   // if node count is > 500 then make the minimum loop time 10 seconds.
   // if node count is > 1000 then make the minimum loop time 30 seconds.
   useEffect(() => {
-    const allNumberNode = nodes.length;
-    if (allNumberNode > 1000) {
-      flowSettings.refreshTimeout = 30;
-    } else if (allNumberNode > 500) {
-      flowSettings.refreshTimeout = 10;
-    }
+    const nodeLength = window.allFlow?.nodes?.length || 0;
+    let newTimeOut = null;
 
-    localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
-    setFlowSettings(flowSettings);
-  },[nodes]);
+    if (nodeLength >= 1000) {
+      newTimeOut = 30;
+    } else if (nodeLength >= 500) {
+      newTimeOut = 10;
+    }
+    flowSettings.refreshTimeout = newTimeOut;
+
+    if (newTimeOut !== null) {
+      localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
+      setFlowSettings(flowSettings);
+    }
+  }, [window.allFlow?.nodes?.length]);
 
   const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
@@ -1070,12 +1075,6 @@ const Flow = (props: FlowProps) => {
   };
 
   const onSaveFlowSettings = (config: FlowSettings) => {
-    if (config?.refreshTimeout < 5) {
-      config = {
-        ...config,
-        refreshTimeout: 5,
-      };
-    }
     localStorage.setItem(FLOW_SETTINGS, JSON.stringify(config));
     setFlowSettings(config);
   };
