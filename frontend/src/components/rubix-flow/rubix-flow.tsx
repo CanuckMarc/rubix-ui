@@ -469,9 +469,8 @@ const Flow = (props: FlowProps) => {
     } else if (nodeLength >= 500) {
       newTimeOut = 10;
     }
-    flowSettings.refreshTimeout = newTimeOut;
-
     if (newTimeOut !== null) {
+      flowSettings.refreshTimeout = newTimeOut;
       localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
       setFlowSettings(flowSettings);
     }
