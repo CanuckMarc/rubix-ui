@@ -123,6 +123,17 @@ export const FlowDeviceTable = (props: any) => {
       if (stylingColumnKeys.includes(header.key)) {
         return stylingColumns.find((col: any) => col.key === header.key);
       } else {
+        if (header.key === "auto_mapping_enable") {
+          header.render = (auto_mapping_enable: boolean) => {
+            let colour = "blue";
+            let text = "disabled";
+            if (auto_mapping_enable) {
+              colour = "orange";
+              text = "enable";
+            }
+            return <Tag color={colour}>{text}</Tag>;
+          };
+        }
         return header;
       }
     });
