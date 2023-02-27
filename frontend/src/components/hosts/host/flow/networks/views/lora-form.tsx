@@ -89,7 +89,7 @@ export const LoraForm = (props: LoraFormPropType) => {
       values.plugin_name = "lora";
       if (!values.name) values.name = "LoRa";
       if (!values.description) values.description = "LoRa Network";
-      if (!values.serial_port) values.serial_port = "/dev/ttyAMA0";
+      if (!values.serial_port) values.serial_port = "/data/socat/loRa1";
       if (!values.serial_baud_rate) values.serial_baud_rate = 38400;
       await factory.Add(values);
       refreshList();
@@ -124,7 +124,7 @@ export const LoraForm = (props: LoraFormPropType) => {
             initialValues={{
               name: "LoRa",
               description: "LoRa Network",
-              serial_port: "/dev/ttyAMA0",
+              serial_port: "/data/socat/loRa1",
               serial_baud_rate: 38400,
             }}
           >
