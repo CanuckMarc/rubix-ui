@@ -45,7 +45,7 @@
 }
 
 .rubix-flow__wrapper.has-tabs .react-flow {
-  height: calc(100vh - 77px) !important;
+  /* height: calc(100vh - 77px) !important; */
   top: 36px;
 }
 
