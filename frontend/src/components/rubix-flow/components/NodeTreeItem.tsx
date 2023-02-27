@@ -44,23 +44,27 @@ export const NodeTreeItem = ({
   };
 
   const spec = Array.isArray(nodesSpec) ? nodesSpec.find((sp) => sp.type === node.type) : undefined;
-  const HeaderPanel = (
+  const ParentPanel = (
     <>
-      <span className="header-name mr-1">{type}</span>
+      <span className="parent-name mr-1">{type}</span>
       {flowSettings.showCount ? "- " + childNodes.length : ""}
     </>
   );
+
+  const NodeClassName = `ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0
+  ${node.isParent ? "parent-item" : "single-item"}`;
+
   return (
     <Collapse
       expandIconPosition="right"
       activeKey={panelKeys}
       onChange={() => onChangeKey(node.id)}
-      className="ant-menu ant-menu-root ant-menu-inline ant-menu-dark border-0"
+      className={NodeClassName}
     >
       {node.isParent ? (
         <Panel
           key={node.id}
-          header={HeaderPanel}
+          header={ParentPanel}
           className={`border-gray-600 border-t border-b-0 relative node-header-panel ${
             node.id === selectedSubFlowId ? "tree-active" : ""
           }`}
@@ -68,7 +72,7 @@ export const NodeTreeItem = ({
             paddingLeft: !node.parentId ? undefined : 10,
           }}
           extra={
-            <div className="w-4/5 h-full absolute left-0 top-0" onClick={onClickNode} onContextMenu={doubleClick}>
+            <div onClick={onClickNode} onContextMenu={doubleClick}>
               {!!spec?.info?.icon && <span className="pr-3 pt-1">{spec?.info?.icon}</span>}
             </div>
           }
@@ -100,7 +104,7 @@ export const NodeTreeItem = ({
           }`}
           style={{ paddingLeft: !node.parentId ? undefined : 22 }}
         >
-          <span className="group-name">
+          <span className="header-name">
             {!!spec?.info?.icon && <span className="top-2 relative">{spec?.info?.icon}</span>}
             {type}
           </span>

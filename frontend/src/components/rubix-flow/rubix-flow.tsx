@@ -409,6 +409,9 @@ const Flow = (props: FlowProps) => {
 
   const onHandelSaveFlow = async () => {
     setIsSaving(true);
+    // stop the loop when user downloads a flow
+    if (refreshInterval.current) clearInterval(refreshInterval.current);
+
     const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
       if (n.isParent) {
         const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
@@ -446,8 +449,32 @@ const Flow = (props: FlowProps) => {
     } catch (error) {
       console.log("__ERROR__", error);
     }
+
     setIsSaving(false);
+
+    //after a download wait 5 seconds before allowing this loop to start
+    setTimeout(() => {
+      refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
+    }, 5000);
   };
+
+  // if node count is > 500 then make the minimum loop time 10 seconds.
+  // if node count is > 1000 then make the minimum loop time 30 seconds.
+  useEffect(() => {
+    const nodeLength = window.allFlow?.nodes?.length || 0;
+    let newTimeOut = null;
+
+    if (nodeLength >= 1000) {
+      newTimeOut = 30;
+    } else if (nodeLength >= 500) {
+      newTimeOut = 10;
+    }
+    if (newTimeOut !== null) {
+      flowSettings.refreshTimeout = newTimeOut;
+      localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
+      setFlowSettings(flowSettings);
+    }
+  }, [window.allFlow?.nodes?.length]);
 
   const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
@@ -919,35 +946,33 @@ const Flow = (props: FlowProps) => {
 
   // delete nodes when CtrX
   const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
-    const nodeIds: string[] = [];
+    const nodeWithChildIds: string[] = [];
     for (const node of _nodesDeleted) {
-      nodeIds.push(node.id);
+      nodeWithChildIds.push(node.id);
       if (node.isParent) {
-        nodeIds.push(...getChildNodeIds(node.id));
+        nodeWithChildIds.push(...getChildNodeIds(node.id));
       }
     }
 
-    const nodeId = _nodesDeleted.map((item: NodeInterface) => item.id);
-
-    const childNode = window.allFlow.nodes.filter((n) => nodeId.includes(n.id));
-    const childEdge = window.allFlow.edges.filter((n) => nodeId.includes(n.source));
-
-    const remainingNodes = nodes.filter((item) => !nodeId.includes(item.id));
-    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeId.includes(n.id));
-
+    const nodeIdsDeleted = _nodesDeleted.map((item: NodeInterface) => item.id);
+    const childNode = window.allFlow.nodes.filter((n) => nodeIdsDeleted.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIdsDeleted.includes(n.source));
+    const remainingNodes = nodes.filter((item) => !nodeIdsDeleted.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeIdsDeleted.includes(n.id));
     const remainingEdges = edges.filter(
       (item) =>
         !_edgesDeleted.some((item2) => item.id === item2.id) &&
-        !nodeIds.includes(item.target) &&
-        !nodeIds.includes(item.source)
+        !nodeWithChildIds.includes(item.target) &&
+        !nodeWithChildIds.includes(item.source)
     );
+
     window.allFlow = {
       nodes: remainingNodesAll,
       edges: window.allFlow.edges.filter(
         (item) =>
           !_edgesDeleted.some((item2) => item.id === item2.id) &&
-          !nodeId.includes(item.target) &&
-          !nodeId.includes(item.source)
+          !nodeIdsDeleted.includes(item.target) &&
+          !nodeIdsDeleted.includes(item.source)
       ),
     };
     setNodes(remainingNodes);
@@ -1271,19 +1296,6 @@ const Flow = (props: FlowProps) => {
     return "#555";
   }, []);
 
-  // useEffect(() => {
-  //   if (disablePointsPallet) {
-  //     setFlowSettings({...flowSettings, showPointPallet: false})
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [disablePointsPallet])
-
-  // useEffect(() => {
-  //   if (flowSettings.showPointPallet) {
-  //     setDisablePointsPallet(false)
-  //   }
-  // }, [flowSettings])
-
   const PalletTab = (
     <>
       <UnorderedListOutlined />
@@ -1305,7 +1317,7 @@ const Flow = (props: FlowProps) => {
 
   return (
     <div className="rubix-flow">
-      {!isFetching && (
+      {!isFetching && flowSettings.showNodesPallet && (
         <div>
           <div className="p-2">
             <input
@@ -1318,37 +1330,31 @@ const Flow = (props: FlowProps) => {
             />
           </div>
           <Tabs size="small" centered className="rubix-flow__tabs">
-            {flowSettings.showNodesPallet && (
-              <TabPane tab={PalletTab} key="Nodes">
-                <NodeSideBar nodesSpec={nodesSpec} search={search} />
-              </TabPane>
-            )}
-            {flowSettings.showNodesTree && (
-              <TabPane tab={NodesTab} key="Tree">
-                <NodesTree
-                  nodes={window.allFlow?.nodes || []}
-                  selectedSubFlowId={selectedNodeForSubFlow?.id}
-                  openNodeMenu={openNodeMenu}
-                  nodesSpec={nodesSpec}
-                  gotoNode={gotoNode}
-                  panelKeys={panelKeys}
-                  setPanelKeys={setPanelKeys}
-                  changeKeys={changeKeys}
-                  flowSettings={flowSettings}
-                  search={search}
-                />
-              </TabPane>
-            )}
-            {flowSettings.showPointPallet && (
-              <TabPane tab={PointsTab} key="Points">
-                <PointsPallet
-                  selectedSubflow={selectedNodeForSubFlow}
-                  // disablePointsPallet={disablePointsPallet}
-                  // setDisablePointsPallet={setDisablePointsPallet}
-                  search={search}
-                />
-              </TabPane>
-            )}
+            <TabPane tab={PalletTab} key="Nodes">
+              <NodeSideBar nodesSpec={nodesSpec} search={search} />
+            </TabPane>
+            <TabPane tab={NodesTab} key="Tree">
+              <NodesTree
+                nodes={window.allFlow?.nodes || []}
+                selectedSubFlowId={selectedNodeForSubFlow?.id}
+                openNodeMenu={openNodeMenu}
+                nodesSpec={nodesSpec}
+                gotoNode={gotoNode}
+                panelKeys={panelKeys}
+                setPanelKeys={setPanelKeys}
+                changeKeys={changeKeys}
+                flowSettings={flowSettings}
+                search={search}
+              />
+            </TabPane>
+            <TabPane tab={PointsTab} key="Points">
+              <PointsPallet
+                selectedSubflow={selectedNodeForSubFlow}
+                // disablePointsPallet={disablePointsPallet}
+                // setDisablePointsPallet={setDisablePointsPallet}
+                search={search}
+              />
+            </TabPane>
           </Tabs>
         </div>
       )}
@@ -1475,6 +1481,7 @@ const Flow = (props: FlowProps) => {
                   isDoubleClick={isDoubleClick}
                   handleAddSubFlow={handleAddSubFlow}
                   selectedNodeForSubFlow={selectedNodeForSubFlow}
+                  changeKeys={changeKeys}
                 />
               )}
               {!!selectedNodeForSubFlow && isConnectionBuilder && (

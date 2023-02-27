@@ -11,8 +11,6 @@ export const getFlowSettings = () => {
     refreshTimeout: config?.refreshTimeout || 5,
     showSubFlowTabs: config?.showSubFlowTabs === undefined ? true : config?.showSubFlowTabs,
     showMiniMap: config?.showMiniMap === undefined ? true : config?.showMiniMap,
-    showNodesTree: config?.showNodesTree === undefined ? true : config?.showNodesTree,
-    showPointPallet: config?.showPointPallet === undefined ? true : config?.showPointPallet,
     showNodesPallet: config?.showNodesPallet === undefined ? true : config?.showNodesPallet,
     showCount: config?.showCount === undefined ? true : config?.showCount,
     positionMiniMap: config?.positionMiniMap === undefined ? "bottom" : config?.positionMiniMap,
@@ -23,8 +21,6 @@ export type FlowSettings = {
   refreshTimeout: number | string;
   showMiniMap: boolean;
   showSubFlowTabs: boolean;
-  showNodesTree: boolean;
-  showPointPallet: boolean;
   showCount: boolean;
   showNodesPallet: boolean;
   positionMiniMap: string;
@@ -48,6 +44,7 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
 
   const handleBlurValue = (e: ChangeEvent<HTMLInputElement>) => {
     const value = isNaN(+e.target.value) ? 1 : Math.max(1, Math.min(60, Number(e.target.value)));
+    console.log("value",value);
 
     setConfigs({ ...configs, refreshTimeout: value });
   };
@@ -73,9 +70,9 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
     <Space direction="horizontal">
       <label className="flow-setting-modal-labels mb-0 mt-1">{label}: </label>
       <Switch checked={configs[keyConfig] as boolean} size="small" onChange={onChangeConfig(keyConfig)} />
-      {configs[keyConfig] && keyConfig === "showNodesTree" && (
+      {configs[keyConfig] && keyConfig === "showNodesPallet" && (
         <>
-          <label className="flow-setting-modal-labels mb-0 mt-1">{"Show Count"}: </label>
+          <label className="flow-setting-modal-labels mb-0 mt-1">{"Node Tree Show Node Count"}: </label>
           <Switch checked={configs["showCount"] as boolean} size="small" onChange={onChangeConfig("showCount")} />
         </>
       )}
@@ -94,8 +91,6 @@ export const FlowSettingsModal: FC<SettingsModalProps> = ({ open = false, onClos
     >
       <Space direction="vertical" align="start">
         {renderConfigs("Show Mini Map", "showMiniMap")}
-        {renderConfigs("Show Nodes Tree", "showNodesTree")}
-        {renderConfigs("Show Points Pallet", "showPointPallet")}
         {renderConfigs("Show Nodes Pallet", "showNodesPallet")}
         {renderConfigs("Show Sub flow tabs", "showSubFlowTabs")}
         <Space direction="horizontal">

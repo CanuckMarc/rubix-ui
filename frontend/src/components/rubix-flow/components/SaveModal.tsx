@@ -60,7 +60,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
         ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
         : factory.GetFlow(connUUID, hostUUID, isRemote));
 
-      data.nodes.forEach((item: any) => {
+      (data.nodes || []).forEach((item: any) => {
         if (item.inputs !== null) {
           Object.entries(item?.inputs).forEach(([key, value]: any) => {
             if (value.links) {
