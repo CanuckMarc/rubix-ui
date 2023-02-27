@@ -23,6 +23,7 @@ export const SubFlowTabs: FC<SubFlowTabsProps> = memo(
         goSubFlow(node);
       }
     };
+
     const nodeTabs = nodes.filter((item) => panelKeysNew.includes(item.id));
 
     return (
@@ -37,3 +38,5 @@ export const SubFlowTabs: FC<SubFlowTabsProps> = memo(
     );
   }
 );
+
+SubFlowTabs.displayName = "SubflowTabs";

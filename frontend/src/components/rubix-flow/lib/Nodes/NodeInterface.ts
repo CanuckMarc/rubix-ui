@@ -5,6 +5,7 @@ import {
   CoordinateExtent,
   internalsSymbol,
   NodeHandleBounds,
+  Edge,
 } from "reactflow";
 
 export type NodeInterfaceInfo = {
@@ -51,5 +52,7 @@ export interface NodeInterface<T = any> {
 export type OutputNodeValueType = {
   pin: string;
   dataType: string;
-  value: any
-}
+  value: any;
+};
+
+export type EdgeInterface = Edge & { originEdgeId?: string; };
