@@ -51,7 +51,6 @@ export const NodesTree = memo(
 
     const onChangeOpenPanels = (isExpanded: boolean) => () => {
       const ids = nodes.filter((n) => (isExpanded ? n.isParent : false)).map((n) => n.id);
-
       setIsExpandedAll(isExpanded);
       setPanelKeys(ids);
     };
@@ -108,47 +107,45 @@ export const NodesTree = memo(
     }, []);
 
     return (
-      <div>
-        <Sider className="rubix-flow__node-sidebar node-picker z-10 text-white border-l border-gray-600">
-          <div className="p-2">
-            Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
-            <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
-              {isExpandedAll ? (
-                <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
-              ) : (
-                <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
-              )}
-            </Tooltip>
-          </div>
-          <div className="p-2">
-            <input
-              type="text"
-              autoFocus
-              placeholder="Type to filter"
-              className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
-              value={search}
-              onChange={onChangeSearch}
+      <Sider className="rubix-flow__node-sidebar node-picker z-9 text-white border-l border-gray-600">
+        <div className="p-2">
+          Nodes Tree {flowSettings.showCount ? `(${nodes.length})` : ""}
+          <Tooltip title={isExpandedAll ? "collapse all" : "expand all"}>
+            {isExpandedAll ? (
+              <CaretDownOutlined className="title-icon" onClick={onChangeOpenPanels(false)} />
+            ) : (
+              <CaretRightOutlined className="title-icon" onClick={onChangeOpenPanels(true)} />
+            )}
+          </Tooltip>
+        </div>
+        <div className="p-2">
+          <input
+            type="text"
+            autoFocus
+            placeholder="Type to filter"
+            className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
+            value={search}
+            onChange={onChangeSearch}
+          />
+        </div>
+        <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
+          {nodesFiltered.nodesL1.map((node, index) => (
+            <NodeTreeItem
+              key={node.id}
+              node={node}
+              nodesSpec={nodesSpec}
+              gotoNode={gotoNode}
+              nodeIndex={index}
+              panelKeys={panelKeys}
+              onChangeKey={changeKeys}
+              allNodes={nodesFiltered.remainingNodes}
+              selectedSubFlowId={selectedSubFlowId}
+              handleNodeContextMenu={handleNodeContextMenu}
+              flowSettings={flowSettings}
             />
-          </div>
-          <div className="overflow-y-scroll" style={{ height: "calc(100vh - 110px)" }}>
-            {nodesFiltered.nodesL1.map((node, index) => (
-              <NodeTreeItem
-                key={node.id}
-                node={node}
-                nodesSpec={nodesSpec}
-                gotoNode={gotoNode}
-                nodeIndex={index}
-                panelKeys={panelKeys}
-                onChangeKey={changeKeys}
-                allNodes={nodesFiltered.remainingNodes}
-                selectedSubFlowId={selectedSubFlowId}
-                handleNodeContextMenu={handleNodeContextMenu}
-                flowSettings={flowSettings}
-              />
-            ))}
-          </div>
-        </Sider>
-      </div>
+          ))}
+        </div>
+      </Sider>
     );
   }
 );
