@@ -411,7 +411,7 @@ const Flow = (props: FlowProps) => {
     setIsSaving(true);
     // stop the loop when user downloads a flow
     if (refreshInterval.current) clearInterval(refreshInterval.current);
-    
+
     const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
       if (n.isParent) {
         const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
@@ -1503,6 +1503,7 @@ const Flow = (props: FlowProps) => {
                   isDoubleClick={isDoubleClick}
                   handleAddSubFlow={handleAddSubFlow}
                   selectedNodeForSubFlow={selectedNodeForSubFlow}
+                  changeKeys={changeKeys}
                 />
               )}
               {!!selectedNodeForSubFlow && isConnectionBuilder && (

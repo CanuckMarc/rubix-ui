@@ -23,6 +23,7 @@ type NodeMenuProps = {
   deleteAllInputOrOutputConnectionsOfNode: (isInputs: boolean, nodeId: string) => void;
   handleAddSubFlow: (node: NodeInterface) => void;
   isOpenFromNodeTree: boolean;
+  changeKeys: (key: string) => void;
 };
 
 export const DEFAULT_NODE_SPEC_JSON: NodeSpecJSON = {
@@ -45,6 +46,7 @@ const NodeMenu = ({
   deleteAllInputOrOutputOfParentNode,
   deleteAllInputOrOutputConnectionsOfNode,
   isOpenFromNodeTree = false,
+  changeKeys,
 }: NodeMenuProps) => {
   const [isModalVisible, setIsModalVisible] = useState(isDoubleClick);
   const [isModalVisibleHelp, setIsModalVisibleHelp] = useState(false);
@@ -103,6 +105,7 @@ const NodeMenu = ({
 
   const onSubFlowClick = () => {
     handleAddSubFlow(node);
+    changeKeys(node.id);
     onClose();
   };
 
@@ -295,4 +298,3 @@ const NodeMenu = ({
   );
 };
 export default NodeMenu;
-
