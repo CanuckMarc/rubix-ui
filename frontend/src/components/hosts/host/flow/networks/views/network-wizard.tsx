@@ -1,15 +1,43 @@
-import { useEffect, useState } from "react";
-import { Modal, Spin, Steps, Button, StepsProps, Image } from "antd";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Modal, Spin, Steps, Button, StepsProps, Image, Card } from "antd";
 import { pluginLogo } from "../../../../../../utils/utils";
-
-// import { CreateConnectionForm } from "./create-form";
-// import { TokenForm } from "./token-form";
-// import { storage } from "../../../../wailsjs/go/models";
-// import { openNotificationWithIcon } from "../../../utils/utils";
-// import { PingRubixAssist } from "../../../../wailsjs/go/backend/App";
-// import RubixConnection = storage.RubixConnection;
+import { FlowPluginFactory } from "../../plugins/factory";
+import { useParams } from "react-router-dom";
+import { LoraForm } from "./lora-form";
+import { FlowNetworkFactory } from "../factory";
+import { ReleasesFactory } from "../../../../../release/factory";
 
 const { Step } = Steps;
+
+type FlexDirection =
+  | "column"
+  | "inherit"
+  | "-moz-initial"
+  | "initial"
+  | "revert"
+  | "unset"
+  | "column-reverse"
+  | "row"
+  | "row-reverse"
+  | undefined;
+interface LabelStyleType {
+  display: string;
+  flexDirection: FlexDirection;
+  alignItems: string;
+  rowGap: string;
+}
+
+interface PluginInstalledType {
+  name: string;
+  isInstalled: boolean;
+}
+
+enum WizardTypes {
+  lora = "lora",
+  bacnet = "bacnet",
+  modbusSerial = "modbusSerial",
+  modbusTcp = "modbusTcp",
+}
 
 const loraImage = pluginLogo("lora");
 const bacnetImage = pluginLogo("bacnet");
@@ -20,57 +48,160 @@ const imageBoxStyle = {
   backgroundColor: "rgba(68,87,96,255)",
   border: "5px solid gray",
   padding: "10px",
-  margin: "10px",
+  margin: "4px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+};
+const labelStyle: LabelStyleType = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  rowGap: "4px",
 };
 
 export const NetworkWizard = (props: any) => {
   const { connectionSchema, isLoadingForm, refreshList, tokenFactory, isWizardModalVisible, setIsWizardModalVisible } =
     props;
-  //   const [newConnection, setNewConnection] = useState({} as RubixConnection);
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps["status"]>("process");
   const [errorAtPing, setErrorAtPing] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [confirmInstall, setConfirmInstall] = useState(false);
+  const [plugins, setPlugins] = useState<any[]>([]);
+  const [pluginStatusArray, setPluginStatusArray] = useState<PluginInstalledType[] | undefined>(undefined);
+  const [selectedWizard, setSelectedWizard] = useState<WizardTypes | undefined>(undefined);
+
+  const factory = new FlowPluginFactory();
+  const networkFactory = new FlowNetworkFactory();
+  const releaseFactory = new ReleasesFactory();
+  networkFactory.connectionUUID = connUUID;
+  networkFactory.hostUUID = hostUUID;
 
   useEffect(() => {
     setStepStatus("process");
+    setCurrentStep(0);
+    setSelectedWizard(undefined);
+    fetchPlugins();
   }, [isWizardModalVisible]);
 
-  //   const pingConnection = (conn: RubixConnection) => {
-  //     PingRubixAssist(conn.uuid).then((ok) => {
-  //       if (ok) {
-  //         openNotificationWithIcon("success", `new connection ${conn.name} is able to access rubix assist server!`);
-  //         setCurrentStep(currentStep + 1);
-  //       } else {
-  //         openNotificationWithIcon("error", `new connection ${conn.name} cannot access rubix assist server!`);
-  //         setStepStatus("error");
-  //         setErrorAtPing(true);
-  //       }
-  //     });
-  //   };
+  useEffect(() => {
+    if (selectedWizard) {
+      console.log("the current selected wizard is: ", selectedWizard);
+      setCurrentStep(currentStep + 1);
+    }
+  }, [selectedWizard]);
+
+  useEffect(() => {
+    const names = ["lora", "bacnetmaster", "modbus"];
+    if (plugins.length !== 0) {
+      let resArray: PluginInstalledType[] = [];
+      names.forEach((name: string) => {
+        const resObj = plugins.find((item: any) => {
+          return item.name === name;
+        });
+        resArray.push({ name: name, isInstalled: resObj.is_installed });
+      });
+      console.log("filtered list is: ", resArray);
+      setPluginStatusArray(resArray);
+    }
+  }, [plugins]);
+
+  const fetchPlugins = async () => {
+    try {
+      setIsFetching(true);
+      const { data = [] } = await factory.GetPluginsDistribution(connUUID, hostUUID);
+      console.log("plugins are: ", data);
+      setPlugins(data);
+      // setFilteredData(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const installPlugin = async (pluginName: string) => {
+    if (pluginName) {
+      try {
+        setConfirmInstall(true);
+        await factory.InstallPlugin(connUUID, hostUUID, pluginName);
+        await releaseFactory.EdgeServiceAction(
+          "restart",
+          connUUID,
+          hostUUID,
+          "nubeio-flow-framework.service",
+          "flow-framework"
+        );
+        fetchPlugins();
+      } finally {
+        setConfirmInstall(false);
+      }
+    }
+  };
+
+  const isPluginInstalled = (name: string) => {
+    if (pluginStatusArray && pluginStatusArray.length !== 0) {
+      const resObj = pluginStatusArray.find((item: PluginInstalledType) => {
+        return item.name === name;
+      });
+      return resObj?.isInstalled;
+    } else {
+      return true;
+    }
+  };
+
+  const onStepsChange = (value: number) => {
+    if (stepStatus === "error") {
+      setStepStatus("process");
+      // setErrorAtPing(false);
+    }
+    setCurrentStep(value);
+  };
+
+  const handleWizardClose = () => {
+    setCurrentStep(0);
+    setIsWizardModalVisible(false);
+    refreshList();
+  };
 
   const data = [
     {
       id: "1",
       name: "Step 1",
-      text: "Network selection",
+      text: "Network selection & Plugin installation",
       content: (
         <div style={{ width: "50vw" }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "5px" }}>
-            <div style={imageBoxStyle}>
-              <Image width={100} preview={false} src={loraImage} />
-            </div>
-            <div style={imageBoxStyle}>
-              <Image width={100} preview={false} src={bacnetImage} />
-            </div>
-            <div style={imageBoxStyle}>
-              <Image width={100} preview={false} src={modbusImage} />
-            </div>
-            <div style={imageBoxStyle}>
-              <Image width={100} preview={false} src={modbusImage} />
-            </div>
+          <div style={{ display: "flex", flexDirection: "row", gap: "5px", justifyContent: "center" }}>
+            <NetworkCard
+              setSelectedWizard={setSelectedWizard}
+              isFetching={isFetching}
+              type={WizardTypes.lora}
+              name={"LoRa"}
+              image={loraImage}
+            />
+            <NetworkCard
+              setSelectedWizard={setSelectedWizard}
+              isFetching={isFetching}
+              type={WizardTypes.bacnet}
+              name={"BACnet"}
+              image={bacnetImage}
+            />
+            <NetworkCard
+              setSelectedWizard={setSelectedWizard}
+              isFetching={isFetching}
+              type={WizardTypes.modbusSerial}
+              name={"Modbus Serial"}
+              image={modbusImage}
+            />
+            <NetworkCard
+              setSelectedWizard={setSelectedWizard}
+              isFetching={isFetching}
+              type={WizardTypes.modbusTcp}
+              name={"Modbus TCP"}
+              image={modbusImage}
+            />
           </div>
         </div>
       ),
@@ -78,42 +209,38 @@ export const NetworkWizard = (props: any) => {
     {
       id: "2",
       name: "Step 2",
-      text: "Ping connection",
+      text: "Configure new network",
       content: (
-        <div style={{ display: "flex", flexDirection: "column", rowGap: "20px", alignItems: "center" }}>
-          <span>Step2</span>
+        <div>
+          {selectedWizard === WizardTypes.lora && (
+            <LoraForm
+              connUUID={connUUID}
+              hostUUID={hostUUID}
+              refreshList={refreshList}
+              factory={networkFactory}
+              isPluginInstalled={isPluginInstalled}
+              installPlugin={installPlugin}
+              confirmInstall={confirmInstall}
+              handleWizardClose={handleWizardClose}
+            />
+          )}
         </div>
       ),
     },
-    {
-      id: "3",
-      name: "Step 3",
-      text: "Configure tokens",
-      content: (
-        <div style={{ width: "35vw", display: "flex", flexDirection: "column", rowGap: "2vh", alignItems: "center" }}>
-          <span>step3</span>
-          <Button type="primary" onClick={() => handleWizardClose()} style={{ width: "120px" }}>
-            Finish
-          </Button>
-        </div>
-      ),
-    },
+    // {
+    //   id: "3",
+    //   name: "Step 3",
+    //   text: "Configure tokens",
+    //   content: (
+    //     <div style={{ width: "35vw", display: "flex", flexDirection: "column", rowGap: "2vh", alignItems: "center" }}>
+    //       <span>step3</span>
+    //       <Button type="primary" onClick={() => handleWizardClose()} style={{ width: "120px" }}>
+    //         Finish
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
   ];
-
-  const onStepsChange = (value: number) => {
-    if (stepStatus === "error") {
-      setStepStatus("process");
-      setErrorAtPing(false);
-    }
-    setCurrentStep(value);
-  };
-
-  const handleWizardClose = () => {
-    // setNewConnection({} as RubixConnection);
-    setCurrentStep(0);
-    setIsWizardModalVisible(false);
-    refreshList();
-  };
 
   return (
     <Modal
@@ -141,5 +268,33 @@ export const NetworkWizard = (props: any) => {
         <div>{data[currentStep].content}</div>
       </div>
     </Modal>
+  );
+};
+
+const NetworkCard = (props: any) => {
+  const { setSelectedWizard, isFetching, type, name, image } = props;
+  return (
+    <Card
+      hoverable={true}
+      onClick={() => {
+        setSelectedWizard(type);
+      }}
+    >
+      {isFetching ? (
+        <Spin
+          style={{
+            width: "100px",
+            height: "100px",
+          }}
+        />
+      ) : (
+        <div style={labelStyle}>
+          <div style={imageBoxStyle}>
+            <Image width={100} preview={false} src={image} />
+          </div>
+          <strong>{name}</strong>
+        </div>
+      )}
+    </Card>
   );
 };
