@@ -10,13 +10,14 @@ import { FlowPluginFactory } from "../factory";
 import { CreateModal } from "./create";
 import { PluginDistributionTable } from "./plugin-distribution-table";
 import { PluginConfig } from "./plugin-config";
+import { pluginsKey } from "../../../host";
 
 const { TabPane } = Tabs;
-const pluginsKey = "MODULES";
+const pluginsKeyLocal = "MODULES";
 const pluginDistribution = "INSTALL PLUGIN";
 
 export const FlowPluginsTable = (props: any) => {
-  const { activeKey } = props;
+  const { activeKey, activeKeyLocal } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState([] as any);
   const [pluginName, setPluginName] = useState<string>();
@@ -113,10 +114,10 @@ export const FlowPluginsTable = (props: any) => {
   };
 
   useEffect(() => {
-    if (activeKey === pluginsKey) {
+    if (activeKeyLocal === pluginsKeyLocal && activeKey === pluginsKey) {
       fetchPlugins();
     }
-  }, [activeKey]);
+  }, [activeKey, activeKeyLocal]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -152,22 +153,24 @@ export const FlowPluginsTable = (props: any) => {
   );
 };
 
-export const Plugins = () => {
-  const [activeKey, setActiveKey] = useState(pluginsKey);
-  const onChange = (newActiveKey: string) => {
-    setActiveKey(newActiveKey);
+export const Plugins = (props: any) => {
+  const { activeKey } = props;
+  const [activeKeyLocal, setActiveKeyLocal] = useState(pluginsKeyLocal);
+  const onChange = (newActiveKeyLocal: string) => {
+    setActiveKeyLocal(newActiveKeyLocal);
   };
 
   return (
-    <Tabs
-      onChange={onChange}
-      activeKey={activeKey}
-    >
-      <TabPane tab={pluginsKey} key={pluginsKey}>
-        <FlowPluginsTable activeKey={activeKey}/>
+    <Tabs onChange={onChange} activeKey={activeKeyLocal}>
+      <TabPane tab={pluginsKeyLocal} key={pluginsKeyLocal}>
+        <FlowPluginsTable activeKey={activeKey} activeKeyLocal={activeKeyLocal} />
       </TabPane>
       <TabPane tab={pluginDistribution} key={pluginDistribution}>
-        <PluginDistributionTable activeKey={activeKey} pluginDistribution={pluginDistribution}/>
+        <PluginDistributionTable
+          activeKey={activeKey}
+          activeKeyLocal={activeKeyLocal}
+          pluginDistribution={pluginDistribution}
+        />
       </TabPane>
     </Tabs>
   );

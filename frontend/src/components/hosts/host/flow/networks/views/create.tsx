@@ -10,14 +10,7 @@ import Network = model.Network;
 const { Option } = Select;
 
 export const EditModal = (props: any) => {
-  const {
-    currentItem,
-    isModalVisible,
-    isLoadingForm,
-    networkSchema,
-    onCloseModal,
-    refreshList,
-  } = props;
+  const { currentItem, isModalVisible, isLoadingForm, networkSchema, onCloseModal, refreshList } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState(currentItem);
@@ -152,12 +145,7 @@ export const CreateModal = (props: any) => {
       style={{ textAlign: "start" }}
     >
       <Spin spinning={isFetching}>
-        <Select
-          showSearch
-          onChange={onChange}
-          style={{ width: "100%", marginBottom: "10px" }}
-          value={selectedPlugin}
-        >
+        <Select showSearch onChange={onChange} style={{ width: "100%", marginBottom: "10px" }} value={selectedPlugin}>
           {plugins.map((plugin: any) => (
             <Option key={plugin.uuid} value={plugin.name}>
               {plugin.name}
@@ -165,13 +153,7 @@ export const CreateModal = (props: any) => {
           ))}
         </Select>
         <Spin spinning={isLoadingForm}>
-          <JsonForm
-            formData={formData}
-            setFormData={setFormData}
-            handleSubmit={handleSubmit}
-            jsonSchema={schema}
-            // a={console.log(schema)}
-          />
+          <JsonForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmit} jsonSchema={schema} />
         </Spin>
       </Spin>
     </Modal>

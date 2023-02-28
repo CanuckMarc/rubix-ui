@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Spin, Steps, Button, StepsProps } from "antd";
+import { Modal, Spin, Steps, Button, StepsProps, Image } from "antd";
 import { CreateConnectionForm } from "./create-form";
 import { TokenForm } from "./token-form";
 import { storage } from "../../../../wailsjs/go/models";

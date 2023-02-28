@@ -5,9 +5,11 @@ import { model } from "../../../../../../../wailsjs/go/models";
 import { FlowNetworksTable } from "./views/table";
 import { hasError } from "../../../../../../utils/response";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
+import { flowNetworksKey } from "../../../host";
 import FlowNetwork = model.FlowNetwork;
 
-export const FlowNetworks = () => {
+export const FlowNetworks = (props: any) => {
+  const { activeKey } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [networks, setNetworks] = useState([] as FlowNetwork[]);
   const [isFetching, setIsFetching] = useState(false);
@@ -17,8 +19,8 @@ export const FlowNetworks = () => {
   factory.hostUUID = hostUUID;
 
   useEffect(() => {
-    fetch();
-  }, []);
+    activeKey === flowNetworksKey && fetch();
+  }, [activeKey]);
 
   const fetch = async () => {
     try {
@@ -45,12 +47,5 @@ export const FlowNetworks = () => {
     }
   };
 
-  return (
-    <FlowNetworksTable
-      data={networks}
-      isFetching={isFetching}
-      refreshList={fetch}
-      sync={sync}
-    />
-  );
+  return <FlowNetworksTable data={networks} isFetching={isFetching} refreshList={fetch} sync={sync} />;
 };
