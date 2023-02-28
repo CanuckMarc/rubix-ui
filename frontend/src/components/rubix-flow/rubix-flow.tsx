@@ -1311,7 +1311,7 @@ const Flow = (props: FlowProps) => {
   const PointsTab = (
     <>
       <ApartmentOutlined />
-      POINTS
+      DRIVERS
     </>
   );
 

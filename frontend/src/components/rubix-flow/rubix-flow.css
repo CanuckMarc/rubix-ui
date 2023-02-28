@@ -29,7 +29,7 @@
 
 .rubix-flow__tabs>.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-ink-bar {
   border-bottom: 2px solid var(--nube-green);
-  width: 85px !important;
+  width: 90px !important;
   margin: 0 5px 0 -5px;
 }
 

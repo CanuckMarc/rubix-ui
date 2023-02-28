@@ -99,7 +99,7 @@ export const NetworkWizard = (props: any) => {
 
   useEffect(() => {
     const names = ["lora", "bacnetmaster", "modbus", "system"];
-    if (plugins.length !== 0) {
+    if (plugins && plugins.length !== 0) {
       let resArray: PluginInstalledType[] = [];
       names.forEach((name: string) => {
         const resObj = plugins.find((item: any) => {
