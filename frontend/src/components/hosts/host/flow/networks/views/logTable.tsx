@@ -5,9 +5,6 @@ import { LogTablePropType } from "./table";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import type { ColumnsType } from 'antd/es/table';
 
-const { Title } = Typography;
-const { Search } = Input;
-
 export interface LogTableType {
   key: number;
   time: string;
@@ -42,6 +39,7 @@ export const LogTable = (props: LogTablePropType) => {
 
   useEffect(() => {
     cleanUp();
+    setDuration(5);
   }, []);
 
   useEffect(() => {
@@ -168,8 +166,8 @@ export const LogTable = (props: LogTablePropType) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-start", gap: "2vh" }}>
       <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.5vw" }}>
-        <strong>Duration: </strong>
-        <Input value={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
+        <strong>Duration (seconds): </strong>
+        <Input value={duration} defaultValue={duration} onChange={handleInputChange} style={{ width: "6vw" }} />
         <Button
           type="primary"
           style={{ width: "6vw" }}
@@ -179,14 +177,13 @@ export const LogTable = (props: LogTablePropType) => {
           Load Logs
         </Button>
       </div>
-      <Search
+      <Input
         placeholder="Search log by message"
-        enterButton="Search"
         disabled={tableData.length === 0}
         allowClear={true}
         value={search}
         onChange={onSearchBarChange}
-        onSearch={handleOnSearch}
+        onPressEnter={handleOnSearch}
         style={{width: '100%'}}
       />
       <Table

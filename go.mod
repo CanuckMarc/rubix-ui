@@ -16,7 +16,7 @@ require (
 	github.com/NubeIO/lib-dirs v0.0.8
 	github.com/NubeIO/lib-files v1.0.0
 	github.com/NubeIO/lib-networking v0.0.9
-	github.com/NubeIO/lib-schema v0.2.4
+	github.com/NubeIO/lib-schema v0.2.7
 	github.com/NubeIO/lib-systemctl-go v0.2.0
 	github.com/NubeIO/lib-ufw v0.0.3
 	github.com/NubeIO/lib-uuid v0.0.3
@@ -36,13 +36,14 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/na4ma4/config v1.0.0
 	github.com/nqd/flat v0.2.0
+	github.com/rvflash/elapsed v0.3.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/objx v0.4.0
 	github.com/tidwall/buntdb v1.2.9
 	github.com/tidwall/gjson v1.14.3
-	github.com/wailsapp/wails/v2 v2.3.1
+	github.com/wailsapp/wails/v2 v2.2.0
 	github.com/xuri/excelize/v2 v2.7.0
 	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.21.0
@@ -100,7 +101,6 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
-	github.com/rvflash/elapsed v0.3.0 // indirect
 	github.com/samber/lo v1.27.1 // indirect
 	github.com/sergeymakinen/go-systemdconf/v2 v2.0.2 // indirect
 	github.com/spf13/afero v1.8.2 // indirect

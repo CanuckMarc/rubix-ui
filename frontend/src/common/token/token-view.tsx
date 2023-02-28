@@ -3,9 +3,9 @@ import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
+  DiffOutlined,
   EyeOutlined,
   RedoOutlined,
-  PlusOutlined, DiffOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import copy from "copy-to-clipboard";
@@ -15,7 +15,7 @@ import { CommonTokenFactory } from "./factory";
 import { useParams } from "react-router-dom";
 import { ConnectionFactory } from "../../components/connections/factory";
 import { HostsFactory } from "../../components/hosts/factory";
-
+import { Result, ResultState } from "../state/state";
 import ExternalToken = externaltoken.ExternalToken;
 import RubixConnection = storage.RubixConnection;
 import Host = amodel.Host;
@@ -23,18 +23,19 @@ import Host = amodel.Host;
 interface ITokenView {
   jwtToken: string;
   tokens: ExternalToken[];
-  isLoading: boolean;
+  resultState: Result;
   factory: CommonTokenFactory;
   fetchToken: any;
-  setIsLoading: any;
+  setResultState: (input: Result) => void;
+  style: any;
   selectedItem: RubixConnection | Host;
 }
 
+
 export const TokenView = (props: ITokenView) => {
-  const { jwtToken, tokens = [], isLoading, factory, fetchToken, setIsLoading, selectedItem } = props;
+  const { jwtToken, tokens = [], resultState, factory, fetchToken, setResultState, selectedItem } = props;
   const { connUUID = "" } = useParams();
-  const [displayToken, setDisplayToken] = useState({} as ExternalToken);
-  const [regeneratedToken, setRegeneratedToken] = useState({} as ExternalToken);
+  const [displayToken, setDisplayToken] = useState(new Map<string, ExternalToken>());
   const [isAddingToken, setIsAdddingToken] = useState(false);
 
   const connectionFactory = new ConnectionFactory();
@@ -42,21 +43,23 @@ export const TokenView = (props: ITokenView) => {
   hostsFactory.connectionUUID = connUUID;
 
   useEffect(() => {
-    setRegeneratedToken({} as ExternalToken);
-    setDisplayToken({} as ExternalToken);
+    setDisplayToken(new Map<string, ExternalToken>());
   }, [jwtToken]);
 
   const getToken = async (token: ExternalToken) => {
-    setIsLoading(true);
+    setResultState({ state: ResultState.loading });
     try {
       const externalToken = await factory.Token(jwtToken, token.uuid);
-      setDisplayToken(externalToken || ({} as ExternalToken));
+      displayToken.set(externalToken.uuid, externalToken);
+
+      setDisplayToken(displayToken);
+      setResultState({ state: ResultState.success });
       if (externalToken && externalToken.token) {
         copy(externalToken.token);
         openNotificationWithIcon("success", "Copied Token to Clipboard!");
       }
     } finally {
-      setIsLoading(false);
+      setResultState({ state: ResultState.failure, message: "Something went wrong" });
     }
   };
 
@@ -102,8 +105,9 @@ export const TokenView = (props: ITokenView) => {
   };
 
   const regenerateToken = async (token: ExternalToken) => {
-    const externalToken = await factory.TokenRegenerate(jwtToken, token.uuid);
-    setRegeneratedToken(externalToken);
+    const externalToken: ExternalToken = await factory.TokenRegenerate(jwtToken, token.uuid);
+    displayToken.set(externalToken.uuid, externalToken);
+    setDisplayToken(displayToken);
     fetchToken().catch(console.error);
   };
 
@@ -112,74 +116,58 @@ export const TokenView = (props: ITokenView) => {
     fetchToken().catch(console.error);
   };
 
+  function renderName(item: externaltoken.ExternalToken) {
+    const token = displayToken.get(item.uuid);
+    if (token) return token.token;
+    return item.token;
+  }
+
   return (
-    <Spin spinning={isLoading}>
-      {Object.keys(displayToken).length !== 0 && (
-        <div>
-          Token of <code>{displayToken.name}</code> is:
-          <br />
-          <i>
-            <code>{displayToken.token}</code>
-          </i>
-          <br />
-          <br />
-        </div>
-      )}
-      {Object.keys(regeneratedToken).length !== 0 && (
-        <div>
-          Regenerated token of <code>{regeneratedToken.name}</code> is:
-          <br />
-          <i>
-            <code>{regeneratedToken.token}</code>
-          </i>
-          <br />
-          <br />
-        </div>
-      )}
-      {tokens.length > 0 && (
-        <List
-          itemLayout="horizontal"
-          dataSource={tokens}
-          loading={isAddingToken}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Tooltip title={`Attach token to ${!!connUUID ? "Host" : "Connection"}`}>
-                  <a key="list-block" onClick={() => setToken(item)}>
-                    <DiffOutlined />
-                  </a>
-                </Tooltip>,
-                <Tooltip title="View">
-                  <a key="list-block" onClick={() => getToken(item)}>
-                    <EyeOutlined />
-                  </a>
-                </Tooltip>,
-                <Popconfirm
-                  title={`Are you sure to ${item.blocked ? "un" : ""}block this token?`}
-                  onConfirm={() => toggleTokenBlockState(item)}
-                >
-                  <a key="list-block">{item.blocked ? <CloseOutlined /> : <CheckOutlined />}</a>
-                </Popconfirm>,
-                <Popconfirm
-                  title="Are you sure to regenerate/old will get removed out?"
-                  onConfirm={() => regenerateToken(item)}
-                >
-                  <a key="list-regenerate">
-                    <RedoOutlined />
-                  </a>
-                </Popconfirm>,
-                <Popconfirm title="Are you sure to delete?" onConfirm={() => deleteToken(item)}>
-                  <a key="list-delete">
-                    <DeleteOutlined style={{ color: "red" }} />
-                  </a>
-                </Popconfirm>,
-              ]}
-            >
-              <List.Item.Meta title={item.name} description={item.token} />
-            </List.Item>
-          )}
-        />
-      )}
+    <Spin spinning={resultState.state == ResultState.loading}>
+      <List
+        itemLayout="horizontal"
+        dataSource={tokens}
+        loading={isAddingToken}
+        style={props.style}
+        renderItem={(item) => (
+          <List.Item
+            actions={[
+              <Tooltip title={`Attach token to ${!!connUUID ? "Host" : "Connection"}`}>
+                <a key="list-block" onClick={() => setToken(item)}>
+                  <DiffOutlined />
+                </a>
+              </Tooltip>,
+              <Tooltip title="View">
+                <a key="list-block" onClick={() => getToken(item)}>
+                  <EyeOutlined />
+                </a>
+              </Tooltip>,
+              <Popconfirm
+                title={`Are you sure to ${item.blocked ? "un" : ""}block this token?`}
+                onConfirm={() => toggleTokenBlockState(item)}
+              >
+                <a key="list-block">{item.blocked ? <CloseOutlined /> : <CheckOutlined />}</a>
+              </Popconfirm>,
+              <Popconfirm
+                title="Are you sure to regenerate/old will get removed out?"
+                onConfirm={() => regenerateToken(item)}
+              >
+                <a key="list-regenerate">
+                  <RedoOutlined />
+                </a>
+              </Popconfirm>,
+              <Popconfirm title="Are you sure to delete?" onConfirm={() => deleteToken(item)}>
+                <a key="list-delete">
+                  <DeleteOutlined style={{ color: "red" }} />
+                </a>
+              </Popconfirm>,
+            ]}
+          >
+            <List.Item.Meta title={item.name} description={renderName(item)}>
+            </List.Item.Meta>
+          </List.Item>
+        )}
+      />
     </Spin>
   );
 };

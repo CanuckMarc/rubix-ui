@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Edge, useEdges, useNodes, useReactFlow } from "react-flow-renderer/nocss";
+import { Edge, useEdges, useNodes, useReactFlow } from "reactflow";
 import { Checkbox } from "antd";
 
 import { NodeInterface, OutputNodeValueType } from "../lib/Nodes/NodeInterface";

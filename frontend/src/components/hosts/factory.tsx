@@ -1,4 +1,4 @@
-import { amodel, assistcli, backend, rumodel } from "../../../wailsjs/go/models";
+import { amodel, assistcli, backend, rumodel, streamlog } from "../../../wailsjs/go/models";
 import {
   AddHost,
   DeleteHost,
@@ -9,7 +9,7 @@ import {
   GetHostSchema,
   ConfigureOpenVPN,
   PingHost,
-  UpdateHostsStatus,
+  UpdateHostsStatus, EdgeAppNewLog,
 } from "../../../wailsjs/go/backend/App";
 import Host = amodel.Host;
 import Response = assistcli.Response;
@@ -68,4 +68,10 @@ export class HostsFactory {
   async ConfigureOpenVPN(): Promise<boolean> {
     return await ConfigureOpenVPN(this.connectionUUID, this.uuid);
   }
+
+  // let user get app logs
+  async EdgeAppNewLog(connUUID: string, hostUUID: string, appName: string, duration: number):Promise<streamlog.Log> {
+    return await EdgeAppNewLog(connUUID, hostUUID, appName, duration);
+  }
+
 }

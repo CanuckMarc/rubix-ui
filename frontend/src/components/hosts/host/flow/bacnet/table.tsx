@@ -34,12 +34,12 @@ export const BacnetWhoIsTable = (props: any) => {
   return (
     <>
       <RbAddButton handleClick={Add} text={addBtnText} />
-      {data && data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={headers}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

@@ -125,7 +125,7 @@ export const FlowPointsTable = (props: any) => {
                 <FormOutlined />
               </a>
             </Tooltip>
-            <Tooltip title="Write Point">
+            <Tooltip title="Write point">
               <a onClick={() => showWritePointModal(point)}>
                 <GoldOutlined style={{ color: "#fa8c16" }} />
               </a>
@@ -150,8 +150,9 @@ export const FlowPointsTable = (props: any) => {
   };
 
   const MassEditTitle = (key: string, schema: any) => {
-    return <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key}
-                     handleOk={handleMassEdit} />;
+    return (
+      <MassEdit fullSchema={schema} title={titleCase(schema[key]?.title)} keyName={key} handleOk={handleMassEdit} />
+    );
   };
 
   const handleMassEdit = async (updateData: any) => {
@@ -169,34 +170,28 @@ export const FlowPointsTable = (props: any) => {
     await flowPointFactory.Update(item.uuid, item);
   };
 
-  const showEditModal = (item: Point) => {
-    setCurrentItem(item);
-    setIsEditModalVisible(true);
-  };
-
-  const closeEditModal = () => {
-    setIsEditModalVisible(false);
-  };
-
   const showCreateModal = () => {
     setIsCreateModalVisible(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalVisible(false);
   };
 
   const showCreateBulkModal = () => {
     setIsCreateBulkModalVisible(true);
   };
 
-  const closeCreateBulkModal = () => {
-    setIsCreateBulkModalVisible(false);
+  const showEditModal = (item: Point) => {
+    setCurrentItem(item);
+    setIsEditModalVisible(true);
   };
 
   const showWritePointModal = (item: Point) => {
-    setIsWritePointModalVisible(true);
     setCurrentItem(item);
+    setIsWritePointModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsCreateBulkModalVisible(false);
+    setIsCreateModalVisible(false);
+    setIsEditModalVisible(false);
   };
 
   useEffect(() => {
@@ -212,18 +207,18 @@ export const FlowPointsTable = (props: any) => {
 
   return (
     <>
-      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={showCreateModal} />
+      <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbAddButton handleClick={showCreateBulkModal} text="Create bulk" />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <ImportDropdownButton refreshList={refreshList} schema={schema} />
       <RbExportButton handleExport={handleExport} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
@@ -234,7 +229,7 @@ export const FlowPointsTable = (props: any) => {
         connUUID={connUUID}
         hostUUID={hostUUID}
         schema={schema}
-        onCloseModal={closeEditModal}
+        onCloseModal={closeModal}
         refreshList={refreshList}
       />
       <CreateModal
@@ -244,7 +239,7 @@ export const FlowPointsTable = (props: any) => {
         hostUUID={hostUUID}
         deviceUUID={deviceUUID}
         schema={schema}
-        onCloseModal={closeCreateModal}
+        onCloseModal={closeModal}
         refreshList={refreshList}
       />
       <CreateBulkModal
@@ -254,7 +249,7 @@ export const FlowPointsTable = (props: any) => {
         hostUUID={hostUUID}
         deviceUUID={deviceUUID}
         schema={schema}
-        onCloseModal={closeCreateBulkModal}
+        onCloseModal={closeModal}
         refreshList={refreshList}
       />
       <ExportModal

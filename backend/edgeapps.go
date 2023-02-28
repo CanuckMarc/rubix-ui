@@ -37,6 +37,10 @@ func (inst *App) EdgeInstallApp(connUUID, hostUUID, appName, appVersion string) 
 	}
 	arch = resp.Arch
 
+	if appName == constants.FlowFramework { // make it easier for the user and make sure the latest release is downloaded
+		inst.GitDownloadReleases()
+	}
+
 	inst.uiSuccessMessage(fmt.Sprintf("%s app installation has been started (version: %s, arch: %s)", appName, appVersion, arch))
 
 	_, err = assistClient.EdgeWriteConfig(hostUUID, appName)

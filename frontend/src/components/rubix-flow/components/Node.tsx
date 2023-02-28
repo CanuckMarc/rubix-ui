@@ -1,7 +1,7 @@
-import { memo, useState } from "react";
-import { NodeProps as FlowNodeProps, useEdges, useNodes } from "react-flow-renderer/nocss";
+import { NodeProps as FlowNodeProps, useEdges, useNodes } from "reactflow";
+import { memo, useCallback, useEffect, useState } from "react";
 
-import { SPLIT_KEY, useChangeNodeData } from "../hooks/useChangeNodeData";
+import { useChangeNodeData } from "../hooks/useChangeNodeData";
 import { isHandleConnected } from "../util/isHandleConnected";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
 import { InputSocketSpecJSON, NodeSpecJSON, OutputSocketSpecJSON } from "../lib";
@@ -48,7 +48,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
         const item = {
           pin: `in${i}`,
           dataType: nodeInputs[0]?.dataType,
-          value: nodeInputs[0]?.defaultValue,
+          value: nodeInputs[0]?.value,
         };
         if (newData) {
           newData.push(item);
@@ -78,8 +78,6 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
     if (!isExist) {
       newInputs.push({
         name: item.pin,
-        valueOfChild: item.valueOfChild,
-        nodeId: item.nodeId,
         subName: item.subName,
         valueType: item.dataType,
         defaultValue: item.value,
@@ -93,8 +91,13 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
 };
 
 const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node: NodeInterface) => {
-  if (specOutputs.length === 0 && !node.isParent) return [];
-  if (specOutputs.length > 0 && !nodeOutputs && !node.isParent) return specOutputs;
+  if (specOutputs.length === 0 && !node.isParent) {
+    return [];
+  }
+
+  if (specOutputs.length > 0 && !nodeOutputs && !node.isParent) {
+    return specOutputs;
+  }
 
   let newOutputs: OutputSocketSpecJSON[] = [];
 
@@ -112,109 +115,63 @@ const getOutputs = (specOutputs: OutputSocketSpecJSON[], nodeOutputs: any, node:
       newOutputs.push({
         name: item.pin,
         subName: item.subName,
-        valueOfChild: item.valueOfChild || item.value,
-        nodeId: item.nodeId,
         valueType: item.dataType,
       } as OutputSocketSpecJSON);
+    } else {
+      const isExistInNewOutput = newOutputs.some((output) => output.name === item.pin);
+      if (!isExistInNewOutput) {
+        newOutputs.push({
+          name: item.pin,
+          valueType: item.dataType,
+        });
+      }
     }
   });
-
-  if (node.isParent) {
-    const out = node.data.out || [];
-    const outs = out.map((item: any) => {
-      const dataOut = specOutputs.find((specItem: { name: string }) => item.pin === specItem.name);
-      return {
-        valueOfChild: item.value,
-        ...dataOut,
-        ...item,
-      };
-    });
-
-    newOutputs.push(...outs);
-  }
 
   return newOutputs;
 };
 
 export const isInputFlow = (type: string) => {
-  const newType = type.split("/")?.[1];
-  return ["input-float", "input-string", "input-boolean"].includes(newType);
+  return ["sub-flow/input-float", "sub-flow/input-string", "sub-flow/input-boolean"].includes(type);
 };
 
 export const isOutputFlow = (type: string) => {
-  const newType = type.split("/")?.[1];
-  return ["output-float", "output-string", "output-boolean"].includes(newType);
+  return ["sub-flow/output-float", "sub-flow/output-string", "sub-flow/output-boolean"].includes(type);
 };
 
 export const Node = memo((props: NodeProps) => {
-  const { id, data, spec, selected, parentNodeId, nodesSpec } = props;
+  const { id, data, spec, selected, nodesSpec } = props;
   const nodes = useNodes();
   const edges = useEdges();
   const handleChange = useChangeNodeData(id);
   const [widthInput, setWidthInput] = useState(-1);
   const [widthOutput, setWidthOutput] = useState(-1);
   const [isSettingModal, setIsSettingModal] = useState(false);
-  const newData = { ...data };
+  const [node, setNode] = useState<NodeInterface | undefined>(undefined);
+  const [pairs, setPairs] = useState<any[]>([]);
 
-  const node: NodeInterface | any = nodes.find((item) => item.id === id);
-  const isHidden = parentNodeId ? node.parentId !== parentNodeId : node.parentId;
+  useEffect(() => {
+    const item = nodes.find((n: NodeInterface) => n.id === id);
+    if (item) {
+      const newPairs = getPairs(
+        getInputs(spec.inputs || [], data.inputs || [], item),
+        getOutputs(spec.outputs || [], data.out || [], item)
+      );
+      setPairs(newPairs);
+    }
+    setNode(nodes.find((item: NodeInterface) => item.id === id));
+  }, [nodes]);
 
-  const childNodes: NodeInterface[] = node.isParent
-    ? nodes.filter((item: NodeInterface) => item.parentId === node.id)
-    : [];
-
-  const nodeInputs = node.isParent
-    ? childNodes
-        .filter((n: NodeInterface) => isInputFlow(n.type!!))
-        .map(({ data, id: nodeId, info }, index, arr) => {
-          const firstInput: any = data.inputs?.[0] || {};
-
-          return {
-            ...firstInput,
-            valueType: firstInput.dataType,
-            valueOfChild: firstInput.value,
-            pin: `${firstInput.pin}${SPLIT_KEY}${nodeId}`,
-            nodeId,
-            name: firstInput.pin,
-            subName: `${firstInput.pin || "in"}${arr.length > 1 ? index + 1 : ""} ${
-              info?.nodeName ? `(${info.nodeName})` : ""
-            }`,
-          };
-        })
-    : node.data.inputs;
-
-  const nodeOutputs = node.isParent
-    ? childNodes
-        .filter((n: NodeInterface) => isOutputFlow(n.type!!))
-        .map(({ data, id: nodeId, info }, index, arr) => {
-          const firstOut = data.out?.[0] || {};
-
-          return {
-            ...firstOut,
-            valueOfChild: firstOut.value,
-            pin: `${firstOut.pin}${SPLIT_KEY}${nodeId}`,
-            nodeId,
-            name: firstOut.pin,
-            subName: `${firstOut.pin || "out"}${arr.length > 1 ? index + 1 : ""} ${
-              info?.nodeName ? `(${info.nodeName})` : ""
-            }`,
-          };
-        })
-    : node.data.out;
-
-  if (node.isParent) {
-    newData.inputs = [...(nodeInputs || []), ...(data.inputs || [])];
-    newData.out = [...(nodeOutputs || []), ...(data.out || [])];
-  }
-
-  const pairs = getPairs(
-    getInputs(spec.inputs || [], nodeInputs, node),
-    getOutputs(spec.outputs || [], nodeOutputs, node)
+  const handleSetWidthInput = useCallback(
+    (width: number) => {
+      setWidthInput((prev: number) => Math.max(prev, width));
+    },
+    [setWidthInput]
   );
 
-  const handleSetWidthInput = (width: number) => {
-    setWidthInput((prev: number) => Math.max(prev, width));
-  };
+  if (!node) {
+    return null;
+  }
 
   const handleSetWidthOutput = (width: number) => {
     setWidthOutput((prev: number) => Math.max(prev, width));
@@ -247,10 +204,9 @@ export const Node = memo((props: NodeProps) => {
 
   return (
     <NodeContainer
-      isHidden={isHidden}
       title={getTitle(spec.type)}
       icon={spec?.info?.icon || ""}
-      nodeName={node?.info?.nodeName?.replace('{parent.name}', '') || ""}
+      nodeName={node?.info?.nodeName?.replace("{parent.name}", "") || ""}
       category={spec.category}
       selected={selected}
       height={node?.height ?? 30}
@@ -261,12 +217,12 @@ export const Node = memo((props: NodeProps) => {
       {pairs.map(([input, output], ix) => {
         if (
           input &&
-          !newData[input.name] &&
-          newData[input.name] !== null &&
-          ((input.valueType === "number" && newData[input.name] !== 0) ||
-            (input.valueType === "boolean" && newData[input.name] === undefined))
+          !data[input.name] &&
+          data[input.name] !== null &&
+          ((input.valueType === "number" && data[input.name] !== 0) ||
+            (input.valueType === "boolean" && data[input.name] === undefined))
         ) {
-          newData[input.name] = input.defaultValue;
+          data[input.name] = input.defaultValue;
         }
 
         const borderB = ix === pairs.length - 1 && node.style?.height ? "border-b pb-3 border-gray-500" : "";
@@ -276,12 +232,12 @@ export const Node = memo((props: NodeProps) => {
             {input && (
               <InputSocket
                 {...input}
-                value={input.valueOfChild || newData[input.name]}
+                value={data[input.name]}
                 onChange={handleChange}
-                connected={isHandleConnected(edges, input.nodeId || id, input.name, "target")}
+                connected={isHandleConnected(edges, id, input.name, "target")}
                 minWidth={widthInput}
                 onSetWidthInput={handleSetWidthInput}
-                dataInput={newData.inputs}
+                dataInput={data.inputs}
                 dataOutput={getConnectionOutput(input.name)}
               />
             )}
@@ -290,15 +246,9 @@ export const Node = memo((props: NodeProps) => {
                 {...output}
                 valueType={output.valueType || output.dataType!!}
                 minWidth={widthOutput}
-                dataOut={newData.out}
+                dataOut={data.out}
                 onSetWidthInput={handleSetWidthOutput}
-                connected={isHandleConnected(
-                  edges,
-                  // if have node id that mean id of child node in sub flow and present for output of parent node
-                  output.nodeId || id,
-                  output.nodeId ? "in" : output.name,
-                  output.nodeId ? "target" : "source"
-                )}
+                connected={isHandleConnected(edges, id, output.name, "source")}
               />
             )}
           </div>

@@ -82,6 +82,46 @@ export function BulkDeleteWiresConnection(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['BulkDeleteWiresConnection'](arg1, arg2, arg3, arg4);
 }
 
+export function CSAddDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSAddDevice'](arg1, arg2, arg3);
+}
+
+export function CSDeleteDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSDeleteDevice'](arg1, arg2, arg3);
+}
+
+export function CSDeviceOTAKeys(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CSDeviceOTAKeys'](arg1, arg2, arg3, arg4);
+}
+
+export function CSEditDevice(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['CSEditDevice'](arg1, arg2, arg3, arg4);
+}
+
+export function CSGetApplications(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetApplications'](arg1, arg2);
+}
+
+export function CSGetDevice(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSGetDevice'](arg1, arg2, arg3);
+}
+
+export function CSGetDeviceProfiles(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetDeviceProfiles'](arg1, arg2);
+}
+
+export function CSGetDevices(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['CSGetDevices'](arg1, arg2, arg3);
+}
+
+export function CSGetGateway(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateway'](arg1, arg2);
+}
+
+export function CSGetGateways(arg1, arg2) {
+  return window['go']['backend']['App']['CSGetGateways'](arg1, arg2);
+}
+
 export function ConfigureOpenVPN(arg1, arg2) {
   return window['go']['backend']['App']['ConfigureOpenVPN'](arg1, arg2);
 }
@@ -246,6 +286,10 @@ export function DownloadIO16Firmware(arg1) {
   return window['go']['backend']['App']['DownloadIO16Firmware'](arg1);
 }
 
+export function EdgeAppNewLog(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['EdgeAppNewLog'](arg1, arg2, arg3, arg4);
+}
+
 export function EdgeAppsInfo(arg1, arg2) {
   return window['go']['backend']['App']['EdgeAppsInfo'](arg1, arg2);
 }
@@ -256,6 +300,10 @@ export function EdgeBiosInstalledRubixEdgeVersion(arg1, arg2) {
 
 export function EdgeBiosLogin(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeBiosLogin'](arg1, arg2, arg3, arg4);
+}
+
+export function EdgeBiosRubixAssistVersions() {
+  return window['go']['backend']['App']['EdgeBiosRubixAssistVersions']();
 }
 
 export function EdgeBiosRubixEdgeInstall(arg1, arg2, arg3) {
@@ -290,6 +338,14 @@ export function EdgeBiosTokens(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeBiosTokens'](arg1, arg2, arg3);
 }
 
+export function EdgeBiosUpdateUser(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['EdgeBiosUpdateUser'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function EdgeCreateSnapshot(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeCreateSnapshot'](arg1, arg2);
+}
+
 export function EdgeDHCPPortExists(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPPortExists'](arg1, arg2, arg3);
 }
@@ -302,8 +358,24 @@ export function EdgeDHCPSetStaticIP(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeDHCPSetStaticIP'](arg1, arg2, arg3);
 }
 
+export function EdgeDeleteAppDB(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteAppDB'](arg1, arg2, arg3);
+}
+
+export function EdgeDeleteDataFile(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteDataFile'](arg1, arg2, arg3);
+}
+
+export function EdgeDeleteSnapshot(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeDeleteSnapshot'](arg1, arg2, arg3);
+}
+
 export function EdgeEnablePlugins(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EdgeEnablePlugins'](arg1, arg2, arg3, arg4);
+}
+
+export function EdgeFileExists(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeFileExists'](arg1, arg2, arg3);
 }
 
 export function EdgeFirewallDisable(arg1, arg2) {
@@ -330,6 +402,10 @@ export function EdgeFirewallStatus(arg1, arg2) {
   return window['go']['backend']['App']['EdgeFirewallStatus'](arg1, arg2);
 }
 
+export function EdgeFlowFrameworkVersions() {
+  return window['go']['backend']['App']['EdgeFlowFrameworkVersions']();
+}
+
 export function EdgeGetConfigPlugin(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeGetConfigPlugin'](arg1, arg2, arg3);
 }
@@ -342,12 +418,24 @@ export function EdgeGetNetworks(arg1, arg2) {
   return window['go']['backend']['App']['EdgeGetNetworks'](arg1, arg2);
 }
 
-export function EdgeGetPlugins(arg1, arg2) {
-  return window['go']['backend']['App']['EdgeGetPlugins'](arg1, arg2);
+export function EdgeGetPlugins(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeGetPlugins'](arg1, arg2, arg3);
 }
 
 export function EdgeGetPluginsDistribution(arg1, arg2) {
   return window['go']['backend']['App']['EdgeGetPluginsDistribution'](arg1, arg2);
+}
+
+export function EdgeGetSnapshots(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshots'](arg1, arg2);
+}
+
+export function EdgeGetSnapshotsCreateLogs(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshotsCreateLogs'](arg1, arg2);
+}
+
+export function EdgeGetSnapshotsRestoreLogs(arg1, arg2) {
+  return window['go']['backend']['App']['EdgeGetSnapshotsRestoreLogs'](arg1, arg2);
 }
 
 export function EdgeGetTimeZoneList(arg1, arg2) {
@@ -376,6 +464,10 @@ export function EdgeNTPEnable(arg1, arg2) {
 
 export function EdgeRestartPlugins(arg1, arg2, arg3) {
   return window['go']['backend']['App']['EdgeRestartPlugins'](arg1, arg2, arg3);
+}
+
+export function EdgeRestoreSnapshot(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['EdgeRestoreSnapshot'](arg1, arg2, arg3);
 }
 
 export function EdgeRubixAppVersions(arg1, arg2, arg3, arg4, arg5) {
@@ -450,6 +542,10 @@ export function EditProducer(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EditProducer'](arg1, arg2, arg3, arg4);
 }
 
+export function EditProducerHistory(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['backend']['App']['EditProducerHistory'](arg1, arg2, arg3, arg4, arg5, arg6);
+}
+
 export function EditSchedule(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['EditSchedule'](arg1, arg2, arg3, arg4);
 }
@@ -480,6 +576,14 @@ export function ExportNetworksBulk(arg1, arg2, arg3, arg4) {
 
 export function ExportPointBulk(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['backend']['App']['ExportPointBulk'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function FFSystemPing(arg1, arg2) {
+  return window['go']['backend']['App']['FFSystemPing'](arg1, arg2);
+}
+
+export function FFToken(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['backend']['App']['FFToken'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function FakeEdgeAppsInfoModelCreationOnUI() {
@@ -518,6 +622,10 @@ export function GetBacnetFreeAddress(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetBacnetFreeAddress'](arg1, arg2, arg3);
 }
 
+export function GetBacnetNodes(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetBacnetNodes'](arg1, arg2, arg3);
+}
+
 export function GetConnection(arg1) {
   return window['go']['backend']['App']['GetConnection'](arg1);
 }
@@ -548,6 +656,10 @@ export function GetDevices(arg1, arg2, arg3) {
 
 export function GetFlow(arg1, arg2, arg3) {
   return window['go']['backend']['App']['GetFlow'](arg1, arg2, arg3);
+}
+
+export function GetFlowByNodeType(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['GetFlowByNodeType'](arg1, arg2, arg3, arg4);
 }
 
 export function GetFlowDeviceSchema(arg1, arg2, arg3) {
@@ -734,6 +846,10 @@ export function GetProducer(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['GetProducer'](arg1, arg2, arg3, arg4);
 }
 
+export function GetProducerByThingUUID(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['GetProducerByThingUUID'](arg1, arg2, arg3);
+}
+
 export function GetProducers(arg1, arg2) {
   return window['go']['backend']['App']['GetProducers'](arg1, arg2);
 }
@@ -836,6 +952,10 @@ export function ImportNetworksBulk(arg1, arg2, arg3) {
 
 export function ImportPointBulk(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['ImportPointBulk'](arg1, arg2, arg3, arg4);
+}
+
+export function LatestVersions() {
+  return window['go']['backend']['App']['LatestVersions']();
 }
 
 export function ListIO16BuildFiles(arg1, arg2) {
@@ -950,12 +1070,60 @@ export function RubixAssistTokens(arg1, arg2) {
   return window['go']['backend']['App']['RubixAssistTokens'](arg1, arg2);
 }
 
+export function RubixAssistUpdateUser(arg1, arg2, arg3, arg4) {
+  return window['go']['backend']['App']['RubixAssistUpdateUser'](arg1, arg2, arg3, arg4);
+}
+
 export function Scanner(arg1, arg2, arg3, arg4) {
   return window['go']['backend']['App']['Scanner'](arg1, arg2, arg3, arg4);
 }
 
 export function SetGitToken(arg1) {
   return window['go']['backend']['App']['SetGitToken'](arg1);
+}
+
+export function SyncConsumers(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncConsumers'](arg1, arg2, arg3);
+}
+
+export function SyncDevices(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncDevices'](arg1, arg2, arg3);
+}
+
+export function SyncFlowNetworkClones(arg1, arg2) {
+  return window['go']['backend']['App']['SyncFlowNetworkClones'](arg1, arg2);
+}
+
+export function SyncFlowNetworks(arg1, arg2) {
+  return window['go']['backend']['App']['SyncFlowNetworks'](arg1, arg2);
+}
+
+export function SyncNetworks(arg1, arg2) {
+  return window['go']['backend']['App']['SyncNetworks'](arg1, arg2);
+}
+
+export function SyncPoints(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncPoints'](arg1, arg2, arg3);
+}
+
+export function SyncProducers(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncProducers'](arg1, arg2, arg3);
+}
+
+export function SyncStreamClones(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncStreamClones'](arg1, arg2, arg3);
+}
+
+export function SyncStreams(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncStreams'](arg1, arg2, arg3);
+}
+
+export function SyncWriterClones(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncWriterClones'](arg1, arg2, arg3);
+}
+
+export function SyncWriters(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['SyncWriters'](arg1, arg2, arg3);
 }
 
 export function UpdateConnection(arg1, arg2) {

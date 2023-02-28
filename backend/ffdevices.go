@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 	"github.com/NubeIO/rubix-ui/backend/storage"
 	"github.com/NubeIO/rubix-ui/backend/storage/logstore"
 )
@@ -199,4 +200,16 @@ func (inst *App) exportDevicesBulk(connUUID, hostUUID, userComment, networkUUID 
 		return nil, err
 	}
 	return backup, nil
+}
+
+func (inst *App) SyncDevices(connUUID, hostUUID, networkUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncDevices(hostUUID, networkUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced devices")
 }

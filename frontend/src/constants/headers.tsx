@@ -163,9 +163,9 @@ export const PRODUCER_HEADERS = [
     key: "history_type",
     title: "History Type",
     dataIndex: "history_type",
-    render(plugin_name: string) {
+    render(history_type: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = history_type?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.history_type.localeCompare(b.history_type),
@@ -436,7 +436,15 @@ export const HOST_HEADERS = [
     title: "Is Online",
     dataIndex: "is_online",
     key: "is_online",
-    render: (a: any) => "" + (a ?? ""),
+    render: (a: boolean) => {
+      let colour = "red";
+      let text = "Offline";
+      if (a) {
+        colour = "green";
+        text = "Online";
+      }
+      return <Tag color={colour}>{text}</Tag>;
+    },
     sorter: (a: any, b: any) => a.is_online - b.is_online,
   },
   {
@@ -510,7 +518,7 @@ export const NETWORK_HEADERS = [
     dataIndex: "plugin_name",
     render(plugin_name: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = plugin_name?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.plugin_name.localeCompare(b.plugin_name),
@@ -539,21 +547,6 @@ export const FLOW_DEVICE_HEADERS = [
     sorter: (a: any, b: any) => a.enable - b.enable,
   },
   {
-    title: "Auto Mapping Enable",
-    key: "auto_mapping_enable",
-    dataIndex: "auto_mapping_enable",
-    render(enable: boolean) {
-      let colour = "blue";
-      let text = "disabled";
-      if (enable) {
-        colour = "orange";
-        text = "enable";
-      }
-      return <Tag color={colour}>{text}</Tag>;
-    },
-    sorter: (a: any, b: any) => a.enable - b.enable,
-  },
-  {
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
@@ -565,6 +558,7 @@ export const FLOW_POINT_HEADERS = [
     title: "Name",
     dataIndex: "name",
     key: "name",
+    fixed: "left",
     render(name: string) {
       if (name != undefined) {
         let colour = "#4d4dff";
@@ -595,7 +589,7 @@ export const FLOW_POINT_HEADERS = [
     render(object_type: string) {
       if (object_type != undefined) {
         let colour = "#4d4dff";
-        let text = object_type.toUpperCase();
+        let text = object_type?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -620,7 +614,7 @@ export const FLOW_POINT_HEADERS = [
     render(io_number: string) {
       if (io_number != undefined) {
         let colour = "#4d4dff";
-        let text = io_number.toUpperCase();
+        let text = io_number?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -633,7 +627,7 @@ export const FLOW_POINT_HEADERS = [
     render(io_type: string) {
       if (io_type != undefined) {
         let colour = "#4d4dff";
-        let text = io_type.toUpperCase();
+        let text = io_type?.toUpperCase();
         return <Tag color={colour}>{text}</Tag>;
       }
     },
@@ -643,6 +637,7 @@ export const FLOW_POINT_HEADERS = [
     title: "UUID",
     key: "uuid",
     dataIndex: "uuid",
+    fixed: "left",
   },
 ];
 
@@ -716,9 +711,9 @@ export const PLUGIN_HEADERS = [
     title: "Name",
     key: "name",
     dataIndex: "name",
-    render(plugin_name: string) {
+    render(name: string) {
       let colour = "#4d4dff";
-      let text = plugin_name.toUpperCase();
+      let text = name?.toUpperCase();
       return <Tag color={colour}>{text}</Tag>;
     },
     sorter: (a: any, b: any) => a.name.localeCompare(b.name),
@@ -1066,78 +1061,101 @@ export const SCHEDULES_HEADERS = [
   },
 ];
 
-//--------------schema-------------//
-export const LOCAL_FLOW_NETWORKS_SCHEMA = {
-  required: ["name"],
-  properties: {
-    name: {
-      title: "name",
-      type: "string",
-      maxLength: 50,
-      minLength: 2,
-    },
-    is_remote: {
-      type: "boolean",
-      title: "is remote network",
-    },
+export const LORAWAN_REMOTE_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
   },
-};
+  {
+    key: "description",
+    title: "Description",
+    dataIndex: "description",
+  },
+  {
+    key: "devEUI",
+    title: "EUI",
+    dataIndex: "devEUI",
+  },
+  {
+    key: "applicationID",
+    title: "Application ID",
+    dataIndex: "applicationID",
+  },
+  {
+    key: "deviceProfileName",
+    title: "Profile Name",
+    dataIndex: "deviceProfileName",
+  },
+  {
+    key: "deviceProfileID",
+    title: "Profile ID",
+    dataIndex: "deviceProfileID",
+  },
+  {
+    key: "lastSeenAtReadable",
+    title: "Last Seen At",
+    dataIndex: "lastSeenAtReadable",
+  },
+  {
+    key: "lastSeenAtTime",
+    title: "Time Last Seen At",
+    dataIndex: "lastSeenAtTime",
+  },
+];
 
-export const REMOTE_FLOW_NETWORKS_SCHEMA = {
-  required: ["name", "flow_ip_local", "flow_ip", "flow_port_local", "flow_port", "flow_token_local", "flow_token"],
-  properties: {
-    name: {
-      title: "name",
-      type: "string",
-      maxLength: 50,
-      minLength: 2,
-    },
-    is_remote: {
-      type: "boolean",
-      title: "is remote network",
-    },
-    flow_ip_local: {
-      type: "string",
-      title: "flow ip local",
-      default: "10.8.1.1",
-      minLength: 6,
-      maxLength: 100,
-    },
-    flow_ip: {
-      type: "string",
-      title: "flow ip remote",
-      default: "10.8.1.1",
-      minLength: 6,
-      maxLength: 100,
-    },
-    flow_port_local: {
-      type: "number",
-      title: "flow port local",
-      minimum: 1,
-      maximum: 65535,
-      default: 1660,
-    },
-    flow_port: {
-      type: "number",
-      title: "flow port remote",
-      minimum: 1,
-      maximum: 65535,
-      default: 1660,
-    },
-    flow_token_local: {
-      title: "token local",
-      type: "string",
-      minLength: 60,
-      maxLength: 60,
-    },
-    flow_token: {
-      title: "token remote",
-      type: "string",
-      minLength: 60,
-      maxLength: 60,
-    },
+export const CREATE_LOGS_HEADERS = [
+  {
+    key: "uuid",
+    title: "UUID",
+    dataIndex: "uuid",
   },
-};
+  {
+    key: "status",
+    title: "Status",
+    dataIndex: "status",
+  },
+  {
+    key: "msg",
+    title: "Message",
+    dataIndex: "msg",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
+export const SNAPSHOTS_HEADERS = [
+  {
+    key: "name",
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    key: "size",
+    title: "Size",
+    dataIndex: "size",
+  },
+  {
+    key: "size_readable",
+    title: "Size Readable",
+    dataIndex: "size_readable",
+  },
+  {
+    key: "created_at_readable",
+    title: "Created At Readable",
+    dataIndex: "created_at_readable",
+  },
+  {
+    key: "created_at",
+    title: "Created At",
+    dataIndex: "created_at",
+  },
+];
+
+//--------------schema-------------//
 
 export const WIRES_CONNECTION_SCHEMA = {
   name: {

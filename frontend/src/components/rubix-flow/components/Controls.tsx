@@ -1,9 +1,5 @@
 import { useState } from "react";
-import { ClearModal } from "./ClearModal";
-import { HelpModal } from "./HelpModal";
-import { LoadModal } from "./LoadModal";
-import { SaveModal } from "./SaveModal";
-import { useReactFlow } from "react-flow-renderer/nocss";
+import { useReactFlow, Edge } from "reactflow";
 import {
   QuestionCircleOutlined,
   DownloadOutlined,
@@ -17,20 +13,26 @@ import {
   CloseCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
+import { Spin } from "antd";
+
 import { useCtrlPressKey } from "../hooks/useCtrlPressKey";
 import { FlowSettings, FlowSettingsModal } from "./FlowSettingsModal";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import { Edge } from "react-flow-renderer";
+import { ClearModal } from "./ClearModal";
+import { HelpModal } from "./HelpModal";
+import { LoadModal } from "./LoadModal";
+import { SaveModal } from "./SaveModal";
 
 type ControlProps = {
   isChangedFlow: boolean;
+  isSaving: boolean;
   settings: FlowSettings;
   selectedNodeForSubFlow?: NodeInterface;
   deleteNodesAndEdges: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
+  deleteNodesAndEdgesCtrX: (nodesDeleted: NodeInterface[], edgesDeleted: Edge[]) => void;
   onCopyNodes: (data: { nodes: NodeInterface[]; edges: Edge[] }) => void;
   onUndo: () => void;
   onRedo: () => void;
-  onRefreshValues: () => void;
   onClearAllNodes: () => void;
   onHandelSaveFlow: () => void;
   onBackToMain: () => void;
@@ -41,16 +43,16 @@ type ControlProps = {
   handleLoadNodesAndEdges: (nodes: NodeInterface[], edges: Edge[]) => void;
 };
 
-
 const Controls = ({
   settings,
+  isSaving,
   isChangedFlow,
   selectedNodeForSubFlow,
   deleteNodesAndEdges,
+  deleteNodesAndEdgesCtrX,
   onCopyNodes,
   onUndo,
   onRedo,
-  onRefreshValues,
   onSaveSettings,
   handleConnectionBuilderFlow,
   onLinkBuilder,
@@ -64,6 +66,8 @@ const Controls = ({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [copyNodesC, setCopyNodesC] = useState(false);
+  const [newNodes, setNewNode] = useState({} as any);
   const [settingRefreshModalOpen, setSettingRefreshModalOpen] = useState(false);
   const instance = useReactFlow();
 
@@ -77,8 +81,8 @@ const Controls = ({
     setLoadModalOpen(true);
   });
 
-  /* Ctrl + Delete (key): Delete items selected  */
-  useCtrlPressKey("Backspace", () => {
+  // Delete selected node
+  const deleteSelectNode = () => {
     const _nodes = instance.getNodes();
     const _edges = instance.getEdges();
 
@@ -86,7 +90,19 @@ const Controls = ({
     const edgesDeleted = _edges.filter((item) => item.selected);
 
     deleteNodesAndEdges(nodesDeleted, edgesDeleted);
-  });
+  };
+  const deleteSelectNodeCtrX = () => {
+    const _nodes = instance.getNodes();
+    const _edges = instance.getEdges();
+
+    const nodesDeleted = _nodes.filter((item) => item.selected);
+    const edgesDeleted = _edges.filter((item) => item.selected);
+
+    deleteNodesAndEdgesCtrX(nodesDeleted, edgesDeleted);
+  };
+
+  /* Ctrl + Delete (key): Delete items selected  */
+  useCtrlPressKey("Backspace", deleteSelectNode);
 
   /* Ctrl + a (key): Select all items */
   useCtrlPressKey("KeyA", () => {
@@ -108,16 +124,19 @@ const Controls = ({
     instance.setEdges(newEdges);
   });
 
-  const handleDuplicatedNodes = (nodes?: NodeInterface[]) => {
+  const handleDuplicatedNodes = (nodes?: NodeInterface[], edges?: Edge[]) => {
     const nodesCopied = nodes || instance.getNodes().filter((item) => item.selected);
+
     const nodeIdCopied = nodesCopied.map((item) => item.id);
-    const edgesCopied = instance
-      .getEdges()
-      .filter((item) => item.selected && nodeIdCopied.includes(item.source) && nodeIdCopied.includes(item.target));
+    const edgesCopied =
+      edges ||
+      instance
+        .getEdges()
+        .filter((item) => item.selected && nodeIdCopied.includes(item.source) && nodeIdCopied.includes(item.target));
 
     onCopyNodes({
       nodes: nodesCopied,
-      edges: edgesCopied,
+      edges: copyNodesC ? edgesCopied : newNodes?.edges || edgesCopied,
     });
   };
 
@@ -134,13 +153,30 @@ const Controls = ({
   useCtrlPressKey("KeyS", onHandelSaveFlow);
 
   /* Ctrl + X (key): Refresh node values */
-  useCtrlPressKey("KeyX", onRefreshValues);
+  useCtrlPressKey("KeyX", () => {
+    setCopyNodesC(false);
+    copySelectNode();
+    deleteSelectNodeCtrX();
+  });
 
-  useCtrlPressKey("KeyC", () => {
+  // Copy selected node
+  const copySelectNode = () => {
     const nodesCopied = instance.getNodes().filter((node) => node.selected);
+    const edgesCopied = instance.getEdges().filter((edge) => edge.selected);
     if (nodesCopied) {
       window.nodesCopied = nodesCopied;
+      window.edgesCopied = edgesCopied;
     }
+    const newNodes= {
+      nodes: nodesCopied,
+      edges: instance.getEdges(),
+    };  
+    setNewNode(newNodes);   
+  };
+  
+  useCtrlPressKey("KeyC", () => {
+    setCopyNodesC(true);
+    copySelectNode();
   });
 
   useCtrlPressKey("KeyV", () => {
@@ -150,7 +186,9 @@ const Controls = ({
       window.nodesCopied &&
       window.nodesCopied.length > 0
     ) {
-      handleDuplicatedNodes(window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id })));
+      const nodes = window.nodesCopied.map((node) => ({ ...node, parentId: selectedNodeForSubFlow?.id }));
+      const edges = window.edgesCopied;
+      handleDuplicatedNodes(nodes, edges);
     }
     window.nodesCopied = [];
   });
@@ -161,7 +199,13 @@ const Controls = ({
 
   const renderIconBtn = (title: string, Icon: any, onClick: () => void, id = "") => {
     return (
-      <div id={id} className="cursor-pointer border-r bg-white hover:bg-gray-100" title={title} onClick={onClick}>
+      <div
+        id={id}
+        className="cursor-pointer border-r bg-white hover:bg-gray-100"
+        title={title}
+        onClick={onClick}
+        style={{ height: 24 }}
+      >
         <Icon className="p-2 text-gray-700 align-middle" />
       </div>
     );
@@ -170,6 +214,11 @@ const Controls = ({
   return (
     <>
       <div className="absolute top-4 right-4 bg-white z-10 flex black--text">
+        {isSaving && (
+          <div className=" border-r bg-white " title="Saving..." style={{ height: 24 }}>
+            <Spin size="small" className="pt-1 px-2" />
+          </div>
+        )}
         {isChangedFlow && renderIconBtn("Sync flow", SyncOutlined, onHandelSaveFlow)}
         {renderIconBtn("Link Builder", LinkOutlined, onLinkBuilder)}
         {!!selectedNodeForSubFlow && (
@@ -184,22 +233,21 @@ const Controls = ({
         {renderIconBtn("Import", DownloadOutlined, () => setLoadModalOpen(true))}
         {renderIconBtn("Export", UploadOutlined, () => setSaveModalOpen(true), "exportButton")}
         {renderIconBtn("Wipe", RestOutlined, () => setClearModalOpen(true))}
-        {renderIconBtn("Download", VerticalAlignBottomOutlined, onHandelSaveFlow)}
       </div>
-      <LoadModal
-        open={loadModalOpen}
-        onClose={() => setLoadModalOpen(false)}
-        handleLoadNodesAndEdges={handleLoadNodesAndEdges}
-      />
-      <SaveModal open={saveModalOpen} onClose={() => setSaveModalOpen(false)} />
-      <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
-      <ClearModal open={clearModalOpen} onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />
-      <FlowSettingsModal
-        settings={settings}
-        open={settingRefreshModalOpen}
-        onClose={() => setSettingRefreshModalOpen(false)}
-        onSaveSettings={onSaveSettings}
-      />
+      {loadModalOpen && (
+        <LoadModal open onClose={() => setLoadModalOpen(false)} handleLoadNodesAndEdges={handleLoadNodesAndEdges} />
+      )}
+      {saveModalOpen && <SaveModal open onClose={() => setSaveModalOpen(false)} />}
+      {helpModalOpen && <HelpModal open onClose={() => setHelpModalOpen(false)} />}
+      {clearModalOpen && <ClearModal open onClose={() => setClearModalOpen(false)} onClear={onClearAllNodes} />}
+      {settingRefreshModalOpen && (
+        <FlowSettingsModal
+          settings={settings}
+          open
+          onClose={() => setSettingRefreshModalOpen(false)}
+          onSaveSettings={onSaveSettings}
+        />
+      )}
     </>
   );
 };

@@ -5,7 +5,8 @@ import {
   RubixAssistTokenDelete,
   RubixAssistTokenGenerate,
   RubixAssistTokenRegenerate,
-  RubixAssistTokens
+  RubixAssistTokens,
+  RubixAssistUpdateUser
 } from "../../../../wailsjs/go/backend/App";
 import { CommonTokenFactory } from "../../../common/token/factory";
 
@@ -38,5 +39,9 @@ export class RubixAssistTokenFactory implements CommonTokenFactory {
 
   public TokenDelete(jwtToken: string, uuid: string): Promise<any> {
     return RubixAssistTokenDelete(this.connectionUUID, jwtToken, uuid);
+  }
+
+  public UpdateUser(jwtToken: string, username: string, password: string): Promise<any> {
+    return RubixAssistUpdateUser(this.connectionUUID, jwtToken, username, password);
   }
 }

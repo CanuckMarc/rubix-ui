@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/NubeIO/lib-uuid/uuid"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
+	"github.com/NubeIO/rubix-ui/backend/helpers/boolean"
+	"github.com/NubeIO/rubix-ui/backend/helpers/integer"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *App) AddProducer(connUUID, hostUUID string, body *model.Producer) *model.Producer {
@@ -66,16 +69,69 @@ func (inst *App) GetProducer(connUUID, hostUUID, uuid string, withWriterClones b
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
 	}
+	if producers == nil {
+		inst.uiErrorMessage("failed to find producer")
+		return nil
+	}
 	return producers
 }
 
-func (inst *App) EditProducer(connUUID, hostUUID, streamUUID string, body *model.Producer) *model.Producer {
+func (inst *App) GetProducerByThingUUID(connUUID, hostUUID, thingUUID string) *model.Producer {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil
 	}
-	producers, err := client.EditProducer(hostUUID, streamUUID, body)
+	producers, err := client.GetProducerByThingUUID(hostUUID, thingUUID)
+	if err != nil {
+		return nil
+	}
+	if producers == nil {
+		inst.uiErrorMessage("failed to find producer")
+		return nil
+	}
+	return producers
+}
+
+const (
+	historyTypeCov            string = "COV"
+	historyTypeInterval       string = "INTERVAL"
+	historyTypeCovAndInterval string = "COV_AND_INTERVAL"
+)
+
+func (inst *App) EditProducerHistory(connUUID, hostUUID, pointUUID, historyType string, historyEnable bool, interval int) *model.Producer {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	producer, err := client.GetProducerByThingUUID(hostUUID, pointUUID)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	if producer == nil {
+		inst.uiErrorMessage("this point has not been setup for mapping")
+		return nil
+	}
+	var correctType bool
+	if historyType == historyTypeCov {
+		correctType = true
+	}
+	if historyType == historyTypeInterval {
+		correctType = true
+	}
+	if historyType == historyTypeCovAndInterval {
+		correctType = true
+	}
+	if !correctType {
+		inst.uiErrorMessage("invalid history type was selected")
+		return nil
+	}
+	producer.HistoryType = model.HistoryType(historyType)
+	producer.EnableHistory = boolean.New(historyEnable)
+	producer.HistoryInterval = integer.New(interval)
+	producers, err := client.EditProducer(hostUUID, producer.UUID, producer)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return nil
@@ -83,13 +139,27 @@ func (inst *App) EditProducer(connUUID, hostUUID, streamUUID string, body *model
 	return producers
 }
 
-func (inst *App) DeleteProducer(connUUID, hostUUID, streamUUID string) interface{} {
+func (inst *App) EditProducer(connUUID, hostUUID, uuid string, body *model.Producer) *model.Producer {
 	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
 	err = inst.errMsg(err)
 	if err != nil {
 		return nil
 	}
-	_, err = client.DeleteProducer(hostUUID, streamUUID)
+	producers, err := client.EditProducer(hostUUID, uuid, body)
+	if err != nil {
+		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
+		return nil
+	}
+	return producers
+}
+
+func (inst *App) DeleteProducer(connUUID, hostUUID, uuid string) interface{} {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	err = inst.errMsg(err)
+	if err != nil {
+		return nil
+	}
+	_, err = client.DeleteProducer(hostUUID, uuid)
 	if err != nil {
 		inst.uiErrorMessage(fmt.Sprintf("error %s", err.Error()))
 		return err
@@ -121,4 +191,16 @@ func (inst *App) DeleteProducerBulk(connUUID, hostUUID string, uuids []UUIDs) in
 		inst.uiErrorMessage(fmt.Sprintf("failed to delete count: %d", errorCount))
 	}
 	return nil
+}
+
+func (inst *App) SyncProducers(connUUID, hostUUID, streamUUID string) *rumodel.Response {
+	client, err := inst.getAssistClient(&AssistClient{ConnUUID: connUUID})
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	_, err = client.SyncProducers(hostUUID, streamUUID)
+	if err != nil {
+		return rumodel.FailResponse(err)
+	}
+	return rumodel.SuccessResponse("synced producers")
 }

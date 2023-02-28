@@ -47,8 +47,8 @@ export const WritePointValueModal = (props: any) => {
       return null;
     }
   };
-  const onChange = (value: number, priorityKey: string) => {
-    formData[priorityKey] = value ? Number(value) : null;
+  const onChange = (value: number | null, priorityKey: string) => {
+    formData[priorityKey] = value;
     setFormData(formData);
   };
 
@@ -99,14 +99,15 @@ export const WritePointValueModal = (props: any) => {
           <Col span={6} key={priorityKey}>
             <InputNumber
               step="0.01"
-              stringMode
               placeholder={priorityKey}
               defaultValue={formData[priorityKey]}
-              onChange={(v: number | null) => {
-                if (v) onChange(v, priorityKey);
-              }}
+              onChange={(v: number | null) => onChange(v, priorityKey)}
               disabled={
-                pluginName === "bacnetmaster" && priorityKey !== "_14" && priorityKey !== "_15" && priorityKey !== "_16"
+                pluginName === "bacnetmaster" &&
+                priorityKey !== "_7" &&
+                priorityKey !== "_14" &&
+                priorityKey !== "_15" &&
+                priorityKey !== "_16"
               }
             />
           </Col>

@@ -7,16 +7,20 @@ import { FlowPluginFactory } from "../factory";
 import { PluginDownloadModal } from "./plugin-download-modal";
 import { RbRefreshButton } from "../../../../../../common/rb-table-actions";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
+import { RestartFFModal } from "./restart-flow-framework-modal";
+import { pluginsKey } from "../../../host";
 
 const { confirm } = Modal;
 
-export const PluginDistributionTable = () => {
+export const PluginDistributionTable = (props: any) => {
+  const { activeKey, activeKeyLocal, pluginDistribution } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [plugins, setPlugins] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [pluginName, setPluginName] = useState<any>();
   const [isFetching, setIsFetching] = useState(false);
   const [isInstallModalVisible, setIsInstallModalVisible] = useState(false);
+  const [isRestartFFModalVisible, setIsRestartFFModalVisible] = useState(false);
 
   const config = {
     originData: plugins,
@@ -87,25 +91,34 @@ export const PluginDistributionTable = () => {
   };
 
   useEffect(() => {
-    fetchPlugins();
-  }, []);
+    if (activeKeyLocal === pluginDistribution && activeKey === pluginsKey) {
+      fetchPlugins();
+    }
+  }, [activeKey, activeKeyLocal]);
 
   return (
     <>
       <RbRefreshButton refreshList={fetchPlugins} />
-      {plugins && plugins.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {plugins?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="name"
-        dataSource={filteredData}
+        dataSource={plugins?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
       <PluginDownloadModal
         isModalVisible={isInstallModalVisible}
         pluginName={pluginName}
+        setIsRestartFFModalVisible={setIsRestartFFModalVisible}
         handleClose={() => setIsInstallModalVisible(false)}
         refreshList={fetchPlugins}
+      />
+      <RestartFFModal
+        pluginName={pluginName}
+        refreshList={fetchPlugins}
+        isModalVisible={isRestartFFModalVisible}
+        handleClose={() => setIsRestartFFModalVisible(false)}
       />
     </>
   );

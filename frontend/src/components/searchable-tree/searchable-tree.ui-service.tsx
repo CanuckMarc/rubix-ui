@@ -8,6 +8,7 @@ import {
   RadarChartOutlined,
   MenuOutlined,
   ToolOutlined,
+  WifiOutlined,
 } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import { NavLink } from "react-router-dom";
@@ -44,6 +45,7 @@ let ObjectType = {
   WIRES_CONNECTIONS_REMOTE: "wires-connections",
   SCHEDULES_REMOTE: "schedules",
   WIRES_MAP_REMOTE: "wires-map",
+  LORAWAN_REMOTE: "lorawan",
 };
 
 let ObjectTypesToRoutes: ObjectTypeRoute = {
@@ -77,6 +79,8 @@ let ObjectTypesToRoutes: ObjectTypeRoute = {
     ROUTES.SCHEDULES_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
   [ObjectType.WIRES_MAP_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
     ROUTES.WIRES_MAP_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
+  [ObjectType.LORAWAN_REMOTE]: (connUUID: string = "", hostUUID: string = "") =>
+    ROUTES.LORAWAN_REMOTE.replace(":connUUID", connUUID).replace(":hostUUID", hostUUID),
 };
 
 const className = "supervisors-menu";
@@ -127,7 +131,7 @@ const objectMap = (treeObj: TreeObj) => {
   treeObj.label = isDisabledTooltip ? (
     <>{treeObj.label}</>
   ) : (
-    <Tooltip placement="right" title={treeObj.name}>
+    <Tooltip placement="right" title={treeObj.label}>
       {treeObj.label}
     </Tooltip>
   );
@@ -271,7 +275,7 @@ export const getTreeDataIterative = (connections: any) => {
                     {
                       ...objectMap(
                         getTreeObject(
-                          { name: "map", uuid: "wires_map_" + host.uuid },
+                          { name: "point mapping", uuid: "wires_map_" + host.uuid },
                           ObjectTypesToRoutes[ObjectType.WIRES_MAP_REMOTE](connection.uuid, host.uuid),
                           "",
                           <RadarChartOutlined />
@@ -295,11 +299,24 @@ export const getTreeDataIterative = (connections: any) => {
                   next: ObjectTypesToRoutes[ObjectType.SCHEDULES_REMOTE](connection.uuid, host.uuid),
                   children: null,
                 },
+                {
+                  ...objectMap(
+                    getTreeObject(
+                      { name: "lorawan", uuid: "lorawan_" + host.uuid },
+                      ObjectTypesToRoutes[ObjectType.LORAWAN_REMOTE](connection.uuid, host.uuid),
+                      "",
+                      <WifiOutlined />
+                    )
+                  ),
+                  next: ObjectTypesToRoutes[ObjectType.LORAWAN_REMOTE](connection.uuid, host.uuid),
+                  children: null,
+                },
               ],
               className,
             })),
             className,
           })),
+          className,
         })),
         className:
           !connection.locations || connection.locations.length === 0 ? className + " disconnect-menu" : className,

@@ -6,8 +6,10 @@ import {model} from '../models';
 import {amodel} from '../models';
 import {db} from '../models';
 import {assistcli} from '../models';
+import {chirpstack} from '../models';
 import {backend} from '../models';
 import {flow} from '../models';
+import {streamlog} from '../models';
 import {ebmodel} from '../models';
 import {externaltoken} from '../models';
 import {system} from '../models';
@@ -15,9 +17,8 @@ import {dhcpd} from '../models';
 import {ufw} from '../models';
 import {networking} from '../models';
 import {datelib} from '../models';
-import {streamlog} from '../models';
-import {flowcli} from '../models';
 import {node} from '../models';
+import {flowcli} from '../models';
 import {store} from '../models';
 import {nodes} from '../models';
 
@@ -29,7 +30,7 @@ export function AddDevice(arg1:string,arg2:string,arg3:model.Device):Promise<mod
 
 export function AddDevicesBulk(arg1:string,arg2:string,arg3:Array<model.Device>):Promise<void>;
 
-export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function AddFlowNetwork(arg1:string,arg2:string,arg3:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function AddHost(arg1:string,arg2:amodel.Host):Promise<rumodel.Response>;
 
@@ -60,6 +61,26 @@ export function BacnetMasterWhois(arg1:string,arg2:string,arg3:string,arg4:assis
 export function BacnetWhois(arg1:string,arg2:string,arg3:string,arg4:string):Promise<Array<model.Device>>;
 
 export function BulkDeleteWiresConnection(arg1:string,arg2:string,arg3:boolean,arg4:Array<string>):Promise<any>;
+
+export function CSAddDevice(arg1:string,arg2:string,arg3:chirpstack.Device):Promise<chirpstack.Device>;
+
+export function CSDeleteDevice(arg1:string,arg2:string,arg3:string):Promise<boolean>;
+
+export function CSDeviceOTAKeys(arg1:string,arg2:string,arg3:string,arg4:string):Promise<any>;
+
+export function CSEditDevice(arg1:string,arg2:string,arg3:string,arg4:chirpstack.Device):Promise<chirpstack.Device>;
+
+export function CSGetApplications(arg1:string,arg2:string):Promise<chirpstack.Applications>;
+
+export function CSGetDevice(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Device>;
+
+export function CSGetDeviceProfiles(arg1:string,arg2:string):Promise<chirpstack.DeviceProfiles>;
+
+export function CSGetDevices(arg1:string,arg2:string,arg3:string):Promise<chirpstack.Devices>;
+
+export function CSGetGateway(arg1:string,arg2:string):Promise<chirpstack.GatewaysResult>;
+
+export function CSGetGateways(arg1:string,arg2:string):Promise<chirpstack.Gateways>;
 
 export function ConfigureOpenVPN(arg1:string,arg2:string):Promise<boolean>;
 
@@ -143,11 +164,15 @@ export function DownloadFlow(arg1:string,arg2:string,arg3:boolean,arg4:any,arg5:
 
 export function DownloadIO16Firmware(arg1:string):Promise<string>;
 
+export function EdgeAppNewLog(arg1:string,arg2:string,arg3:string,arg4:number):Promise<streamlog.Log>;
+
 export function EdgeAppsInfo(arg1:string,arg2:string):Promise<rumodel.Response>;
 
 export function EdgeBiosInstalledRubixEdgeVersion(arg1:string,arg2:string):Promise<ebmodel.Version>;
 
 export function EdgeBiosLogin(arg1:string,arg2:string,arg3:string,arg4:string):Promise<model.TokenResponse>;
+
+export function EdgeBiosRubixAssistVersions():Promise<Array<string>>;
 
 export function EdgeBiosRubixEdgeInstall(arg1:string,arg2:string,arg3:string):Promise<any>;
 
@@ -165,13 +190,25 @@ export function EdgeBiosTokenRegenerate(arg1:string,arg2:string,arg3:string,arg4
 
 export function EdgeBiosTokens(arg1:string,arg2:string,arg3:string):Promise<externaltoken.ExternalToken>;
 
+export function EdgeBiosUpdateUser(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<boolean>;
+
+export function EdgeCreateSnapshot(arg1:string,arg2:string):Promise<assistcli.Message>;
+
 export function EdgeDHCPPortExists(arg1:string,arg2:string,arg3:system.NetworkingBody):Promise<system.DHCPPortExists>;
 
 export function EdgeDHCPSetAsAuto(arg1:string,arg2:string,arg3:system.NetworkingBody):Promise<system.Message>;
 
 export function EdgeDHCPSetStaticIP(arg1:string,arg2:string,arg3:dhcpd.SetStaticIP):Promise<string>;
 
+export function EdgeDeleteAppDB(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
+export function EdgeDeleteDataFile(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
+export function EdgeDeleteSnapshot(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
+
 export function EdgeEnablePlugins(arg1:string,arg2:string,arg3:Array<string>,arg4:boolean):Promise<rumodel.Response>;
+
+export function EdgeFileExists(arg1:string,arg2:string,arg3:string):Promise<assistcli.FilesExists>;
 
 export function EdgeFirewallDisable(arg1:string,arg2:string):Promise<ufw.Message>;
 
@@ -185,15 +222,23 @@ export function EdgeFirewallPortOpen(arg1:string,arg2:string,arg3:system.UFWBody
 
 export function EdgeFirewallStatus(arg1:string,arg2:string):Promise<ufw.Message>;
 
+export function EdgeFlowFrameworkVersions():Promise<Array<string>>;
+
 export function EdgeGetConfigPlugin(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function EdgeGetHardwareTZ(arg1:string,arg2:string):Promise<string>;
 
 export function EdgeGetNetworks(arg1:string,arg2:string):Promise<Array<networking.NetworkInterfaces>>;
 
-export function EdgeGetPlugins(arg1:string,arg2:string):Promise<rumodel.Response>;
+export function EdgeGetPlugins(arg1:string,arg2:string,arg3:boolean):Promise<rumodel.Response>;
 
 export function EdgeGetPluginsDistribution(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function EdgeGetSnapshots(arg1:string,arg2:string):Promise<Array<assistcli.Snapshots>>;
+
+export function EdgeGetSnapshotsCreateLogs(arg1:string,arg2:string):Promise<Array<assistcli.SnapshotCreateLog>>;
+
+export function EdgeGetSnapshotsRestoreLogs(arg1:string,arg2:string):Promise<Array<assistcli.SnapshotRestoreLog>>;
 
 export function EdgeGetTimeZoneList(arg1:string,arg2:string):Promise<Array<string>>;
 
@@ -208,6 +253,8 @@ export function EdgeNTPDisable(arg1:string,arg2:string):Promise<system.Message>;
 export function EdgeNTPEnable(arg1:string,arg2:string):Promise<system.Message>;
 
 export function EdgeRestartPlugins(arg1:string,arg2:string,arg3:Array<string>):Promise<rumodel.Response>;
+
+export function EdgeRestoreSnapshot(arg1:string,arg2:string,arg3:string):Promise<assistcli.Message>;
 
 export function EdgeRubixAppVersions(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<Array<string>>;
 
@@ -233,7 +280,7 @@ export function EditConsumer(arg1:string,arg2:string,arg3:string,arg4:model.Cons
 
 export function EditDevice(arg1:string,arg2:string,arg3:string,arg4:model.Device):Promise<model.Device>;
 
-export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<model.FlowNetwork>;
+export function EditFlowNetwork(arg1:string,arg2:string,arg3:string,arg4:model.FlowNetwork):Promise<rumodel.Response>;
 
 export function EditHost(arg1:string,arg2:string,arg3:amodel.Host):Promise<rumodel.Response>;
 
@@ -245,6 +292,8 @@ export function EditPoint(arg1:string,arg2:string,arg3:string,arg4:model.Point):
 
 export function EditProducer(arg1:string,arg2:string,arg3:string,arg4:model.Producer):Promise<model.Producer>;
 
+export function EditProducerHistory(arg1:string,arg2:string,arg3:string,arg4:string,arg5:boolean,arg6:number):Promise<model.Producer>;
+
 export function EditSchedule(arg1:string,arg2:string,arg3:string,arg4:assistcli.Schedule):Promise<any>;
 
 export function EditStream(arg1:string,arg2:string,arg3:string,arg4:model.Stream):Promise<model.Stream>;
@@ -253,13 +302,17 @@ export function EditWriter(arg1:string,arg2:string,arg3:string,arg4:model.Writer
 
 export function ExportBackup(arg1:string):Promise<void>;
 
-export function ExportConnection(arg1:Array<string>):Promise<void>;
+export function ExportConnection(arg1:Array<string>):Promise<Error>;
 
 export function ExportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
 
 export function ExportNetworksBulk(arg1:string,arg2:string,arg3:string,arg4:Array<string>):Promise<storage.Backup>;
 
 export function ExportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string,arg5:Array<string>):Promise<storage.Backup>;
+
+export function FFSystemPing(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function FFToken(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string):Promise<rumodel.Response>;
 
 export function FakeEdgeAppsInfoModelCreationOnUI():Promise<rumodel.EdgeAppsInfo>;
 
@@ -279,6 +332,8 @@ export function GetBacnetDevicePoints(arg1:string,arg2:string,arg3:string,arg4:b
 
 export function GetBacnetFreeAddress(arg1:string,arg2:string,arg3:boolean):Promise<backend.BacnetPoints>;
 
+export function GetBacnetNodes(arg1:string,arg2:string,arg3:boolean):Promise<Array<node.Schema>>;
+
 export function GetConnection(arg1:string):Promise<storage.RubixConnection>;
 
 export function GetConnectionSchema():Promise<backend.ConnectionSchema>;
@@ -294,6 +349,8 @@ export function GetDevice(arg1:string,arg2:string,arg3:string,arg4:boolean):Prom
 export function GetDevices(arg1:string,arg2:string,arg3:boolean):Promise<Array<model.Device>>;
 
 export function GetFlow(arg1:string,arg2:string,arg3:boolean):Promise<any>;
+
+export function GetFlowByNodeType(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<any>;
 
 export function GetFlowDeviceSchema(arg1:string,arg2:string,arg3:string):Promise<string>;
 
@@ -387,6 +444,8 @@ export function GetPointsForDevice(arg1:string,arg2:string,arg3:string):Promise<
 
 export function GetProducer(arg1:string,arg2:string,arg3:string,arg4:boolean):Promise<model.Producer>;
 
+export function GetProducerByThingUUID(arg1:string,arg2:string,arg3:string):Promise<model.Producer>;
+
 export function GetProducers(arg1:string,arg2:string):Promise<Array<model.Producer>>;
 
 export function GetProducersUnderStreamClone(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
@@ -438,6 +497,8 @@ export function ImportDevicesBulk(arg1:string,arg2:string,arg3:string,arg4:strin
 export function ImportNetworksBulk(arg1:string,arg2:string,arg3:string):Promise<backend.BulkAddResponse>;
 
 export function ImportPointBulk(arg1:string,arg2:string,arg3:string,arg4:string):Promise<backend.BulkAddResponse>;
+
+export function LatestVersions():Promise<backend.LatestVersions>;
 
 export function ListIO16BuildFiles(arg1:string,arg2:boolean):Promise<Array<string>>;
 
@@ -495,9 +556,33 @@ export function RubixAssistTokenRegenerate(arg1:string,arg2:string,arg3:string):
 
 export function RubixAssistTokens(arg1:string,arg2:string):Promise<externaltoken.ExternalToken>;
 
+export function RubixAssistUpdateUser(arg1:string,arg2:string,arg3:string,arg4:string):Promise<boolean>;
+
 export function Scanner(arg1:string,arg2:string,arg3:number,arg4:Array<string>):Promise<any>;
 
 export function SetGitToken(arg1:string):Promise<rumodel.Response>;
+
+export function SyncConsumers(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncDevices(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncFlowNetworkClones(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncFlowNetworks(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncNetworks(arg1:string,arg2:string):Promise<rumodel.Response>;
+
+export function SyncPoints(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncProducers(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncStreamClones(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncStreams(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncWriterClones(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
+
+export function SyncWriters(arg1:string,arg2:string,arg3:string):Promise<rumodel.Response>;
 
 export function UpdateConnection(arg1:string,arg2:storage.RubixConnection):Promise<rumodel.Response>;
 

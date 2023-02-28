@@ -1,5 +1,5 @@
-import { Space, Spin, Tooltip, Modal } from "antd";
-import { ArrowRightOutlined, FormOutlined, BookOutlined } from "@ant-design/icons";
+import { Modal, Space, Spin, Tooltip } from "antd";
+import { ArrowRightOutlined, BookOutlined, FormOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { backend, model } from "../../../../../../../wailsjs/go/models";
@@ -11,6 +11,7 @@ import {
   RbImportButton,
   RbRefreshButton,
   RbRestartButton,
+  RbSyncButton,
 } from "../../../../../../common/rb-table-actions";
 import { openNotificationWithIcon } from "../../../../../../utils/utils";
 import { NETWORK_HEADERS } from "../../../../../../constants/headers";
@@ -20,10 +21,13 @@ import { FlowNetworkFactory } from "../factory";
 import { CreateModal, EditModal } from "./create";
 import { ExportModal, ImportModal } from "./import-export";
 import "./style.css";
-import UUIDs = backend.UUIDs;
-import Network = model.Network;
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
 import { LogTable } from "./logTable";
+import { hasError } from "../../../../../../utils/response";
+import { NetworkWizard } from "./network-wizard";
+import { networksKey } from "../../../host";
+import UUIDs = backend.UUIDs;
+import Network = model.Network;
 
 export interface LogTablePropType {
   pluginName: string | undefined;
@@ -39,7 +43,8 @@ export interface ExternalWindowParamType {
   logNetwork: string | undefined;
 }
 
-export const FlowNetworkTable = () => {
+export const FlowNetworkTable = (props: any) => {
+  const { activeKey } = props;
   let { connUUID = "", hostUUID = "", netUUID = "", locUUID = "" } = useParams();
   const [currentItem, setCurrentItem] = useState({});
   const [networkSchema, setNetworkSchema] = useState({});
@@ -56,6 +61,7 @@ export const FlowNetworkTable = () => {
   const [logNetwork, setLogNetwork] = useState<model.Network>();
   const [isLogTableOpen, setIsLogTableOpen] = useState(false);
   const [resetLogTableData, setResetLogTableData] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
 
   const config = {
     originData: networks,
@@ -98,7 +104,7 @@ export const FlowNetworkTable = () => {
   const onOpenLog = (network: model.Network) => {
     setLogNetwork(network);
     setIsLogTableOpen(true);
-  }
+  };
 
   const rowSelection = {
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -112,7 +118,21 @@ export const FlowNetworkTable = () => {
       const res = (await networkFactory.GetAll(false)) || [];
       setNetworks(res);
       setFilteredData(res);
-    } catch (error) {
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const syncNetworks = async () => {
+    try {
+      setIsFetching(true);
+      const res = await networkFactory.Sync();
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetchNetworks();
     } finally {
       setIsFetching(false);
     }
@@ -175,8 +195,8 @@ export const FlowNetworkTable = () => {
   };
 
   useEffect(() => {
-    fetchNetworks();
-  }, []);
+    activeKey === networksKey && fetchNetworks();
+  }, [activeKey]);
 
   const handleOk = () => {
     setIsLogTableOpen(false);
@@ -191,17 +211,18 @@ export const FlowNetworkTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetchNetworks} />
-      <RbAddButton handleClick={() => setIsCreateModalVisible(true)} />
+      <RbSyncButton onClick={syncNetworks} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
-      {networks.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {networks?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={networks?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
@@ -228,8 +249,20 @@ export const FlowNetworkTable = () => {
         onClose={() => setIsImportModalVisible(false)}
         refreshList={fetchNetworks}
       />
+      <NetworkWizard
+        refreshList={fetchNetworks}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
+        setIsCreateModalVisible={setIsCreateModalVisible}
+      />
       <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
-        <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={logNetwork?.plugin_name} resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData}/>
+        <LogTable
+          connUUID={connUUID}
+          hostUUID={hostUUID}
+          pluginName={logNetwork?.plugin_name}
+          resetLogTableData={resetLogTableData}
+          setResetLogTableData={setResetLogTableData}
+        />
       </Modal>
     </>
   );

@@ -1,4 +1,4 @@
-import { MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -8,11 +8,13 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
   XYPosition,
-} from "react-flow-renderer/nocss";
+  EdgeProps,
+  ReactFlowInstance,
+  MiniMap,
+  ReactFlowProvider,
+} from "reactflow";
 import cx from "classnames";
 import { Box, boxesIntersect, useSelectionContainer } from "@air/react-drag-to-select";
-
-import MiniMap from "./components/MiniMap";
 import BehaveControls from "./components/Controls";
 import NodePicker from "./components/NodePicker";
 import NodeMenu from "./components/NodeMenu";
@@ -21,34 +23,37 @@ import { calculateNewEdge } from "./util/calculateNewEdge";
 import { getNodePickerFilters } from "./util/getPickerFilters";
 import { CustomEdge } from "./components/CustomEdge";
 import { generateUuid } from "./lib/generateUuid";
-import { Edge, EdgeProps, ReactFlowInstance, ReactFlowProvider } from "react-flow-renderer";
 import { convertDataSpec, getNodeSpecDetail, useNodesSpec } from "./use-nodes-spec";
-import { Spin } from "antd";
+import { Spin, Tabs } from "antd";
+import { UnorderedListOutlined, NodeIndexOutlined, ApartmentOutlined } from "@ant-design/icons";
 import { NodeSpecJSON } from "./lib";
 import { FlowFactory } from "./factory";
 import { behaveToFlow } from "./transformers/behaveToFlow";
 import ControlUndoable from "./components/ControlUndoable";
-import { NodeInterface } from "./lib/Nodes/NodeInterface";
-import { handleGetSettingType, handleNodesEmptySettings } from "./util/handleSettings";
+import { NodeInterface, EdgeInterface as Edge } from "./lib/Nodes/NodeInterface";
+import { handleGetSettingType } from "./util/handleSettings";
 import { useParams } from "react-router-dom";
 import { getFlowSettings, FLOW_SETTINGS, FlowSettings } from "./components/FlowSettingsModal";
 import { NodesTree } from "./components/NodesTree";
+import { PointsPallet } from "./components/PointsPallet";
 import { NodeSideBar } from "./components/NodeSidebar";
-import "./rubix-flow.css";
-import { categoryColorMap } from "./util/colors";
-import { NodeCategory } from "./lib/Nodes/NodeCategory";
 import { useOnPressKey } from "./hooks/useOnPressKey";
 import { handleCopyNodesAndEdges } from "./util/handleNodesAndEdges";
 import { isValidConnection, isInputExistConnection } from "./util/isCanConnection";
 import { flowToBehave } from "./transformers/flowToBehave";
 import { uniqArray } from "../../utils/utils";
-import { SPLIT_KEY } from "./hooks/useChangeNodeData";
 import { ConnectionBuilderModal } from "./components/ConnectionBuilderModal";
-import { LoadWiresMap } from "./components/LoadWiresMap";
+import { LoadWiresMap } from "./components/LoadFlownetMap";
+import { LoadBacnetMap } from "./components/LoadBacnetMap";
 import { useIsLoading } from "../../App";
 import { LinkBuilderModal } from "./components/LinkBuilderModal";
 import { SubFlowTabs } from "./components/SubFlowTabs";
 import SelectMenu from "./components/SelectMenu";
+import { formatParentNodesWithInputsOutputs, formatEdgesWithParentNode } from "./util/flow";
+import "./rubix-flow.css";
+import "reactflow/dist/style.css";
+
+const { TabPane } = Tabs;
 
 type SelectableBoxType = {
   edgeId: string;
@@ -58,6 +63,8 @@ type SelectableBoxType = {
 type UndoStateType = {
   nodes: NodeInterface[];
   edges: Edge[];
+  childNode?: NodeInterface[];
+  childEdge?: Edge[];
 };
 
 type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
@@ -66,6 +73,7 @@ type NodeInterfaceWithOldId = NodeInterface & { oldId?: string };
 declare global {
   interface Window {
     nodesCopied?: NodeInterface[];
+    edgesCopied?: Edge[];
     subFlowIds: string[];
     selectedNodeForExport: NodeInterface | undefined;
     selectedNodeForSubFlow: NodeInterface | undefined;
@@ -93,9 +101,10 @@ const Flow = (props: FlowProps) => {
     handlePushSelectedNodeForSubFlow,
     handleRemoveSelectedNodeForSubFlow,
   } = props;
-  const [nodes, setNodes, onNodesChange] = useNodesState([] as NodeInterface[]);
+  const [isFetching, setIsFetching] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [nodes, setNodes, onNodesChange] = useNodesState<NodeInterface[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [shouldUpdateMiniMap, setShouldUpdateMiniMap] = useState(false);
   const [selectedNode, setSelectedNode] = useState({} as any);
   const [nodeSelect, setNodeSelect] = useState({} as any);
   const [nodePickerVisibility, setNodePickerVisibility] = useState<XYPosition>();
@@ -113,12 +122,15 @@ const Flow = (props: FlowProps) => {
   const isDragSelection = useRef<boolean>(false);
   const changeSelectionRef = useRef<number | null>(null);
   const [isConnectionBuilder, setIsConnectionBuilder] = useState(false);
+  const [panelKeys, setPanelKeys] = useState<string[]>([]);
+  const [panelKeysNew, setPanelKeysNew] = useState<string[]>([]);
   const [isLinkBuilder, setIsLinkBuilder] = useState(false);
   const [undoState, setUndoState] = useState<{ past: UndoStateType[]; future: UndoStateType[] }>({
     past: [],
     future: [],
   });
   const [isChangedFlow, setIsChangedFlow] = useState(false);
+  const [search, setSearch] = useState("");
 
   const isRemote = !!connUUID && !!hostUUID;
   const factory = new FlowFactory();
@@ -174,6 +186,13 @@ const Flow = (props: FlowProps) => {
     },
   });
 
+  // Subflow nodes are open
+  const changeKeys = (key: string) => {
+    const isExist = panelKeys.includes(key);
+    setPanelKeys(isExist ? panelKeys.filter((item) => item !== key) : [...panelKeys, key]);
+    setPanelKeysNew(isExist ? panelKeys.filter((item) => item === key) : [key]);
+  };
+
   // delete selected wires
   useOnPressKey("Backspace", () => {
     const edgesDeleted = edges.filter((item) => item.selected);
@@ -182,12 +201,10 @@ const Flow = (props: FlowProps) => {
     }
   });
 
-  const onMove = () => setShouldUpdateMiniMap((s) => !s);
-
   const handleFlowChange = () => setIsChangedFlow(true);
 
   const handleAddNode = useCallback(
-    async (isParent: boolean, style: any, nodeType: string, position: XYPosition) => {
+    async (isParent: boolean, style: any, nodeType: string, position: XYPosition, name?: string) => {
       closeNodePicker();
       const nodeSettings = await handleGetSettingType(connUUID, hostUUID, isRemote, nodeType);
       const spec: NodeSpecJSON = getNodeSpecDetail(nodesSpec, nodeType);
@@ -212,6 +229,7 @@ const Flow = (props: FlowProps) => {
       );
       const newNode = {
         id: generateUuid(),
+        info: { nodeName: name ? name : "" },
         isParent,
         style,
         type: nodeType,
@@ -223,7 +241,7 @@ const Flow = (props: FlowProps) => {
           out: convertDataSpec(spec.outputs || []),
         },
         parentId: selectedNodeForSubFlow?.id || undefined,
-        settings: nodeSettings,
+        settings: name ? { ...nodeSettings, point: name } : nodeSettings,
         selected: false,
       };
 
@@ -257,17 +275,16 @@ const Flow = (props: FlowProps) => {
 
       onEdgesChange([{ type: "add", item: newEdge }]);
       window.allFlow.edges = [...window.allFlow.edges, newEdge];
-      
     },
     [lastConnectStart, nodes, onEdgesChange, onNodesChange, selectedNodeForSubFlow, handleFlowChange]
   );
 
-  const handleAddSubFlow = (node: NodeInterface) => {
+  const handleAddSubFlow = useCallback((node: NodeInterface) => {
     handlePushSelectedNodeForSubFlow(node);
     setTimeout(() => {
       rubixFlowInstance?.fitView();
     }, 100);
-  };
+  }, []);
 
   const handleConnectionBuilderFlow = (node: NodeInterface) => {
     setNodes((nodes) => nodes.map((node) => ({ ...node, selected: false })));
@@ -343,8 +360,17 @@ const Flow = (props: FlowProps) => {
       };
     });
 
-    setNodes([...currentNodes, ...newNodesWithOldId]);
-    setEdges([...currentEdges, ...finalEdges]);
+    // just show nodes and edges at level 1
+    const nodesFormatted = formatParentNodesWithInputsOutputs(newNodesWithOldId, nodesSpec as any[]);
+    const edgesFormatted = formatEdgesWithParentNode(newNodes, finalEdges);
+
+    const newNodesL1 = nodesFormatted.filter((node) => !node.parentId);
+    const newEdgesL1 = edgesFormatted.filter((e) =>
+      newNodesL1.some((node) => node.id === e.target || node.id === e.source)
+    );
+
+    setNodes([...currentNodes, ...newNodesL1]);
+    setEdges([...currentEdges, ...newEdgesL1]);
     window.allFlow = {
       nodes: [...window.allFlow.nodes, ...newNodesWithOldId],
       edges: [...window.allFlow.edges, ...finalEdges],
@@ -354,7 +380,7 @@ const Flow = (props: FlowProps) => {
     // TODO better way to call fit vew after edges render
     setTimeout(() => {
       rubixFlowInstance.fitView();
-    }, 100);
+    }, 300);
   };
 
   const onCloseBuilderModal = () => {
@@ -397,13 +423,27 @@ const Flow = (props: FlowProps) => {
   };
 
   // close sub flow
-  const onBackToMain = () => {
+  const onBackToMain = useCallback(() => {
     setSelectedNodeForSubFlow([]);
     setIsConnectionBuilder(false);
-  };
+  }, []);
 
   const onHandelSaveFlow = async () => {
-    const allNodes = [...nodes];
+    setIsSaving(true);
+    // stop the loop when user downloads a flow
+    if (refreshInterval.current) clearInterval(refreshInterval.current);
+
+    const allNodes: NodeInterface[] = nodes.map((n: NodeInterface) => {
+      if (n.isParent) {
+        const originNode = window.allFlow.nodes.find((i) => i.id === n.id) || n;
+        return {
+          ...n,
+          data: originNode?.data || {},
+        };
+      }
+      return n;
+    });
+
     window.allFlow.nodes.forEach((node) => {
       const isExist = allNodes.some((n) => n.id === node.id);
       if (!isExist) {
@@ -419,37 +459,45 @@ const Flow = (props: FlowProps) => {
     });
     const graphJson = flowToBehave(newNodesFiltered, window.allFlow.edges);
 
-    // save nodes and edges
-    await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
+    try {
+      // save nodes and edges
+      await factory.DownloadFlow(connUUID, hostUUID, isRemote, graphJson, true);
+      setNodes((n) => n.map((item) => ({ ...item, selected: false })));
+      setEdges((e) => e.map((item) => ({ ...item, selected: false })));
+      window.allFlow = { nodes: newNodesFiltered, edges: window.allFlow.edges };
+      setIsChangedFlow(false);
+      handleRefreshValues();
+    } catch (error) {
+      console.log("__ERROR__", error);
+    }
 
-    // format nodes with settings
-    const nodesWithSetting = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newNodesFiltered);
+    setIsSaving(false);
 
-    // filter nodes at level 1 or in sub flow
-    const newNodesL1 = nodesWithSetting.filter((node) => {
-      return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
-    });
-
-    nodesWithSetting.forEach((node1) => {
-      const hasParent = newNodesL1.some((node2) => {
-        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
-      });
-      if (hasParent) {
-        newNodesL1.push(node1);
-      }
-    });
-    const edgesL1 = window.allFlow.edges.filter((e) =>
-      newNodesL1.some((node) => node.id === e.target || node.id === e.source)
-    );
-
-    setNodes(newNodesL1.map((n) => ({ ...n, selected: false })));
-    setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
-    window.allFlow = { nodes: nodesWithSetting, edges: window.allFlow.edges };
-    setIsChangedFlow(false);
-    handleRefreshValues();
+    //after a download wait 5 seconds before allowing this loop to start
+    setTimeout(() => {
+      refreshInterval.current = setInterval(handleRefreshValues, flowSettings.refreshTimeout * 1000);
+    }, 5000);
   };
 
-  const handleStartConnect = (e: ReactMouseEvent, params: OnConnectStartParams) => {
+  // if node count is > 500 then make the minimum loop time 10 seconds.
+  // if node count is > 1000 then make the minimum loop time 30 seconds.
+  useEffect(() => {
+    const nodeLength = window.allFlow?.nodes?.length || 0;
+    let newTimeOut = null;
+
+    if (nodeLength >= 1000) {
+      newTimeOut = 30;
+    } else if (nodeLength >= 500) {
+      newTimeOut = 10;
+    }
+    if (newTimeOut !== null) {
+      flowSettings.refreshTimeout = newTimeOut;
+      localStorage.setItem(FLOW_SETTINGS, JSON.stringify(flowSettings));
+      setFlowSettings(flowSettings);
+    }
+  }, [window.allFlow?.nodes?.length]);
+
+  const handleStartConnect = (e: any, params: OnConnectStartParams) => {
     setLastConnectStart(params);
   };
 
@@ -462,124 +510,140 @@ const Flow = (props: FlowProps) => {
     [edges, setEdges]
   );
 
-  const onConnectEnd = (evt: ReactMouseEvent | any) => {
-    if (lastConnectStart) {
-      const { nodeid: nodeId, handleid: handleId, handlepos: position } = (evt.target as HTMLDivElement).dataset;
-      const isTarget = position === "left";
+  const createNewConnection = useCallback(
+    (
+      nodes: NodeInterface[],
+      start: { sourceNodeId: string; sourceHandleId: string },
+      end: { targetNodeId: string; targetHandleId: string },
+      isTarget: boolean
+    ) => {
+      const { sourceNodeId, sourceHandleId } = start;
+      const { targetNodeId, targetHandleId } = end;
+      const edgesAdded: Edge[] = [
+        {
+          id: generateUuid(),
+          source: sourceNodeId,
+          sourceHandle: sourceHandleId,
+          target: targetNodeId,
+          targetHandle: targetHandleId,
+        },
+      ];
 
-      const [targetHandleId, targetNodeId] = handleId?.includes(SPLIT_KEY)
-        ? handleId.split(SPLIT_KEY)
-        : [handleId, nodeId];
+      const nodeTarget: NodeInterface = nodes.find((n) => n.id === targetNodeId)!!;
+      const nodeSource: NodeInterface = nodes.find((n) => n.id === sourceNodeId)!!;
 
-      const [lastConnectStartHandleId, lastConnectStartNodeId] = lastConnectStart.handleId?.includes(SPLIT_KEY)
-        ? lastConnectStart.handleId.split(SPLIT_KEY)
-        : [lastConnectStart.handleId, lastConnectStart.nodeId];
-
-      if (
-        targetNodeId &&
-        targetHandleId &&
-        !isValidConnection(
-          window.allFlow.nodes,
-          lastConnectStart,
-          { nodeId: targetNodeId, handleId: targetHandleId },
-          isTarget
-        )
-      ) {
-        return;
-      }
-
-      const edgeByTarget: Edge | undefined = window.allFlow.edges.find((e) =>
-        isTarget ? e.target === targetNodeId && e.targetHandle === targetHandleId : e.target === lastConnectStartNodeId
-      );
-
-      const isSameTarget = lastConnectStart.handleType === "target" && isTarget;
-
-      if (edgeByTarget && !isSameTarget && nodeId) {
-        const newSourceId = isTarget ? lastConnectStartNodeId!! : targetNodeId!!;
-        const newSourceHandle = isTarget ? lastConnectStartHandleId!! : targetHandleId!!;
-
-        if (newSourceId !== edgeByTarget.target) {
-          edgeByTarget.source = newSourceId;
-          edgeByTarget.sourceHandle = newSourceHandle;
-
-          const newEdges = edges.map((item) => (item.id === edgeByTarget.id ? edgeByTarget : item));
-          setEdges(newEdges);
-          window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
-          setUndoState((s) => ({
-            past: [...s.past, { edges, nodes }],
-            future: s.future,
-          }));
-          handleFlowChange();
-        }
-        return;
-      }
-
-      const isDragSelected = edges.some((item) => {
-        if (item.selected) {
-          const isChangeTarget =
-            lastConnectStart.handleType === "target" && item.targetHandle === lastConnectStartHandleId;
-          const isChangeSource = lastConnectStartHandleId && item.source === lastConnectStartNodeId;
-
-          return isChangeTarget || isChangeSource;
-        }
-
-        return false;
-      });
-
-      if (isDragSelected) {
-        let newEdges: Edge[] = [];
-        if (targetNodeId) {
-          // update selected lines to new node if start and end are same type
-          newEdges = edges.map((item: Edge) => {
-            if (item.selected && lastConnectStartNodeId === item[lastConnectStart.handleType!!]) {
-              const updateKey = isTarget ? "target" : "source";
-              item[`${updateKey}Handle`] = targetHandleId;
-              item[updateKey as keyof Edge] = targetNodeId;
-            }
-            return item;
-          });
-          // remove edges have same target
-          newEdges = newEdges.filter(
-            (edge, index) => index === newEdges.findIndex((edge2) => edge2.target === edge.target)
-          );
-        } else {
-          // remove selected lines
-          newEdges = edges.filter((item) => !item.selected);
-        }
-
-        if (newEdges) {
-          setEdges(newEdges);
-          window.allFlow.edges = window.allFlow.edges.map((e) => newEdges.find((e2) => e2.id === e.id) || e);
-          setUndoState((s) => ({
-            past: [...s.past, { edges, nodes }],
-            future: s.future,
-          }));
-          handleFlowChange();
-        }
-      } else {
-        const element = evt.target as HTMLElement;
-        if (element.classList.contains("react-flow__pane")) {
-          const { x, y } = setMousePosition(evt);
-          setNodePickerVisibility({ x, y });
-        }
-        if (!isSameTarget && targetNodeId && lastConnectStartNodeId) {
-          const newEdge = {
+      // create edge connect to child nodes if have
+      if (nodeTarget?.isParent && nodeSource?.isParent) {
+        const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
+        const output = nodeSource.data.out.find((item: any) => item.pin === sourceHandleId);
+        edgesAdded.push({
+          id: generateUuid(),
+          source: isTarget ? output.nodeId : input.nodeId,
+          sourceHandle: isTarget ? "output" : "input",
+          target: isTarget ? input.nodeId : output.nodeId,
+          targetHandle: isTarget ? "input" : "output",
+        });
+      } else if (nodeTarget?.isParent) {
+        if (isTarget) {
+          const input = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandleId);
+          edgesAdded.push({
             id: generateUuid(),
-            source: lastConnectStartNodeId,
-            sourceHandle: lastConnectStartHandleId,
+            source: sourceNodeId,
+            sourceHandle: sourceHandleId,
+            target: input.nodeId,
+            targetHandle: "input",
+          });
+        }
+      } else if (nodeSource?.isParent) {
+        const outputIndex = nodeSource.data.out.findIndex((item: any) => item.pin === sourceHandleId);
+        if (outputIndex >= 0) {
+          const outItem = nodeSource.data.out[outputIndex];
+          edgesAdded.push({
+            id: generateUuid(),
+            source: outItem.nodeId,
+            sourceHandle: "output",
             target: targetNodeId,
             targetHandle: targetHandleId,
-          };
-
-          onEdgesChange([{ type: "add", item: newEdge }]);
-          setUndoState((s) => ({
-            past: [...s.past, { edges, nodes }],
-            future: s.future,
-          }));
-          handleFlowChange();
-          window.allFlow.edges = [...window.allFlow.edges, newEdge];
+          });
         }
       }
+
+      return edgesAdded;
+    },
+    []
+  );
+
+  const onConnectEnd = (evt: ReactMouseEvent | any) => {
+    if (lastConnectStart) {
+      const { nodeid, handleid, handlepos: position } = (evt.target as HTMLDivElement).dataset;
+      const { handleType } = lastConnectStart;
+      const isTarget = position === "left";
+
+      const { targetNodeId, targetHandleId } = {
+        targetNodeId: isTarget ? nodeid : lastConnectStart.nodeId,
+        targetHandleId: isTarget ? handleid : lastConnectStart.handleId,
+      };
+      const { sourceNodeId, sourceHandleId } = {
+        sourceNodeId: !isTarget ? nodeid : lastConnectStart.nodeId!!,
+        sourceHandleId: !isTarget ? handleid : lastConnectStart.handleId!!,
+      };
+
+      let isRemoveEdge = false;
+      const edgeIdsWillBeRemoved: string[] = [];
+      const edgesAdded: Edge[] = [];
+
+      const edgeNeedToUpdated: Edge | undefined = edges.find((item) => {
+        return (
+          item.selected &&
+          (item.source === targetNodeId ||
+            item.target === sourceNodeId ||
+            (!sourceNodeId && item.target === targetNodeId))
+        );
+      });
+
+      // update target or source
+      if (edgeNeedToUpdated) {
+        isRemoveEdge = !sourceNodeId;
+        edgeIdsWillBeRemoved.push(edgeNeedToUpdated.id);
+        if (edgeNeedToUpdated.originEdgeId) {
+          edgeIdsWillBeRemoved.push(edgeNeedToUpdated.originEdgeId);
+        }
+      }
+
+      if (!isRemoveEdge) {
+        const isValidConnect = isValidConnection(
+          window.allFlow.nodes,
+          { nodeId: sourceNodeId!!, handleId: sourceHandleId!!, handleType },
+          { nodeId: targetNodeId!!, handleId: targetHandleId!! },
+          isTarget
+        );
+
+        if (isValidConnect) {
+          edgesAdded.push(
+            ...createNewConnection(
+              nodes,
+              {
+                sourceNodeId: edgeNeedToUpdated ? edgeNeedToUpdated.source : sourceNodeId!!,
+                sourceHandleId: edgeNeedToUpdated ? edgeNeedToUpdated.sourceHandle!! : sourceHandleId!!,
+              },
+              { targetNodeId: targetNodeId!!, targetHandleId: targetHandleId!! },
+              isTarget
+            )
+          );
+        }
+      }
+
+      const newEdges = edges.filter((edge) => !edgeIdsWillBeRemoved.includes(edge.id));
+      const allEdges = window.allFlow.edges.filter((e) => !edgeIdsWillBeRemoved.includes(e.id));
+      allEdges.push(...edgesAdded);
+      window.allFlow.edges = allEdges;
+
+      setEdges([...newEdges, ...edgesAdded]);
+      setUndoState((s) => ({
+        past: [...s.past, { edges, nodes }],
+        future: s.future,
+      }));
+      handleFlowChange();
     }
 
     setLastConnectStart(undefined);
@@ -599,34 +663,33 @@ const Flow = (props: FlowProps) => {
     closeNodePicker();
   };
 
-  const onChangeSelection = ({
-    nodes: newNodesChange,
-    edges: newEdgesChange,
-  }: {
-    nodes: NodeInterface[];
-    edges: Edge[];
-  }) => {
-    if (changeSelectionRef.current) {
-      clearTimeout(changeSelectionRef.current);
-      changeSelectionRef.current = null;
-    }
+  const onChangeSelection = useCallback(
+    ({ nodes: newNodesChange, edges: newEdgesChange }: { nodes: NodeInterface[]; edges: Edge[] }) => {
+      if (changeSelectionRef.current) {
+        clearTimeout(changeSelectionRef.current);
+        changeSelectionRef.current = null;
+      }
 
-    if (newNodesChange.length > 0 || newEdgesChange.length > 0) {
-      changeSelectionRef.current = setTimeout(() => {
-        const newNodes = nodes.map((node) => {
-          node.selected = newNodesChange.some((i) => i.id === node.id);
-          return node;
-        });
-        const newEdges = edges.map((edge) => {
-          edge.selected = newEdgesChange.some((i) => i.id === edge.id);
-          return edge;
-        });
+      if (newNodesChange.length > 0 || newEdgesChange.length > 0) {
+        changeSelectionRef.current = setTimeout(() => {
+          const nodes = rubixFlowInstance.getNodes();
+          const edges = rubixFlowInstance.getEdges();
+          const newNodes = nodes.map((node: NodeInterface) => {
+            node.selected = newNodesChange.some((i) => i.id === node.id);
+            return node;
+          });
+          const newEdges = edges.map((edge: Edge) => {
+            edge.selected = newEdgesChange.some((i) => i.id === edge.id);
+            return edge;
+          });
 
-        setNodes(newNodes);
-        setEdges(newEdges);
-      }, 50);
-    }
-  };
+          setNodes(newNodes);
+          setEdges(newEdges);
+        }, 50);
+      }
+    },
+    [rubixFlowInstance]
+  );
 
   const handlePaneContextMenu = (event: ReactMouseEvent) => {
     const { x, y } = setMousePosition(event);
@@ -634,15 +697,30 @@ const Flow = (props: FlowProps) => {
   };
 
   const handleNodeContextMenu = (event: React.MouseEvent, node: NodeInterface) => {
-    const { x, y } = setMousePosition(event);
-    setNodeMenuVisibility({ x, y });
-    setSelectedNode(node);
+    if (event.ctrlKey) {
+      if (node.isParent && ((event as any).which === 3 || event.button === 2)) {
+        event.preventDefault();
+        event.stopPropagation();
+        handlePushSelectedNodeForSubFlow(node);
+        setNodeMenuSelectVisibility(undefined);
+        setNodeMenuVisibility(undefined);
+        setMenuOpenFromNodeTree(false);
+      }
+    } else {
+      const { x, y } = setMousePosition(event);
+      setNodeMenuVisibility({ x, y });
+      setSelectedNode(node);
+    }
   };
+
   const handleSelectContextMenu = (event: ReactMouseEvent) => {
-    const { x, y } = setMousePosition(event);
-    setNodeMenuSelectVisibility({ x, y });
-    const nodeSelect = nodes.filter((item) => item.selected === true);
-    setNodeSelect(nodeSelect);
+    const nodeSelect = nodes.filter((item) => item.selected);
+
+    if (nodeSelect.length > 1) {
+      const { x, y } = setMousePosition(event);
+      setNodeMenuSelectVisibility({ x, y });
+      setNodeSelect(nodeSelect);
+    }
   };
 
   const setMousePosition = useCallback(
@@ -690,21 +768,48 @@ const Flow = (props: FlowProps) => {
     if (outputNodes && outputNodes.length === 0) return prevNodes;
 
     return prevNodes.map((node: NodeInterface) => {
-      const data = outputNodes.find((item) => item.nodeId === node.id);
-      if (data) {
-        const dataInputs = data?.inputs?.map((item: any) => ({
-          ...item,
-          ...node?.orderInput?.[item?.pin],
-          ...node?.hiddenInput?.[item?.pin],
-        }));
+      if (node.isParent) {
+        const nodeOut = outputNodes.find((nodeO) => nodeO.nodeId === node.id);
+        const outs = (nodeOut?.outputs || []).filter(
+          (out: { pin: string }) => !node.data.out.some((dI: { pin: string }) => dI.pin === out.pin)
+        );
+        const childrenOfParent = window.allFlow.nodes.filter((n) => n.parentId === node.id);
+        const inputs = childrenOfParent.filter((n) => isInputFlow(n.type!!));
+        const outputs = childrenOfParent.filter((n) => isOutputFlow(n.type!!));
 
-        node.data.inputs = !node.data.inputs ? dataInputs : handleBeforeAddOutput(node.data.inputs, dataInputs);
-        node.data.out = !node.data.out ? data?.outputs : handleBeforeAddOutput(node.data.out, data?.outputs);
-        node.status = data?.status;
-        node.info = { ...node.info, ...data?.info };
+        inputs.forEach((input, idx) => {
+          const inputData = outputNodes.find((o) => o.nodeId === input.id);
+          if (inputData) {
+            node.data[`input${inputs.length > 1 ? idx + 1 : ""}`] = inputData.inputs[0].value;
+            node.data.inputs[idx].value = inputData.inputs[0].value;
+          }
+        });
+
+        outputs.forEach((outItem, idx) => {
+          const outData = outputNodes.find((o) => o.nodeId === outItem.id);
+          if (outData) {
+            node.data.out[idx].value = outData.inputs[0].value;
+          }
+        });
+
+        node.data.out = [...(node.data?.out || []), ...outs];
+      } else {
+        const data = outputNodes.find((item) => item.nodeId === node.id);
+        if (data) {
+          const dataInputs = data?.inputs?.map((item: any) => ({
+            ...item,
+            ...node?.orderInput?.[item?.pin],
+            ...node?.hiddenInput?.[item?.pin],
+          }));
+
+          node.data.inputs = !node.data.inputs ? dataInputs : handleBeforeAddOutput(node.data.inputs, dataInputs);
+          node.data.out = !node.data.out ? data?.outputs : handleBeforeAddOutput(node.data.out, data?.outputs);
+          node.status = data?.status;
+          node.info = { ...node.info, ...data?.info };
+        }
+
+        return node;
       }
-
-      return node;
     });
   };
 
@@ -727,13 +832,29 @@ const Flow = (props: FlowProps) => {
     const lastPast = undoState.past.pop();
     if (lastPast) {
       undoState.future.push({ nodes, edges });
+      const nodeAdded = lastPast.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
       const nodeIdsDeleted = nodes.filter((n1) => !lastPast.nodes.some((n2) => n1.id === n2.id)).map(({ id }) => id);
-      const nodesAdded = lastPast.nodes.filter((n1) => !nodes.some((n2) => n1.id === n2.id));
-      window.allFlow.nodes = [...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)), ...nodesAdded];
+      const nodeChild = lastPast?.childNode || [];
+      const nodeIdChild = nodeAdded.map((item) => item.id);
+      const nodeChillAdd = nodeChild.filter((item) => !nodeIdChild.includes(item.id));
 
+      window.allFlow.nodes = [
+        ...window.allFlow.nodes.filter(({ id }) => !nodeIdsDeleted.includes(id)),
+        ...nodeAdded,
+        ...nodeChillAdd,
+      ];
+
+      const edgeAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
       const edgeIdsDeleted = edges.filter((n1) => !lastPast.edges.some((n2) => n1.id === n2.id)).map(({ id }) => id);
-      const edgesAdded = lastPast.edges.filter((n1) => !edges.some((n2) => n1.id === n2.id));
-      window.allFlow.edges = [...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)), ...edgesAdded];
+      const edgeChild = lastPast?.childEdge || [];
+      const edgeIdChild = edgeAdded.map((item) => item.id);
+      const edgeChillAdd = edgeChild.filter((item) => !edgeIdChild.includes(item.id));
+
+      window.allFlow.edges = [
+        ...window.allFlow.edges.filter(({ id }) => !edgeIdsDeleted.includes(id)),
+        ...edgeAdded,
+        ...edgeChillAdd,
+      ];
 
       setNodes(lastPast.nodes);
       setEdges(lastPast.edges);
@@ -766,9 +887,10 @@ const Flow = (props: FlowProps) => {
       (node: NodeInterface) => node.parentId === parentId
     );
     const nodeIds: string[] = [];
-
+    const nodeChild: NodeInterface[] = [];
     for (const node of childNodes) {
       nodeIds.push(node.id);
+      nodeChild.push(node);
       if (node.isParent) {
         nodeIds.push(...getChildNodeIds(node.id));
       }
@@ -776,8 +898,43 @@ const Flow = (props: FlowProps) => {
     return nodeIds;
   };
 
-  const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+  const getEdgeIdsDeleted = (_edges: Edge[], _nodes: NodeInterface[]): string[] => {
+    const edgeIdsDeleted: string[] = [];
+
+    _edges.forEach((item) => {
+      const { source, target, targetHandle, sourceHandle } = item;
+      const nodeTarget: NodeInterface | undefined = _nodes.find((n) => n.id === target);
+      const nodeSource: NodeInterface | undefined = _nodes.find((n) => n.id === source);
+      let itemDeleted: Edge | undefined = undefined;
+
+      if (nodeTarget?.isParent && nodeSource?.isParent) {
+        const outputOfSource = nodeSource.data.out.find((item: any) => item.pin === sourceHandle);
+        const inputOfTarget = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.target === inputOfTarget.nodeId && item.source === outputOfSource.nodeId
+        );
+      } else if (nodeSource?.isParent) {
+        const outputOfSource = nodeSource.data.out.find((item: any) => item.pin === sourceHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.source === outputOfSource?.nodeId && item.sourceHandle === "output" && item.target === target
+        );
+      } else if (nodeTarget?.isParent) {
+        const inputOfTarget = nodeTarget.data.inputs.find((item: any) => item.pin === targetHandle);
+        itemDeleted = window.allFlow.edges.find(
+          (item) => item.target === inputOfTarget?.nodeId && item.targetHandle === "input" && item.source === source
+        );
+      }
+      if (itemDeleted) {
+        edgeIdsDeleted.push(itemDeleted.id);
+      }
+    });
+    return edgeIdsDeleted;
+  };
+
+  const deleteNodesAndEdges = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[], saveChange = false) => {
     const nodeIds: string[] = [];
+    const _edgeIds: string[] = _edgesDeleted.map((e) => e.id);
+    const _edgesDeletedClone = [..._edgeIds];
 
     for (const node of _nodesDeleted) {
       nodeIds.push(node.id);
@@ -786,45 +943,99 @@ const Flow = (props: FlowProps) => {
       }
     }
 
+    const childNode = window.allFlow.nodes.filter((n) => nodeIds.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIds.includes(n.source));
+
     const remainingNodes = nodes.filter((item) => !nodeIds.includes(item.id));
-    const remainingEdges = edges.filter(
-      (item) =>
-        !_edgesDeleted.some((item2) => item.id === item2.id) &&
-        !nodeIds.includes(item.target) &&
-        !nodeIds.includes(item.source)
-    );
+    const remainingEdges = edges.filter((item) => !_edgeIds.includes(item.id));
 
     const allRemainingNodes = window.allFlow.nodes.filter((n) => !nodeIds.includes(n.id));
+
+    _edgesDeletedClone.push(...getEdgeIdsDeleted(_edgesDeleted, nodes));
+
     window.allFlow = {
       nodes: allRemainingNodes,
-      edges: window.allFlow.edges.filter(
-        (item) =>
-          !_edgesDeleted.some((item2) => item.id === item2.id) &&
-          !nodeIds.includes(item.target) &&
-          !nodeIds.includes(item.source)
-      ),
+      edges: window.allFlow.edges.filter((item) => !_edgesDeletedClone.includes(item.id)),
     };
     setNodes(remainingNodes);
     setEdges(remainingEdges);
     setUndoState((s) => ({
-      past: [...s.past, { edges, nodes }],
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
       future: s.future,
     }));
     handleFlowChange();
   };
 
-  const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: any }) => {
+  // delete nodes when CtrX
+  const deleteNodesAndEdgesCtrX = (_nodesDeleted: NodeInterface[], _edgesDeleted: Edge[]) => {
+    const nodeWithChildIds: string[] = [];
+    for (const node of _nodesDeleted) {
+      nodeWithChildIds.push(node.id);
+      if (node.isParent) {
+        nodeWithChildIds.push(...getChildNodeIds(node.id));
+      }
+    }
+
+    const nodeIdsDeleted = _nodesDeleted.map((item: NodeInterface) => item.id);
+    const childNode = window.allFlow.nodes.filter((n) => nodeIdsDeleted.includes(n.id));
+    const childEdge = window.allFlow.edges.filter((n) => nodeIdsDeleted.includes(n.source));
+    const remainingNodes = nodes.filter((item) => !nodeIdsDeleted.includes(item.id));
+    const remainingNodesAll = window.allFlow.nodes.filter((n) => !nodeIdsDeleted.includes(n.id));
+    const remainingEdges = edges.filter(
+      (item) =>
+        !_edgesDeleted.some((item2) => item.id === item2.id) &&
+        !nodeWithChildIds.includes(item.target) &&
+        !nodeWithChildIds.includes(item.source)
+    );
+
+    window.allFlow = {
+      nodes: remainingNodesAll,
+      edges: window.allFlow.edges.filter(
+        (item) =>
+          !_edgesDeleted.some((item2) => item.id === item2.id) &&
+          !nodeIdsDeleted.includes(item.target) &&
+          !nodeIdsDeleted.includes(item.source)
+      ),
+    };
+    setNodes(remainingNodes);
+    setEdges(remainingEdges);
+    setUndoState((s) => ({
+      past: [...s.past, { edges, nodes, childNode, childEdge }],
+      future: s.future,
+    }));
+    handleFlowChange();
+  };
+
+  const handleCopyNodes = async (_copied: { nodes: NodeInterface[]; edges: Edge[] }) => {
     /* Unselected nodes, edges */
     nodes.forEach((item) => (item.selected = false));
     edges.forEach((item) => (item.selected = false));
+
+    // get nodes original
+    const newNodesCopied = _copied.nodes.map((node) => {
+      if (node.isParent) {
+        return window.allFlow.nodes.find((item) => item.id === node.id) || node;
+      }
+      return node;
+    });
+    const newEdgesCopied = _copied.edges.map((e) => {
+      if (e.originEdgeId) {
+        return window.allFlow.edges.find((e2) => e2.id === e.originEdgeId) || e;
+      }
+      return e;
+    });
 
     /*
      * Generate new id of edges copied
      * Add new id source and target of edges copied
      */
-    const newFlow = handleCopyNodesAndEdges(_copied, window.allFlow.nodes, window.allFlow.edges);
-
-    newFlow.nodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, newFlow.nodes);
+    const newFlow = handleCopyNodesAndEdges(
+      { nodes: newNodesCopied, edges: newEdgesCopied },
+      window.allFlow.nodes,
+      window.allFlow.edges,
+      true,
+      nodesSpec
+    );
 
     // remove connections if have source or target is not belong to new nodes
     newFlow.edges = newFlow.edges.filter((edge: Edge) => {
@@ -833,32 +1044,29 @@ const Flow = (props: FlowProps) => {
       return existSource && existTarget;
     });
 
+    const newNodes = formatParentNodesWithInputsOutputs(newFlow.nodes, nodesSpec as any);
+    const newEdges = formatEdgesWithParentNode(newNodes, newFlow.edges);
+    const nodesL1 = newNodes.filter((node) => {
+      if (!node.parentId) {
+        return true;
+      }
+      return !newNodes.find((item) => item.id === node.parentId);
+    });
+
     // unique items and delete oldId field
-    const nodesUniq = uniqArray([...nodes, ...newFlow.nodes]).map(({ oldId, ...node }: NodeInterface) => node);
-    const edgesUniq = uniqArray([...edges, ...newFlow.edges]).map(({ oldId, ...edge }: any) => edge);
-    const newAllNodes = [...window.allFlow.nodes];
-    const newAllEdges = [...window.allFlow.edges];
+    const nodesUniq = uniqArray([...nodes, ...nodesL1]).map(({ oldId, ...node }: NodeInterface) => node);
+    const edgesUniq = uniqArray([...edges, ...newEdges]).map(({ oldId, ...edge }: Edge & { oldId?: string }) => edge);
 
-    nodesUniq.forEach((n: NodeInterface) => {
-      const exist = newAllNodes.some((node: NodeInterface) => node.id === n.id);
-      if (!exist) {
-        newAllNodes.push(n);
-      }
-    });
-    edgesUniq.forEach((n: Edge) => {
-      const exist = newAllEdges.some((node: Edge) => node.id === n.id);
-      if (!exist) {
-        newAllEdges.push(n);
-      }
-    });
-
-    window.allFlow = { nodes: newAllNodes, edges: newAllEdges };
     setNodes(nodesUniq);
     setEdges(edgesUniq);
     setUndoState((s) => ({
       past: [...s.past, { edges, nodes }],
       future: s.future,
     }));
+    window.allFlow = {
+      nodes: [...window.allFlow.nodes, ...newFlow.nodes],
+      edges: [...window.allFlow.edges, ...newEdges],
+    };
     handleFlowChange();
   };
 
@@ -880,7 +1088,9 @@ const Flow = (props: FlowProps) => {
 
   const handleRefreshValues = async () => {
     const _outputNodes = (await fetchOutput()) || [];
-    setNodes((prevNodes) => addOutputToNodes(_outputNodes, prevNodes));
+    setTimeout(() => {
+      setNodes((prevNodes) => addOutputToNodes(_outputNodes, prevNodes));
+    }, 100);
   };
 
   const onSaveFlowSettings = (config: FlowSettings) => {
@@ -894,22 +1104,17 @@ const Flow = (props: FlowProps) => {
   };
 
   const onDrop = (event: any) => {
-    const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
-    const position = setMousePosition(event, true);
-    handleAddNode(isParent, null, nodeType, position);
-  };
-
-  const handleMinimapNodeColor = (node: NodeInterface) => {
-    if (node.type) {
-      const category = node.type.split("/")[0] as NodeCategory;
-      return categoryColorMap[category] || "gray";
+    if (event.dataTransfer.getData("from-node-sidebar") !== "") {
+      const { isParent, nodeType } = JSON.parse(event.dataTransfer.getData("from-node-sidebar"));
+      const position = setMousePosition(event, true);
+      handleAddNode(isParent, null, nodeType, position);
     }
-    return "gray";
-  };
 
-  const handleMinimapBorderColor = (node: NodeInterface) => {
-    if (node.selected) return "red";
-    return "none";
+    if (event.dataTransfer.getData("from-point-pallet") !== "") {
+      const { namePallet, nodeTypePallet } = JSON.parse(event.dataTransfer.getData("from-point-pallet"));
+      const position = setMousePosition(event, true);
+      handleAddNode(false, null, nodeTypePallet, position, namePallet);
+    }
   };
 
   const onEdgeClick = useCallback(
@@ -964,11 +1169,11 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const openNodeMenu = (position: { x: number; y: number }, node: NodeInterface) => {
+  const openNodeMenu = useCallback((position: { x: number; y: number }, node: NodeInterface) => {
     setNodeMenuVisibility(position);
     setSelectedNode(node);
     setMenuOpenFromNodeTree(true);
-  };
+  }, []);
 
   const deleteAllInputOrOutputConnectionsOfNode = (isInputs: boolean, nodeId: string) => {
     const node: NodeInterface | undefined = nodes.find((n: NodeInterface) => n.id === nodeId);
@@ -998,76 +1203,69 @@ const Flow = (props: FlowProps) => {
     }
   };
 
-  const gotoNode = (node: NodeInterface) => {
-    if (node.parentId) {
-      node.isParent
-        ? handleAddSubFlow(node)
-        : handleAddSubFlow(window.allFlow.nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
-    } else {
-      setSelectedNodeForSubFlow([]);
-    }
-    setTimeout(() => {
-      setNodes((newNodes) => newNodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id })));
-    }, 1000);
-    rubixFlowInstance.fitView(node.position);
-  };
+  const gotoNode = useCallback(
+    (node: NodeInterface) => {
+      if (node.parentId) {
+        node.isParent
+          ? handleAddSubFlow(node)
+          : handleAddSubFlow(window.allFlow.nodes.filter((item: NodeInterface) => item.id === node.parentId)[0]);
+      } else {
+        setSelectedNodeForSubFlow([]);
+      }
+      setTimeout(() => {
+        setNodes((newNodes) => newNodes.map((item: NodeInterface) => ({ ...item, selected: item.id === node.id })));
+      }, 1000);
+      rubixFlowInstance?.fitView(node.position);
+    },
+    [rubixFlowInstance]
+  );
 
   useEffect(() => {
     if (!window.allFlow) {
       window.allFlow = { nodes: [], edges: [] };
     }
 
+    if (isFetching) return;
+
     // save all nodes with latest values
     window.allFlow.nodes = window.allFlow.nodes.map((node) => {
       return nodes.find((node2: NodeInterface) => node2.id === node.id) || node;
     });
 
+    const nodesFormatted = formatParentNodesWithInputsOutputs(window.allFlow.nodes, nodesSpec as Array<any>);
+    const edgesFormatted = formatEdgesWithParentNode(window.allFlow.nodes, window.allFlow.edges);
+
     // get nodes and edges by sub flow or level 1 from all nodes and edges saved
     // when change sub flow
-    const newNodes = window.allFlow.nodes.filter((node) => {
+    const nodesL1 = nodesFormatted.filter((node) => {
       return selectedNodeForSubFlow ? selectedNodeForSubFlow.id === node.parentId : !node.parentId;
     });
+    const edgesL1 = edgesFormatted.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
 
-    window.allFlow.nodes.forEach((node1) => {
-      const hasParent = newNodes.some((node2) => {
-        return node2.id === node1.parentId && (isInputFlow(node1.type!!) || isOutputFlow(node1.type!!));
-      });
-      if (hasParent) {
-        newNodes.push(node1);
-      }
-    });
-    const edgesL1 = window.allFlow.edges.filter((e) =>
-      newNodes.some((node) => node.id === e.target || node.id === e.source)
-    );
-
-    setNodes(newNodes.map((n) => ({ ...n, selected: false })));
+    setNodes(nodesL1.map((n) => ({ ...n, selected: false })));
     setEdges(edgesL1.map((n) => ({ ...n, selected: false })));
     handleRefreshValues();
     setTimeout(() => {
       rubixFlowInstance?.fitView();
     }, 50);
     setUndoState({ past: [], future: [] });
-  }, [selectedNodeForSubFlow, setNodes, setEdges]);
+  }, [selectedNodeForSubFlow]);
 
   useEffect(() => {
     closeNodePicker();
     factory
       .GetFlow(connUUID, hostUUID, isRemote)
       .then(async (res) => {
-        let [_nodes, _edges] = behaveToFlow(res);
-        _nodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
+        const [_nodes, _edges] = behaveToFlow(res) as [NodeInterface[], Edge[]];
+        let newNodes = handleInputEmpty(res.nodes || [], _nodes, nodesSpec as NodeSpecJSON[]);
 
-        const newNodes = await handleNodesEmptySettings(connUUID, hostUUID, isRemote, _nodes);
+        const nodesFormatted = formatParentNodesWithInputsOutputs(newNodes, nodesSpec as Array<any>);
+        const edgesFormatted = formatEdgesWithParentNode(_nodes, _edges);
         // just show nodes and edges at level 1
-        const nodesL1 = newNodes.filter((node) => !node.parentId);
-
-        newNodes.forEach((node1) => {
-          const hasParent = nodesL1.some((node2) => !!node1.parentId && node2.id === node1.parentId);
-          if (hasParent) {
-            nodesL1.push(node1);
-          }
-        });
-        const edgesL1 = _edges.filter((e) => nodesL1.some((node) => node.id === e.target || node.id === e.source));
+        const nodesL1 = nodesFormatted.filter((node) => !node.parentId);
+        const edgesL1 = edgesFormatted.filter((e) =>
+          nodesL1.some((node) => node.id === e.target || node.id === e.source)
+        );
 
         // tracking all nodes and edges to save
         window.allFlow = { nodes: newNodes, edges: _edges };
@@ -1076,9 +1274,12 @@ const Flow = (props: FlowProps) => {
         /* Get output Nodes */
         handleRefreshValues();
         incrementRefreshCounter();
+        setIsFetching(false);
       })
-      .catch(() => {});
-  }, [connUUID, hostUUID]);
+      .catch(() => {
+        setIsFetching(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (refreshInterval.current) clearInterval(refreshInterval.current);
@@ -1098,165 +1299,239 @@ const Flow = (props: FlowProps) => {
     handleFlowChange();
   };
 
+  const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   useEffect(() => {
     window.saveCurrentFlowForUndo = saveCurrentFlowForUndo;
   }, [saveCurrentFlowForUndo]);
 
-  const nodesParent = (window.allFlow?.nodes || []).filter((n) => n.isParent);
+  const nodesParent = useMemo(() => {
+    return (window.allFlow?.nodes || []).filter((n) => n.isParent);
+  }, [window.allFlow?.nodes]);
+
+  const nodeColor = useCallback((node: any) => {
+    if (node.selected) {
+      return "#6ede87";
+    }
+    return "#555";
+  }, []);
+
+  const PalletTab = (
+    <>
+      <UnorderedListOutlined />
+      PALLET
+    </>
+  );
+  const NodesTab = (
+    <>
+      <NodeIndexOutlined />
+      NODES
+    </>
+  );
+  const PointsTab = (
+    <>
+      <ApartmentOutlined />
+      POINTS
+    </>
+  );
 
   return (
     <div className="rubix-flow">
-      {flowSettings.showNodesTree && (
-        <NodesTree
-          nodes={window.allFlow?.nodes || []}
-          selectedSubFlowId={selectedNodeForSubFlow?.id}
-          openNodeMenu={openNodeMenu}
-          nodesSpec={nodesSpec}
-          gotoNode={gotoNode}
-          flowSettings={flowSettings}
-        />
+      {!isFetching && flowSettings.showNodesPallet && (
+        <div>
+          <div className="p-2">
+            <input
+              type="text"
+              autoFocus
+              placeholder="Type to filter"
+              className="bg-gray-600 disabled:bg-gray-700 w-full py-1 px-2"
+              value={search}
+              onChange={onChangeSearch}
+            />
+          </div>
+          <Tabs size="small" centered className="rubix-flow__tabs">
+            <TabPane tab={PalletTab} key="Nodes">
+              <NodeSideBar nodesSpec={nodesSpec} search={search} />
+            </TabPane>
+            <TabPane tab={NodesTab} key="Tree">
+              <NodesTree
+                nodes={window.allFlow?.nodes || []}
+                selectedSubFlowId={selectedNodeForSubFlow?.id}
+                openNodeMenu={openNodeMenu}
+                nodesSpec={nodesSpec}
+                gotoNode={gotoNode}
+                panelKeys={panelKeys}
+                setPanelKeys={setPanelKeys}
+                changeKeys={changeKeys}
+                flowSettings={flowSettings}
+                search={search}
+              />
+            </TabPane>
+            <TabPane tab={PointsTab} key="Points">
+              <PointsPallet
+                selectedSubflow={selectedNodeForSubFlow}
+                // disablePointsPallet={disablePointsPallet}
+                // setDisablePointsPallet={setDisablePointsPallet}
+                search={search}
+              />
+            </TabPane>
+          </Tabs>
+        </div>
       )}
-      {flowSettings.showNodesPallet && <NodeSideBar nodesSpec={nodesSpec} />}
-      <div className={`rubix-flow__wrapper ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`} ref={rubixFlowWrapper}>
-        <SubFlowTabs
-          nodes={nodesParent}
-          selectedSubflow={selectedNodeForSubFlow}
-          goSubFlow={handleAddSubFlow}
-          onBackToMain={onBackToMain}
-        />
-        <ReactFlowProvider>
-          <ReactFlow
-            onContextMenu={(event: ReactMouseEvent) => {
-              handleSelectContextMenu(event);
-              setMenuOpenFromNodeTree(false);
-            }}
-            nodeTypes={customNodeTypes}
-            edgeTypes={customEdgeTypes}
-            nodes={nodes}
-            edges={edges}
-            onMove={onMove}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onSelectionChange={onChangeSelection}
-            onEdgeClick={onEdgeClick}
-            onConnectStart={handleStartConnect}
-            onEdgeContextMenu={onEdgeContextMenu}
-            onConnectEnd={onConnectEnd}
-            onPaneClick={handlePaneClick}
-            onPaneContextMenu={handlePaneContextMenu}
-            onNodeContextMenu={handleNodeContextMenu}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onInit={setRubixFlowInstance}
-            fitView
-            deleteKeyCode={["Delete"]}
-            onNodeDragStop={handleNodeDragStop}
-            multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
-          >
-            {nodeMenuSelectVisibility && (
-              <SelectMenu
-                isOpenFromNodeTree={isMenuOpenFromNodeTree}
-                handleAlignLefts={handleAlignLeft}
-                handleAlignRights={handleAlignRight}
-                position={nodeMenuSelectVisibility}
-                node={nodeSelect}
-                onClose={closeNodePicker}
+
+      <div
+        className={`rubix-flow__wrapper relative ${flowSettings.showSubFlowTabs ? "has-tabs" : ""}`}
+        ref={rubixFlowWrapper}
+      >
+        {!isFetching && (
+          <SubFlowTabs
+            nodes={nodesParent}
+            selectedSubflow={selectedNodeForSubFlow}
+            goSubFlow={handleAddSubFlow}
+            onBackToMain={onBackToMain}
+            panelKeysNew={panelKeysNew}
+          />
+        )}
+        {isFetching ? (
+          <div className="h-full flex">
+            <Spin className="m-auto" />
+          </div>
+        ) : (
+          <ReactFlowProvider>
+            <ReactFlow
+              onContextMenu={(event: ReactMouseEvent) => {
+                handleSelectContextMenu(event);
+                setMenuOpenFromNodeTree(false);
+              }}
+              nodeTypes={customNodeTypes}
+              edgeTypes={customEdgeTypes}
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onSelectionChange={onChangeSelection}
+              onEdgeClick={onEdgeClick}
+              onConnectStart={handleStartConnect}
+              onEdgeContextMenu={onEdgeContextMenu}
+              onConnectEnd={onConnectEnd}
+              onPaneClick={handlePaneClick}
+              onPaneContextMenu={handlePaneContextMenu}
+              onNodeContextMenu={handleNodeContextMenu}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onInit={setRubixFlowInstance}
+              fitView
+              deleteKeyCode={["Delete"]}
+              onNodeDragStop={handleNodeDragStop}
+              multiSelectionKeyCode={["ControlLeft", "ControlRight"]}
+            >
+              {nodeMenuSelectVisibility && (
+                <SelectMenu
+                  isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                  handleAlignLefts={handleAlignLeft}
+                  handleAlignRights={handleAlignRight}
+                  position={nodeMenuSelectVisibility}
+                  node={nodeSelect}
+                  onClose={closeNodePicker}
+                  selectedNodeForSubFlow={selectedNodeForSubFlow}
+                />
+              )}
+              <LoadWiresMap />
+              <LoadBacnetMap deleteNodesAndEdges={deleteNodesAndEdges} />
+              <DragSelection />
+              {flowSettings.showMiniMap && (
+                <MiniMap
+                  className={cx("absolute", {
+                    "top-20 right-4 h-60": flowSettings.positionMiniMap === "top",
+                  })}
+                  nodeColor={nodeColor}
+                  nodeStrokeWidth={3}
+                  zoomable
+                  pannable
+                />
+              )}
+              <ControlUndoable
+                canUndo={undoState.past.length > 0}
+                onUndo={handleUndo}
+                canRedo={undoState.future.length > 0}
+                onRedo={handleRedo}
+              />
+              <Controls />
+              <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
+              <BehaveControls
+                isSaving={isSaving}
+                isChangedFlow={isChangedFlow}
+                deleteNodesAndEdges={deleteNodesAndEdges}
+                deleteNodesAndEdgesCtrX={deleteNodesAndEdgesCtrX}
+                onCopyNodes={handleCopyNodes}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                settings={flowSettings}
+                onSaveSettings={onSaveFlowSettings}
                 selectedNodeForSubFlow={selectedNodeForSubFlow}
+                onClearAllNodes={onClearAllNodes}
+                onCloseSubFlow={onCloseSubFlow}
+                onBackToMain={onBackToMain}
+                onHandelSaveFlow={onHandelSaveFlow}
+                onLinkBuilder={handleLinkBuilder}
+                handleConnectionBuilderFlow={handleConnectionBuilderFlow}
+                handleLoadNodesAndEdges={handleLoadNodesAndEdges}
               />
-            )}
-            <LoadWiresMap />
-            <DragSelection />
-            {flowSettings.showMiniMap && (
-              <MiniMap
-                nodes={nodes.filter((node: NodeInterface) => {
-                  if (selectedNodeForSubFlow) {
-                    return node.parentId === selectedNodeForSubFlow.id;
-                  }
-                  return !node.parentId;
-                })}
-                shouldUpdate={shouldUpdateMiniMap}
-                className={cx("absolute", {
-                  "top-20 right-4": flowSettings.positionMiniMap === "top",
-                })}
-                nodeColor={handleMinimapNodeColor}
-                nodeStrokeColor={handleMinimapBorderColor}
-              />
-            )}
-            <ControlUndoable
-              canUndo={undoState.past.length > 0}
-              onUndo={handleUndo}
-              canRedo={undoState.future.length > 0}
-              onRedo={handleRedo}
-            />
-            <Controls />
-            <Background variant={BackgroundVariant.Lines} color="#353639" style={{ backgroundColor: "#1E1F22" }} />
-            <BehaveControls
-              isChangedFlow={isChangedFlow}
-              deleteNodesAndEdges={deleteNodesAndEdges}
-              onCopyNodes={handleCopyNodes}
-              onUndo={handleUndo}
-              onRedo={handleRedo}
-              onRefreshValues={handleRefreshValues}
-              settings={flowSettings}
-              onSaveSettings={onSaveFlowSettings}
-              selectedNodeForSubFlow={selectedNodeForSubFlow}
-              onClearAllNodes={onClearAllNodes}
-              onCloseSubFlow={onCloseSubFlow}
-              onBackToMain={onBackToMain}
-              onHandelSaveFlow={onHandelSaveFlow}
-              onLinkBuilder={handleLinkBuilder}
-              handleConnectionBuilderFlow={handleConnectionBuilderFlow}
-              handleLoadNodesAndEdges={handleLoadNodesAndEdges}
-            />
-            {nodePickerVisibility && (
-              <NodePicker
-                position={nodePickerVisibility}
-                filters={getNodePickerFilters(nodes, lastConnectStart)}
-                onPickNode={handleAddNode}
-                onClose={closeNodePicker}
-              />
-            )}
-            {nodeMenuVisibility && (
-              <NodeMenu
-                isOpenFromNodeTree={isMenuOpenFromNodeTree}
-                deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
-                deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
-                handleAlignLefts={handleAlignLeft}
-                handleAlignRights={handleAlignRight}
-                deleteNode={deleteNodesAndEdges}
-                duplicateNode={handleCopyNodes}
-                position={nodeMenuVisibility}
-                node={selectedNode}
-                nodesSpec={nodesSpec}
-                onClose={closeNodePicker}
-                isDoubleClick={isDoubleClick}
-                handleAddSubFlow={handleAddSubFlow}
-                selectedNodeForSubFlow={selectedNodeForSubFlow}
-              />
-            )}
-            {!!selectedNodeForSubFlow && (
-              <ConnectionBuilderModal
-                parentNode={selectedNodeForSubFlow}
-                open={isConnectionBuilder}
-                onClose={onCloseBuilderModal}
-                nodesSpec={nodesSpec}
-              />
-            )}
-            <LinkBuilderModal
-              parentNode={selectedNodeForSubFlow}
-              open={isLinkBuilder}
-              onClose={onCloseBuilderModal}
-              nodesSpec={nodesSpec}
-            />
-          </ReactFlow>
-        </ReactFlowProvider>
+              {nodePickerVisibility && (
+                <NodePicker
+                  position={nodePickerVisibility}
+                  filters={getNodePickerFilters(nodes, lastConnectStart)}
+                  onPickNode={handleAddNode}
+                  onClose={closeNodePicker}
+                />
+              )}
+              {nodeMenuVisibility && (
+                <NodeMenu
+                  isOpenFromNodeTree={isMenuOpenFromNodeTree}
+                  deleteAllInputOrOutputOfParentNode={deleteAllInputOrOutputOfParentNode}
+                  deleteAllInputOrOutputConnectionsOfNode={deleteAllInputOrOutputConnectionsOfNode}
+                  handleAlignLefts={handleAlignLeft}
+                  handleAlignRights={handleAlignRight}
+                  deleteNode={deleteNodesAndEdges}
+                  duplicateNode={handleCopyNodes}
+                  position={nodeMenuVisibility}
+                  node={selectedNode}
+                  nodesSpec={nodesSpec}
+                  onClose={closeNodePicker}
+                  isDoubleClick={isDoubleClick}
+                  handleAddSubFlow={handleAddSubFlow}
+                  selectedNodeForSubFlow={selectedNodeForSubFlow}
+                  changeKeys={changeKeys}
+                />
+              )}
+              {!!selectedNodeForSubFlow && isConnectionBuilder && (
+                <ConnectionBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+              )}
+              {isLinkBuilder && (
+                <LinkBuilderModal
+                  parentNode={selectedNodeForSubFlow}
+                  open
+                  onClose={onCloseBuilderModal}
+                  nodesSpec={nodesSpec}
+                />
+              )}
+            </ReactFlow>
+          </ReactFlowProvider>
+        )}
       </div>
     </div>
   );
 };
 
 export const RubixFlow = () => {
-  const [nodesSpec, setNodesSpec, isFetchingNodeSpec] = useNodesSpec();
+  const [nodesSpec, , isFetchingNodeSpec] = useNodesSpec();
   const [selectedNodeForSubFlow, setSelectedNodeForSubFlow] = useState<NodeInterface[]>([]);
   const nodeForSubFlowEnd = selectedNodeForSubFlow[selectedNodeForSubFlow.length - 1];
 
@@ -1278,7 +1553,7 @@ export const RubixFlow = () => {
   };
 
   const customEdgeTypes = {
-    default: (props: EdgeProps) => <CustomEdge {...props} parentNodeId={nodeForSubFlowEnd?.id} />,
+    default: (props: EdgeProps) => <CustomEdge {...props} />,
   };
 
   const customNodeTypes = (nodesSpec as NodeSpecJSON[]).reduce((nodes, node) => {

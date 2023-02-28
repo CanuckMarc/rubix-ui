@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { useNodes } from "react-flow-renderer/nocss";
+import { useNodes } from "reactflow";
 import { useParams } from "react-router-dom";
 
 import { FlowFactory } from "../factory";
@@ -21,7 +21,7 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
   const { connUUID = "", hostUUID = "" } = useParams();
   const isRemote = !!connUUID && !!hostUUID;
   const nodes = useNodes();
-  const nodeIDs = flowcli.NodesList;
+
   const handleCopy = () => {
     if (ref.current) {
       ref.current.select();
@@ -53,12 +53,32 @@ export const SaveModal: FC<SaveModalProps> = ({ open = false, onClose }) => {
       const selectedNodeIds: string[] = nodes.filter((item: NodeInterface) => item.selected).map((item) => item.id);
       let n = new flowcli.NodesList();
       n.nodes = selectedNodeIds;
+
       const data = await (window.selectedNodeForExport
         ? factory.GetSubFlow(connUUID, hostUUID, window.selectedNodeForExport.id, isRemote)
         : selectedNodeIds.length > 0
         ? factory.GetFlowList(connUUID, hostUUID, n, isRemote)
         : factory.GetFlow(connUUID, hostUUID, isRemote));
-      setCountExport(data.nodes.length);
+
+      (data.nodes || []).forEach((item: any) => {
+        if (item.inputs !== null) {
+          Object.entries(item?.inputs).forEach(([key, value]: any) => {
+            if (value.links) {
+              item.inputs = {
+                ...item.inputs,
+                [key]: value,
+              };
+            } else {
+              item.inputs = {
+                ...item.inputs,
+                [key]: { overridePosition: false, position: 0 },
+              };
+            }
+          });
+        }
+      });
+      
+      setCountExport(data.nodes?.length || 0);
       setNodeRender(JSON.stringify(data, null, 2));
     } catch (error) {
       console.log("error", error);

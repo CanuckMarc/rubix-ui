@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/nubeio-rubix-lib-models-go/pkg/v1/model"
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
+	"github.com/NubeIO/rubix-ui/backend/rumodel"
 )
 
 func (inst *Client) FFGetNetworks(hostIDName string, withDevices bool, overrideUrl ...string) ([]model.Network, error) {
@@ -129,4 +130,17 @@ func (inst *Client) FFEditNetwork(hostIDName, uuid string, body *model.Network) 
 		return nil, err
 	}
 	return resp.Result().(*model.Network), nil
+}
+
+func (inst *Client) SyncNetworks(hostIDName string) (*[]rumodel.SyncModel, error) {
+	url := "proxy/ff/api/networks/sync?with_devices=true&with_points=true"
+	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetResult(&[]rumodel.SyncModel{}).
+		Get(url))
+	if err != nil {
+		return nil, err
+	}
+	return resp.Result().(*[]rumodel.SyncModel), nil
 }

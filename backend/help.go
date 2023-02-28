@@ -44,6 +44,8 @@ func appsDescriptions(pluginName string) string {
 		return "is an app used to read/write the io on nube device edge-28"
 	case constants.RubixIOApp:
 		return "is an app used to read/write the io on nube device rubix-compute-io"
+	case constants.LoRaModbusBrideApp:
+		return "is an app used to read/write the io on nube IO-16 via lora, this app is to used with the driver-lora and flow-framework modbus plugin"
 	case constants.LoRaSerialApp:
 		return "LoRa protocol: (use serial port /data/socat/LoRa1) The LoRa plugin allows the Rubix Compute controller to receive data from Nube-iO LoRa Raw sensors (Droplets, and MicroEdge) and also the IO16 when used as modbus over lora (for IO-16 over lora use /data/socat/serialBridge1)"
 	default:

@@ -7,6 +7,7 @@ import (
 	"github.com/NubeIO/lib-schema/schema"
 	"github.com/NubeIO/rubix-edge/service/system"
 	"github.com/NubeIO/rubix-ui/backend/constants"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -54,7 +55,7 @@ type Eth0 struct {
 	Eth0Interface       schema.Interface `json:"eth0_interface"`
 	Eth0Ip              schema.Ip        `json:"eth0_ip"`
 	Eth0Netmask         schema.Netmask   `json:"eth0_netmask"`
-	Eth0Gateway         schema.Ip        `json:"eth0_gateway"`
+	Eth0Gateway         schema.Gateway   `json:"eth0_gateway"`
 }
 
 type Eth1 struct {
@@ -63,7 +64,7 @@ type Eth1 struct {
 	Eth1Interface       schema.Interface `json:"eth1_interface"`
 	Eth1Ip              schema.Ip        `json:"eth1_ip"`
 	Eth1Netmask         schema.Netmask   `json:"eth1_netmask"`
-	Eth1Gateway         schema.Ip        `json:"eth1_gateway"`
+	Eth1Gateway         schema.Gateway   `json:"eth1_gateway"`
 }
 
 type RcNetwork struct {
@@ -129,19 +130,21 @@ func (inst *App) RcSetNetworks(connUUID, hostUUID string, rcNetworkBody *RcNetwo
 	}
 	// set ETH0
 	if rcNetworkBody.Eth0Interface != "" {
-		inst.uiSuccessMessage(fmt.Sprintf("try and update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
 		if rcNetworkBody.Eth0IpSettings == dhcpDynamic {
+			inst.uiSuccessMessage(fmt.Sprintf("try and update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
 			resp, err := inst.EdgeDHCPSetAsAuto(connUUID, hostUUID, &system.NetworkingBody{
 				PortName: "eth0",
 			})
 			if err != nil {
 				inst.uiErrorMessage(err.Error())
+				log.Error(fmt.Sprintf("failed to update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
 				return
 			}
 			inst.uiSuccessMessage(fmt.Sprintf(resp.Message))
 			return
 		}
 		if rcNetworkBody.Eth0IpSettings == staticFixed {
+			inst.uiSuccessMessage(fmt.Sprintf("try and update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
 			_, err := inst.EdgeDHCPSetStaticIP(connUUID, hostUUID, &dhcpd.SetStaticIP{
 				Ip:                   rcNetworkBody.Eth0Ip,
 				NetMask:              rcNetworkBody.Eth0Netmask,
@@ -153,6 +156,7 @@ func (inst *App) RcSetNetworks(connUUID, hostUUID string, rcNetworkBody *RcNetwo
 			})
 			if err != nil {
 				inst.uiErrorMessage(err.Error())
+				log.Error(fmt.Sprintf("failed to update eth0 as %s with ip: %s", rcNetworkBody.Eth0IpSettings, rcNetworkBody.Eth0Ip))
 				return
 			}
 			inst.uiSuccessMessage("update eth0 to fixed ip ok, please now reboot or repower the device")
@@ -161,19 +165,21 @@ func (inst *App) RcSetNetworks(connUUID, hostUUID string, rcNetworkBody *RcNetwo
 	}
 	// set ETH1
 	if rcNetworkBody.Eth1Interface != "" {
-		inst.uiSuccessMessage(fmt.Sprintf("try and update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
 		if rcNetworkBody.Eth1IpSettings == dhcpDynamic {
+			inst.uiSuccessMessage(fmt.Sprintf("try and update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
 			resp, err := inst.EdgeDHCPSetAsAuto(connUUID, hostUUID, &system.NetworkingBody{
 				PortName: "eth1",
 			})
 			if err != nil {
 				inst.uiErrorMessage(err.Error())
+				log.Error(fmt.Sprintf("failed to update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
 				return
 			}
 			inst.uiSuccessMessage(fmt.Sprintf(resp.Message))
 			return
 		}
 		if rcNetworkBody.Eth1IpSettings == staticFixed {
+			inst.uiSuccessMessage(fmt.Sprintf("try and update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
 			_, err := inst.EdgeDHCPSetStaticIP(connUUID, hostUUID, &dhcpd.SetStaticIP{
 				Ip:                   rcNetworkBody.Eth1Ip,
 				NetMask:              rcNetworkBody.Eth1Netmask,
@@ -185,6 +191,7 @@ func (inst *App) RcSetNetworks(connUUID, hostUUID string, rcNetworkBody *RcNetwo
 			})
 			if err != nil {
 				inst.uiErrorMessage(err.Error())
+				log.Error(fmt.Sprintf("failed to update eth1 as %s with ip: %s", rcNetworkBody.Eth1IpSettings, rcNetworkBody.Eth1Ip))
 				return
 			}
 			inst.uiSuccessMessage("update eth1 to fixed ip ok, please now reboot or repower the device")

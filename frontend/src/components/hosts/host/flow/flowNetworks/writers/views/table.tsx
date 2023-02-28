@@ -6,13 +6,19 @@ import { WritersFactory } from "../factory";
 import { FlowConsumerFactory } from "../../consumers/factory";
 import { WRITER_HEADERS } from "../../../../../../../constants/headers";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import {
+  RbAddButton,
+  RbDeleteButton,
+  RbRefreshButton,
+  RbSyncButton
+} from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 import { FormOutlined } from "@ant-design/icons";
-
+import { RbSearchInput } from "../../../../../../../common/rb-search-input";
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 import UUIDs = backend.UUIDs;
 import Writer = model.Writer;
-import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const WritersTable = () => {
   const { connUUID = "", hostUUID = "", consumerUUID = "" } = useParams();
@@ -81,6 +87,23 @@ export const WritersTable = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync(consumerUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
@@ -93,14 +116,15 @@ export const WritersTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
+      <RbSyncButton onClick={sync} />
       <RbAddButton handleClick={() => showModal({} as Writer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {writers.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {writers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={writers?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

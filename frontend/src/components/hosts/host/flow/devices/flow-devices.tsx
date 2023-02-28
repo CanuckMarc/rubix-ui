@@ -1,9 +1,9 @@
-import { Tabs, Typography, Card, Button, Modal, Space, Select, Form, Input } from "antd";
+import { Button, Card, Form, Input, Modal, Select, Tabs, Typography } from "antd";
 import { RedoOutlined } from "@ant-design/icons";
-import { useState, useEffect, ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { assistcli, model } from "../../../../../../wailsjs/go/models";
-import { RbRefreshButton } from "../../../../../common/rb-table-actions";
+import { RbRefreshButton, RbSyncButton } from "../../../../../common/rb-table-actions";
 import { BACNET_HEADERS } from "../../../../../constants/headers";
 import { PLUGINS } from "../../../../../constants/plugins";
 import { ROUTES } from "../../../../../constants/routes";
@@ -16,9 +16,10 @@ import { FlowDeviceFactory } from "./factory";
 import { FlowDeviceTable } from "./views/table";
 import useTitlePrefix from "../../../../../hooks/usePrefixedTitle";
 import { setDataLocalStorage } from "../flow-service";
-import Device = model.Device;
 import { HostNetworkingFactory } from "../../../../edge/system/networking/factory";
 import { LogTable } from "../networks/views/logTable";
+import { hasError } from "../../../../../utils/response";
+import Device = model.Device;
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -50,14 +51,14 @@ export const FlowDevices = () => {
   const hostNetworkingFactory = new HostNetworkingFactory();
   flowDeviceFactory.connectionUUID =
     bacnetFactory.connectionUUID =
-    flowNetworkFactory.connectionUUID =
-    hostNetworkingFactory.connectionUUID =
-      connUUID;
+      flowNetworkFactory.connectionUUID =
+        hostNetworkingFactory.connectionUUID =
+          connUUID;
   flowDeviceFactory.hostUUID =
     bacnetFactory.hostUUID =
-    flowNetworkFactory.hostUUID =
-    hostNetworkingFactory.hostUUID =
-      hostUUID;
+      flowNetworkFactory.hostUUID =
+        hostNetworkingFactory.hostUUID =
+          hostUUID;
 
   const routes = [
     {
@@ -111,6 +112,21 @@ export const FlowDevices = () => {
       setDataLocalStorage(devices); //handle mass edit
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const syncDevices = async () => {
+    try {
+      setIsFetching(true);
+      const res = await flowDeviceFactory.SyncDevices(networkUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
     } finally {
       setIsFetching(false);
     }
@@ -196,10 +212,12 @@ export const FlowDevices = () => {
         <Tabs defaultActiveKey={devices}>
           <TabPane tab={devices} key={devices}>
             <RbRefreshButton refreshList={fetch} />
+            <RbSyncButton onClick={syncDevices} />
             <FlowDeviceTable data={data} pluginUUID={pluginUUID} isFetching={isFetching} refreshList={fetch} />
           </TabPane>
           <TabPane tab={logs} key={logs}>
-            <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={pluginName} resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData}/>
+            <LogTable connUUID={connUUID} hostUUID={hostUUID} pluginName={pluginName}
+                      resetLogTableData={resetLogTableData} setResetLogTableData={setResetLogTableData} />
           </TabPane>
           {pluginName === PLUGINS.bacnetmaster ? (
             <TabPane tab={bacnet} key={bacnet}>

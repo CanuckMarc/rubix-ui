@@ -1,18 +1,48 @@
-import { Edge, Node } from "react-flow-renderer/nocss";
+import { Edge, Node } from "reactflow";
 import { isObjectEmpty } from "../../../utils/utils";
 import { GraphJSON, NodeJSON } from "../lib";
-import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { EdgeInterface, NodeInterface } from "../lib/Nodes/NodeInterface";
 
 const isNullish = (value: any): value is null | undefined =>
   value === undefined || value === null;
 
 export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
   const graph: GraphJSON = { nodes: [] };
+  const newEdges: Edge[] = edges.filter((edge: EdgeInterface) => !edge.originEdgeId);
 
   nodes.forEach((node: NodeInterface) => {
     if (node.type === undefined) {
       return;
     }
+
+    const newInput = node.isParent ? {} : (node.data?.inputs || []).reduce(
+      (
+        obj: { [key: string]: any; },
+        item: {
+          value: string;
+          defaultValue: any;
+          pin: string;
+          position: number;
+          overridePosition: boolean;
+        },
+        index: number
+      ) => {
+        return {
+          ...obj,
+          [item.pin]: {
+            position: item.position || index,
+            overridePosition: item.overridePosition || false,
+            value:
+              node.data[item.pin] !== undefined
+                ? node.data[item.pin]
+                : item.value === undefined
+                  ? item.defaultValue
+                  : item.value,
+          },
+        };
+      },
+      {}
+    );
 
     const behaveNode: NodeJSON = {
       id: node.id,
@@ -24,24 +54,14 @@ export const flowToBehave = (nodes: Node[], edges: Edge[]): GraphJSON => {
       },
       settings: node.settings,
       nodeName: node.info?.nodeName,
+      inputs: newInput,
+      parentId: node.parentId,
     };
-
-    if (node.parentId) behaveNode.parentId = node.parentId;
 
     if (node.style && !isObjectEmpty(node.style)) behaveNode.style = node.style;
 
-    Object.entries(node.data).forEach(([key, value]) => {
-      if (behaveNode.inputs === undefined) {
-        behaveNode.inputs = {};
-      }
-      behaveNode.inputs = {
-        ...behaveNode.inputs,
-        [key]: { value: value as string },
-      } as any;
-    });
-
-    edges
-      .filter((edge) => edge.target === node.id)
+    newEdges
+      .filter((edge: EdgeInterface) => edge.target === node.id)
       .forEach((edge) => {
         if (behaveNode.inputs === undefined) {
           behaveNode.inputs = {};

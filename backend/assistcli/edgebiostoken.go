@@ -8,12 +8,11 @@ import (
 	"github.com/NubeIO/rubix-assist/service/clients/helpers/nresty"
 )
 
-func (inst *Client) EdgeBiosLogin(hostIDName string, externalToken string, body *user.User) (*model.TokenResponse, error) {
+func (inst *Client) EdgeBiosLogin(hostIDName string, body *user.User) (*model.TokenResponse, error) {
 	url := "/proxy/eb/api/users/login"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetBody(body).
 		SetResult(&model.TokenResponse{}).
 		Post(url))
@@ -23,12 +22,11 @@ func (inst *Client) EdgeBiosLogin(hostIDName string, externalToken string, body 
 	return resp.Result().(*model.TokenResponse), nil
 }
 
-func (inst *Client) EdgeBiosTokens(hostIDName, externalToken, jwtToken string) (*[]externaltoken.ExternalToken, error) {
+func (inst *Client) EdgeBiosTokens(hostIDName, jwtToken string) (*[]externaltoken.ExternalToken, error) {
 	url := "/proxy/eb/api/tokens"
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		SetResult(&[]externaltoken.ExternalToken{}).
 		Get(url))
@@ -39,12 +37,11 @@ func (inst *Client) EdgeBiosTokens(hostIDName, externalToken, jwtToken string) (
 	return data, nil
 }
 
-func (inst *Client) EdgeBiosToken(hostIDName, externalToken, jwtToken string, uuid string) (*externaltoken.ExternalToken, error) {
+func (inst *Client) EdgeBiosToken(hostIDName, jwtToken, uuid string) (*externaltoken.ExternalToken, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		SetResult(&externaltoken.ExternalToken{}).
 		Get(url))
@@ -55,13 +52,12 @@ func (inst *Client) EdgeBiosToken(hostIDName, externalToken, jwtToken string, uu
 	return data, nil
 }
 
-func (inst *Client) EdgeBiosTokenGenerate(hostIDName, externalToken, jwtToken string, name string) (*externaltoken.ExternalToken, error) {
+func (inst *Client) EdgeBiosTokenGenerate(hostIDName, jwtToken, name string) (*externaltoken.ExternalToken, error) {
 	url := "/proxy/eb/api/tokens/generate"
 	body := externaltoken.ExternalToken{Name: name, Blocked: false}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		SetBody(body).
 		SetResult(&externaltoken.ExternalToken{}).
@@ -73,13 +69,12 @@ func (inst *Client) EdgeBiosTokenGenerate(hostIDName, externalToken, jwtToken st
 	return data, nil
 }
 
-func (inst *Client) EdgeBiosTokenBlock(hostIDName, externalToken, jwtToken string, uuid string, block bool) (*externaltoken.ExternalToken, error) {
+func (inst *Client) EdgeBiosTokenBlock(hostIDName, jwtToken, uuid string, block bool) (*externaltoken.ExternalToken, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s/block", uuid)
 	body := map[string]bool{"blocked": block}
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		SetBody(body).
 		SetResult(&externaltoken.ExternalToken{}).
@@ -91,12 +86,11 @@ func (inst *Client) EdgeBiosTokenBlock(hostIDName, externalToken, jwtToken strin
 	return data, nil
 }
 
-func (inst *Client) EdgeBiosTokenRegenerate(hostIDName, externalToken, jwtToken string, uuid string) (*externaltoken.ExternalToken, error) {
+func (inst *Client) EdgeBiosTokenRegenerate(hostIDName, jwtToken, uuid string) (*externaltoken.ExternalToken, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s/regenerate", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		SetResult(&externaltoken.ExternalToken{}).
 		Put(url))
@@ -107,16 +101,29 @@ func (inst *Client) EdgeBiosTokenRegenerate(hostIDName, externalToken, jwtToken 
 	return data, nil
 }
 
-func (inst *Client) EdgeBiosTokenDelete(hostIDName, externalToken, jwtToken string, uuid string) (bool, error) {
+func (inst *Client) EdgeBiosTokenDelete(hostIDName, jwtToken, uuid string) (bool, error) {
 	url := fmt.Sprintf("/proxy/eb/api/tokens/%s", uuid)
 	resp, err := nresty.FormatRestyResponse(inst.Rest.R().
 		SetHeader("host-uuid", hostIDName).
 		SetHeader("host-name", hostIDName).
-		SetHeader("Authorization", composeToken(externalToken)).
 		SetHeader("jwt-token", jwtToken).
 		Delete(url))
 	if err != nil {
 		return false, err
 	}
 	return resp.String() == "true", nil
+}
+
+func (inst *Client) EdgeBiosUpdateUser(hostIDName, jwtToken, username, password string) (bool, error) {
+	url := "/proxy/eb/api/users"
+	_, err := nresty.FormatRestyResponse(inst.Rest.R().
+		SetHeader("host-uuid", hostIDName).
+		SetHeader("host-name", hostIDName).
+		SetHeader("jwt-token", jwtToken).
+		SetBody(map[string]string{"username": username, "password": password}).
+		Put(url))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

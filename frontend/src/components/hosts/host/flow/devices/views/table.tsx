@@ -123,6 +123,17 @@ export const FlowDeviceTable = (props: any) => {
       if (stylingColumnKeys.includes(header.key)) {
         return stylingColumns.find((col: any) => col.key === header.key);
       } else {
+        if (header.key === "auto_mapping_enable") {
+          header.render = (auto_mapping_enable: boolean) => {
+            let colour = "blue";
+            let text = "disabled";
+            if (auto_mapping_enable) {
+              colour = "orange";
+              text = "enable";
+            }
+            return <Tag color={colour}>{text}</Tag>;
+          };
+        }
         return header;
       }
     });
@@ -220,12 +231,12 @@ export const FlowDeviceTable = (props: any) => {
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
       <RbExportButton handleExport={handleExport} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

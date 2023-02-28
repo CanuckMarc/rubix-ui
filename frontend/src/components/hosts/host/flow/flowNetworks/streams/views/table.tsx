@@ -5,7 +5,12 @@ import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { FlowStreamFactory } from "../factory";
 import { backend, model } from "../../../../../../../../wailsjs/go/models";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import {
+  RbAddButton,
+  RbDeleteButton,
+  RbRefreshButton,
+  RbSyncButton
+} from "../../../../../../../common/rb-table-actions";
 import { ROUTES } from "../../../../../../../constants/routes";
 import { STREAM_HEADERS } from "../../../../../../../constants/headers";
 import { CreateEditModal } from "./create";
@@ -15,7 +20,7 @@ import Stream = model.Stream;
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
 
 export const StreamsTable = (props: any) => {
-  const { data, isFetching, refreshList } = props;
+  const { data, isFetching, refreshList, sync } = props;
   const { connUUID = "", hostUUID = "", netUUID = "", locUUID = "", flNetworkUUID = "" } = useParams();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUUIDs, setSelectedUUIDs] = useState([] as Array<UUIDs>);
@@ -108,6 +113,7 @@ export const StreamsTable = (props: any) => {
   return (
     <>
       <RbRefreshButton refreshList={refreshList} />
+      <RbSyncButton onClick={sync} />
       <RbAddButton handleClick={() => showModal({} as Stream)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
@@ -115,7 +121,7 @@ export const StreamsTable = (props: any) => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

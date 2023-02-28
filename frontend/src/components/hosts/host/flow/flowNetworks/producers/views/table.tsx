@@ -6,10 +6,17 @@ import { FlowProducerFactory } from "../factory";
 import { PRODUCER_HEADERS } from "../../../../../../../constants/headers";
 import { ROUTES } from "../../../../../../../constants/routes";
 import RbTable from "../../../../../../../common/rb-table";
-import { RbAddButton, RbDeleteButton, RbRefreshButton } from "../../../../../../../common/rb-table-actions";
+import {
+  RbAddButton,
+  RbDeleteButton,
+  RbRefreshButton,
+  RbSyncButton
+} from "../../../../../../../common/rb-table-actions";
 import { CreateEditModal } from "./create";
 import { ArrowRightOutlined, FormOutlined } from "@ant-design/icons";
 import { RbSearchInput } from "../../../../../../../common/rb-search-input";
+import { hasError } from "../../../../../../../utils/response";
+import { openNotificationWithIcon } from "../../../../../../../utils/utils";
 import UUIDs = backend.UUIDs;
 import Producer = model.Producer;
 
@@ -94,6 +101,23 @@ export const ProducersTable = () => {
     }
   };
 
+  const sync = async () => {
+    try {
+      setIsFetching(true);
+      const res = await factory.Sync(streamUUID);
+      if (hasError(res)) {
+        openNotificationWithIcon("error", res.msg);
+      } else {
+        openNotificationWithIcon("success", res.data);
+      }
+      await fetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const bulkDelete = async () => {
     await factory.BulkDelete(selectedUUIDs);
     fetch();
@@ -106,6 +130,7 @@ export const ProducersTable = () => {
   return (
     <>
       <RbRefreshButton refreshList={fetch} />
+      <RbSyncButton onClick={sync} />
       <RbAddButton handleClick={() => showModal({} as Producer)} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       {producers?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
@@ -113,7 +138,7 @@ export const ProducersTable = () => {
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={producers?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

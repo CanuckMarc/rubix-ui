@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import { Edge, Node } from "react-flow-renderer/nocss";
+import { Edge, Node } from "reactflow";
 import { GraphJSON } from "../lib";
 import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";

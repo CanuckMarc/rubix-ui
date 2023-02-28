@@ -1,7 +1,10 @@
-import { Edge } from "react-flow-renderer";
-import { uniqArray } from '../../../utils/utils';
+import { Edge } from "reactflow";
+
+import { NodeSpecJSON } from "../lib";
+import { uniqArray } from "../../../utils/utils";
 import { generateUuid } from "../lib/generateUuid";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
+import { convertDataSpec } from '../use-nodes-spec';
 
 type NodeWithOldId = NodeInterface & { oldId: string; };
 
@@ -10,22 +13,64 @@ type NodesAndEdgesType = {
   edges: Edge[];
 };
 
+const cloneEdges = (edges: Edge[], subNodes: NodeWithOldId[]): Edge[] => {
+  const edgesCloned: Edge[] = [];
+  edges.forEach((edge) => {
+    const itemClone = subNodes.find(
+      (node: NodeWithOldId) =>
+        node.oldId === edge.target || node.oldId === edge.source
+    );
+    if (itemClone) {
+      const target = subNodes.find(
+        (node: NodeWithOldId) => node.oldId === edge.target
+      );
+      const source = subNodes.find(
+        (node: NodeWithOldId) => node.oldId === edge.source
+      );
+      edgesCloned.push({
+        ...edge,
+        id: generateUuid(),
+        source: source?.id || edge.source,
+        target: target?.id || edge.target,
+      });
+    }
+  });
+  return edgesCloned;
+};
+
 export const handleCopyNodesAndEdges = (
   flow: NodesAndEdgesType,
   nodes: NodeInterface[] = [],
   edges: Edge[] = [],
-  isAutoSelected = true
+  isAutoSelected = true,
+  nodesSpec:
+    | boolean
+    | NodeSpecJSON[]
+    | React.Dispatch<React.SetStateAction<NodeSpecJSON[]>>
 ) => {
-  let newEdges: Edge[] = [...flow.edges];
+  let newEdges: Edge[] = [...edges];
   const subNodes: NodeWithOldId[] = [];
   const subEdges: Edge[] = [];
 
   const copyAllNode = (id: string, newId: string) => {
-    const childNodes = nodes.filter((node: NodeInterface) => id === node.parentId);
+    const childNodes = nodes.filter(
+      (node: NodeInterface) => id === node.parentId
+    );
 
     childNodes.forEach((item: NodeInterface) => {
       const childNodeId = generateUuid();
-      subNodes.push({ ...item, oldId: item.id, id: childNodeId, parentId: newId });
+      const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
+
+      subNodes.push({
+        ...item,
+        data: {
+          inputs: convertDataSpec(specNOde!!.inputs || []),
+          out: convertDataSpec(specNOde!!.outputs || []),
+        },
+        oldId: item.id,
+        id: childNodeId,
+        parentId: newId,
+      });
 
       if (item.isParent) {
         copyAllNode(item.id, childNodeId);
@@ -36,6 +81,13 @@ export const handleCopyNodesAndEdges = (
   /* Generate new id of nodes */
   const newNodes: NodeInterface[] = flow.nodes.map((item) => {
     const newNodeId = generateUuid();
+    const specNOde = (nodesSpec as NodeSpecJSON[]).find(it => it.type === item.type);
+
+    item.data = {
+      inputs: convertDataSpec(specNOde!!.inputs || []),
+      out: convertDataSpec(specNOde!!.outputs || []),
+    };
+
     subNodes.push({ ...item, id: newNodeId, oldId: item.id });
     copyAllNode(item.id, newNodeId);
     /*
@@ -61,22 +113,18 @@ export const handleCopyNodesAndEdges = (
     };
   });
 
-  edges.forEach((edge) => {
-    const itemClone = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target || node.oldId === edge.source);
-    if (itemClone) {
-      const target = subNodes.find((node: NodeWithOldId) => node.oldId === edge.target);
-      const source = subNodes.find((node: NodeWithOldId) => node.oldId === edge.source);
-      subEdges.push({
-        ...edge,
-        id: generateUuid(),
-        source: source?.id || edge.source,
-        target: target?.id || edge.target,
-      });
+  subEdges.push(...cloneEdges(edges, subNodes));
+  subEdges.push(...cloneEdges(flow.edges, subNodes));
+
+  const allNodes = uniqArray([...newNodes, ...subNodes]).map((node) => {
+    if (node.isParent) {
+      node.data = {};
     }
+    return node;
   });
 
   return {
-    nodes: uniqArray([...newNodes, ...subNodes]),
+    nodes: uniqArray(allNodes),
     edges: uniqArray([...newEdges, ...subEdges]),
   };
 };

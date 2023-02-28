@@ -91,12 +91,12 @@ export const WiresConnectionsTable = (props: any) => {
     <>
       <RbAddButton handleClick={showCreateModal} />
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         columns={columns}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

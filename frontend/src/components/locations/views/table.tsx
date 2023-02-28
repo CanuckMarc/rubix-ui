@@ -33,12 +33,12 @@ export const LocationsTable = (props: any) => {
   return (
     <div>
       <RbDeleteButton bulkDelete={bulkDelete} />
-      {locations.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {locations?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
         rowSelection={rowSelection}
-        dataSource={locations.length > 0 ? filteredData : []}
+        dataSource={locations?.length > 0 ? filteredData : []}
         columns={tableSchema}
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />

@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { Connection, Handle, Position, useReactFlow } from "react-flow-renderer/nocss";
+import { Connection, Handle, Position, useReactFlow } from "reactflow";
 import cx from "classnames";
 import { colors, valueTypeColorMap } from "../util/colors";
 import { isValidConnection } from "../util/isValidConnection";
@@ -57,7 +57,7 @@ export const OutputSocket = memo(
 
     useEffect(() => {
       const val = valueType === "boolean" ? getValueOptions(getValueOutput(name)) : getValueOutput(name);
-      
+
       if (val !== outValue) {
         setOutValue(val);
       }
@@ -103,3 +103,5 @@ export const OutputSocket = memo(
     );
   }
 );
+
+OutputSocket.displayName = "OutputSocket";

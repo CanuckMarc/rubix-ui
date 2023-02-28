@@ -11,6 +11,23 @@ var uName string = "admin"
 var pass string = "Helensburgh2508"
 var deviceEUI string = "bd6324d827cc20b3"
 
+func TestChirpClient_GetGateways(t *testing.T) {
+
+	c := New(&Connection{Ip: ipAddr})
+	err := c.Login(uName, pass)
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+
+	resp, err := c.GetGateways()
+	fmt.Println(err)
+	if err != nil {
+		return
+	}
+	pprint.PrintJOSN(resp)
+}
+
 func TestChirpClient_Login(t *testing.T) {
 
 	c := New(&Connection{Ip: ipAddr})
@@ -98,13 +115,18 @@ func TestChirpClient_AddDevice(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	dev, err := c.GetDevice(deviceEUI)
-	if err != nil {
-		fmt.Println(err)
-		return
+
+	dev := &Device{
+		Device: &DeviceBody{
+			DevEUI:          "ccc693d239c20422",
+			Name:            "abc",
+			ApplicationID:   "4",
+			Description:     "my new dev",
+			DeviceProfileID: "31fcdf3c-efbc-439b-aaed-6acca398ecee",
+			IsDisabled:      false,
+		},
 	}
-	dev.Device.Name = "new name"
-	dev.Device.DevEUI = "ccc693d239c20422"
+
 	pprint.PrintJOSN(dev)
 
 	respEdit, err := c.AddDevice(dev)

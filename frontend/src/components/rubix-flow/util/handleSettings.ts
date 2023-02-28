@@ -1,36 +1,6 @@
 import { FlowFactory } from "../factory";
-import { NodeInterface } from "../lib/Nodes/NodeInterface";
 
 const factory = new FlowFactory();
-
-export const handleNodesEmptySettings = async (
-  connUUID: string,
-  hostUUID: string,
-  isRemote: boolean,
-  _nodes: NodeInterface[]
-) => {
-  return Promise.all(
-    await _nodes.map(async (node) => {
-      const newNode: NodeInterface = node;
-      if (
-        newNode.type &&
-        (!newNode.settings || Object.entries(newNode.settings).length === 0)
-      ) {
-        node.settings = {
-          ...node.settings,
-          ...(await handleGetSettingType(
-            connUUID,
-            hostUUID,
-            isRemote,
-            newNode.type
-          )),
-        };
-      }
-
-      return node;
-    })
-  );
-};
 
 export const handleGetSettingType = async (
   connUUID: string,

@@ -5,7 +5,7 @@ import { FlowNetworkClones } from "./flow/flowNetworks/networkClones/network-clo
 import { FlowNetworkTable } from "./flow/networks/views/table";
 import { Plugins } from "./flow/plugins/views/table";
 import useTitlePrefix from "../../../hooks/usePrefixedTitle";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HostsFactory } from "../factory";
 import { ROUTES } from "../../../constants/routes";
 import RbxBreadcrumb from "../../breadcrumbs/breadcrumbs";
@@ -13,18 +13,23 @@ import RbxBreadcrumb from "../../breadcrumbs/breadcrumbs";
 const { TabPane } = Tabs;
 const { Title } = Typography;
 
-const networksKey = "Drivers";
-const pluginsKey = "Modules";
-const flowNetworksKey = "Flow Networks";
-const flowNetworkClonesKey = "Flow Network Clones";
+export const networksKey = "Drivers";
+export const pluginsKey = "Modules";
+export const flowNetworksKey = "Flow Networks";
+export const flowNetworkClonesKey = "Flow Network Clones";
 
 const hostFactory = new HostsFactory();
 
 export const Host = () => {
   const { connUUID = "", hostUUID = "", locUUID = "", netUUID = "" } = useParams();
+  const [activeKey, setActiveKey] = useState(networksKey);
   const { prefixedTitle, addPrefix } = useTitlePrefix("Device");
   hostFactory.uuid = hostUUID;
   hostFactory.connectionUUID = connUUID;
+
+  const onTabChange = (newActiveKey: string) => {
+    setActiveKey(newActiveKey);
+  };
 
   useEffect(() => {
     hostFactory.GetOne().then((host) => {
@@ -67,18 +72,18 @@ export const Host = () => {
       </Title>
       <Card bordered={false}>
         <RbxBreadcrumb routes={routes} />
-        <Tabs defaultActiveKey={networksKey}>
+        <Tabs activeKey={activeKey} onChange={onTabChange}>
           <TabPane tab={networksKey} key={networksKey}>
-            <FlowNetworkTable />
+            <FlowNetworkTable activeKey={activeKey} />
           </TabPane>
           <TabPane tab={pluginsKey} key={pluginsKey}>
-            <Plugins />
+            <Plugins activeKey={activeKey} />
           </TabPane>
           <TabPane tab={flowNetworksKey} key={flowNetworksKey}>
-            <FlowNetworks />
+            <FlowNetworks activeKey={activeKey} />
           </TabPane>
           <TabPane tab={flowNetworkClonesKey} key={flowNetworkClonesKey}>
-            <FlowNetworkClones />
+            <FlowNetworkClones activeKey={activeKey} />
           </TabPane>
         </Tabs>
       </Card>

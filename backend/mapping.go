@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/NubeDev/flow-eng/node"
 	"github.com/NubeDev/flow-eng/nodes"
 	"github.com/mitchellh/mapstructure"
-	"sort"
-	"strings"
 )
 
 // GetNodesAllFlowNetworks all nodes of type flow/flow-network
@@ -73,7 +74,7 @@ type BacnetPoints struct {
 }
 
 func (inst *App) GetBacnetFreeAddress(connUUID, hostUUID string, isRemote bool) *BacnetPoints {
-	encodedNodes := inst.getBacnetNodes(connUUID, hostUUID, isRemote)
+	encodedNodes := inst.GetBacnetNodes(connUUID, hostUUID, isRemote)
 	pointsList := &BacnetPoints{}
 	for _, schema := range encodedNodes {
 		_, nodeName, _ := decodeType(schema.Type)
@@ -94,7 +95,7 @@ func (inst *App) GetBacnetFreeAddress(connUUID, hostUUID string, isRemote bool) 
 
 }
 
-func (inst *App) getBacnetNodes(connUUID, hostUUID string, isRemote bool) []*node.Schema {
+func (inst *App) GetBacnetNodes(connUUID, hostUUID string, isRemote bool) []*node.Schema {
 	encodedNodes := inst.GetNodesByCategory(connUUID, hostUUID, "bacnet", isRemote)
 	var nodeList []*node.Schema
 	var out []*node.Schema

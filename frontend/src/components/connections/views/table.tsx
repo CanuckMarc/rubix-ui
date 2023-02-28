@@ -62,7 +62,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
     setIsLoadingForm(true);
     const jsonSchema = await factory.Schema();
     setConnectionSchema(jsonSchema);
-    getTableHeaders(jsonSchema.properties);
+    getTableHeaders({...jsonSchema.properties});
     setIsLoadingForm(false);
   };
 
@@ -171,7 +171,7 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
                 <FormOutlined />
               </a>
             </Tooltip>
-            <Tooltip title="Tokens">
+            <Tooltip title="Login">
               <a onClick={(e) => showTokenModal(conn, e)}>
                 <ScanOutlined />
               </a>
@@ -204,7 +204,6 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
   const handleMassEdit = async (updateData: any) => {
     const selectedItems = JSON.parse("" + localStorage.getItem(SELECTED_ITEMS)) || [];
     const promises = [];
-    console.log("updateData", updateData);
     for (let item of selectedItems) {
       item = { ...item, ...updateData };
       promises.push(editConnection(item));
@@ -244,11 +243,11 @@ export const ConnectionsTable = ({ data, fetch, isFetching }: any) => {
       <RbExportButton handleExport={handleExport} />
       <ImportDropdownButton refreshList={fetch} schema={connectionSchema} handleSubmit={handleAddConnectionsBulk} />
 
-      {data.length > 0 && <RbSearchInput config={config} className="mb-4" />}
+      {data?.length > 0 && <RbSearchInput config={config} className="mb-4" />}
 
       <RbTable
         rowKey="uuid"
-        dataSource={filteredData}
+        dataSource={data?.length > 0 ? filteredData : []}
         rowSelection={rowSelection}
         columns={tableHeaders}
         loading={{ indicator: <Spin />, spinning: isFetching }}
