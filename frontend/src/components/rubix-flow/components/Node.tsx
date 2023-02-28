@@ -67,7 +67,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
       nodeInputs.forEach((item: any) => (nodeInputsObj[item.pin!!] = item));
       newInputs = [...specInputs];
       newInputs.sort((a: InputSocketSpecJSON, b: InputSocketSpecJSON) => nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position);
-      newInputs = newInputs.filter((item) => nodeInputsObj[item.name].hiddenInput === false);
+      newInputs = newInputs.filter((item) => nodeInputsObj[item.name]?.hiddenInput === false);
     }
   }
   const nodeInputsObj: any = {};
@@ -84,7 +84,7 @@ const getInputs = (specInputs: InputSocketSpecJSON[], nodeInputs: InputSocketSpe
       } as InputSocketSpecJSON);
     }
     newInputs.sort((a: InputSocketSpecJSON, b: InputSocketSpecJSON) => nodeInputsObj[a.name]?.position - nodeInputsObj[b.name]?.position);
-    // newInputs = newInputs.filter((item) => nodeInputsObj[item.name].hiddenInput === false)
+    newInputs = newInputs.filter((item) => nodeInputsObj[item.name].hiddenInput === false)
   });
 
   return newInputs;

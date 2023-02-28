@@ -10,6 +10,15 @@ export const behaveToFlow = (graph: GraphJSON): [Node[], Edge[]] => {
 
   if (graph.nodes) {
     graph.nodes.forEach((nodeJson) => {
+      const entries = Object.entries(nodeJson.inputs || []);
+      let newHiddenInput = {};
+      for (const [key, value] of entries) {
+        newHiddenInput = {
+          ...newHiddenInput,
+          [key]: { hiddenInput: false }
+        }
+      }
+      
       const node: NodeInterface = {
         id: nodeJson.id,
         type: nodeJson.type || "",
@@ -21,10 +30,7 @@ export const behaveToFlow = (graph: GraphJSON): [Node[], Edge[]] => {
             ? Number(nodeJson.metadata?.positionY)
             : 0,
         },
-        hiddenInput: {
-          in1: { hiddenInput: false },
-          in2: { hiddenInput: false },
-        },
+        hiddenInput: newHiddenInput,
         orderInput: nodeJson.inputs || {},
         data: nodeJson.data || ({} as { [key: string]: any }),
         style: nodeJson.style || ({} as CSSProperties),

@@ -1,6 +1,6 @@
 import { Switch } from "antd";
 import { FC, useState } from "react";
-import { useNodes, useReactFlow } from "react-flow-renderer/nocss";
+import { useNodes, useReactFlow } from "reactflow";
 import { UpCircleOutlined, DownCircleOutlined } from "@ant-design/icons";
 
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
