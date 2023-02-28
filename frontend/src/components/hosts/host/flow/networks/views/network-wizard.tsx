@@ -51,7 +51,7 @@ const modbusImage = pluginLogo("modbus");
 const historyImage = pluginLogo("system");
 const imageBoxStyle = {
   width: 150,
-  height: 100,
+  height: 80,
   backgroundColor: "rgba(68,87,96,255)",
   border: "5px solid gray",
   padding: "10px",
@@ -174,13 +174,13 @@ export const NetworkWizard = (props: any) => {
       content: (
         <div
           style={{
-            width: "45vw",
+            width: "55vw",
             display: "flex",
             flexDirection: "column",
             gap: "5px",
           }}
         >
-          <Row justify="center" gutter={5}>
+          <Row justify="center" gutter={20}>
             <Col span={5}>
               <NetworkCard
                 setSelectedWizard={setSelectedWizard}
@@ -219,7 +219,7 @@ export const NetworkWizard = (props: any) => {
             </Col>
           </Row>
 
-          <Row justify="center" gutter={5}>
+          <Row justify="center" gutter={20}>
             <Col span={5}>
               <NetworkCard
                 setSelectedWizard={setSelectedWizard}
