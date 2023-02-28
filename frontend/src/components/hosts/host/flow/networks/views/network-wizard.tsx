@@ -177,7 +177,7 @@ export const NetworkWizard = (props: any) => {
             width: "55vw",
             display: "flex",
             flexDirection: "column",
-            gap: "5px",
+            gap: "10px",
           }}
         >
           <Row justify="center" gutter={20}>
