@@ -8,6 +8,11 @@ import postgresLogo from "../assets/images/postgresql.png";
 import historyLogo from "../assets/images/history.png";
 import edge28 from "../assets/images/Edge-iO-28.png";
 import rubixIO from "../assets/images/RC-IO.png";
+import dropletTH from "../assets/images/droplet_TH.png";
+import dropletTHL from "../assets/images/droplet_THL.png";
+import dropletTHML from "../assets/images/droplet_THML.png";
+import microedge from "../assets/images/microedge.png";
+import viewmore from "../assets/images/view_more.png";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
 type NotificationType = "success" | "info" | "warning" | "error";
@@ -71,6 +76,21 @@ export function pluginLogo(plugin: string): string {
   }
   if (plugin == "rubix-io") {
     image = rubixIO;
+  }
+  if (plugin == "droplet_th") {
+    image = dropletTH;
+  }
+  if (plugin == "droplet_thl") {
+    image = dropletTHL;
+  }
+  if (plugin == "droplet_thml") {
+    image = dropletTHML;
+  }
+  if (plugin == "microedge") {
+    image = microedge;
+  }
+  if (plugin == "viewmore") {
+    image = viewmore;
   }
   return image;
 }
@@ -158,12 +178,12 @@ export const exportExcelCSV = (fileName: string, data: any[], isExcel: boolean) 
 };
 
 export const titleCase = (str: string) => {
-  const splitStr = str.toLowerCase().split(' ');
+  const splitStr = str.toLowerCase().split(" ");
   for (let i = 0; i < splitStr.length; i++) {
     // You do not need to check if i is larger than splitStr length, as your for does that for you
     // Assign it back to the array
     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
   }
   // Directly return the joined string
-  return splitStr.join(' ');
+  return splitStr.join(" ");
 };

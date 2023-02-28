@@ -48,7 +48,8 @@ const systemImage = pluginLogo("system");
 const loraImage = pluginLogo("lora");
 const bacnetImage = pluginLogo("bacnet");
 const modbusImage = pluginLogo("modbus");
-const historyImage = pluginLogo("system");
+const viewmoreImage = pluginLogo("viewmore");
+
 const imageBoxStyle = {
   width: 150,
   height: 80,
@@ -250,7 +251,7 @@ export const NetworkWizard = (props: any) => {
                 isFetching={isFetching}
                 type={WizardTypes.other}
                 name={"More Drivers"}
-                image={historyImage}
+                image={viewmoreImage}
                 showOtherOption={true}
                 handleWizardClose={handleWizardClose}
                 setIsCreateModalVisible={setIsCreateModalVisible}
