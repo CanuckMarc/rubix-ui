@@ -223,11 +223,9 @@ export const FlowPointsTable = (props: any) => {
         loading={{ indicator: <Spin />, spinning: isFetching }}
       />
       <EditModal
-        currentItem={currentItem}
+        currentItemUUID={currentItem.uuid}
         isModalVisible={isEditModalVisible}
         isLoadingForm={isLoadingForm}
-        connUUID={connUUID}
-        hostUUID={hostUUID}
         schema={schema}
         onCloseModal={closeModal}
         refreshList={refreshList}

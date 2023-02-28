@@ -1,5 +1,6 @@
 import { Modal, Spin } from "antd";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { FlowPointFactory } from "../factory";
 import { JsonForm } from "../../../../../../common/json-schema-form";
 import { model } from "../../../../../../../wailsjs/go/models";
@@ -7,24 +8,17 @@ import { model } from "../../../../../../../wailsjs/go/models";
 import Point = model.Point;
 
 export const EditModal = (props: any) => {
-  const {
-    currentItem,
-    isModalVisible,
-    isLoadingForm,
-    connUUID,
-    hostUUID,
-    schema,
-    onCloseModal,
-    refreshList,
-  } = props;
+  const { currentItemUUID, isModalVisible, isLoadingForm, schema, onCloseModal, refreshList } = props;
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [formData, setFormData] = useState({} as any);
+  const [formData, setFormData] = useState({} as Point);
+  const [currentItem, setCurrentItem] = useState({} as Point);
 
   const factory = new FlowPointFactory();
+  factory.connectionUUID = connUUID;
+  factory.hostUUID = hostUUID;
 
   const edit = async (point: Point) => {
-    factory.connectionUUID = connUUID;
-    factory.hostUUID = hostUUID;
     await factory.Update(point.uuid, point);
   };
 
@@ -40,9 +34,15 @@ export const EditModal = (props: any) => {
     refreshList();
   };
 
+  const fetchPoint = async (uuid: string) => {
+    const res = (await factory.GetOne(uuid)) || {};
+    setCurrentItem(res);
+    setFormData(res);
+  };
+
   useEffect(() => {
-    setFormData(currentItem);
-  }, [currentItem]);
+    if (isModalVisible) fetchPoint(currentItemUUID);
+  }, [isModalVisible]);
 
   return (
     <>
@@ -57,12 +57,7 @@ export const EditModal = (props: any) => {
         style={{ textAlign: "start" }}
       >
         <Spin spinning={isLoadingForm}>
-          <JsonForm
-            formData={formData}
-            setFormData={setFormData}
-            handleSubmit={handleSubmit}
-            jsonSchema={schema}
-          />
+          <JsonForm formData={formData} setFormData={setFormData} handleSubmit={handleSubmit} jsonSchema={schema} />
         </Spin>
       </Modal>
     </>

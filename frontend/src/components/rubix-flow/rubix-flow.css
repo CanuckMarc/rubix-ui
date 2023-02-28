@@ -136,6 +136,11 @@
 .node-item>div>div {
   display: flex;
   flex-direction: column;
+  font-family: monospace;
+}
+
+.node-item>div>.actions {
+  display: block;
 }
 
 .flow-setting-modal-labels {

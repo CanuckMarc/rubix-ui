@@ -1,16 +1,15 @@
-import { Layout, Tooltip, Collapse, Switch, Spin } from "antd";
-import { CaretRightOutlined, CaretDownOutlined } from "@ant-design/icons";
-import { ChangeEvent, useEffect, useState } from "react";
-
+import { Layout, Tooltip, Collapse, Switch, Spin, Popconfirm } from "antd";
+import { CaretRightOutlined, CaretDownOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { NodeInterface } from "../lib/Nodes/NodeInterface";
-import { NodeTreeItem } from "./NodeTreeItem";
-import { NodeSpecJSON } from "../lib";
-import { FlowSettings } from "./FlowSettingsModal";
-
 import { FlowPointFactory } from "../../hosts/host/flow/points/factory";
-import { backend, model, rumodel, storage } from "../../../../wailsjs/go/models";
-import { PointTableType } from "../../../App";
+import { backend, model } from "../../../../wailsjs/go/models";
 import { useParams } from "react-router-dom";
+import { EditModal } from "../../hosts/host/flow/points/views/edit";
+
+import Point = model.Point;
+import { openNotificationWithIcon } from "../../../utils/utils";
+
 const pointFactory = new FlowPointFactory();
 
 const { Sider } = Layout;
@@ -34,31 +33,17 @@ interface NodePalletPropType {
 }
 
 export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) => {
-  let { connUUID = "", hostUUID = "" } = useParams();
+  const { connUUID = "", hostUUID = "" } = useParams();
   const [allPoints, setAllPoints] = useState<PluginTableDataType[] | undefined>(undefined);
   const [allPointsBeforeSearch, setAllPointsBeforeSearch] = useState<PluginTableDataType[] | undefined>(undefined);
-  const [displayObj, setDisplayObj] = useState<any>({});
   const [activeKeyPanel, setActiveKeyPanel] = useState<string[]>([]);
+  const [displayObj, setDisplayObj] = useState<any>({});
+  const [schema, setSchema] = useState<any>({});
+  const [currentItemUUID, setCurrentItemUUID] = useState("");
   const [isFetchingPoints, setIsFetchingPoints] = useState(false);
   const [disablePointsPallet, setDisablePointsPallet] = useState(false);
-
-  useEffect(() => {
-    pointFactory.connectionUUID = connUUID;
-    pointFactory.hostUUID = hostUUID;
-    fetchFlowPoints();
-  }, [connUUID, hostUUID]);
-
-  useEffect(() => {
-    fetchFlowPoints();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedSubflow || selectedSubflow.type !== "flow/flow-network") {
-      setDisablePointsPallet(true);
-    } else {
-      setDisablePointsPallet(false);
-    }
-  }, [selectedSubflow]);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isLoadingForm, setIsLoadingForm] = useState(false);
 
   const fetchFlowPoints = async () => {
     try {
@@ -75,6 +60,54 @@ export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) =>
       console.log("error on fetching: ", err);
     } finally {
       setIsFetchingPoints(false);
+    }
+  };
+
+  const onDragStart = (event: any, namePallet: any, isWrite: boolean) => {
+    const nodeTypePallet = isWrite ? "flow/flow-point-write" : "flow/flow-point";
+    const data = { namePallet, nodeTypePallet };
+    event.dataTransfer.setData("from-point-pallet", JSON.stringify(data));
+    event.dataTransfer.effectAllowed = "move";
+  };
+
+  const onChangeOpenPanels = (key: string | string[]) => {
+    setActiveKeyPanel(typeof key === "string" ? [key] : key);
+  };
+
+  const onSwitchChange = (checked: boolean, itemUUID: string) => {
+    const mappedAllPoints = allPoints?.map((point: PluginTableDataType) => {
+      if (point.uuid === itemUUID) {
+        return { ...point, isWrite: checked };
+      } else {
+        return point;
+      }
+    });
+    setAllPoints(mappedAllPoints);
+  };
+
+  const showEditModal = (item: PluginTableDataType) => {
+    setCurrentItemUUID(item.uuid);
+    setIsEditModalVisible(true);
+    getSchema(item.plugin_name);
+  };
+
+  const getSchema = async (pluginName: string) => {
+    setIsLoadingForm(true);
+    const res = await pointFactory.Schema(connUUID, hostUUID, pluginName);
+    const jsonSchema = {
+      properties: res,
+    };
+    setSchema(jsonSchema);
+    setIsLoadingForm(false);
+  };
+
+  const deletePoint = async (uuid: string) => {
+    try {
+      const res = await pointFactory.Delete(uuid);
+      openNotificationWithIcon("success", res);
+      fetchFlowPoints();
+    } catch (error) {
+      openNotificationWithIcon("error", "Delete fail");
     }
   };
 
@@ -106,27 +139,23 @@ export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) =>
     }
   }, [search]);
 
-  const onDragStart = (event: any, namePallet: any, isWrite: boolean) => {
-    const nodeTypePallet = isWrite ? "flow/flow-point-write" : "flow/flow-point";
-    const data = { namePallet, nodeTypePallet };
-    event.dataTransfer.setData("from-point-pallet", JSON.stringify(data));
-    event.dataTransfer.effectAllowed = "move";
-  };
+  useEffect(() => {
+    pointFactory.connectionUUID = connUUID;
+    pointFactory.hostUUID = hostUUID;
+    fetchFlowPoints();
+  }, [connUUID, hostUUID]);
 
-  const onChangeOpenPanels = (key: string | string[]) => {
-    setActiveKeyPanel(typeof key === "string" ? [key] : key);
-  };
+  useEffect(() => {
+    if (!selectedSubflow || selectedSubflow.type !== "flow/flow-network") {
+      setDisablePointsPallet(true);
+    } else {
+      setDisablePointsPallet(false);
+    }
+  }, [selectedSubflow]);
 
-  const onSwitchChange = (checked: boolean, itemUUID: string) => {
-    const mappedAllPoints = allPoints?.map((point: PluginTableDataType) => {
-      if (point.uuid === itemUUID) {
-        return { ...point, isWrite: checked };
-      } else {
-        return point;
-      }
-    });
-    setAllPoints(mappedAllPoints);
-  };
+  useEffect(() => {
+    fetchFlowPoints();
+  }, []);
 
   return (
     <>
@@ -175,13 +204,19 @@ export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) =>
                               draggable={true}
                               onDragStart={(event) => onDragStart(event, item.name, item.isWrite)}
                             >
-                              <div style={{ fontFamily: "monospace" }}>
+                              <div>
                                 {item.device_name && (
                                   <span style={{ fontSize: "smaller" }}>{`${item.device_name}`}</span>
                                 )}
                                 {item.point_name && <span>{`${item.point_name}`}</span>}
                               </div>
-                              <div>
+                              <div className="actions">
+                                <a onClick={() => showEditModal(item)} className="mr-3">
+                                  <EditOutlined />
+                                </a>
+                                <Popconfirm title="Are you sure?" onConfirm={() => deletePoint(item.uuid)}>
+                                  <DeleteOutlined className="danger--text mr-3" />
+                                </Popconfirm>
                                 <Switch
                                   size={"small"}
                                   checkedChildren={<span style={{ fontSize: "10px" }}>Write</span>}
@@ -217,6 +252,15 @@ export const PointsPallet = ({ selectedSubflow, search }: NodePalletPropType) =>
           <span style={{ color: "orange", fontSize: "14px" }}>Not in a flow network!</span>
         </div>
       )}
+
+      <EditModal
+        currentItemUUID={currentItemUUID}
+        isModalVisible={isEditModalVisible}
+        isLoadingForm={isLoadingForm}
+        schema={schema}
+        onCloseModal={() => setIsEditModalVisible(false)}
+        refreshList={fetchFlowPoints}
+      />
     </>
   );
 };
