@@ -22,6 +22,7 @@ import { ExportModal, ImportModal } from "./import-export";
 import MassEdit from "../../../../../../common/mass-edit";
 import { SELECTED_ITEMS } from "../../../../../rubix-flow/use-nodes-spec";
 import { RbSearchInput } from "../../../../../../common/rb-search-input";
+import { LoraWizard } from "./lora-wizard";
 import Device = model.Device;
 import UUIDs = backend.UUIDs;
 
@@ -39,6 +40,7 @@ export const FlowDeviceTable = (props: any) => {
   const [isRestarting, setIsRestarting] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+  const [isWizardModalVisible, setIsWizardModalVisible] = useState(false);
 
   const flowDeviceFactory = new FlowDeviceFactory();
   const flowPluginFactory = new FlowPluginFactory();
@@ -227,6 +229,7 @@ export const FlowDeviceTable = (props: any) => {
   return (
     <>
       <RbAddButton handleClick={() => showCreateModal()} />
+      <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
       <RbImportButton showModal={() => setIsImportModalVisible(true)} />
@@ -264,6 +267,12 @@ export const FlowDeviceTable = (props: any) => {
         isModalVisible={isImportModalVisible}
         onClose={() => setIsImportModalVisible(false)}
         refreshList={refreshList}
+      />
+      <LoraWizard
+        refreshList={refreshList}
+        isWizardModalVisible={isWizardModalVisible}
+        setIsWizardModalVisible={setIsWizardModalVisible}
+        setIsCreateModalVisible={showCreateModal}
       />
     </>
   );
