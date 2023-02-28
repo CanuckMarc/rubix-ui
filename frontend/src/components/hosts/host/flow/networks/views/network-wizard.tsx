@@ -249,7 +249,7 @@ export const NetworkWizard = (props: any) => {
                 setSelectedWizard={setSelectedWizard}
                 isFetching={isFetching}
                 type={WizardTypes.other}
-                name={"More settings"}
+                name={"More Drivers"}
                 image={historyImage}
                 showOtherOption={true}
                 handleWizardClose={handleWizardClose}
