@@ -100,7 +100,7 @@ export const BacnetForm = (props: BacnetFormPropType) => {
       {confirmInstall ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", rowGap: "4px" }}>
           <Spin />
-          <strong style={{ color: "orange" }}>Installing Plugin for BACnet</strong>
+          <strong style={{ color: "orange" }}>Installing modules for BACnet, please wait...</strong>
         </div>
       ) : (
         <Spin spinning={isLoadingForm}>
@@ -114,6 +114,7 @@ export const BacnetForm = (props: BacnetFormPropType) => {
             initialValues={{
               name: "BACnet",
               description: "BACnet Network",
+              enable: true,
               port: 47808,
               network_interface: "eth0",
               fast_poll_rate: 1,
@@ -121,9 +122,6 @@ export const BacnetForm = (props: BacnetFormPropType) => {
               slow_poll_rate: 120,
             }}
           >
-            <Form.Item label="UUID" name="uuid">
-              <Input />
-            </Form.Item>
             <Form.Item label="Name" name="name">
               <Input />
             </Form.Item>
@@ -141,7 +139,11 @@ export const BacnetForm = (props: BacnetFormPropType) => {
                 <Form.Item label="Port" name="port">
                   <InputNumber style={{ width: "100%" }} />
                 </Form.Item>
-                <Form.Item label="Network interface" name="network_interface">
+                <Form.Item
+                  label="Network interface"
+                  name="network_interface"
+                  extra="ETH-1 interface eth0, ETH-2 interface eth1"
+                >
                   <Select placeholder="Select a serial port" options={interfaceNames} allowClear />
                 </Form.Item>
                 <Form.Item label="Fast poll rate (seconds)" name="fast_poll_rate">

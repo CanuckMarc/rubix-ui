@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Spin, Steps, StepsProps, Image, Card } from "antd";
+import { Modal, Spin, Steps, StepsProps, Image, Card, Col, Row } from "antd";
 import { pluginLogo } from "../../../../../../utils/utils";
 import { FlowPluginFactory } from "../../plugins/factory";
 import { useParams } from "react-router-dom";
@@ -41,19 +41,21 @@ enum WizardTypes {
   bacnet = "bacnet",
   modbusSerial = "modbusSerial",
   modbusTcp = "modbusTcp",
+  other = "other",
 }
 
 const systemImage = pluginLogo("system");
 const loraImage = pluginLogo("lora");
 const bacnetImage = pluginLogo("bacnet");
 const modbusImage = pluginLogo("modbus");
+const historyImage = pluginLogo("system");
 const imageBoxStyle = {
   width: 150,
   height: 100,
   backgroundColor: "rgba(68,87,96,255)",
   border: "5px solid gray",
   padding: "10px",
-  margin: "4px",
+  margin: "5px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -66,7 +68,7 @@ const labelStyle: LabelStyleType = {
 };
 
 export const NetworkWizard = (props: any) => {
-  const { refreshList, isWizardModalVisible, setIsWizardModalVisible } = props;
+  const { refreshList, isWizardModalVisible, setIsWizardModalVisible, setIsCreateModalVisible } = props;
   const { connUUID = "", hostUUID = "" } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [stepStatus, setStepStatus] = useState<StepsProps["status"]>("process");
@@ -170,44 +172,91 @@ export const NetworkWizard = (props: any) => {
       name: "Step 1",
       text: "Network type selection",
       content: (
-        <div style={{ width: "55vw" }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "5px", justifyContent: "center" }}>
-            <NetworkCard
-              setSelectedWizard={setSelectedWizard}
-              isFetching={isFetching}
-              type={WizardTypes.system}
-              name={"System"}
-              image={systemImage}
-            />
-            <NetworkCard
-              setSelectedWizard={setSelectedWizard}
-              isFetching={isFetching}
-              type={WizardTypes.lora}
-              name={"LoRa"}
-              image={loraImage}
-            />
-            <NetworkCard
-              setSelectedWizard={setSelectedWizard}
-              isFetching={isFetching}
-              type={WizardTypes.bacnet}
-              name={"BACnet"}
-              image={bacnetImage}
-            />
-            <NetworkCard
-              setSelectedWizard={setSelectedWizard}
-              isFetching={isFetching}
-              type={WizardTypes.modbusSerial}
-              name={"Modbus Serial"}
-              image={modbusImage}
-            />
-            <NetworkCard
-              setSelectedWizard={setSelectedWizard}
-              isFetching={isFetching}
-              type={WizardTypes.modbusTcp}
-              name={"Modbus TCP"}
-              image={modbusImage}
-            />
-          </div>
+        <div
+          style={{
+            width: "45vw",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+          }}
+        >
+          <Row justify="center" gutter={5}>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.system}
+                name={"System"}
+                image={systemImage}
+                showOtherOption={false}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.lora}
+                name={"LoRa"}
+                image={loraImage}
+                showOtherOption={false}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.bacnet}
+                name={"BACnet"}
+                image={bacnetImage}
+                showOtherOption={false}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+          </Row>
+
+          <Row justify="center" gutter={5}>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.modbusSerial}
+                name={"Modbus Serial"}
+                image={modbusImage}
+                showOtherOption={false}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.modbusTcp}
+                name={"Modbus TCP"}
+                image={modbusImage}
+                showOtherOption={false}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+            <Col span={5}>
+              <NetworkCard
+                setSelectedWizard={setSelectedWizard}
+                isFetching={isFetching}
+                type={WizardTypes.other}
+                name={"More settings"}
+                image={historyImage}
+                showOtherOption={true}
+                handleWizardClose={handleWizardClose}
+                setIsCreateModalVisible={setIsCreateModalVisible}
+              />
+            </Col>
+          </Row>
         </div>
       ),
     },
@@ -287,9 +336,9 @@ export const NetworkWizard = (props: any) => {
 
   return (
     <Modal
-      title={"Create Connection"}
+      title={"Add Network"}
       visible={isWizardModalVisible}
-      width={"60vw"}
+      width={"45vw"}
       onCancel={handleWizardClose}
       footer={null}
       destroyOnClose={true}
@@ -301,7 +350,7 @@ export const NetworkWizard = (props: any) => {
           direction="horizontal"
           current={currentStep}
           onChange={onStepsChange}
-          style={{ width: "55vw" }}
+          style={{ width: "40vw" }}
           status={stepStatus}
         >
           {data.map((item, index) => (
@@ -315,12 +364,26 @@ export const NetworkWizard = (props: any) => {
 };
 
 const NetworkCard = (props: any) => {
-  const { setSelectedWizard, isFetching, type, name, image } = props;
+  const {
+    setSelectedWizard,
+    isFetching,
+    type,
+    name,
+    image,
+    showOtherOption,
+    handleWizardClose,
+    setIsCreateModalVisible,
+  } = props;
   return (
     <Card
       hoverable={true}
       onClick={() => {
-        setSelectedWizard(type);
+        if (!showOtherOption) {
+          setSelectedWizard(type);
+        } else {
+          handleWizardClose();
+          setIsCreateModalVisible(true);
+        }
       }}
     >
       {isFetching ? (

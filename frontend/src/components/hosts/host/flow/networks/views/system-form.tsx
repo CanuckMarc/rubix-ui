@@ -65,11 +65,9 @@ export const SystemForm = (props: SystemFormPropType) => {
           initialValues={{
             name: "System",
             description: "System Network",
+            enable: true,
           }}
         >
-          <Form.Item label="UUID" name="uuid">
-            <Input />
-          </Form.Item>
           <Form.Item label="Name" name="name">
             <Input />
           </Form.Item>

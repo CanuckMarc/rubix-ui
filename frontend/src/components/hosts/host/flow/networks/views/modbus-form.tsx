@@ -150,7 +150,7 @@ export const ModbusForm = (props: ModbusFormPropType) => {
       {confirmInstall ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", rowGap: "4px" }}>
           <Spin />
-          <strong style={{ color: "orange" }}>Installing Plugin for Modbus</strong>
+          <strong style={{ color: "orange" }}>Installing modules for Modbus, please wait...</strong>
         </div>
       ) : (
         <Spin spinning={isLoadingForm}>
@@ -164,17 +164,17 @@ export const ModbusForm = (props: ModbusFormPropType) => {
             initialValues={{
               name: type === "modbusSerial" ? "Modbus serial" : "Modbus TCP",
               description: type === "modbusSerial" ? "Modbus serial Network" : "Modbus TCP Network",
+              enable: true,
               serial_port: "/dev/tty/AMA0",
               serial_baud_rate: 38400,
               serial_parity: "none",
               serial_data_bit: 8,
               serial_stop_bit: 1,
               serial_timeout: 1,
+              ip: type !== "modbusSerial" && "0.0.0.0",
+              port: type !== "modbusSerial" && 502,
             }}
           >
-            <Form.Item label="UUID" name="uuid">
-              <Input />
-            </Form.Item>
             <Form.Item label="Name" name="name">
               <Input />
             </Form.Item>

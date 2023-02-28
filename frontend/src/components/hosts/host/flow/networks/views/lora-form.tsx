@@ -114,7 +114,7 @@ export const LoraForm = (props: LoraFormPropType) => {
       {confirmInstall ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", rowGap: "4px" }}>
           <Spin />
-          <strong style={{ color: "orange" }}>Installing Plugin for LoRa</strong>
+          <strong style={{ color: "orange" }}>Installing modules for LoRa, please wait...</strong>
         </div>
       ) : (
         <Spin spinning={isLoadingForm}>
@@ -127,14 +127,12 @@ export const LoraForm = (props: LoraFormPropType) => {
             autoComplete="off"
             initialValues={{
               name: "LoRa",
+              enable: true,
               description: "LoRa Network",
               serial_port: "/data/socat/loRa1",
               serial_baud_rate: 38400,
             }}
           >
-            <Form.Item label="UUID" name="uuid">
-              <Input />
-            </Form.Item>
             <Form.Item label="Name" name="name">
               <Input />
             </Form.Item>

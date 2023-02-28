@@ -212,7 +212,6 @@ export const FlowNetworkTable = (props: any) => {
     <>
       <RbRefreshButton refreshList={fetchNetworks} />
       <RbSyncButton onClick={syncNetworks} />
-      {/* <RbAddButton handleClick={() => setIsCreateModalVisible(true)} /> */}
       <RbAddButton handleClick={() => setIsWizardModalVisible(true)} />
       <RbRestartButton handleClick={handleRestart} loading={isRestarting} />
       <RbDeleteButton bulkDelete={bulkDelete} />
@@ -254,6 +253,7 @@ export const FlowNetworkTable = (props: any) => {
         refreshList={fetchNetworks}
         isWizardModalVisible={isWizardModalVisible}
         setIsWizardModalVisible={setIsWizardModalVisible}
+        setIsCreateModalVisible={setIsCreateModalVisible}
       />
       <Modal title="Log table" visible={isLogTableOpen} onOk={handleOk} onCancel={handleCancel} width={"70vw"}>
         <LogTable
